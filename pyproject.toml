@@ -1,0 +1,35 @@
+[tool.poetry]
+authors = [
+    "Koch, Pablo <pkoch@csn.uchile.cl>", 
+    "Goldberg, Dara <dgoldberg@usgs.gov>",
+    "Hunsinger, Heather <hhunsinger@usgs.gov>"
+]
+description = "Wavelet based inversion for slip on a fault, used to generate Finite Fault products"
+keywords = ["usgs", "neic", "earthquake", "slip", "finitefault"]
+license = "CC0-1.0"
+name = "neic-finitefault"
+repository = "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+python = "^3.9,<3.13"
+Cartopy = "^0.21.1"
+PyQt5 = "^5.15.9"
+geographiclib = "^2.0"
+matplotlib = "^3.7.1"
+netCDF4 = "^1.6.4"
+numpy = "^1.25.0"
+obspy = "^1.4.0"
+pygmt = "^0.9.0"
+scipy = "^1.11.0"
+shapely = "^2.0.1"
+
+
+[tool.poetry.dev-dependencies]
+black = "^22.3.0"
+isort = "^5.12.0"
+safety = "^2.1.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
