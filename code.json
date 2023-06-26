@@ -1,0 +1,39 @@
+[
+  {
+    "name": "neic-finitefault",
+    "organization": "U.S. Geological Survey",
+    "description": "Wavelet based inversion for slip ona fault, used to generate Finite Fault products",
+    "version": "0.1.0",
+    "status": "development",
+
+    "permissions": {
+      "usageType": "openSource",
+      "licenses": [
+        {
+          "name": "Public Domain, CC0-1.0",
+          "URL": "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault/-/raw/LICENSE.md"
+        }
+      ]
+    },
+
+    "homepageURL": "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault",
+    "downloadURL": "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault/-/archive/main/neic-finitefault-main.zip",
+    "disclaimerURL": "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault/-/raw/DISCLAIMER.md",
+    "repositoryURL": "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault.git",
+    "vcs": "git",
+    "laborHours": 50,
+
+    "tags": ["usgs", "neic", "earthquake", "slip", "finitefault"],
+
+    "languages": ["python", "fortran"],
+
+    "contact": {
+      "name": "Dara Goldberg",
+      "email": "dgoldberg@usgs.gov"
+    },
+
+    "date": {
+      "metadataLastUpdated": "2023-06-26"
+    }
+  }
+]
