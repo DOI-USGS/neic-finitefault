@@ -1,0 +1,44 @@
+---
+image: code.usgs.gov:5001/devops/images/usgs/python:3.10
+
+default:
+  tags:
+    - cdk
+
+# Do not run for merge requests
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH
+
+stages:
+  - init
+
+
+##
+# Define type of pipeline (on a fork or on the upstream project)
+##
+.fork: &fork
+  if: $CI_PROJECT_PATH != 'ghsc/neic/algorithms/neic-finitefault'
+
+.upstream: &upstream
+  if: >
+    $CI_PROJECT_PATH == 'ghsc/neic/algorithms/neic-finitefault'
+    && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+## -------------------------------------
+#  Init Stage
+## -------------------------------------
+
+
+Poetry:
+  artifacts:
+    paths:
+      - poetry.toml
+      - .venv
+  script:
+    # install into .venv for artifact
+    - poetry config virtualenvs.in-project true --local
+    - poetry install
+    - poetry run safety check
+  stage: init
