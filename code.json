@@ -2,7 +2,7 @@
   {
     "name": "neic-finitefault",
     "organization": "U.S. Geological Survey",
-    "description": "Wavelet based inversion for slip ona fault, used to generate Finite Fault products",
+    "description": "Wavelet based inversion for slip on a fault, used to generate Finite Fault products",
     "version": "0.1.0",
     "status": "development",
 
