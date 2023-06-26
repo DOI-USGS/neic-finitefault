@@ -3,7 +3,9 @@ image: code.usgs.gov:5001/devops/images/usgs/python:3.10
 
 default:
   tags:
-    - cdk
+    - chs-shared
+    - dind
+
 
 # Do not run for merge requests
 workflow:
