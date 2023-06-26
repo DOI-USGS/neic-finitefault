@@ -4,7 +4,7 @@ authors = [
     "Goldberg, Dara <dgoldberg@usgs.gov>",
     "Hunsinger, Heather <hhunsinger@usgs.gov>"
 ]
-description = "Wavelet based inversion for slip ona fault, used to generate Finite Fault products"
+description = "Wavelet based inversion for slip on a fault, used to generate Finite Fault products"
 keywords = ["usgs", "neic", "earthquake", "slip", "finitefault"]
 license = "CC0-1.0"
 name = "neic-finitefault"
