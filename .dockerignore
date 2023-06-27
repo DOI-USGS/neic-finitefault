@@ -1,0 +1,8 @@
+# Since this is at the top level ignore everything
+*
+# Except for the python code, poetry files, fortran_code, and install scripts
+!install.d
+!fortran_code
+!src
+!poetry*
+!pyproject.toml

@@ -1,1 +1,15 @@
-./fortran_code/gfs_nm/long/fd_bank
+# External inputs
+fortran_code/gfs_nm/long/fd_bank
+fortran_code/info/LITHO1.0.nc
+tectonicplates
+
+# lambda files
+__pycache__
+.coverage
+.mypy_cache
+.pytest_cache
+.venv
+coverage.xml
+dist
+htmlcov
+

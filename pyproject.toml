@@ -8,6 +8,10 @@ description = "Wavelet based inversion for slip on a fault, used to generate Fin
 keywords = ["usgs", "neic", "earthquake", "slip", "finitefault"]
 license = "CC0-1.0"
 name = "neic-finitefault"
+packages = [
+  {include = "wasp", from = "src"},
+]
+
 repository = "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault"
 version = "0.1.0"
 
