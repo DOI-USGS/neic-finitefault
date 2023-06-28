@@ -1,7 +1,7 @@
 #! /bin/bash -ex
 
 CLEANUP=${1:-false}
-PROJ_VERSION=${PROJ_VERSION:-"9.2.0"}
+PROJ_VERSION=${2:-"9.2.0"}
 
 # Download proj source
 curl -o "/opt/proj-${PROJ_VERSION}.tar.gz" -L \
@@ -10,7 +10,7 @@ cd /opt && tar -xvf "/opt/proj-${PROJ_VERSION}.tar.gz";
 
 # Build the proj source code
 cd /opt/proj-${PROJ_VERSION}\
-    && mkdir build \
+    && mkdir -p build \
     && cd build \
     && cmake .. \
     && cmake --build . \

@@ -1,9 +1,9 @@
 #! /bin/bash -ex
 
 CLEANUP=${1:-false}
-DCW_VERSION=${DCW_VERSION:-"2.1.1"}
-GMT_VERSION=${GMT_VERSION:-"6.4.0"}
-GSHHG_VERSION=${GSHHG_VERSION:-"2.3.7"}
+DCW_VERSION=${2:-"2.1.1"}
+GMT_VERSION=${3:-"6.4.0"}
+GSHHG_VERSION=${4:-"2.3.7"}
 
 # Download GMT source and supporting data
 GMT_URL="https://github.com/GenericMappingTools"
@@ -21,7 +21,7 @@ mv "/opt/dcw-gmt-${DCW_VERSION}" "/opt/gmt-${GMT_VERSION}/share/dcw-gmt";
 
 # Build the gmt source code
 cd /opt/gmt-${GMT_VERSION} \
-  && mkdir build \
+  && mkdir -p build \
   && cd build \
   && cmake .. \
   && cmake --build . \

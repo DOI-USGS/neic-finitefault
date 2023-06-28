@@ -1,7 +1,12 @@
 #! /bin/bash -ex
 
 # assume running from top level of the project directory
-FINITEFAULT_DIR=${FINITEFAULT_DIR:-"."}
+FINITEFAULT_DIR=$1
+if [ -z ${FINITEFAULT_DIR+x} ]
+then 
+  echo "Argument FINITEFAULT_DIR must be set";
+  exit 1; 
+fi
 FORTRAN_DIR="${FINITEFAULT_DIR}/fortran_code"
 echo "HERE ${FINITEFAULT_DIR}"
 echo "THERE ${FORTRAN_DIR}"

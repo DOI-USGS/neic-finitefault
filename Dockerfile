@@ -5,10 +5,11 @@ FROM ${FROM_IMAGE} as packages
 
 USER root
 
-ENV PYTHON "3.10"
-COPY install.d/1_ubuntu_packages.sh ./install.d/
+ARG PYTHON="3.10"
+COPY install.d/ubuntu_packages.sh ./install.d/
 ## packages
-RUN bash install.d/1_ubuntu_packages.sh
+RUN apt update -y && apt upgrade -y
+RUN bash install.d/ubuntu_packages.sh $PYTHON
 
 USER usgs-user
 
@@ -23,18 +24,18 @@ ARG PROJ_VERSION
 USER root
 
 ## gmt
-COPY install.d/2_gmt.sh ./install.d/
-RUN bash install.d/2_gmt.sh true
+COPY install.d/gmt.sh ./install.d/
+RUN bash install.d/gmt.sh true "${DCW_VERSION}" "${GMT_VERSION}" "${GSHHG_VERSION}"
 ENV PATH "/usr/local/bin/gmt:${PATH}"
 ## geos
-COPY install.d/3_libgeos.sh ./install.d/
-RUN bash install.d/3_libgeos.sh true
+COPY install.d/libgeos.sh ./install.d/
+RUN bash install.d/libgeos.sh true "${GEOS_VERSION}"
 ENV PATH "/usr/local/bin/geosop:${PATH}"
 ENV GEOS_INCLUDE_PATH "/usr/local/include"
 ENV GEOS_LIBRARY_PATH "/usr/local/lib"
 ## proj
-COPY install.d/4_proj.sh ./install.d/
-RUN bash install.d/4_proj.sh true
+COPY install.d/proj.sh ./install.d/
+RUN bash install.d/proj.sh true "${PROJ_VERSION}"
 ## environment variables
 ENV PATH "/usr/local/bin/gmt:${PATH}"
 ENV GEOS_INCLUDE_PATH "/usr/local/include"
@@ -59,7 +60,7 @@ ENV FINITEFAULT_DIR /home/usgs-user/finitefault
 
 ## compile fortran code
 RUN apt install -y git
-RUN cd $FINITEFAULT_DIR && bash install.d/5_wasp.sh
+RUN cd $FINITEFAULT_DIR && bash install.d/wasp.sh "${FINITEFAULT_DIR}"
 RUN apt remove -y git
 ## install python dependencies
 RUN cd $FINITEFAULT_DIR && poetry build

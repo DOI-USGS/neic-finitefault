@@ -1,7 +1,7 @@
 #! /bin/bash -ex
 
 CLEANUP=${1:-false}
-GEOS_VERSION=${GEOS_VERSION:-"3.11.2"}
+GEOS_VERSION=${2:-"3.11.2"}
 
 # Download GEOS source
 curl -o "/opt/geos-${GEOS_VERSION}.tar.bz2" -L \
@@ -10,7 +10,7 @@ cd /opt && tar xvfj "/opt/geos-${GEOS_VERSION}.tar.bz2";
 
 # Build the gmt source code
 cd /opt/geos-${GEOS_VERSION} \
-    && mkdir build \
+    && mkdir -p build \
     && cd build \
     && cmake .. \
     && make \
