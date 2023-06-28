@@ -159,14 +159,6 @@ unicode = ["unicodedata2 (>=15.0.0)"]
 woff = ["zopfli (>=0.1.4)", "brotlicffi (>=0.8.0)", "brotli (>=1.0.1)"]
 
 [[package]]
-name = "geographiclib"
-version = "2.0"
-description = "The geodesic routines from GeographicLib"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[[package]]
 name = "greenlet"
 version = "2.0.2"
 description = "Lightweight in-process concurrent programming"
@@ -685,7 +677,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9,<3.13"
-content-hash = "a3362163497a98b9c35d94e1f6a54580b7252bbdfa3272b02d89afbccbb4b966"
+content-hash = "054c78e239ea9e37770378c6873b2158666ca5ec19bc0aa77069077b6dd68283"
 
 [metadata.files]
 black = []
@@ -700,7 +692,6 @@ cycler = []
 decorator = []
 dparse = []
 fonttools = []
-geographiclib = []
 greenlet = []
 idna = []
 importlib-resources = []

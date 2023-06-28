@@ -18,7 +18,6 @@ version = "0.1.0"
 [tool.poetry.dependencies]
 python = "^3.9,<3.13"
 Cartopy = "^0.21.1"
-geographiclib = "^2.0"
 matplotlib = "^3.7.1"
 netCDF4 = "^1.6.4"
 numpy = "^1.25.0"
