@@ -9,7 +9,7 @@ curl -o "/opt/proj-${PROJ_VERSION}.tar.gz" -L \
 cd /opt && tar -xvf "/opt/proj-${PROJ_VERSION}.tar.gz";
 
 # Build the proj source code
-cd /opt/proj-${PROJ_VERSION}\
+cd "/opt/proj-${PROJ_VERSION}"\
     && mkdir -p build \
     && cd build \
     && cmake .. \
@@ -19,5 +19,5 @@ cd /opt/proj-${PROJ_VERSION}\
 # cleanup
 if [ "$CLEANUP" = true ] ; then
     echo 'Cleaning up source code for proj.';
-    rm -r /opt/proj-${PROJ_VERSION}*;
+    rm -r "/opt/proj-${PROJ_VERSION}*";
 fi

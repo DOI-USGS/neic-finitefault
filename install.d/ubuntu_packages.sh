@@ -12,7 +12,7 @@ apt install -y \
   ghostscript \
   libnetcdf-dev \
   libgdal-dev \
-  python${PYTHON_VERSION}-dev \
+  "python${PYTHON_VERSION}-dev" \
   sqlite3 \
   && apt clean;
 

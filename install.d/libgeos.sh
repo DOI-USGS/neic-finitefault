@@ -9,7 +9,7 @@ curl -o "/opt/geos-${GEOS_VERSION}.tar.bz2" -L \
 cd /opt && tar xvfj "/opt/geos-${GEOS_VERSION}.tar.bz2";
 
 # Build the gmt source code
-cd /opt/geos-${GEOS_VERSION} \
+cd "/opt/geos-${GEOS_VERSION}" \
     && mkdir -p build \
     && cd build \
     && cmake .. \
@@ -18,6 +18,6 @@ cd /opt/geos-${GEOS_VERSION} \
 
 # cleanup
 if [ "$CLEANUP" = true ] ; then
-    echo 'Cleaning up source code for geos.';
-    rm -r /opt/geos-${GEOS_VERSION}*;
+    echo "Cleaning up source code for geos.";
+    rm -r "/opt/geos-${GEOS_VERSION}*";
 fi

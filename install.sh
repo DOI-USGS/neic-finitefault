@@ -55,57 +55,58 @@ function usage {
 ## parse arguments
 REQUIRED_ARGS=()
 while [[ $# -gt 0 ]]; do
-  case $1 in
-    -x|--skip-packages)
-      SKIP_SYSTEM_INSTALL=true
-      shift
-      ;;
-    -s|--skip-env)
-      SKIP_ENV=true
-      shift
-      ;;
-    --dcw)
-      DCW_VERSION="$2"
-      shift
-      shift
-      ;;
-    --gmt)
-      GMT_VERSION="$2"
-      shift
-      shift
-      ;;
-    --gshhg)
-      GSHHG_VERSION="$2"
-      shift
-      shift
-      ;;
-    --geos)
-      GEOS_VERSION="$2"
-      shift
-      ;;
-    --proj)
-      PROJ_VERSION="$2"
-      shift
-      shift
-      ;;
-    -c|--cleanup)
-      CLEANUP=true
-      shift
-      ;;
-    -h|--help)
-      usage
-      exit 0
-      ;;
-    -*|--*)
-      echo "Invalid option $1"
-      usage
-      exit 1
-      ;;
-    *)
-      REQUIRED_ARGS+=("$1")
-      shift
-      ;;
-  esac
+    # shellcheck disable=SC2221,SC2222
+    case $1 in
+        -x|--skip-packages)
+            SKIP_SYSTEM_INSTALL=true
+            shift
+            ;;
+        -s|--skip-env)
+            SKIP_ENV=true
+            shift
+            ;;
+        --dcw)
+            DCW_VERSION="$2"
+            shift
+            shift
+            ;;
+        --gmt)
+            GMT_VERSION="$2"
+            shift
+            shift
+            ;;
+        --gshhg)
+            GSHHG_VERSION="$2"
+            shift
+            shift
+            ;;
+        --geos)
+            GEOS_VERSION="$2"
+            shift
+            ;;
+        --proj)
+            PROJ_VERSION="$2"
+            shift
+            shift
+            ;;
+        -c|--cleanup)
+            CLEANUP=true
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        -*|--*)
+            echo "Invalid option $1"
+            usage
+            exit 1
+            ;;
+        *)
+            REQUIRED_ARGS+=("$1")
+            shift
+            ;;
+    esac
 done
 ### set positional arguments
 set -- "${REQUIRED_ARGS[@]}" # restore positional parameters
@@ -155,16 +156,21 @@ INSTALL_DIR="${FINITEFAULT_DIR}/install.d"
 if [ "$SKIP_SYSTEM_INSTALL" = true ] ; then
     echo "Skipping running ${INSTALL_DIR}/${OPERATING_SYSTEM}_packages.sh";
 else
+    # shellcheck source=./install.d/ubuntu_packages.sh
     source "${INSTALL_DIR}/${OPERATING_SYSTEM}_packages.sh" "${PYTHON_VERSION}";    
 fi
-source "${INSTALL_DIR}/gmt.sh.sh" $CLEANUP "${DCW_VERSION}" "${GMT_VERSION}" "${GSHHG_VERSION}";
-source "${INSTALL_DIR}/libgeos.sh" $CLEANUP  "${GEOS_VERSION}";
-source "${INSTALL_DIR}/proj.sh" $CLEANUP  "${PROJ_VERSION}";
+# shellcheck source=./install.d/gmt.sh
+source "${INSTALL_DIR}/gmt.sh" "${CLEANUP}" "${DCW_VERSION}" "${GMT_VERSION}" "${GSHHG_VERSION}";
+# shellcheck source=./install.d/libgeos.sh
+source "${INSTALL_DIR}/libgeos.sh" "${CLEANUP}"  "${GEOS_VERSION}";
+# shellcheck source=./install.d/proj.sh
+source "${INSTALL_DIR}/proj.sh" "${CLEANUP}"  "${PROJ_VERSION}";
 
 # Source environment.d file for environment variables
 ENV_DIR="${FINITEFAULT_DIR}/environment.d"
 if [ "$SKIP_ENV" = true ] ; then
     echo "Skipping sourcing env ${ENV_DIR}/${OPERATING_SYSTEM}.sh";
 else
+    # shellcheck source=./environment.d/ubuntu.sh
     source "${ENV_DIR}/${OPERATING_SYSTEM}.sh";    
 fi
