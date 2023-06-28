@@ -433,34 +433,6 @@ python-versions = ">=3.9"
 certifi = "*"
 
 [[package]]
-name = "pyqt5"
-version = "5.15.9"
-description = "Python bindings for the Qt cross platform application toolkit"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-PyQt5-Qt5 = ">=5.15.2"
-PyQt5-sip = ">=12.11,<13"
-
-[[package]]
-name = "pyqt5-qt5"
-version = "5.15.2"
-description = "The subset of a Qt installation needed by PyQt5."
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
-name = "pyqt5-sip"
-version = "12.12.1"
-description = "The sip module support for PyQt5"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[[package]]
 name = "pyshp"
 version = "2.3.1"
 description = "Pure Python read/write support for ESRI Shapefile format"
@@ -713,7 +685,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9,<3.13"
-content-hash = "b01006219fd68fe084565d30817eb504c39b08ba8c77353f486fbaf343ef99f6"
+content-hash = "a3362163497a98b9c35d94e1f6a54580b7252bbdfa3272b02d89afbccbb4b966"
 
 [metadata.files]
 black = []
@@ -748,9 +720,6 @@ platformdirs = []
 pygmt = []
 pyparsing = []
 pyproj = []
-pyqt5 = []
-pyqt5-qt5 = []
-pyqt5-sip = []
 pyshp = []
 python-dateutil = []
 pytz = []
