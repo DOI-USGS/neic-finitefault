@@ -1,7 +1,48 @@
 #! /bin/bash -ex
 
-# assume running from top level of the project directory
+# ==============================================================================
+# Define usage
+#     Sets up usage function and parses arguments
+# ==============================================================================
+## define usage
+function usage {
+    echo "----------------------------------------------------------------"
+    echo "Install package with Ubuntu package manager 'apt'. "
+    echo "apt update/upgrade may be required if packages can't be found."
+    echo "----------------------------------------------------------------"
+    echo ""
+    echo "  FINITEFAULT_DIR string  the directory where the finite fault"
+    echo "                          repository exists"
+    echo "                          (example: /home/user/neic-finitefault)"
+}
+## parse arguments
+REQUIRED_ARGS=()
+while [[ $# -gt 0 ]]; do
+    # shellcheck disable=SC2221,SC2222
+    case $1 in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        -*|--*)
+            echo "Invalid option $1"
+            usage
+            exit 1
+            ;;
+        *)
+            REQUIRED_ARGS+=("$1")
+            shift
+            ;;
+    esac
+done
+### set positional arguments
+set -- "${REQUIRED_ARGS[@]}" # restore positional parameters
 FINITEFAULT_DIR=$1
+
+# ==============================================================================
+# Download required data and compile FORTRAN code
+# ==============================================================================
+# assume running from top level of the project directory
 if [ -z ${FINITEFAULT_DIR+x} ]
 then 
   echo "Argument FINITEFAULT_DIR must be set";
