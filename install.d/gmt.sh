@@ -5,7 +5,7 @@ DCW_VERSION=${2:-"2.1.1"}
 GMT_VERSION=${3:-"6.4.0"}
 GSHHG_VERSION=${4:-"2.3.7"}
 
-# Download GMT source and supporting data
+# Download GMT source code and supporting data
 GMT_URL="https://github.com/GenericMappingTools"
 curl -o "/opt/dcw-gmt-${DCW_VERSION}.tar.gz" -L \
   "${GMT_URL}/dcw-gmt/releases/download/${DCW_VERSION}/dcw-gmt-${DCW_VERSION}.tar.gz";
