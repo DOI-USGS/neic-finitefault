@@ -57,7 +57,7 @@ echo "Installing PROJ with cmake"
 cd "/opt/proj-${PROJ_VERSION}"\
     && mkdir -p build \
     && cd build \
-    && cmake .. \
+    && cmake -DBUILD_TESTING=OFF .. \
     && cmake --build . \
     && cmake --build . --target install;
 

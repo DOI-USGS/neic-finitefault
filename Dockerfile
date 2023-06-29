@@ -1,15 +1,15 @@
-ARG FROM_IMAGE=code.usgs.gov:5001/devops/images/usgs/python:3.10
+ARG PYTHON_VERSION
+ARG PYTHON_VERSION=${PYTHON_VERSION:-3.10}
+ARG FROM_IMAGE=code.usgs.gov:5001/devops/images/usgs/python:${PYTHON_VERSION}
 
 # ubuntu packages
 FROM ${FROM_IMAGE} as packages
 
 USER root
 
-ARG PYTHON="3.10"
 COPY install.d/ubuntu_packages.sh ./install.d/
-## packages
 RUN apt update -y && apt upgrade -y
-RUN bash install.d/ubuntu_packages.sh $PYTHON
+RUN bash install.d/ubuntu_packages.sh ${PYTHON_VERSION}
 
 USER usgs-user
 
@@ -23,17 +23,17 @@ ARG PROJ_VERSION
 
 USER root
 
-## gmt
+## GMT
 COPY install.d/gmt.sh ./install.d/
 RUN bash install.d/gmt.sh true "${DCW_VERSION}" "${GMT_VERSION}" "${GSHHG_VERSION}"
 ENV PATH "/usr/local/bin/gmt:${PATH}"
-## geos
+## GEOS
 COPY install.d/libgeos.sh ./install.d/
 RUN bash install.d/libgeos.sh true "${GEOS_VERSION}"
 ENV PATH "/usr/local/bin/geosop:${PATH}"
 ENV GEOS_INCLUDE_PATH "/usr/local/include"
 ENV GEOS_LIBRARY_PATH "/usr/local/lib"
-## proj
+## PROJ
 COPY install.d/proj.sh ./install.d/
 RUN bash install.d/proj.sh true "${PROJ_VERSION}"
 ## environment variables
@@ -52,6 +52,8 @@ USER usgs-user
 FROM dependencies as finitefault
 ARG FD_BANK
 ARG LITHO1
+ARG FD_BANK="${FD_BANK:-download}"
+ARG LITHO1="${LITHO1:-download}"
 
 USER root
 
@@ -60,12 +62,13 @@ RUN mkdir /home/usgs-user/finitefault
 COPY . /home/usgs-user/finitefault/
 ENV FINITEFAULT_DIR /home/usgs-user/finitefault
 
+
 ## compile fortran code
 RUN cd $FINITEFAULT_DIR \
     && bash install.d/wasp.sh \
     "${FINITEFAULT_DIR}" \
-    --fd-bank "${FINITEFAULT_DIR}/${FD_BANK:-download}" \
-    --lith "${FINITEFAULT_DIR}/${LITHO1:-download}"
+    --fd-bank "${FINITEFAULT_DIR}/${FD_BANK}" \
+    --lith "${FINITEFAULT_DIR}/${LITHO1}"
 ## install python dependencies
 RUN cd $FINITEFAULT_DIR && poetry build 
 RUN pip install $FINITEFAULT_DIR/dist/neic_finitefault*.whl

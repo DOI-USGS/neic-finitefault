@@ -13,6 +13,7 @@ workflow:
     - if: $CI_COMMIT_BRANCH
 
 stages:
+  - build
   - test
 
 
@@ -30,14 +31,92 @@ stages:
 ##
 # Define the supported systems
 ##
-.systems:
-  matrix: &systems
-    - OPERATING_SYSTEM:
-        - 'ubuntu'
+.images:
+  matrix: &images
+    - TARGET:
+        - dependencies 
+        - finitefault
+      OPERATING_SYSTEM:
+        - ubuntu
+
+## -------------------------------------
+#  Build Stage
+## -------------------------------------
+.docker_login:
+  before_script:
+    - |
+      test -n "${CI_REGISTRY_USER}" -a -n "${CI_REGISTRY_PASSWORD}" \
+          && echo "${CI_REGISTRY_PASSWORD}" | \
+          docker login \
+          --username "${CI_REGISTRY_USER}" \
+          --password-stdin \
+          "${CI_REGISTRY}";
+  cache:
+    paths:
+      - .trivy/
+  services:
+    - alias: docker
+      name: code.usgs.gov:5001/devops/images/usgs/docker:20-dind
+  
+Docker Build:
+  extends:
+    - .docker_login
+  image: code.usgs.gov:5001/devops/images/usgs/docker:20
+  parallel:
+    matrix: *images
+  rules:
+    - if: "$SCHEDULED"
+    - changes:
+          - Dockerfile
+          - fortran_code/*
+          - install.d/*
+          - poetry.lock
+          - pyproject.toml
+          - src/*   
+  script:
+    -  |
+      ARGS=();
+      for ARG in ${BUILD_ARGS}; do
+        ARGS+=("--build-arg" "${ARG}=${!ARG}");
+      done
+      if [[ ${TARGET} == "build" ]]; then
+        ARGS+=("--target" "${TARGET}");
+        BUILD="-build";
+      fi
+    - IMAGE="wasp-${OPERATING_SYSTEM}${BUILD}"
+    - TAG="${CI_COMMIT_TAG:-latest}"
+    - LOCAL_IMAGE="${CI_REGISTRY}/ghsc/neic/algorithms/${IMAGE}:${TAG}"
+    - echo "${ARGS[@]} --tag ${LOCAL_IMAGE}" 
+    - docker build "${ARGS[@]}" --tag "${LOCAL_IMAGE}" .
+    # trivy scan before push
+    # fail LOW,MEDIUM vulnerabilities that have a fix available
+    - ${TRIVY} image --exit-code 1 --ignore-unfixed --severity LOW,MEDIUM
+      --skip-files "/usr/local/bin/trivy"
+      "${LOCAL_IMAGE}";
+    # fail HIGH,CRITICAL vulnerabilities
+    - ${TRIVY} image --exit-code 1 --severity HIGH,CRITICAL
+      --skip-files "/usr/local/bin/trivy"
+      "${LOCAL_IMAGE}";
+    # push to registry
+    - if [ "${CI_PROJECT_PATH}" != "ghsc/neic/algorithms/neic-finitefault" ]; then
+      echo "Skipping push on non-upstream (${CI_PROJECT_PATH})";
+      exit 0;
+      fi
+    - docker push "${LOCAL_IMAGE}";
+  stage: build
+  variables:
+    BUILD_ARGS: DCW_VERSION GMT_VERSION GSHHG_VERSION 
+    DCW_VERSION: "2.1.1"
+    DOCKER_DRIVER: overlay2
+    GMT_VERSION: "6.4.0"
+    GSHHG_VERSION: "2.3.7"
+    PYTHON_VERSION: "3.10"
+    TRIVY: trivy --cache-dir .trivy --timeout 10m
+
 
 
 ## -------------------------------------
-#  TEST Stage
+#  Test Stage
 ## -------------------------------------
 
 Shell Check:
