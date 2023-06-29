@@ -50,27 +50,39 @@ USER usgs-user
 
 # Add and install/compile code
 FROM dependencies as finitefault
+ARG FD_BANK
+ARG LITHO1
 
 USER root
 
 ## copy code
 RUN mkdir /home/usgs-user/finitefault
-COPY . /home/usgs-user/finitefault
+COPY . /home/usgs-user/finitefault/
 ENV FINITEFAULT_DIR /home/usgs-user/finitefault
 
 ## compile fortran code
-RUN apt install -y git
-RUN cd $FINITEFAULT_DIR && bash install.d/wasp.sh "${FINITEFAULT_DIR}"
-RUN apt remove -y git
+RUN cd $FINITEFAULT_DIR \
+    && bash install.d/wasp.sh \
+    "${FINITEFAULT_DIR}" \
+    --fd-bank "${FINITEFAULT_DIR}/${FD_BANK:-download}" \
+    --lith "${FINITEFAULT_DIR}/${LITHO1:-download}"
 ## install python dependencies
-RUN cd $FINITEFAULT_DIR && poetry build
+RUN cd $FINITEFAULT_DIR && poetry build 
 RUN pip install $FINITEFAULT_DIR/dist/neic_finitefault*.whl
+RUN pip install okada-wrapper==18.12.07.3
 ## update permissions
-RUN chown -R usgs-user:usgs-user /home/usgs-user/finitefault
-RUN chmod -R 777 /home/usgs-user/finitefault
+RUN chown -R usgs-user:usgs-user "${FINITEFAULT_DIR}"
+RUN chmod -R 777 "${FINITEFAULT_DIR}"
 ## cleanup
-RUN rm -rf /home/usgs-user/finitefault/install.d
-
+RUN rm -rf "${FINITEFAULT_DIR}/install.d"
+RUN if [ "${FD_BANK}" != "fortran_code/gfs_nm/long/fd_bank" ]; then rm -f "${FINITEFAULT_DIR}/${FD_BANK}"; fi
+RUN if [ "${LITHO1}" != "fortran_code/info/LITHO1.0.nc" ]; then rm -f "${FINITEFAULT_DIR}/${LITHO1}"; fi
+RUN apt remove -y \
+    cmake \
+    curl \
+    gcc \
+    gfortran \
+    git;
 USER usgs-user
 
 # test code

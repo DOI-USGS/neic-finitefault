@@ -62,5 +62,5 @@ cd "/opt/proj-${PROJ_VERSION}"\
 # cleanup
 if [ "$CLEANUP" = true ] ; then
     echo 'Cleaning up source code for PROJ.';
-    rm -r "/opt/proj-${PROJ_VERSION}*";
+    rm -r /opt/proj-"${PROJ_VERSION}"*;
 fi

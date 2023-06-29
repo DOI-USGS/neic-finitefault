@@ -1,6 +1,6 @@
 # External inputs
-fortran_code/gfs_nm/long/fd_bank
-fortran_code/info/LITHO1.0.nc
+fd_bank
+LITHO1.0.nc
 tectonicplates
 
 # lambda files

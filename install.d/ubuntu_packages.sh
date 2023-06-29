@@ -1,5 +1,4 @@
 #! /bin/bash -ex
-
 # ==============================================================================
 # Define usage
 #     Sets up usage function and parses arguments
@@ -50,6 +49,7 @@ apt install -y \
   gcc \
   gfortran \
   ghostscript \
+  git \
   libnetcdf-dev \
   libgdal-dev \
   "python${PYTHON_VERSION}-dev" \

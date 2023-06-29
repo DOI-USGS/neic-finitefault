@@ -6,3 +6,5 @@
 !src
 !poetry*
 !pyproject.toml
+!fd_bank
+!LITHO1.0.nc

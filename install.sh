@@ -46,6 +46,14 @@ function usage {
     echo "  --proj string           version of PROJ to install"
     echo "                          default=9.2.0"
     echo "                          (example: --proj 9.2.0)"
+    echo "  --fd-bank string        the location of the fd_bank file"
+    echo "                          if not specified it will be downloaded"
+    echo "                          default=download"
+    echo "                          (example: --fd-bank /home/user/fd_bank)"
+    echo "  --lith string        the location of the fd_bank file"
+    echo "                          if not specified it will be downloaded"
+    echo "                          default=download"
+    echo "                          (example: --lith /home/user/fd_bank)"
     echo "  -c,--cleanup bool       remove gmt, proj, and geos source code"
     echo "                             from /opt after they're installed"
     echo "                          default=false"
@@ -89,6 +97,16 @@ while [[ $# -gt 0 ]]; do
             shift
             shift
             ;;
+        --fd-bank)
+            FD_BANK="$2"
+            shift
+            shift
+            ;;
+        --lith)
+            LITHO1="$2"
+            shift
+            shift
+            ;;
         -c|--cleanup)
             CLEANUP=true
             shift
@@ -121,7 +139,8 @@ GMT_VERSION=${GMT_VERSION:-"6.4.0"}
 GSHHG_VERSION=${GSHHG_VERSION:-"2.3.7"}
 GEOS_VERSION=${GEOS_VERSION:-"3.11.2"}
 PROJ_VERSION=${PROJ_VERSION:-"9.2.0"}
-CLEANUP=${CLEANUP:-false}
+FD_BANK=${FD_BANK:-"download"}
+LITHO1=${LITHO1:-"download"}
 ### validate python version choice (in security status)
 #### See https://devguide.python.org/versions/ for statuses of versions
 case $PYTHON_VERSION in
@@ -165,6 +184,8 @@ source "${INSTALL_DIR}/gmt.sh" "${CLEANUP}" "${DCW_VERSION}" "${GMT_VERSION}" "$
 source "${INSTALL_DIR}/libgeos.sh" "${CLEANUP}"  "${GEOS_VERSION}";
 # shellcheck source=./install.d/proj.sh
 source "${INSTALL_DIR}/proj.sh" "${CLEANUP}"  "${PROJ_VERSION}";
+# shellcheck source=./install.d/wasp.sh
+source "${INSTALL_DIR}/wasp.sh" "${FINITEFAULT_DIR}" --fd-bank "${FD_BANK}" --lith "${LITHO1}";
 
 # Source environment.d file for environment variables
 ENV_DIR="${FINITEFAULT_DIR}/environment.d"

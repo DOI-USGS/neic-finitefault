@@ -62,5 +62,5 @@ cd "/opt/geos-${GEOS_VERSION}" \
 # cleanup
 if [ "$CLEANUP" = true ] ; then
     echo "Cleaning up source code for GEOS.";
-    rm -r "/opt/geos-${GEOS_VERSION}*";
+    rm -r /opt/geos-"${GEOS_VERSION}"*;
 fi

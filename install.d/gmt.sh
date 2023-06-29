@@ -79,7 +79,7 @@ cd "/opt/gmt-${GMT_VERSION}" \
 # cleanup
 if [ "$CLEANUP" = true ] ; then
     echo 'Cleaning up source code for GMT.';
-    rm -r "/opt/dcw-gmt-${DCW_VERSION}*";
-    rm -r "/opt/gshhg-gmt-${GSHHG_VERSION}*";
-    rm -r "/opt/gmt-${GMT_VERSION}-src*";
+    rm -r /opt/dcw-gmt-"${DCW_VERSION}"*;
+    rm -r /opt/gshhg-gmt-"${GSHHG_VERSION}"*;
+    rm -r /opt/gmt-"${GMT_VERSION}"-src*;
 fi
