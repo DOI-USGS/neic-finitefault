@@ -37,6 +37,13 @@ done
 ### set positional argument's defaults
 set -- "${REQUIRED_ARGS[@]}" # restore positional parameters
 PYTHON_VERSION=${1:-"3.10"}
+if python --version | grep -q "${PYTHON_VERSION}"; then
+  echo "Found python ${PYTHON_VERSION} ($(python --version))"
+else
+  echo "Python ${PYTHON_VERSION} couldn't be found (version=$(python --version))"
+  echo "Install a version of python ${PYTHON_VERSION}"
+  exit 1
+fi
 
 # ==============================================================================
 # Download and install packages with apt
@@ -56,5 +63,3 @@ apt install -y \
   "python${PYTHON_VERSION}-dev" \
   sqlite3 \
   && apt clean;
-
-
