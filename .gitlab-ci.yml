@@ -1,0 +1,50 @@
+---
+
+default:
+  tags:
+    - chs-shared
+    - dind
+
+
+# Do not run for merge requests
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH
+
+stages:
+  - test
+
+
+##
+# Define type of pipeline (on a fork or on the upstream project)
+##
+.fork: &fork
+  if: $CI_PROJECT_PATH != 'ghsc/neic/algorithms/neic-finitefault'
+
+.upstream: &upstream
+  if: >
+    $CI_PROJECT_PATH == 'ghsc/neic/algorithms/neic-finitefault'
+    && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+##
+# Define the supported systems
+##
+.systems:
+  matrix: &systems
+    - OPERATING_SYSTEM:
+        - 'ubuntu'
+
+
+## -------------------------------------
+#  TEST Stage
+## -------------------------------------
+
+Shell Check:
+  image: usgs/ubuntu:latest
+  script:
+    - apt install -y shellcheck
+    - shellcheck install.sh -x
+    - shellcheck install.d/*
+    - shellcheck environment.d/*
+  stage: test
