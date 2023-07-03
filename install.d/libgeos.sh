@@ -52,7 +52,7 @@ curl -o "/opt/geos-${GEOS_VERSION}.tar.bz2" -L \
   "https://download.osgeo.org/geos/geos-${GEOS_VERSION}.tar.bz2"; 
 cd /opt && tar xvfj "/opt/geos-${GEOS_VERSION}.tar.bz2";
 
-# Build the gmt source code
+# Build the GEOS source code
 echo "Installing GEOS with cmake"
 cd "/opt/geos-${GEOS_VERSION}" \
     && mkdir -p build \
