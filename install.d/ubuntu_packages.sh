@@ -42,6 +42,7 @@ PYTHON_VERSION=${1:-"3.10"}
 # Download and install packages with apt
 # ==============================================================================
 # install packages
+echo "Installing packages with apt"
 apt install -y \
   build-essential \
   cmake \

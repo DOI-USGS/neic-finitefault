@@ -47,11 +47,13 @@ GEOS_VERSION=${2:-"3.11.2"}
 # Download and install GEOS
 # ==============================================================================
 # Download GEOS source
+echo "Downloading GEOS ${GEOS_VERSION} source code"
 curl -o "/opt/geos-${GEOS_VERSION}.tar.bz2" -L \
   "https://download.osgeo.org/geos/geos-${GEOS_VERSION}.tar.bz2"; 
 cd /opt && tar xvfj "/opt/geos-${GEOS_VERSION}.tar.bz2";
 
 # Build the gmt source code
+echo "Installing GEOS with cmake"
 cd "/opt/geos-${GEOS_VERSION}" \
     && mkdir -p build \
     && cd build \

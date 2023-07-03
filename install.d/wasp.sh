@@ -74,25 +74,31 @@ FORTRAN_DIR="${FINITEFAULT_DIR}/fortran_code"
 ## fd_bank
 FD_FILE="${FORTRAN_DIR}/gfs_nm/long/fd_bank"
 if [[ "$FD_BANK" == *"download" ]]; then
+    echo "Downloading the fd_bank file"
     curl -o "${FD_FILE}" -L \
       "https://zenodo.org/record/7236739/files/fd_bank?download=1"
 else
-    mv "${FD_BANK}" "${FD_FILE}"
+    echo "Copying the provided fd_bank file to the required location"
+    cp "${FD_BANK}" "${FD_FILE}"
 fi
 ## LITHO1.0.nc
 LITHO1_FILE="${FORTRAN_DIR}/info/LITHO1.0.nc"
 if [[ "$LITHO1" == *"download" ]]; then
+    echo "Downloading the LITHO1.0.nc file"
     curl -o "${LITHO1_FILE}" -L \
         "https://ds.iris.edu/files/products/emc/emc-files/LITHO1.0.nc"; 
 else
+    echo "Copying the provided LITHO1.0.nc file to the required location"
     cp "${LITHO1}" "${LITHO1_FILE}"
 fi
 # tectonicsplates master branch
 TECTONICS_DIR="${FINITEFAULT_DIR}/tectonicplates"
 TECTONICS_URL="https://github.com/fraxen/tectonicplates.git"
+echo "Getting a copy of the tectonicplates data from master branch"
 git clone --single-branch --branch master "${TECTONICS_URL}" "${TECTONICS_DIR}"
 
 # build fortran
+echo "Compiling the FORTRAN code with make"
 cd "${FORTRAN_DIR}" \
     && cd bin_inversion_gfortran_f95 \
     && make clean \
@@ -109,9 +115,11 @@ cd "${FORTRAN_DIR}" \
 
 # update configuration for fd_bank location
 LOWIN_FILE="${FORTRAN_DIR}/gfs_nm/long/low.in"
+echo "Updating the location of the fd_bank file in ${LOWIN_FILE}"
 grep -qF -- "$FD_FILE" "$LOWIN_FILE" || echo "$FD_FILE" >> "$LOWIN_FILE"
 
 # write the config file
+echo "Writing the config file"
 CONFIG_FILE="${FINITEFAULT_DIR}/config.ini"
 
 cat <<EO_CONFIG > "${CONFIG_FILE}"

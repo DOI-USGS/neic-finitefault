@@ -55,13 +55,16 @@ GSHHG_VERSION=${4:-"2.3.7"}
 # Download and install GMT
 # ==============================================================================
 # Download GMT source code and supporting data
+echo "Downloading GMT supporting data DCW ${DCW_VERSION}"
 GMT_URL="https://github.com/GenericMappingTools"
 curl -o "/opt/dcw-gmt-${DCW_VERSION}.tar.gz" -L \
   "${GMT_URL}/dcw-gmt/releases/download/${DCW_VERSION}/dcw-gmt-${DCW_VERSION}.tar.gz";
 cd /opt && tar -xvf "/opt/dcw-gmt-${DCW_VERSION}.tar.gz";
+echo "Downloading GMT ${GMT_VERSION}"
 curl -o "/opt/gmt-${GMT_VERSION}-src.tar.gz" -L \
   "${GMT_URL}/gmt/releases/download/${GMT_VERSION}/gmt-${GMT_VERSION}-src.tar.gz";
 cd /opt && tar -xvf "/opt/gmt-${GMT_VERSION}-src.tar.gz";
+echo "Downloading GMT supporting data GSHHG ${GSHHG_VERSION}"
 curl -o "/opt/gshhg-gmt-${GSHHG_VERSION}.tar.gz" -L \
   "${GMT_URL}/gshhg-gmt/releases/download/${GSHHG_VERSION}/gshhg-gmt-${GSHHG_VERSION}.tar.gz";
 cd /opt && tar -xvf "/opt/gshhg-gmt-${GSHHG_VERSION}.tar.gz";
@@ -69,6 +72,7 @@ mv "/opt/gshhg-gmt-${GSHHG_VERSION}" "/opt/gmt-${GMT_VERSION}/share/gshhg-gmt";
 mv "/opt/dcw-gmt-${DCW_VERSION}" "/opt/gmt-${GMT_VERSION}/share/dcw-gmt";
 
 # Build the GMT source code
+echo "Installing GMT with cmake"
 cd "/opt/gmt-${GMT_VERSION}" \
   && mkdir -p build \
   && cd build \
@@ -78,7 +82,7 @@ cd "/opt/gmt-${GMT_VERSION}" \
 
 # cleanup
 if [ "$CLEANUP" = true ] ; then
-    echo 'Cleaning up source code for GMT.';
+    echo "Cleaning up source code for GMT.";
     rm -r /opt/dcw-gmt-"${DCW_VERSION}"*;
     rm -r /opt/gshhg-gmt-"${GSHHG_VERSION}"*;
     rm -r /opt/gmt-"${GMT_VERSION}"-src*;

@@ -47,11 +47,13 @@ PROJ_VERSION=${2:-"9.2.0"}
 # Download and install PROJ
 # ==============================================================================
 # Download PROJ source
+echo "Downloading PROJ ${PROJ_VERSION} source code"
 curl -o "/opt/proj-${PROJ_VERSION}.tar.gz" -L \
   "https://download.osgeo.org/proj/proj-${PROJ_VERSION}.tar.gz"; 
 cd /opt && tar -xvf "/opt/proj-${PROJ_VERSION}.tar.gz";
 
 # Build the PROJ source code
+echo "Installing PROJ with cmake"
 cd "/opt/proj-${PROJ_VERSION}"\
     && mkdir -p build \
     && cd build \
