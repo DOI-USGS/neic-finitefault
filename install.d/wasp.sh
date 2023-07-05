@@ -131,6 +131,6 @@ modelling = %(code_path)s/fortran_code/bin_inversion_gfortran_f95
 get_near_gf = %(code_path)s/fortran_code/bin_str_f95
 compute_near_gf = %(code_path)s/fortran_code/src_dc_f95
 info = %(code_path)s/fortran_code/info
-cartopy_files = %(code_path)s/fortran_code/tectonicplates-master
+cartopy_files = %(code_path)s/fortran_code/tectonicplates
 
 EO_CONFIG

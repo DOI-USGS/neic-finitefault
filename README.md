@@ -25,14 +25,18 @@ The following dependencies are not handled by any install scripts and/or package
 
 ## Install Scripts and
 
-Automated installation of the dependencies and fortran code has been provided in the form of an [install script](./install.sh). Currently this install script only supports installation on linux systems (specifically Ubuntu for the system packages). Installation of Python dependencies and code is managed with Poetry. To install the dependencies and code run the two commands:
+Automated installation of the dependencies and fortran code has been provided in the form of an [install script](./install.sh). Currently this install script only supports installation on linux systems (specifically Ubuntu for the system packages). Installation of Python dependencies and code is managed with the provided Poetry environment setupy by pyproject.toml and package-lock.json. To install the dependencies and code run the two commands:
 
-1. `sudo ./install <>` (with optional configurations)
-2. `poetry install`
+1. `sudo ./install.sh` (with optional configurations)
+2. `sudo ./environment.d/<operating_system>.sh`
+   1. If you want the configurations in to be loaded automatically consider adding them to your .bashrc or .bash_profile: `echo "source /home/user/neic-finitefault/environment.d/ubuntu.sh" >> ~/.bashrc`
+3. `poetry install`
 
-> Note: the installation of system packages, GEOS, GMT, and PROJ, requires that the install script be run as root. A full list of configurations can be found by running `sudo ./install.sh --help`
+> Note 1: the installation of system packages, GEOS, GMT, and PROJ, requires that the install script be run as root. A full list of configurations can be found by running `sudo ./install.sh --help`
+> Note 2: the install scripts can also be run individually if some of the dependencies (e.g. proj, gmt, etc) are already satisfied on your system. The usage for each individual script can be accessed using the `--help` flag (e.g. `./install.d/proj.sh --help`).
+> Note 3: if packages cannot initially be found when running the packages script (ubuntu_packages.sh), then your system package manager may need to be updated (`apt update -y`) and/or upgraded (`apt upgrade -y`).
 
-The following documents provide more extensive information about the installation process:
+The following documents provide more information about the installation process:
 
 - [Data Dependencies](./docs/data-dependencies.md): Provides a list of data required to run the code
 - [Code Dependencies](./docs/code-dependecies.md): Provides a list of dependencies required to run the code
