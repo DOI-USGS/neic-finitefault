@@ -1,9 +1,12 @@
-# External inputs
+# docker files
+.trivy
+
+# external inputs
 fd_bank
 LITHO1.0.nc
 tectonicplates
 
-# lambda files
+# python files
 __pycache__
 .coverage
 .mypy_cache

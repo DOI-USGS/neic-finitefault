@@ -57,7 +57,7 @@ echo "Installing GEOS with cmake"
 cd "/opt/geos-${GEOS_VERSION}" \
     && mkdir -p build \
     && cd build \
-    && cmake .. \
+    && cmake -DBUILD_TESTING=OFF .. \
     && make \
     && make install;
 
