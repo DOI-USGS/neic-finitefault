@@ -11,7 +11,7 @@ Users of this code should consider citing the following relevant publications:
 
 Example json files for the modelling of multi-segment faults are available now in multi_segment_example. With these files, the user can re-create the geometry for the solution of the 2011 Tohoku event published by the USGS.
 
-## Installation
+# Installation
 
 ## Prior Dependencies
 
@@ -38,3 +38,9 @@ The following documents provide more information about the installation process:
 - [Data Dependencies](./docs/data-dependencies.md): Provides a list of data required to run the code
 - [Code Dependencies](./docs/code-dependecies.md): Provides a list of dependencies required to run the code
 - [Manual Installation](./docs/code-dependecies.md): Provides a list of steps to manually install dependencies and code without reference to a specific operating system.
+
+# Local Testing
+
+Tests and linting can both be run locally:
+1. To run all python unit tests: `poetry run poe test`
+2. To run python linting: `poetry run poe lint`

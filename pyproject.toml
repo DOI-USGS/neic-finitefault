@@ -35,8 +35,23 @@ black = "^22.3.0"
 isort = "^5.12.0"
 safety = "^2.1.1"
 poethepoet = "^0.20.0"
+pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
+mypy = "^1.4.1"
 
 [tool.poe.tasks]
+lint = [
+  { shell = "black --check src" },
+  { shell = "isort --check src" },
+  { shell = "mypy src/wasp" }
+]
 okada = [
   { shell = "pip install okada-wrapper==18.12.07.3" }
 ]
+test = [
+  { shell = "pytest src/test --cov=src/wasp" },
+  { shell = "coverage xml" },
+  { shell = "coverage html" }
+]
+
+
