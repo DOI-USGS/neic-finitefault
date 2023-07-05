@@ -9,9 +9,6 @@ Users of this code should consider citing the following relevant publications:
   -Goldberg, D. E., P. Koch, D. Melgar, S. Riquelme, and W. L. Yeck (2022). Beyond the Teleseism: Introducing Regional Seismic and Geodetic Data into Routine USGS FiniteFault Modeling, Seismological Research Letters, 93, 3308–3323, https://doi.org/10.1785/0220220047.
   -Zhu, L., & Rivera, L. A. (2002). A note on the dynamic and static displacements from a point source in multilayered media: A note on the dynamic and static displacements from a point source. Geophysical Journal International, 148(3), 619–627. https://doi.org/10.1046/j.1365-246X.2002.01610.x.
 
-The surface wave GF bank (fd_bank) is now available in Zenodo, where the user needs to search for "Surface wave Green's functions for WASP slip inversion code" or go directly to: https://zenodo.org/record/7236739#.Y9q4BOzMKDV
-Put the fd_bank file in fortran_code/gfs_nm/long/.
-
 Example json files for the modelling of multi-segment faults are available now in multi_segment_example. With these files, the user can re-create the geometry for the solution of the 2011 Tohoku event published by the USGS.
 
 ## Installation

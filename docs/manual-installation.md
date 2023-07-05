@@ -1,6 +1,6 @@
 # Manual Installation
 
-This document provides manual installation instructions for users that do not with to use the provided install scripts and/or want to use other package management tools.
+This document provides manual installation instructions for users that do not wish to use the provided install scripts and/or want to use other package management tools.
 
 - [Manual Installation](#manual-installation)
 - [Install Dependencies](#install-dependencies)
