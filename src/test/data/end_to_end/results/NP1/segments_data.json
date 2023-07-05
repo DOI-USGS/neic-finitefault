@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "rise_time": {
     "delta_rise": 1.5,
     "min_rise": 1.5,
@@ -23,3 +24,27 @@
     }
   ]
 }
+=======
+    "rise_time": {
+        "delta_rise": 1.5,
+        "min_rise": 1.5,
+        "windows": 10
+    },
+    "segments": [
+        {
+            "delay_segment": 0,
+            "delta_dip": 14.924353208236587,
+            "delta_strike": 17.92760869565217,
+            "dip": 19.280827965117993,
+            "dip_subfaults": 9,
+            "hyp_dip": 5,
+            "hyp_stk": 9,
+            "neighbours": [],
+            "rake": 109.27817171619564,
+            "rupture_vel": 2.5,
+            "stk_subfaults": 23,
+            "strike": 6.613912311529926
+        }
+    ]
+}
+>>>>>>> Add get_outputs.py test coverage=84%
