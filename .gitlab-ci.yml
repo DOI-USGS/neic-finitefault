@@ -85,7 +85,8 @@ Docker Build:
       fi
     - IMAGE="wasp-${OPERATING_SYSTEM}${BUILD}"
     - TAG="${CI_COMMIT_TAG:-latest}"
-    - LOCAL_IMAGE="${CI_REGISTRY}/ghsc/neic/algorithms/${IMAGE}:${TAG}"
+    - REPOSITORY="ghsc/neic/algorithms/neic-finitefault"
+    - LOCAL_IMAGE="${CI_REGISTRY}/${REPOSITORY}/${IMAGE}:${TAG}"
     - echo "${ARGS[@]} --tag ${LOCAL_IMAGE}" 
     - docker build "${ARGS[@]}" --tag "${LOCAL_IMAGE}" .
     # trivy scan before push
