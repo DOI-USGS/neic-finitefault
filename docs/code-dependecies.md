@@ -27,6 +27,6 @@ This document outlines the dependencies required to run the code. This may be he
 
 ## Other dependencies
 
-1. [GMT](https://github.com/GenericMappingTools/gmt/blob/master/INSTALL.md): Must be installed separately pyGMT is installed with pip
+1. [GMT](https://github.com/GenericMappingTools/gmt/blob/master/INSTALL.md): Must be installed separately if PyGMT is installed with pip
 2. [GEOS](https://geos.readthedocs.io/en/latest/users.html): Must be installed separately if Cartopy is installed with pip
 3. [PROJ](https://proj.org/en/9.2/install.html): Must be installed separately if Cartopy is installed with pip
