@@ -13,14 +13,14 @@ import pathlib
 import queue
 import threading
 import time
-from typing import Any, Dict, List, Literal, Union
+from typing import Dict, List, Literal, Union
 
-from obspy.clients.fdsn import Client
-from obspy.clients.iris import Client as IRIS_Client
-from obspy.core.inventory.channel import Channel
-from obspy.core.inventory.inventory import Inventory
-from obspy.core.inventory.util import Latitude, Longitude
-from obspy.core.utcdatetime import UTCDateTime
+from obspy.clients.fdsn import Client  # type: ignore
+from obspy.clients.iris import Client as IRIS_Client  # type: ignore
+from obspy.core.inventory.channel import Channel  # type: ignore
+from obspy.core.inventory.inventory import Inventory  # type: ignore
+from obspy.core.inventory.util import Latitude, Longitude  # type: ignore
+from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 
 import wasp.seismic_tensor as tensor
 
@@ -30,7 +30,7 @@ def acquisition(
     lat_ep: float,
     lon_ep: float,
     depth: float,
-    data_to_use: Literal["strong", "tele"],
+    data_to_use: List[Literal["strong", "tele"]],
     minutes_before: int = 3,
     minutes_after: int = 67,
     strong_before: int = 1,
@@ -119,7 +119,7 @@ def acquisition(
             latitude=lat_ep,
             longitude=lon_ep,
         )
-    cola = queue.Queue()
+    cola: queue.Queue = queue.Queue()
     for i in range(10):
         worker = threading.Thread(target=wrapper, args=(cola,), daemon=True)
         worker.start()
