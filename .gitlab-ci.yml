@@ -100,7 +100,7 @@ Python Test:
     - .docker_login
   image: "${WASP_IMAGE}"
   script:
-    - poetry run poe lint
+    - poetry run poe test
   stage: test
 
 Shell Check:
