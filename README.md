@@ -24,7 +24,7 @@ Users of this code should consider citing the following relevant publications:
 - Zhu, L., & Rivera, L. A. (2002). A note on the dynamic and static displacements from a point source in multilayered media: A note on the dynamic and static displacements from a point source. Geophysical Journal International, 148(3), 619–627. https://doi.org/10.1046/j.1365-246X.2002.01610.x.
 
 
-## Installation
+# Installation
 
 ## Prior Dependencies
 
@@ -51,3 +51,9 @@ The following documents provide more information about the installation process:
 - [Data Dependencies](./docs/data-dependencies.md): Provides a list of data required to run the code
 - [Code Dependencies](./docs/code-dependecies.md): Provides a list of dependencies required to run the code
 - [Manual Installation](./docs/code-dependecies.md): Provides a list of steps to manually install dependencies and code without reference to a specific operating system.
+
+# Local Testing
+
+Tests and linting can both be run locally:
+1. To run all python unit tests: `poetry run poe test`
+2. To run python linting: `poetry run poe lint`

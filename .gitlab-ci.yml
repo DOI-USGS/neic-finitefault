@@ -5,6 +5,12 @@ default:
     - chs-shared
     - dind
 
+variables:
+  REPOSITORY: "ghsc/neic/algorithms/neic-finitefault"
+  DOCKER_IMAGE: "code.usgs.gov:5001/devops/images/usgs/docker:20"
+  WASP_IMAGE: "${CI_REGISTRY}/${REPOSITORY}/wasp-ubuntu-dependencies:latest"
+   
+
 
 # Do not run for merge requests
 workflow:
@@ -13,8 +19,9 @@ workflow:
     - if: $CI_COMMIT_BRANCH
 
 stages:
-  - build
+  - init
   - test
+  - deploy
 
 
 ##
@@ -39,9 +46,6 @@ stages:
       OPERATING_SYSTEM:
         - ubuntu
 
-## -------------------------------------
-#  Build Stage
-## -------------------------------------
 .docker_login:
   before_script:
     - |
@@ -56,12 +60,66 @@ stages:
       - .trivy/
   services:
     - alias: docker
-      name: code.usgs.gov:5001/devops/images/usgs/docker:20-dind
-  
-Docker Build:
+      name: "${DOCKER_IMAGE}-dind"
+
+## -------------------------------------
+#  Init Stage
+## -------------------------------------
+Poetry:
+  allow_failure: true
+  artifacts:
+    paths:
+      - poetry.toml
+      - .venv
+      - dist/lambda
+    expire_in: 1 week
   extends:
     - .docker_login
-  image: code.usgs.gov:5001/devops/images/usgs/docker:20
+  image: "${WASP_IMAGE}"
+  script:
+    - poetry config virtualenvs.in-project true --local
+    - poetry install
+  stage: init
+
+## -------------------------------------
+#  Test Stage
+## -------------------------------------
+
+Python Lint:
+  allow_failure: true
+  extends:
+    - .docker_login
+  image: "${WASP_IMAGE}"
+  script:
+    - poetry run poe lint
+  stage: test
+
+Python Test:
+  allow_failure: true
+  extends:
+    - .docker_login
+  image: "${WASP_IMAGE}"
+  script:
+    - poetry run poe test
+  stage: test
+
+Shell Check:
+  image: usgs/ubuntu:latest
+  script:
+    - apt install -y shellcheck
+    - shellcheck install.sh -x
+    - shellcheck install.d/*
+    - shellcheck environment.d/*
+  stage: test
+
+## -------------------------------------
+#  Deploy Stage
+## -------------------------------------
+
+Docker Deploy:
+  extends:
+    - .docker_login
+  image: "${DOCKER_IMAGE}"
   parallel:
     matrix: *images
   rules:
@@ -104,7 +162,7 @@ Docker Build:
       exit 0;
       fi
     - docker push "${LOCAL_IMAGE}";
-  stage: build
+  stage: deploy
   variables:
     BUILD_ARGS: DCW_VERSION GMT_VERSION GSHHG_VERSION 
     DCW_VERSION: "2.1.1"
@@ -113,18 +171,3 @@ Docker Build:
     GSHHG_VERSION: "2.3.7"
     PYTHON_VERSION: "3.10"
     TRIVY: trivy --cache-dir .trivy --timeout 10m
-
-
-
-## -------------------------------------
-#  Test Stage
-## -------------------------------------
-
-Shell Check:
-  image: usgs/ubuntu:latest
-  script:
-    - apt install -y shellcheck
-    - shellcheck install.sh -x
-    - shellcheck install.d/*
-    - shellcheck environment.d/*
-  stage: test
