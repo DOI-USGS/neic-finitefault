@@ -52,11 +52,11 @@ def theoretic_arrivals(
     s_slowness = (s_arrivals[0].time - s_arrival[0].time) / 0.1
     arrivals = {
         "p_arrival": p_arrival,
+        "p_slowness": p_slowness,
         "pp_arrival": pp_arrival,
         "s_arrival": s_arrival,
-        "ss_arrival": ss_arrival,
-        "p_slowness": p_slowness,
         "s_slowness": s_slowness,
+        "ss_arrival": ss_arrival,
     }
     return arrivals
 
