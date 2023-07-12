@@ -95,7 +95,7 @@ Python Test:
   allow_failure: true
   image: "${WASP_IMAGE}"
   script:
-    - poetry run pytest src/wasp/modify_jsons.py --cov src/wasp/modify_jsons.py
+    - poetry run poe test
   stage: test
 
 Shell Check:
