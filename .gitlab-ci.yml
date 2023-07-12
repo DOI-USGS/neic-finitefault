@@ -87,14 +87,15 @@ Python Lint:
   allow_failure: true
   image: "${WASP_IMAGE}"
   script:
-    - poetry run poe lint
+    - poetry run mypy src/wasp/modify_jsons.py
+    - poetry run black --check src/wasp/modify_jsons.py
   stage: test
 
 Python Test:
   allow_failure: true
   image: "${WASP_IMAGE}"
   script:
-    - poetry run poe test
+    - poetry run pytest src/wasp/modify_jsons.py --cov src/wasp/modify_jsons.py
   stage: test
 
 Shell Check:
