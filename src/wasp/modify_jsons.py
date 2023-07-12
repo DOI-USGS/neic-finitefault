@@ -82,7 +82,6 @@ def _modify_by_input(
         if station.lower() == "exit":
             print("Exit\n")
             break
-        print("HERE", station)
         if station not in stations:
             raise ValueError(
                 "Selected station does not belong to list of available stations"
