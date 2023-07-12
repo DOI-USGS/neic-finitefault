@@ -137,13 +137,15 @@ Docker Deploy:
       for ARG in ${BUILD_ARGS}; do
         ARGS+=("--build-arg" "${ARG}=${!ARG}");
       done
-      if [[ ${TARGET} == "build" ]]; then
+      if [[ ${TARGET} == "dependencies" ]]; then
         ARGS+=("--target" "${TARGET}");
-        BUILD="-build";
+        BUILD="-dependencies";
       fi
+    - echo "BUILD= ${BUILD}"
+    - echo "TARGET= ${TARGET}"
     - IMAGE="wasp-${OPERATING_SYSTEM}${BUILD}"
     - TAG="${CI_COMMIT_TAG:-latest}"
-    - LOCAL_IMAGE="${CI_REGISTRY}/ghsc/neic/algorithms/${IMAGE}:${TAG}"
+    - LOCAL_IMAGE="${CI_REGISTRY}/${REPOSITORY}/${IMAGE}:${TAG}"
     - echo "${ARGS[@]} --tag ${LOCAL_IMAGE}" 
     - docker build "${ARGS[@]}" --tag "${LOCAL_IMAGE}" .
     # trivy scan before push
@@ -160,6 +162,7 @@ Docker Deploy:
       echo "Skipping push on non-upstream (${CI_PROJECT_PATH})";
       exit 0;
       fi
+    - echo "Pushing image ${LOCAL_IMAGE}"
     - docker push "${LOCAL_IMAGE}";
   stage: deploy
   variables:
