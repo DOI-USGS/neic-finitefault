@@ -130,7 +130,7 @@ def modify_channels(
     input: bool = True,
     station_dict: Dict[str, List[str]] = {},
 ):
-    """Method to select interactively channels to remove or downweight in
+    """Method to select channels to remove or downweight in
        modelling
 
     :param json_file: File with channels
