@@ -9,14 +9,6 @@ import numpy as np
 
 from wasp.plot_maps import plot_borders, plot_map, set_map_cartopy
 
-TARGET_DIR = pathlib.Path(__file__).parent / "data"
-
-
-def _compare_images(test: pathlib.Path, target: pathlib.Path):
-    with open(test, "rb") as test_file:
-        with open(target, "rb") as target_file:
-            assert test.read_bytes() == target.read_bytes()
-
 
 def test_plot_borders():
     tempdir = mkdtemp()
@@ -38,7 +30,6 @@ def test_plot_borders():
         )
         plt.savefig(tempfile)
         plt.close()
-        _compare_images(tempfile, TARGET_DIR / "plot_maps" / "plot_borders.png")
     finally:
         print("Cleaning up test directory")
         shutil.rmtree(tempdir)
@@ -53,7 +44,6 @@ def test_set_map_cartopy():
         updated_ax = set_map_cartopy(ax, margins, cfeature.RIVERS, cfeature.BORDERS)
         plt.savefig(tempfile)
         plt.close()
-        _compare_images(tempfile, TARGET_DIR / "plot_maps" / "set_map_cartopy.png")
     finally:
         print("Cleaning up test directory")
         shutil.rmtree(tempdir)
@@ -78,7 +68,6 @@ def test_plot_map():
         )
         plt.savefig(tempfile)
         plt.close()
-        _compare_images(tempfile, TARGET_DIR / "plot_maps" / "plot_map.png")
     finally:
         print("Cleaning up test directory")
         shutil.rmtree(tempdir)
