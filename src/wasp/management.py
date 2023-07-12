@@ -81,21 +81,21 @@ def default_dirs(
     get_near_gf = paths["get_near_gf"]
     modelling = paths["modelling"]
     default_dirs = {
-        "root_dir": paths["code_path"],
-        "long_gf_bank": paths["surf_gf_bank"],
+        "cgps_gf_bank": os.path.join(get_near_gf, "cgps"),
         "crust_codes": os.path.join(info, "CNtype2.txt"),
-        "models_codes": os.path.join(info, "CNtype2_key.txt"),
-        "litho_model": os.path.join(info, "LITHO1.0.nc"),
+        "finite_fault": os.path.join(modelling, "run_modelling"),
+        "forward": os.path.join(modelling, "run_forward"),
         "gf_bank": paths["surf_gf_bank"],
+        "gps_gf": os.path.join(compute_near_gf, "gf_static_f95"),
+        "litho_model": os.path.join(info, "LITHO1.0.nc"),
+        "long_gf_bank": paths["surf_gf_bank"],
+        "models_codes": os.path.join(info, "CNtype2_key.txt"),
+        "root_dir": paths["code_path"],
+        "strong_motion_gf": os.path.join(get_near_gf, "get_strong_motion"),
         "strong_motion_gf_bank2": os.path.join(
             compute_near_gf, "green_bank_openmp_f95"
         ),
-        "strong_motion_gf": os.path.join(get_near_gf, "get_strong_motion"),
-        "cgps_gf_bank": os.path.join(get_near_gf, "cgps"),
-        "gps_gf": os.path.join(compute_near_gf, "gf_static_f95"),
         "tele_gf": os.path.join(modelling, "green_tele"),
-        "finite_fault": os.path.join(modelling, "run_modelling"),
-        "forward": os.path.join(modelling, "run_forward"),
         "trench_graphics": os.path.join(paths["cartopy_files"], "PB2002_plates"),
     }
     return default_dirs
