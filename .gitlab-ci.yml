@@ -73,8 +73,6 @@ Poetry:
       - .venv
       - dist/lambda
     expire_in: 1 week
-  extends:
-    - .docker_login
   image: "${WASP_IMAGE}"
   script:
     - poetry config virtualenvs.in-project true --local
@@ -87,8 +85,6 @@ Poetry:
 
 Python Lint:
   allow_failure: true
-  extends:
-    - .docker_login
   image: "${WASP_IMAGE}"
   script:
     - poetry run poe lint
@@ -96,8 +92,6 @@ Python Lint:
 
 Python Test:
   allow_failure: true
-  extends:
-    - .docker_login
   image: "${WASP_IMAGE}"
   script:
     - poetry run poe test
