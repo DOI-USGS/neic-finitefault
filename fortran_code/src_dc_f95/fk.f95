@@ -75,6 +75,13 @@ contains
 
    subroutine sub_bs_dc(nx,x,t0,green,disp)
 !
+!  Args:
+!  nx: amount of source-station distances to compute GF
+!  x: range of source-station distances to compute GF
+!  t0: start time for each waveform
+!  green: GF to be computed
+!  disp: True if GF for cGPS, False otherwise
+!
    IMPLICIT NONE
 !   include 'omp_lib.h'
    integer stype,updn

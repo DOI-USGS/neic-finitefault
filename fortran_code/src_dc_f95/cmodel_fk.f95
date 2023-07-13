@@ -9,6 +9,19 @@ contains
 
    subroutine cmodel_fk(depth_s,depth_r, jjo, nlay_s, nlay_r, c, s, den, th, qa, qb)
 !
+!  Args:
+!  depth_s: depth of source
+!  depth_r: depth of receiver
+!  jjo: layers of modified velocity model
+!  nlay_s: layer of source
+!  nlay_r: layer of receiver
+!  c: P wave velocity of modified velocity model
+!  s: S wave velocity of modified velocity model
+!  den: density of modified velocity model
+!  th: thickness of each layer for modified velocity model
+!  qa: attenuation for modified velocity model
+!  qb: attenuation for modified velocity model
+!
    implicit none
    include 'fk.h'
    integer :: io_up

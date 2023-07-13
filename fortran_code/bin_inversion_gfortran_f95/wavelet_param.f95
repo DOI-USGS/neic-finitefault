@@ -9,6 +9,14 @@ contains
 
    
    subroutine get_data_param(lnpt0, jmin0, jmax0, nlen0, max_freq0)
+!
+!  Args:
+!  lnpt0: log2 of size of data arrays to be used
+!  jmin0: minimum used wavelet scale
+!  jmax0: maximum used wavelet scale
+!  nlen0: size of data arrays to be used
+!  max_freq0: maximum frequency to be modelled
+!
    implicit none
    integer :: lnpt0, nlen0, jmin0, jmax0, max_freq0
    lnpt0 = lnpt
@@ -20,6 +28,14 @@ contains
 
 
    subroutine set_params(lnpt0, jmin0, jmax0, nlen0, max_freq0)
+!
+!  Args:
+!  lnpt0: log2 of size of data arrays to be used
+!  jmin0: minimum used wavelet scale
+!  jmax0: maximum used wavelet scale
+!  nlen0: size of data arrays to be used
+!  max_freq0: maximum frequency to be modelled
+!
    implicit none
    integer :: lnpt0, nlen0, jmin0, jmax0, max_freq0
    lnpt = lnpt0

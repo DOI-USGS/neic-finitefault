@@ -45,6 +45,15 @@ contains
 
 
    subroutine print_static_summary(slip, rake, static, insar, get_coeff, ramp)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  static: True if static GPS data used in modelling, False otherwise
+!  insar: True if insar data used in modelling, False otherwise
+!  get_coeff: get regularization coefficients if and only if this is True
+!  ramp: Value of insar ramp, optional
+!
    implicit none
    real*8, optional :: ramp(:)
    real :: slip(:), rake(:)
@@ -156,6 +165,15 @@ contains
 
    
    subroutine annealing_iter(slip, rake, t, static, insar, ramp)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  t: Current temperature of the annealing method
+!  static: True if static GPS data used in modelling, False otherwise
+!  insar: True if insar data used in modelling, False otherwise
+!  ramp: Value of insar ramp, optional
+!
    implicit none
    integer isl, isr, n_subfault(max_subfaults), n_accept, &
    & nbb, i, k, npb, nn, nran, subfault_seg, segment, channel, subfault, iys, &
@@ -316,7 +334,10 @@ contains
          call modify_slip_field(subfault, duse, ause)
          call slip_laplace(slip_reg)
 
-         misfit2 = insar_misfit + gps_misfit
+         misfit2 = 0.d0
+         if (static) misfit2 = misfit2 + gps_misfit
+         if (insar) misfit2 = misfit2 + insar_misfit
+!         misfit2 = insar_misfit + gps_misfit
          value1 = misfit2 + moment_reg*coef_moment+amp*slip_reg*coef_slip
 !         value1 = value1+coef_gps*gps_misfit+coef_insar*insar_misfit
          moment0 = moment0-duse*shear(subfault)

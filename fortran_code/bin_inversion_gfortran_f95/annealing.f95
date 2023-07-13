@@ -44,6 +44,10 @@ contains
 
 
    subroutine n_threads(auto)
+!
+!  Args:
+!  auto: True if automatic inversion, False otherwise
+!
    implicit none
    logical :: auto
    threads = 4
@@ -98,6 +102,14 @@ contains
    
    
    subroutine initial_model(slip, rake, rupt_time, t_rise, t_fall)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  t_rise: array with model risetime values for all subfaults
+!  t_fall: array with model falltime values for all subfaults
+!
    use model_parameters, only : slip0, rake0, rupt_time0, t_rise0, t_fall0
    implicit none
    real :: slip(:), rake(:), rupt_time(:), t_rise(:), t_fall(:)
@@ -142,6 +154,18 @@ contains
 
    subroutine print_summary(slip, rake, rupt_time, t_rise, t_fall, static, insar, &
       &   get_coeff, ramp)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  t_rise: array with model risetime values for all subfaults
+!  t_fall: array with model falltime values for all subfaults
+!  static: True if static GPS data used in modelling, False otherwise
+!  insar: True if insar data used in modelling, False otherwise
+!  get_coeff: get regularization coefficients if and only if this is True
+!  ramp: Value of insar ramp, optional
+!
    implicit none
    real*8, optional :: ramp(:)
    real :: slip(:), rake(:), rupt_time(:)
@@ -309,6 +333,18 @@ contains
    
    subroutine print_summary2(slip, rake, rupt_time, t_rise, t_fall, static, insar, &
       &   get_coeff, ramp)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  t_rise: array with model risetime values for all subfaults
+!  t_fall: array with model falltime values for all subfaults
+!  static: True if static GPS data used in modelling, False otherwise
+!  insar: True if insar data used in modelling, False otherwise
+!  get_coeff: get regularization coefficients if and only if this is True
+!  ramp: Value of insar ramp, optional
+!
    use modelling_inputs, only : events, moment_event
    implicit none
    real*8, optional :: ramp(:)
@@ -488,6 +524,15 @@ contains
 
 
    subroutine annealing_iter3(slip, rake, rupt_time, t_rise, t_fall, t)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  t_rise: array with model risetime values for all subfaults
+!  t_fall: array with model falltime values for all subfaults
+!  t: Current temperature of the annealing method
+!
    implicit none
    real, intent(inout) :: slip(:), rake(:), rupt_time(:), t_fall(:), t_rise(:)
    real, intent(in) :: t
@@ -823,6 +868,18 @@ contains
    
    subroutine annealing_iter4(slip, rake, rupt_time, t_rise, &
    & t_fall, t, static, insar, ramp)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  t_rise: array with model risetime values for all subfaults
+!  t_fall: array with model falltime values for all subfaults
+!  t: Current temperature of the annealing method
+!  static: True if static GPS data used in modelling, False otherwise
+!  insar: True if insar data used in modelling, False otherwise
+!  ramp: Value of insar ramp, optional
+!
    implicit none
    real, intent(inout) :: slip(:), rake(:), rupt_time(:), t_fall(:), t_rise(:)
    real, intent(in) :: t
@@ -1226,6 +1283,15 @@ contains
 
 
    subroutine annealing_iter5(slip, rake, rupt_time, t_rise, t_fall, t)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  t_rise: array with model risetime values for all subfaults
+!  t_fall: array with model falltime values for all subfaults
+!  t: Current temperature of the annealing method
+!
    use modelling_inputs, only : events, moment_event
    implicit none
    real, intent(inout) :: slip(:), rake(:), rupt_time(:), t_fall(:), t_rise(:)
@@ -1589,6 +1655,18 @@ contains
    
    subroutine annealing_iter6(slip, rake, rupt_time, t_rise, &
    & t_fall, t, static, insar, ramp)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  t_rise: array with model risetime values for all subfaults
+!  t_fall: array with model falltime values for all subfaults
+!  t: Current temperature of the annealing method
+!  static: True if static GPS data used in modelling, False otherwise
+!  insar: True if insar data used in modelling, False otherwise
+!  ramp: Value of insar ramp, optional
+!
    use modelling_inputs, only : events, moment_event
    implicit none
    real, intent(inout) :: slip(:), rake(:), rupt_time(:), t_fall(:), t_rise(:)

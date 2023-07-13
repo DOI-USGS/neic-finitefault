@@ -39,14 +39,28 @@ contains
    end subroutine saveforward_set_data_properties
 
 
-   subroutine write_forward(slip, rake, rupt_time, tl, tr, strong, cgps, body, surf)
+   subroutine write_forward(slip, rake, rupt_time, tl, tr, &
+      &  strong, cgps, body, surf, dart)
+!
+!  Args:
+!  strong: True if strong motion data are used, False otherwise
+!  cgps: True if cGPS data are used, False otherwise
+!  body: True if body wave data are used, False otherwise
+!  surf: True if surface wave data are used, False otherwise
+!  dart: True if DART data are used, False otherwise
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  tl: array with model risetime values for all subfaults
+!  tr: array with model falltime values for all subfaults
+!
 !
 !  Here, we write the forward solution given a kinematic model, for all specified 
 !       data types.
 !  
    implicit none
    integer ll_in, ll_out
-   logical :: strong, cgps, body, surf
+   logical :: strong, cgps, body, surf, dart
    real slip(:), rake(:), rupt_time(:), &
    &  tr(:), tl(:), erm, ermin
    complex z0
@@ -59,11 +73,13 @@ contains
    ermin = 1.0e+10
 !   write(*,*) dxs, dys
    if (strong) then
-      call write_strong_motion_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+      call write_near_field_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out, &
+                                  & strong, .False.)
       ll_in = ll_out
    end if
    if (cgps) then
-      call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+      call write_near_field_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out, &
+                                  & .False., cgps)
       ll_in = ll_out
    end if
    if (body) then
@@ -74,14 +90,27 @@ contains
       call write_surface_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
       ll_in = ll_out
    end if
-!   if (dart) then
-!      call write_dart_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
-!      ll_in = ll_out
-!   end if
+   if (dart) then
+      call write_dart_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+      ll_in = ll_out
+   end if
    end subroutine write_forward
    
    
-   subroutine write_strong_motion_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+   subroutine write_near_field_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out, &
+   &  strong, cgps)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  tl: array with model risetime values for all subfaults
+!  tr: array with model falltime values for all subfaults
+!  ll_in: number of initial channel
+!  ll_out: number of final channel
+!  strong: True if strong motion data are used, False otherwise
+!  cgps: True if cGPS data are used, False otherwise
+!
    implicit none
    integer ll_in, ll_out, ll_g, isl, isr, channel_max, subfault, &
    &  jf, i, k, segment_subfault, segment, channel, n_chan, ixs, iys
@@ -91,12 +120,17 @@ contains
    real*8 t1, t2, df
    complex forward(wave_pts2), z0, z
    complex :: source2(wave_pts, max_rise_time_range, max_rise_time_range)
-!   character(len=6) sta_name(max_stations)
+   character(len=70) filename, filename2
    character(len=3) comp!component(max_stations), comp
+   logical :: strong, cgps
 
-   write(*,*)'Return strong motion synthetics from input kinematic model...'
+   if (strong) write(*,*)'Return strong motion synthetics from input kinematic model...'
+   if (cgps) write(*,*)'Return cGPS synthetics from input kinematic model...'
    z0 = cmplx(0.0, 0.0)
-   open(9,file='channels_strong.txt',status='old')
+   filename = 'channels_strong.txt'
+   if (cgps) filename = 'channels_cgps.txt'
+   filename = trim(filename)
+   open(9,file=filename,status='old')
    read(9,*)
    read(9,*)
    read(9,*)
@@ -149,7 +183,10 @@ contains
 !
 !  end of rise time 
 !       
-   open(18,file='synthetics_strong.txt')
+   filename2 = 'synthetics_strong.txt'
+   if (cgps) filename2 = 'synthetics_cgps.txt'
+   filename2 = trim(filename2)
+   open(18,file=filename2)
    k = 0
 !       
 !  set up the green function for every subfault
@@ -182,85 +219,20 @@ contains
    end do
    close(18)
    ll_out = ll_in+n_chan
-   end subroutine write_strong_motion_forward
-   
-   
-   subroutine write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
-   implicit none
-   integer ll_in, ll_out, ll_g, isl, isr, subfault, &
-   &  jf, i, k, segment_subfault, segment, channel, n_chan, ixs, iys, channel_max
-   real slip(:), rake(:), rupt_time(:), &
-   &  tr(:), tl(:), cr(wave_pts2), cz(wave_pts2), dt
-   real*8 t1, t2, df
-   complex forward(wave_pts2), z0, z
-   complex :: source2(wave_pts, max_rise_time_range, max_rise_time_range)
-!   character(len=6) sta_name(max_stations)
-   character(len=3) comp!component(max_stations), comp
-
-   write(*,*)'Return cGPS synthetics from input kinematic model...'
-   z0 = cmplx(0.0, 0.0)
-   
-   open(9,file='channels_cgps.txt',status='old')
-   read(9,*)
-   read(9,*)
-   read(9,*)
-   read(9,*)
-   read(9,*) channel_max, n_chan
-!   read(9,*)
-!   do channel = 1, channel_max
-!      read(9,*) int1, sta_name(channel), float1, float2, int2, component(channel), float3, int3
-!   end do
-   close(9)
-!
-!       make the rise time function
-!     
-   dt = dt_channel(ll_in + 1)
-   jf = 2**(lnpt-1)+1
-   df = 1.d0/(2**lnpt)/dt
-   do isl = 1, msou
-      do isr = 1, msou
-         t1 = ta0+(isl-1)*dta
-         t2 = ta0+(isr-1)*dta
-         if (t1 .lt. dt) t1 = dt
-         if (t2 .lt. dt) t2 = dt
-         do i = 1, jf
-            call fourier_asym_cosine((i-1)*df, t1, t2, source2(i, isl, isr))
-         end do
-      end do
-   end do
-!
-!  end of rise time 
-!       
-   open(18,file='synthetics_cgps.txt')
-   k = 0
-!       
-!  set up the green function for every subfault
-!  and calculate the initial value of objective function
-!
-   do channel = 1, n_chan
-      ll_g = channel+ll_in
-      comp = component(ll_g)
-      call create_waveform(slip, rake, rupt_time, tl, tr, forward, source2, ll_g)
-   
-      do i = 1, jf
-         cr(i) = real(forward(i))
-         cz(i) = aimag(forward(i))
-      end do
-  
-      call realtr(cr, cz, lnpt)
-      call fft(cr, cz, lnpt, 1.)
-   
-      write(18,*)nlen,dt,sta_name(ll_g),comp
-      do k = 1, nlen
-         write(18,*) cr(k), cz(k)
-      end do
-   end do   
-   close(18)
-   ll_out = ll_in+n_chan
-   end subroutine write_cgps_forward
+   end subroutine write_near_field_forward
 
 
    subroutine write_body_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  tl: array with model risetime values for all subfaults
+!  tr: array with model falltime values for all subfaults
+!  ll_in: number of initial channel
+!  ll_out: number of final channel
+!
    implicit none
    integer n_chan, channel, ll_g, k, subfault, &
    &  segment, iys, jf, i, npxy, segment_subfault, ixs, isl, isr, nl, &
@@ -336,6 +308,16 @@ contains
 
 
    subroutine write_surface_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  tl: array with model risetime values for all subfaults
+!  tr: array with model falltime values for all subfaults
+!  ll_in: number of initial channel
+!  ll_out: number of final channel
+!
    implicit none
    integer ll_in, ll_out, channel_max, subfault, &
    &  ll_g, isl, isr, jf, i, k, segment_subfault, segment, channel, n_chan, &
@@ -420,6 +402,16 @@ contains
 
 
    subroutine write_dart_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  tl: array with model risetime values for all subfaults
+!  tr: array with model falltime values for all subfaults
+!  ll_in: number of initial channel
+!  ll_out: number of final channel
+!
    implicit none
    integer ll_in, ll_out, ll_g, isl, isr, subfault, &
    &  jf, i, k, segment_subfault, segment, channel, n_chan, ixs, iys, channel_max
@@ -477,7 +469,7 @@ contains
          cr(i) = real(forward(i))
          cz(i) = aimag(forward(i))
       end do
-  
+ 
       call realtr(cr, cz, lnpt)
       call fft(cr, cz, lnpt, 1.)
    
@@ -492,6 +484,17 @@ contains
 
 
    subroutine create_waveform(slip, rake, rupt_time, tl, tr, forward, source2, ll_g)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  tl: array with model risetime values for all subfaults
+!  tr: array with model falltime values for all subfaults
+!  forward: synthetic for current channel given the input model
+!  source2: source function for given data type
+!  ll_g: index of current channel
+!
    implicit none
    integer ll_g, isl, isr, jf, segment, &
    &  i, k, subfault, ixs, iys, segment_subfault

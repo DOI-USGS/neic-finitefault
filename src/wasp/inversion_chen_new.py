@@ -59,7 +59,9 @@ def automatic_usgs(tensor_info, data_type, default_dirs, velmodel=None,
     sol_folder = os.path.abspath(sol_folder)
     time0 = time.time()
     if 'gps' in data_type:
-        copy2(os.path.join('data', 'gps_data'), sol_folder)
+        gps_file = os.path.join('data', 'gps_data')
+        if os.path.isfile(gps_file):
+            copy2(gps_file, sol_folder)
     if 'insar' in data_type:
         insar_files = glob.glob(os.path.join('data', 'insar_a*txt'))
         insar_files = insar_files + glob.glob(os.path.join('data', 'insar_d*txt'))
@@ -326,6 +328,8 @@ def modelling_new_data(tensor_info, data_type, default_dirs,
         data_type2 = data_type2 + ['gps']
     if os.path.isfile('insar_data.json'):
         data_type2 = data_type2 + ['insar']
+    if os.path.isfile('dart_waves.json'):
+        data_type2 = data_type2 + ['dart']
     manual_modelling(tensor_info, data_type2, default_dirs, segments_data)
     return
 
@@ -584,13 +588,16 @@ def writing_inputs0(tensor_info, data_type):
     if 'surf_tele' in data_type:
         input_files.input_chen_tele_surf(tensor_info, data_prop)
     if 'strong_motion' in data_type:
-        input_files.input_chen_strong_motion(tensor_info, data_prop)
+        input_files.input_chen_near_field(
+            tensor_info, data_prop, 'strong_motion')
     if 'cgps' in data_type:
-        input_files.input_chen_cgps(tensor_info, data_prop)
+        input_files.input_chen_near_field(tensor_info, data_prop, 'cgps')
     if 'gps' in data_type:
         input_files.input_chen_static(tensor_info)
     if 'insar' in data_type:
         input_files.input_chen_insar()
+    if 'dart' in data_type:
+        input_files.input_chen_dart(tensor_info, data_prop)
 
 
 def writing_inputs(tensor_info, data_type, segments_data, min_vel, max_vel,

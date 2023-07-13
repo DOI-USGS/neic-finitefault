@@ -12,6 +12,11 @@ contains
 
 
    subroutine load_bessel(x,nd_max)
+!
+!  Args:
+!  x: range of source-station distances
+!  nd_max: amount of source-station distances
+!
    implicit none
    real :: aj0, aj1, aj2, x(ndis)
    real :: k, dk, z, pmax, omega, dw

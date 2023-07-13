@@ -24,6 +24,12 @@ contains
 
 
    subroutine wavelet_obs(cr, cz, u)
+!
+!  Args:
+!  cr: real part of data vector
+!  cz: imaginary part of data vector
+!  u: wavelet coefficients from data vector
+!
    implicit none
 !       ******* Explaination ********
 !       In order to normalized the amplitude, we move the coeffficient
@@ -76,6 +82,12 @@ contains
 
 
    pure subroutine wavelet_syn(cr, cz, u)
+!
+!  Args:
+!  cr: real part of data vector
+!  cz: imaginary part of data vector
+!  u: wavelet coefficients from data vector
+!
    implicit none
 !       ******* Explaination ********
 !       In order to normalized the amplitude, we move the coeffficient
@@ -138,6 +150,12 @@ contains
 
    pure subroutine cfft(xr, xi, n)
 !
+!  Args:
+!  xr: real part of data vector
+!  xi: imaginary part of data vector
+!  n: length of data vector
+!
+!
 ! old version
 !
    implicit none
@@ -188,6 +206,12 @@ contains
 
 
    pure subroutine cifft(xr, xi, n)
+!
+!  Args:
+!  xr: real part of data vector
+!  xi: imaginary part of data vector
+!  n: length of data vector
+!
    implicit none
 !
 ! old version
@@ -299,6 +323,11 @@ contains
 
 
    function wave(w, ic) result(wave1)
+!
+!  Args:
+!  w: frequency value
+!  ic: 1 to get value of wavelet function, -1 if to get its complex conjugate
+!
    implicit none
    real*8 :: w
    integer :: ic
@@ -338,6 +367,12 @@ contains
 
 
    subroutine realtr(xr, xi, n)
+!
+!  Args:
+!  xr: real part of data vector
+!  xi: imaginary part of data vector
+!  n: length of data vector
+!
    implicit none
    real xr(:), xi(:)
    integer :: n

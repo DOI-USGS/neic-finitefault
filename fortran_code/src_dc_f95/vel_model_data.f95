@@ -14,6 +14,10 @@ contains
 
 
    subroutine read_vel_model(vel_model)
+!
+!  Args:
+!  vel_model: file with velocity model
+!
    implicit none
    character(len=100) :: vel_model
    integer :: j
@@ -36,6 +40,11 @@ contains
 
   
    subroutine update_model(depth_source, depth_rcv)
+!
+!  Args:
+!  depth_source: depth of point source
+!  depth_rcv: depth of receiver
+!
    implicit none
    real, intent(in) :: depth_source, depth_rcv
    real :: cum_dep, depths(nlay), depth1, depth2
@@ -148,6 +157,10 @@ contains
 
 
    subroutine extra(hs)
+!
+!  Args:
+!  hs: depth of source
+!
    implicit none
    real*8 :: hs
    integer :: i
@@ -162,6 +175,10 @@ contains
    
    
    subroutine extra2(hs)
+!
+!  Args:
+!  hs: depth of source
+!
    implicit none
    real*8 :: hs
    integer :: i
