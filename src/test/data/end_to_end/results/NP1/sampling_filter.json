@@ -1,0 +1,31 @@
+{
+    "cgps_filter": {
+        "high_freq": 0.3,
+        "low_freq": 0.01
+    },
+    "sampling": {
+        "dt_cgps": 0.4,
+        "dt_strong": 0.4,
+        "dt_tele": 0.2
+    },
+    "strong_filter": {
+        "high_freq": 0.125,
+        "low_freq": 0.01
+    },
+    "surf_filter": {
+        "freq1": 0.003,
+        "freq2": 0.004,
+        "freq3": 0.006,
+        "freq4": 0.007
+    },
+    "tele_filter": {
+        "freq0": 0.002,
+        "freq3": 1.2,
+        "high_freq": 1.0,
+        "low_freq": 0.004
+    },
+    "wavelet_scales": [
+        1,
+        8
+    ]
+}
