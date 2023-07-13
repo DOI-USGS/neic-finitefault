@@ -36,6 +36,15 @@ contains
 
 
    subroutine check_waveforms(strong, cgps, body, surf, dart, use_waveforms)
+!
+!  Args:
+!  strong: True if strong motion data are used, False otherwise
+!  cgps: True if cGPS data are used, False otherwise
+!  body: True if body wave data are used, False otherwise
+!  surf: True if surface wave data are used, False otherwise
+!  dart: True if DART data are used, False otherwise
+!  use_waveforms: True if some waveform data used in modelling, False otherwise
+!
    implicit none
    logical :: strong, cgps, dart, body, surf, use_waveforms
    use_waveforms = .False.
@@ -48,6 +57,12 @@ contains
 
 
    subroutine check_static(static, insar, use_static)
+!
+!  Args:
+!  static: True if static GPS data used in modelling, False otherwise
+!  insar: True if insar data used in modelling, False otherwise
+!  use_static: True if some static data used in modelling, False otherwise
+!
    implicit none
    logical :: static, insar, use_static
    use_static = .False.
@@ -58,6 +73,20 @@ contains
 
    subroutine waveform_ffm(strong, cgps, body, surf, dart, &
        & slip, rake, rupt_time, t_rise, t_fall, many_events)
+!
+!  Args:
+!  strong: True if strong motion data are used, False otherwise
+!  cgps: True if cGPS data are used, False otherwise
+!  body: True if body wave data are used, False otherwise
+!  surf: True if surface wave data are used, False otherwise
+!  dart: True if DART data are used, False otherwise
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  t_rise: array with model risetime values for all subfaults
+!  t_fall: array with model falltime values for all subfaults
+!  many_events: True if more than one event to be modelled, False otherwise
+!
    implicit none
    real :: slip(:), rake(:), rupt_time(:)
    real :: t_rise(:), t_fall(:)
@@ -115,7 +144,8 @@ contains
       call print_summary(slip, rake, rupt_time, t_rise, t_fall, static, &
         &  insar, get_coeff)
    endif
-   call write_forward(slip, rake, rupt_time, t_rise, t_fall, strong, cgps, body, surf)
+   call write_forward(slip, rake, rupt_time, t_rise, t_fall, &
+           &  strong, cgps, body, surf, dart)
    call write_model(slip, rake, rupt_time, t_rise, t_fall, use_waveforms)
    call deallocate_source()
    call deallocate_forward()
@@ -125,6 +155,22 @@ contains
 
    subroutine mixed_ffm(strong, cgps, body, surf, dart, &
        & static, insar, slip, rake, rupt_time, t_rise, t_fall, many_events)
+!
+!  Args:
+!  strong: True if strong motion data are used, False otherwise
+!  cgps: True if cGPS data are used, False otherwise
+!  body: True if body wave data are used, False otherwise
+!  surf: True if surface wave data are used, False otherwise
+!  dart: True if DART data are used, False otherwise
+!  static: True if static GPS data used in modelling, False otherwise
+!  insar: True if insar data used in modelling, False otherwise
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  t_rise: array with model risetime values for all subfaults
+!  t_fall: array with model falltime values for all subfaults
+!  many_events: True if more than one event to be modelled, False otherwise
+!
    implicit none
    real :: slip(:), rake(:), rupt_time(:)
    real :: t_rise(:), t_fall(:)
@@ -229,7 +275,8 @@ contains
       endif
       call initial_insar(slip, rake, ramp)
    end if
-   call write_forward(slip, rake, rupt_time, t_rise, t_fall, strong, cgps, body, surf)
+   call write_forward(slip, rake, rupt_time, t_rise, t_fall, &
+        &  strong, cgps, body, surf, dart)
    if (static) call initial_gps(slip, rake, many_events)
    call write_model(slip, rake, rupt_time, t_rise, t_fall, use_waveforms)
    call deallocate_source()
@@ -240,6 +287,14 @@ contains
 
 
    subroutine static_ffm(slip, rake, static, insar, many_events)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  static: True if static GPS data used in modelling, False otherwise
+!  insar: True if insar data used in modelling, False otherwise
+!  many_events: True if more than one event to be modelled, False otherwise
+!
    implicit none
    real :: slip(:), rake(:)
    logical :: static, get_coeff, insar, ramp_gf_file

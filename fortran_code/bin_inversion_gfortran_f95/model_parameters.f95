@@ -166,6 +166,15 @@ contains
 
 
    subroutine write_model(slip, rake, tt, tl, tr, use_waveforms)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  tt: array with model rupture time values for all subfaults
+!  tl: array with model risetime values for all subfaults
+!  tr: array with model falltime values for all subfaults
+!  use_waveforms: True if some waveform data used in modelling, False otherwise
+!
    real :: slip(:), rake(:), tt(:)
    real :: tl(:), tr(:)
    real :: latitude_ep, longitude_ep, t_ref, moment_sol
@@ -423,8 +432,8 @@ contains
             u0(k, 3) = npv
             k = k+1
             u0(k, 1) = 1
-            u0(k, 2) = MSOU
-            u0(k, 3) = MSOU
+            u0(k, 2) = msou
+            u0(k, 3) = msou
          end do
       end do
    end do
@@ -443,6 +452,12 @@ contains
 
    
    subroutine bbsort(a, mm, nn)
+!
+!  Args:
+!  a: array of values
+!  mm: 
+!  nn: 
+!  
    implicit none
    real :: a(:), d
    integer :: mm, nn, m, j, i
@@ -526,7 +541,7 @@ contains
       end do
    end do
    open(22, file='regularization_borders.txt', status='old')
-   do I_s = 1, segments 
+   do I_s = 1, segments
       subfault = cum_subfaults(i_s)
 !      up 
       read(22,*)
@@ -607,6 +622,11 @@ contains
    
    
    subroutine get_events_segments(segment_in_event0, subfault_in_event0)
+!
+!  Args:
+!  segment_in_event0: True if given segment belongs to given event, False otherwise
+!  subfault_in_event0: True if given subfault belongs to given event, False otherwise
+!  
    implicit none
    logical :: segment_in_event0(max_seg, 10)
    logical :: subfault_in_event0(max_subfaults, 10)
@@ -616,6 +636,12 @@ contains
 
 
    subroutine get_rise_time(ta00, dta0, msou0)
+!
+!  Args:
+!  ta00: first parameter of rise time function
+!  dta0: second parameter of rise time function
+!  msou: time windows for rise time function
+!  
    implicit none
    real :: ta00, dta0
    integer :: msou0 
@@ -626,6 +652,10 @@ contains
 
    
    subroutine get_shear(shear0)
+!
+!  Args:
+!  shear0: shear modulous for each subfault
+!  
    implicit none
    real :: shear0(:) 
    shear0(:) = shear(:)
@@ -634,6 +664,17 @@ contains
    
    subroutine get_segments(nxs_sub0, nys_sub0, dip0, strike0, delay_seg0, &
    &  segments0, subfaults0, cum_subfaults0)
+!
+!  Args:
+!  nxs_sub0: amount of subfaults in strike dimension for each segment
+!  nys_sub0: amount of subfaults in dip dimension for each segment
+!  strike0: strike value for each segment
+!  dip0: dip value for each segment
+!  delay_seg0: time delay for each segment
+!  segments0: amount of fault segments
+!  subfaults0: total amount of subfaults
+!  cum_subfaults0: cumulative amount of subfaults for each segment
+!  
    implicit none
    integer :: nxs_sub0(:), nys_sub0(:), subfaults0, segments0, cum_subfaults0(:)
    real :: dip0(:), strike0(:), delay_seg0(:)
@@ -649,6 +690,16 @@ contains
 
 
    subroutine get_subfaults(dxs0, dys0, nx_p0, ny_p0, v_min0, v_max0, v_ref0)
+!
+!  Args:
+!  dxs0: length along strike of each subfault
+!  dys0: length along dip of each subfault
+!  nx_p0: amount of point sources in strike dimension for each subfault
+!  ny_p0: amount of point sources in dip dimension for each subfault
+!  v_min0: mimimum rupture velocity allowed
+!  v_max0: maximum rupture velocity allowed
+!  v_ref0: reference rupture velocity
+!  
    implicit none
    integer :: nx_p0, ny_p0
    real :: dxs0, dys0, v_min0, v_max0, v_ref0
@@ -663,6 +714,15 @@ contains
    
 
    subroutine get_space(time_min0, time_max0, time_ref0, beg0, dp0, np0)
+!
+!  Args:
+!  time_min0: minimum allowed time of rupture initiation at each subfault
+!  time_max0: maximum allowed time of rupture initiation at each subfault
+!  time_ref0: reference time of rupture initiation at each subfault
+!  beg0: minimum value of slip and rake at each subfault
+!  dp0: delta slip and delta rake at each subfault
+!  np0: allowed amount of options for slip and rake values at each subfault
+!  
    implicit none
    real :: time_min0(max_subfaults), time_max0(max_subfaults)
    real :: time_ref0(max_subfaults)
@@ -678,6 +738,14 @@ contains
 
    
    subroutine get_borders(rake_min0, nleft0, nright0, nup0, ndown0)
+!
+!  Args:
+!  rake_min0: minimum rake value allowed
+!  nleft0: information about subfault to the left of current subfault
+!  nright0: information about subfault to the right of current subfault
+!  nup0: information about subfault above current subfault
+!  ndown0: information about subfault below current subfault
+!  
    implicit none
    integer :: nleft0(3, max_subfaults), nright0(3, max_subfaults), & 
    & nup0(3, max_subfaults), ndown0(3, max_subfaults)

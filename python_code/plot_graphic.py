@@ -133,6 +133,19 @@ def plot_misfit(used_data_type, forward=False, event=None):
     :type forward: bool, optional
     """
     from many_events import select_waveforms_event
+
+    if 'dart' in used_data_type:
+        if not os.path.isfile('dart_waves.json'):
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), 'dart_waves.json')
+        traces_info = json.load(open('dart_waves.json'))
+        traces_info = get_outputs.get_data_dict(
+            traces_info, obs_file='waveforms_dart.txt',
+            syn_file='synthetics_dart.txt')
+        values = ['dart']
+        for components in values:
+            plot_waveform_fits(
+                traces_info, components, 'dart', start_margin=0)
     if 'tele_body' in used_data_type:
         if not os.path.isfile('tele_waves.json'):
             raise FileNotFoundError(

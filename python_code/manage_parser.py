@@ -31,6 +31,9 @@ def parser_ffm_data(parser):
     parser.add_argument(
         "-in", "--insar", action="store_true",
         help="use InSar data in modelling")
+    parser.add_argument(
+        "--dart", action="store_true",
+        help="use DART data in modelling")
     return parser
 
 
@@ -85,6 +88,9 @@ def parser_data_dict(parser):
     parser.add_argument(
         "-indr", "--insar_desc_ramp", nargs='*',
         default=None, help="Ramp of descending InSar data")
+    parser.add_argument(
+        "--dart", action="store_true",
+        help="create JSON for DART data")
     return parser
 
 
@@ -109,6 +115,9 @@ def parser_fill_data_files(parser):
     parser.add_argument(
         "-in", "--insar", action="store_true",
         help="fill text files with InSar data")
+    parser.add_argument(
+        "--dart", action="store_true",
+        help="fill text files with DART data")
     return parser
 
 
@@ -133,6 +142,9 @@ def parser_data_plot(parser):
     parser.add_argument(
         "-in", "--insar", action="store_true",
         help="plot InSar data")
+    parser.add_argument(
+        "--dart", action="store_true",
+        help="plot DART data")
     return parser
 
 
@@ -173,4 +185,6 @@ def get_used_data(args):
         used_data = used_data + ['surf_tele'] if args.surface else used_data
     if 'insar' in args:
         used_data = used_data + ['insar'] if args.insar else used_data
+    if 'dart' in args:
+        used_data = used_data + ['dart'] if args.dart else used_data
     return used_data

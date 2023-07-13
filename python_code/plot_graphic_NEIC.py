@@ -912,8 +912,12 @@ def _PlotMap(tensor_info, segments, point_sources, solution, default_dirs, conve
                 legend_len = 5
             elif max_obs < 20:
                 legend_len = 10
-            else:
+            elif max_obs < 50:
                 legend_len = 20
+            elif max_obs < 100:
+                legend_len = 50
+            else:
+                legend_len = 100
         if scale==None:
             scale=2
         max_obs = max_obs/scale
@@ -937,18 +941,20 @@ def _PlotMap(tensor_info, segments, point_sources, solution, default_dirs, conve
         resolution='01m'
         map_scale_len='200k'
     grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=region)
-    projection = "M15c"
+    projection = "M10c"
     map_scale = "g"+str(region[0])+"/"+str(region[2])+"+c17.40+w"+map_scale_len+"+ar+l+jBL+o0.5/0.5+f"
 
+
     #pygmt.config(MAP_FRAME_TYPE="plain")
-    pygmt.config(MAP_FRAME_TYPE="plain",
+    pygmt.config(PS_MEDIA="A0",
+                 MAP_FRAME_TYPE="plain",
                  MAP_FRAME_AXES="WSen",
                  FORMAT_GEO_OUT = "F",
                  FORMAT_GEO_MAP = "ddd:mm:ss",
                  FONT_ANNOT_PRIMARY = "10p,Helvetica,black",
-                 FONT_ANNOT_SECONDARY = "12p,Helvetica,black",
+                 FONT_ANNOT_SECONDARY = "6p,Helvetica,black",
                  FONT_HEADING = "30p,Helvetica,black",
-                 FONT_LABEL = "14p,Helvetica,black",
+                 FONT_LABEL = "10p,Helvetica,black",
                  FONT_LOGO = "6p,Helvetica,black",
                  FONT_SUBTITLE = "16p,Helvetica,black",
                  FONT_TAG = "18p,Helvetica,black",
@@ -957,12 +963,12 @@ def _PlotMap(tensor_info, segments, point_sources, solution, default_dirs, conve
                  )
     fig.basemap(region=region, projection=projection, frame=["WSne", "afg"])
     fig.grdimage(grid=grid, cmap="oleron", shading=True, transparency=20)
-    fig.colorbar(yshift='a15p',
-                 xshift='a-5p',
-                 position="n0.05/-0.1+jTL+w100p/8%+h",
+    fig.colorbar(yshift='a0.75c',
+                 xshift='a-0.45c',
+                 position="n0.05/-0.1+jBL+w3c/8%+h",
                  frame="x+lElevation (km)",
                  #box="+p2p,black+ggray80",
-                 scale=0.001
+                 scale=0.001,
                  )
     fig.plot(str(default_dirs['root_dir'])+'/pb2002_boundaries.gmt', style="f10/3p", region=region, pen="2p,black")
     fig.plot(str(default_dirs['root_dir'])+'/pb2002_boundaries.gmt', style="f10/3p", region=region, pen="1p,white")
@@ -1019,12 +1025,15 @@ def _PlotMap(tensor_info, segments, point_sources, solution, default_dirs, conve
              color=slips/100.
              )
 
-    fig.colorbar(yshift='a15p',
-                 xshift='a135p',
-                 position="n0.05/-0.1+jTL+w100p/8%+h",
+    fig.colorbar(yshift='a0.75c',
+                 xshift='a3c',
+                 position="n0.05/-0.1+jBL+w3c/8%+h",
                  frame="x+lSlip (m)",
                  #box="+p2p,black+ggray80"
                  )
+    # Just in case fault plane is going under coastline, plot that coast again #
+    fig.coast(resolution="h", shorelines=True)
+
     #################################
     ### PLOT AFTERSHOCKS OVER TOP ###
     #################################
@@ -1143,10 +1152,10 @@ def _PlotMap(tensor_info, segments, point_sources, solution, default_dirs, conve
                     fig.text(x=lonp, y=latp, text=name, justify="ML", font="7p")
         ### ADD TO LEGEND ###
         fig.plot(x=region[1], y=region[2],
-            xshift="a-135p", yshift="a-66p",
+            xshift="a-2.7c", yshift="a-2.3c",
             no_clip=True, style="i10p", color="white", pen="black")
         fig.text(x=region[1], y=region[2], text="Accelerometer",
-            xshift="a-128p", yshift="a-67p", no_clip=True, justify="ML")
+            xshift="a-2.5c", yshift="a-2.3c", no_clip=True, justify="ML")
 
     ### HIGH-RATE GNSS ###
     if stations_cgps is not None:
@@ -1165,10 +1174,10 @@ def _PlotMap(tensor_info, segments, point_sources, solution, default_dirs, conve
                     fig.text(x=lonp, y=latp, text=name, justify="TR", font="7p")
         ### ADD TO LEGEND ###
         fig.plot(x=region[1], y=region[2],
-            xshift="a-55p", yshift="a-68p",
+            xshift="a0.2c", yshift="a-2.3c",
             no_clip=True, style="t10p", color="navy", pen="black")
         fig.text(x=region[1], y=region[2], text="HR GNSS",
-            xshift="a-48p", yshift="a-67p", no_clip=True, justify="ML", offset=0/10)
+            xshift="a0.4c", yshift="a-2.3c", no_clip=True, justify="ML", offset=0/10)
 
     ### STATIC GNSS ####
     if stations_gps is not None:
@@ -1240,10 +1249,10 @@ def _PlotMap(tensor_info, segments, point_sources, solution, default_dirs, conve
                 vector=v_syn
             )
         ### ADD TO LEGEND ###
-        fig.text(x=region[1], y=region[2], text="Observed GNSS",
-            xshift="a-133p", yshift="a-42p", no_clip=True, justify="ML")
-        fig.text(x=region[1], y=region[2], text="Synthetic  GNSS",
-            xshift="a-133p", yshift="a-52p", no_clip=True, justify="ML")
+        fig.text(x=region[1], y=region[2], text="Observed GNSS", font="10p,Helvetica,black",
+            xshift="a-2.9c", yshift="a-1.45c", no_clip=True, justify="ML")
+        fig.text(x=region[1], y=region[2], text="Synthetic  GNSS", font="10p,Helvetica,black",
+            xshift="a-2.9c", yshift="a-1.8c", no_clip=True, justify="ML")
         static_legend = pd.DataFrame(
              data={
                  "x": [region[1]],
@@ -1264,7 +1273,7 @@ def _PlotMap(tensor_info, segments, point_sources, solution, default_dirs, conve
                 color="grey",
                 spec="e1/0",
                 vector=v_obs,
-                xshift="a-45p", yshift="a-42p",
+                xshift="a0c", yshift="a-1.45c",
                 no_clip=True
             )
         fig.velo(
@@ -1274,7 +1283,7 @@ def _PlotMap(tensor_info, segments, point_sources, solution, default_dirs, conve
                 color="BLACK",
                 spec="e1/0.34",
                 vector=v_obs,
-                xshift="a-45p", yshift="a-42p",
+                xshift="a0c", yshift="a-1.45c",
                 no_clip=True
             )
         # Plot thick black arrow behind, to get black outline on red arrow
@@ -1285,7 +1294,7 @@ def _PlotMap(tensor_info, segments, point_sources, solution, default_dirs, conve
                 color="black",
                 spec="e1/0",
                 vector=v_syn,
-                xshift="a-45p", yshift="a-52p",
+                xshift="a0c", yshift="a-1.8c",
                 no_clip=True
             )
         #overlay thin red arrow
@@ -1296,12 +1305,15 @@ def _PlotMap(tensor_info, segments, point_sources, solution, default_dirs, conve
                 color="red",
                 spec="e1/0",
                 vector=v_syn,
-                xshift="a-45p", yshift="a-52p",
+                xshift="a0c", yshift="a-1.8c",
                 no_clip=True
             )
-        fig.text(x=region[1], y=region[2], text=str(legend_len*10)+"+/-"+str(legend_len)+" mm",
-            xshift="a-60p", yshift="a-32p", no_clip=True, justify="ML")
-
+        if legend_len <=10:
+            fig.text(x=region[1], y=region[2], text=str(legend_len*10)+"+/-"+str(legend_len)+" mm",
+                xshift="a-0.2c", yshift="a-1.1c", no_clip=True, justify="ML")
+        else:
+            fig.text(x=region[1], y=region[2], text=str(legend_len)+"+/-"+str(legend_len/10)+" cm",
+                xshift="a-0.2c", yshift="a-1.1c", no_clip=True, justify="ML")
     ##################################
     ### PLOT FAULT TRACES OVER TOP ###
     ##################################
@@ -1328,6 +1340,7 @@ def _PlotMap(tensor_info, segments, point_sources, solution, default_dirs, conve
 
     fig.savefig("Map.eps")
     fig.savefig("Map.png")
+    fig.savefig("Map.pdf")
 
 def _PlotMap_Old(tensor_info, segments, point_sources, solution, default_dirs,
              convex_hulls=[], files_str=None, stations_gps=None, stations_cgps=None,
@@ -2651,6 +2664,8 @@ if __name__ == '__main__':
     #    os.remove(plot_file)
     plot_files = glob.glob('*png')
     for plot_file in plot_files:
+        if os.path.isfile(os.path.join('plots', plot_file)):
+            os.remove(os.path.join('plots', plot_file))
         move(plot_file, 'plots')
 
     if args.publish:

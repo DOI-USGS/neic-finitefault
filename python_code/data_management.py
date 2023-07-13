@@ -313,6 +313,59 @@ def cgps_traces(files, tensor_info, data_prop):
     return info_traces
 
 
+def dart_traces(files, tensor_info, data_prop):
+    """Write json dictionary with specified properties for DART data
+
+    :param files: list of waveform files in sac format
+    :param tensor_info: dictionary with moment tensor information
+    :param data_prop: dictionary with waveform properties
+    :type files: list
+    :type tensor_info: dict
+    :type data_prop: dict
+
+    .. warning::
+
+        Make sure the filters of cGPS data agree with the values in
+        sampling_filter.json!
+    """
+    if len(files) == 0:
+        return
+    event_lat = tensor_info['lat']
+    event_lon = tensor_info['lon']
+    depth = tensor_info['depth']
+    origin_time = tensor_info['date_origin']
+    headers = [SACTrace.read(file) for file in files]
+    dt_dart = headers[0].delta
+    dt_dart = round(dt_dart, 2)
+    fun1 = lambda header: mng._distazbaz(header.stla, header.stlo, event_lat, event_lon)
+    values = map(fun1, headers)
+    distances = [value[0] for value in values]
+    duration = 300
+    n0, n1 = data_prop['wavelet_scales']
+    wavelet_weight = wavelets_dart(n0, n1)
+    info_traces = []
+    headers = (header for header in headers)
+    streams = [read(file) for file in files]
+    channels = (st[0].stats.channel for st in streams)
+    weights = (0.5 for channel in channels)
+    streams = (st for st in streams)
+
+    for file, header, stream, weight in zip(files, headers, streams, weights):
+        start = 0#origin_time - stream[0].stats.starttime
+        distance, azimuth, back_azimuth = mng._distazbaz(
+            header.stla, header.stlo, event_lat, event_lon)
+        info = _dict_trace(
+            file, header.kstnm, 'dart', azimuth, distance / 111.11,
+            dt_dart, duration, int(start // dt_dart), weight,
+            wavelet_weight, [], location=[header.stla, header.stlo])
+        info_traces.append(info)
+    with open('dart_waves.json','w') as f:
+        json.dump(
+            info_traces, f, sort_keys=True, indent=4,
+            separators=(',', ': '), ensure_ascii=False)
+    return info_traces
+
+
 def static_data(tensor_info, unit='m'):
     """Write json dictionary for static GPS data
 
@@ -360,9 +413,12 @@ def static_data(tensor_info, unit='m'):
                 observed[index] = str(baseline)
                 weights[index] = str(weight)
                 error[index] = str(variance)
+                distance, azimuth, back_azimuth = mng._distazbaz(
+                lat, lon, event_lat, event_lon)
             info = _dict_trace(
-                [], name, [], [], [], [], 1, 10, weights,
-                [], [], observed_trace=observed, location=[lat, lon])
+                [], name, [], azimuth, distance / 111.11, [], 1, 10, weights,
+                azimuth, distance / 111.11, observed_trace=observed,
+                location=[lat, lon])
             info['data_error'] = error
             info_traces.append(info)
 
@@ -402,8 +458,8 @@ def static_data(tensor_info, unit='m'):
             distance, azimuth, back_azimuth = mng._distazbaz(
             lat, lon, event_lat, event_lon)
             info = _dict_trace(
-                [], name, ['Z,N,E'], azimuth, distance / 111.11, [], 1, 10, weights,
-                [], [], observed_trace=observed, location=[lat, lon])
+                [], name, ['Z,N,E'], azimuth, distance / 111.11, [], 1, 10,
+                weights, [], [], observed_trace=observed, location=[lat, lon])
             info['data_error'] = error
             info_traces.append(info)
 
@@ -707,6 +763,12 @@ def filling_data_dicts(
         insar_data(
             insar_asc=insar_asc, insar_desc=insar_desc,
             ramp_asc=ramp_asc, ramp_desc=ramp_desc)
+    if 'dart' in data_type:
+        os.chdir(data_folder)
+        dart_data = get_traces_files('dart')
+        os.chdir(folder)
+        if not os.path.isfile('dart_waves.json'):
+            dart_traces(dart_data, tensor_info, data_prop)
 
 
 def get_traces_files(data_type):
@@ -726,6 +788,8 @@ def get_traces_files(data_type):
         traces_files = glob.glob(os.path.join('STR', 'final*'))
     if data_type == 'cgps':
         traces_files = glob.glob(os.path.join('cGPS', 'final*'))
+    if data_type == 'dart':
+        traces_files = glob.glob('final*')
     traces_files = [os.path.abspath(file) for file in traces_files]
     return traces_files
 
@@ -835,6 +899,20 @@ def wavelets_strong_motion(duration, filtro_strong, dt_strong, n_begin, n_end,
     wavelet_weight[:min_wavelet] = ['0'] * min_wavelet
     wavelet_weight = wavelet_weight[:n_end]
     wavelet_weight = wavelet_weight[:max_wavelet] + ['0'] * (n_end - max_wavelet)
+    wavelet_weight = ' '.join(wavelet_weight[n_begin - 1:n_end])
+    wavelet_weight = ''.join([wavelet_weight, '\n'])
+    return wavelet_weight
+
+
+def wavelets_dart(n_begin, n_end):
+    """Automatic determination of weight of wavelet scales
+
+    :param n_begin: minimum wavelet scale
+    :param n_end: maximum wavelet scale
+    :type n_begin: int
+    :type n_end: int
+    """
+    wavelet_weight = ['0'] * 2 + ['2'] * 6
     wavelet_weight = ' '.join(wavelet_weight[n_begin - 1:n_end])
     wavelet_weight = ''.join([wavelet_weight, '\n'])
     return wavelet_weight

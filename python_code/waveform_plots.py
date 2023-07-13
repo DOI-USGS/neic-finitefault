@@ -156,6 +156,9 @@ def plot_waveform_fits(files, components, type_str, start_margin=10,
         if 'BHZ' in components: plot_name = 'Rayleigh_surf_waves'
         if 'SH' in components: plot_name = 'Love_surf_waves'
 
+    if type_str == 'dart':
+        plot_name = 'DART_waves.png'
+
     if event is not None:
         plot_name = '{}_event{}'.format(plot_name, event)
     plt.savefig(plot_name, bbox_inches='tight')

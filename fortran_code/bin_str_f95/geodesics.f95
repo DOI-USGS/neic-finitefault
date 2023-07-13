@@ -14,6 +14,16 @@ contains
 
 
    subroutine distaz(lat_sta, lon_sta, lat_e, lon_e, dis, azz, baz)
+!
+!  Args:
+!  lat_sta: station latitude
+!  lon_sta: station longitude
+!  lat_e: point_source latitude
+!  lon_e: point source longitude
+!  dis: source-station distance
+!  azz: source-station azimuth
+!  baz: source-station back-azimuth
+!
    implicit none
    real, intent(in) :: lat_sta, lon_sta, lat_e, lon_e
    real*8, intent(out) :: dis, azz, baz
@@ -35,6 +45,11 @@ contains
 
 
    subroutine disaz1(n, k)
+!
+!  Args:
+!  n: amount of stations for which to compute distance, azimuth and back-azimuth
+!  k: index of point source
+!
    implicit none
    integer, intent(in) :: n, k
    integer :: i
@@ -133,6 +148,12 @@ contains
 
 
    function arc_dist(b, u, s) result(dist)
+!
+!  Args:
+!  b: ?
+!  u: ?
+!  s: ?
+!
    implicit none
    real*8 :: b, u, s, dist, x, sinu2, sinu4, sins2, sins4
    sinu2 = sin(2.d0 * u)

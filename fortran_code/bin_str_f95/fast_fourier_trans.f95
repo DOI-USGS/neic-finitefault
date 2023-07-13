@@ -54,6 +54,13 @@ contains
 
 
    subroutine fft(xr, xi, n, sn)
+!
+!  Args:
+!  xr: real part of data vector
+!  xi: imaginary part of data vector
+!  n: length of data vector
+!  sn: 1 or -1, whether to compute FFT or IFFT
+!
    implicit none
    integer :: n, sn
    real :: xr(*), xi(*)

@@ -674,6 +674,7 @@ def __select_cgps_files(cgps_files, tensor_info):
                 for gap in gaps:
                     begin = gap[0] - 1
                     end = gap[-1] + 1
+                    end = min(end, len(stream[0].data) - 1)
                     stream[0].data = __linear_fill(stream[0].data, begin, end)
 
         station = stream[0].stats.station

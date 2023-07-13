@@ -15,6 +15,12 @@ contains
 
 
    subroutine get_gf_data(gf_file, vel_model, gf_bank)
+!
+!  Args:
+!  gf_file: file with properties of GF bank
+!  gf_bank: location of GF bank
+!  vel_model: file with velocity model
+!
    implicit none
    character(len=100), intent(in) :: gf_file
    character(len=100), intent(out) :: vel_model, gf_bank
@@ -31,6 +37,12 @@ contains
 
    
    subroutine get_gf(gf_bank, z_min, z_max)
+!
+!  Args:
+!  gf_bank: location of GF bank
+!  z_min: minimum depth of point sources
+!  z_max: maximum depth of point sources
+!
    implicit none
    character(len=100) :: gf_bank
    real :: z_min, z_max
@@ -98,6 +110,13 @@ contains
 
 
    function interp_gf(distance, depth, zu_min, zu_max) result(green_out)
+!
+!  Args:
+!  distance: distance between source and station
+!  depth: source depth
+!  zu_min: minimum depth to get GF from GF bank
+!  zu_max: maximum depth to get GF from Gf bank
+!
    implicit none
    real*8 :: distance
    real :: depth, zu_min, zu_max
@@ -190,6 +209,14 @@ contains
 
 
    subroutine get_subgrid_bounds(fault_bounds, nx_b, nx_e, nz_b, nz_e)
+!
+!  Args:
+!  fault_bounds: minimum and maximum depths and distances for the fault
+!  nx_b: index of minimum source-station distance
+!  nx_e: index of maximum source-station distance
+!  nz_b: index of minimum depth
+!  nz_e: index of maximum depth
+!
    implicit none
    real, intent(in) :: fault_bounds(2, 2)
    integer, intent(out) :: nx_b, nx_e, nz_b, nz_e
@@ -219,6 +246,12 @@ contains
 
 
    subroutine get_subgrid(fault_bounds, subgrid_dist, subgrid_depth)
+!
+!  Args:
+!  fault_bounds: location of GF bank
+!  subgrid_dist: range of source-station distances to be used
+!  subgrid_depth: range of depths to be used
+!
    implicit none
    real, intent(in) :: fault_bounds(2, 2)
    real, intent(out) :: subgrid_depth(nny), subgrid_dist(ndis)

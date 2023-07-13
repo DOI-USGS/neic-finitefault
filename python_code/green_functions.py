@@ -93,7 +93,7 @@ def gf_retrieve(used_data_type, default_dirs):
 
     # [p.wait() for p in processes]
     for p, log, data_type in zip(processes, loggers, data_types):
-        out, err = p.communicate(timeout=50 * 60)
+        out, err = p.communicate(timeout=100 * 60)
         log.info(out.decode('utf-8'))
         if err: log.error(err.decode('utf-8', 'ignore'))
         ml.close_log(log)

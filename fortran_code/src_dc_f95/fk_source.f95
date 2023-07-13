@@ -35,6 +35,13 @@ contains
 
 
    subroutine source(stype, xi, mu, flip)
+!
+!  Args:
+!  stype: type of seismic source
+!  xi: square of S velocity / square of P velocity at source
+!  mu: shear modulous at source
+!  flip: whether source is above or below receiver
+!
    IMPLICIT NONE
    integer stype, flip
    real*8 :: xi, mu

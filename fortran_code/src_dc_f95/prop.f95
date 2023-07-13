@@ -24,6 +24,11 @@ contains
 
 
    subroutine propagateG(a, g)
+!
+!  Args:
+!  a: compound Haskell matrix
+!  g: vector to be propagated
+!
 !***************************************************************
 ! propagate g vector upward using the compound matrix
 !	g = g*a
@@ -53,6 +58,12 @@ contains
 
 
    subroutine initialZ(s, g, z)
+!
+!  Args:
+!  s: source vector
+!  g: vector to be propagated
+!  z: propagator matrix from the surface to above the source
+!
 !***************************************************************
 ! initialize the row-vector z at the source z(j)=s(i)*X|_ij^12
 ! for P-SV and z(j)=s(i)*X(5,i) for SH.
@@ -83,6 +94,11 @@ contains
 
 
    subroutine propagateZ(a, z)
+!
+!  Args:
+!  a: 4x4 P-SV Haskell matrix for layer
+!  z: propagator matrix from the surface to above the source
+!
 !***************************************************************
 !  apply the Haskell matrix a to the z vector
 !	z = z*a
@@ -109,6 +125,12 @@ contains
 
 
    subroutine initialB(b, e, g)
+!
+!  Args:
+!  b: 7x7 identity matrix
+!  g: vector to be propagated
+!  e: comes from E the similarity matrix 
+!
 !***************************************************************
 ! Initialize b as an unit matrix; e as an unit vector;
 ! e = (1 0 0 0 0 1 0) for top halfspace boundary condition;
@@ -134,6 +156,11 @@ contains
 
 
    subroutine propagateB(c, b)
+!
+!  Args:
+!  b: 7x7 identity matrix
+!  c: compound matrix
+!
 !***************************************************************
 !	b = b*c
 !***************************************************************

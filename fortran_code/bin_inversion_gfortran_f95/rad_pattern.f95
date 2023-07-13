@@ -11,6 +11,15 @@ contains
 !     Eight Green´s function in the sequence SS DS SS DS DD SS DS DD
 !
    subroutine rad_coef(dip, theta, az, ang_d, coef_v, coef_r)
+!
+!  Args:
+!  dip: value of dip angle
+!  theta: value of strike angle (?)
+!  az: source-station azimuth
+!  ang_d: angle to rotate radiation pattern
+!  coef_v: vertical radiation coefficients
+!  coef_r: radial radiation coefficients
+!
 
    real*8 :: coef_v(2, 3), coef_r(2, 5), dip, theta, az, ang_d
    real*8 :: source_az, source_az2, dip_rad, dip_rad2, rad_rot, tan_rot

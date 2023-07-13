@@ -1,1 +1,14 @@
-./fortran_code/gfs_nm/long/fd_bank
+python_code/__pycache__/
+
+fortran_code/tectonicplates-master/
+fortran_code/info/
+fortran_code/gfs_nm/
+fortran_code/bin_inversion_gfortran_f95/run_modelling
+fortran_code/bin_inversion_gfortran_f95/run_forward
+fortran_code/bin_inversion_gfortran_f95/green_tele
+fortran_code/bin_inversion_gfortran_f95/docs/
+fortran_code/bin_str_f95/get_strong_motion
+fortran_code/src_dc_f95/green_bank_fk_openmp
+fortran_code/src_dc_f95/gf_static_f95
+
+*txt
