@@ -20,7 +20,7 @@ from obspy import read
 from scipy.stats import norm
 import argparse
 import errno
-import management as mng
+import wasp.management as mng
 from obspy.taup import TauPyModel
 
 
