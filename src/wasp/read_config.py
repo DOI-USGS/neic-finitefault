@@ -4,6 +4,7 @@ import pathlib
 import os
 
 folder = os.path.dirname(__file__)
+folder = os.path.dirname(folder)
 CONFIG_PATH = os.path.join(os.path.dirname(folder), 'config.ini')
 print(CONFIG_PATH)
 
