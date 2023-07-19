@@ -7,24 +7,33 @@ import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import numpy as np
 
-from wasp.plot_maps import plot_borders, plot_map, set_map_cartopy
+from wasp.plot_maps_NEIC import plot_borders, plot_map, set_map_cartopy
 
 
 def test_plot_borders():
-    ax = plt.axes(projection=ccrs.PlateCarree())
-    ax = set_map_cartopy(ax, [46, 50, 10, 13], cfeature.OCEAN, cfeature.BORDERS)
-    updated_ax = plot_borders(
-        ax,
-        [
-            np.array([[46.909, 48.359], [46.909, 48.359]]),
-            np.array([[47.217, 49.062], [47.217, 49.062]]),
-        ],
-        [
-            np.array([[11.727, 12.650], [12.650, 11.727]]),
-            np.array([[10.022, 11.317], [11.317, 10.022]]),
-        ],
-        transform=None,
-    )
+    tempdir = mkdtemp()
+    try:
+        tempfile = pathlib.Path(tempdir) / "test.png"
+        ax = plt.axes(projection=ccrs.PlateCarree())
+        ax = set_map_cartopy(
+            ax, [46, 50, 10, 13], cfeature.OCEAN, cfeature.BORDERS, directory=tempdir
+        )
+        updated_ax = plot_borders(
+            ax,
+            [
+                np.array([[46.909, 48.359], [46.909, 48.359]]),
+                np.array([[47.217, 49.062], [47.217, 49.062]]),
+            ],
+            [
+                np.array([[11.727, 12.650], [12.650, 11.727]]),
+                np.array([[10.022, 11.317], [11.317, 10.022]]),
+            ],
+            transform=None,
+        )
+
+    finally:
+        print("Cleaning up test directory")
+        shutil.rmtree(tempdir)
 
 
 def test_set_map_cartopy():
