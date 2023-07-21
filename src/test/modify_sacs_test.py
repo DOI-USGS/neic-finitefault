@@ -4,6 +4,7 @@ import shutil
 import tempfile
 from copy import deepcopy
 from glob import glob
+from os import mkdir
 from unittest import mock
 
 import numpy as np
@@ -11,31 +12,17 @@ from obspy import read
 
 from wasp.modify_sacs import __is_number, correct_waveforms, plot_channels
 
-DATA_DIR = pathlib.Path(__file__).parent / "data" / "end_to_end" / "teleseismic"
+from .testutils import update_manager_file_locations
 
-TELE_WAVES = [
-    {
-        "name": "G_CCD__BHZ00",
-        "file": str(DATA_DIR / "G_CCD__BHE00.sac"),
-        "component": "BHZ",
-        "station": "G_CCD",
-        # made up a start signal
-        "start_signal": 120,
-        "dt": 0.2,
-        "duration": 60000,
-    },
-    {
-        "name": "IUTUC__BH200",
-        "file": str(DATA_DIR / "IUTUC__BH200.sac"),
-        "component": "BH2",
-        "station": "IUTUC",
-        # made up a start signal
-        "start_signal": 100,
-        # made up a dt
-        "dt": 0.2,
-        "duration": 60000,
-    },
-]
+RESULTS = pathlib.Path(__file__).parent / "data" / "end_to_end" / "results"
+
+
+with open(RESULTS / "NP1" / "tele_waves.json", "r") as f:
+    TELE_WAVES = update_manager_file_locations(json.load(f)[0:3], RESULTS / "data")
+with open(RESULTS / "NP1" / "surf_waves.json", "r") as f:
+    SURF_WAVES = update_manager_file_locations(json.load(f)[0:3], RESULTS / "data")
+with open(RESULTS / "NP1" / "strong_motion_waves.json", "r") as f:
+    STRONG_WAVES = update_manager_file_locations(json.load(f)[0:3], RESULTS / "data")
 
 
 def test_is_number():
@@ -49,21 +36,28 @@ def test_plot_channels():
         with open(pathlib.Path(tempdir) / "tele_waves.json", "w") as f:
             json.dump(TELE_WAVES, f)
         with open(pathlib.Path(tempdir) / "strong_motion_waves.json", "w") as f:
-            json.dump(TELE_WAVES, f)
+            json.dump(STRONG_WAVES, f)
         with open(pathlib.Path(tempdir) / "surf_waves.json", "w") as f:
-            json.dump(TELE_WAVES, f)
+            json.dump(SURF_WAVES, f)
 
         plot_channels("tele_waves.json", tempdir, tempdir)
         plot_channels("strong_motion_waves.json", tempdir, tempdir)
         plot_channels("surf_waves.json", tempdir, tempdir)
         written_plots = [f.replace(f"{tempdir}/", "") for f in glob(f"{tempdir}/*/*")]
-        assert len(written_plots) == 6
-        assert "review_strong/IUTUC__BH200_BH2.png" in written_plots
-        assert "review_strong/G_CCD__BHZ00_BHZ.png" in written_plots
-        assert "review_surf/IUTUC__BH200_BH2.png" in written_plots
-        assert "review_surf/G_CCD__BHZ00_BHZ.png" in written_plots
-        assert "review_tele/IUTUC__BH200_BH2.png" in written_plots
-        assert "review_tele/G_CCD__BHZ00_BHZ.png" in written_plots
+        assert len(written_plots) == 9
+        target_plots = [
+            "review_strong/VA03_HNZ.png",
+            "review_strong/GO04_HNN.png",
+            "review_strong/CO03_HNZ.png",
+            "review_surf/MACI_BHZ.png",
+            "review_surf/MPG_BHZ.png",
+            "review_surf/RCBR_BHZ.png",
+            "review_tele/MACI_BHZ.png",
+            "review_tele/MPG_BHZ.png",
+            "review_tele/RCBR_BHZ.png",
+        ]
+        for t in target_plots:
+            assert t in written_plots
     finally:
         shutil.rmtree(tempdir)
 
@@ -71,13 +65,13 @@ def test_plot_channels():
 @mock.patch(
     "builtins.input",
     side_effect=[
-        "G_CCD__BHZ00",
+        "MACI",
         "BHZ",
-        -1,
+        -100,
         "",
         "exit",
-        "IUTUC__BH200",
-        "BH2",
+        "RCBR",
+        "BHZ",
         "",
         -10,
         "exit",
@@ -86,28 +80,26 @@ def test_plot_channels():
 def test_correct_waveforms_input(mock_input):
     tempdir = tempfile.mkdtemp()
     try:
-        tele_waves = deepcopy(TELE_WAVES)
-        for idx, t in enumerate(TELE_WAVES):
-            new_file = tempdir + "/" + t["file"].split("/")[-1]
-            shutil.copyfile(t["file"], new_file)
-            tele_waves[idx]["file"] = new_file
-            stream_before = read(new_file)
-
-        print("channels_before", tele_waves)
+        new_tele_waves = update_manager_file_locations(
+            TELE_WAVES, tempdir, replace_dir=str(RESULTS / "data")
+        )
+        mkdir(pathlib.Path(tempdir) / "P")
+        for o, n in zip(TELE_WAVES, new_tele_waves):
+            shutil.copyfile(o["file"], n["file"])
         with open(pathlib.Path(tempdir) / "tele_waves.json", "w") as f:
-            json.dump(tele_waves, f)
+            json.dump(new_tele_waves, f)
         correct_waveforms(pathlib.Path(tempdir) / "tele_waves.json")
         correct_waveforms(pathlib.Path(tempdir) / "tele_waves.json")
 
         # check baseline shift
-        stream = read(pathlib.Path(tempdir) / "IUTUC__BH200.sac")
-        assert np.max(stream[0].data) == 1090667.0
+        stream = read(pathlib.Path(tempdir) / "P" / "final_IU_RCBR_BHZ.sac")
+        assert np.max(stream[0].data) == 356.4468994140625
 
         # check time shift
         with open(pathlib.Path(tempdir) / "tele_waves.json", "r") as f:
             updated_tele_waves = json.load(f)
             print("channels_after", updated_tele_waves)
-        assert updated_tele_waves[0]["start_signal"] == 140
+        assert updated_tele_waves[0]["start_signal"] == 595
     finally:
         shutil.rmtree(tempdir)
 
@@ -115,28 +107,27 @@ def test_correct_waveforms_input(mock_input):
 def test_correct_waveforms_dict():
     tempdir = tempfile.mkdtemp()
     try:
-        tele_waves = deepcopy(TELE_WAVES)
-        for idx, t in enumerate(TELE_WAVES):
-            new_file = tempdir + "/" + t["file"].split("/")[-1]
-            shutil.copyfile(t["file"], new_file)
-            tele_waves[idx]["file"] = new_file
-            stream_before = read(new_file)
-
-        print("channels_before", tele_waves)
+        new_tele_waves = update_manager_file_locations(
+            TELE_WAVES, tempdir, replace_dir=str(RESULTS / "data")
+        )
+        mkdir(pathlib.Path(tempdir) / "P")
+        for o, n in zip(TELE_WAVES, new_tele_waves):
+            shutil.copyfile(o["file"], n["file"])
         with open(pathlib.Path(tempdir) / "tele_waves.json", "w") as f:
-            json.dump(tele_waves, f)
+            json.dump(new_tele_waves, f)
+
         correct_waveforms(
             pathlib.Path(tempdir) / "tele_waves.json",
             input=False,
             station_dict={
-                "G_CCD__BHZ00": {
+                "MACI": {
                     "BHZ": {
-                        "time_correction": -1,
+                        "time_correction": -100,
                         "baseline_correction": None,
                     }
                 },
-                "IUTUC__BH200": {
-                    "BH2": {
+                "RCBR": {
+                    "BHZ": {
                         "time_correction": None,
                         "baseline_correction": -10,
                     }
@@ -145,13 +136,13 @@ def test_correct_waveforms_dict():
         )
 
         # check baseline shift
-        stream = read(pathlib.Path(tempdir) / "IUTUC__BH200.sac")
-        assert np.max(stream[0].data) == 1090667.0
+        stream = read(pathlib.Path(tempdir) / "P" / "final_IU_RCBR_BHZ.sac")
+        assert np.max(stream[0].data) == 356.4468994140625
 
         # check time shift
         with open(pathlib.Path(tempdir) / "tele_waves.json", "r") as f:
             updated_tele_waves = json.load(f)
             print("channels_after", updated_tele_waves)
-        assert updated_tele_waves[0]["start_signal"] == 140
+        assert updated_tele_waves[0]["start_signal"] == 595
     finally:
         shutil.rmtree(tempdir)
