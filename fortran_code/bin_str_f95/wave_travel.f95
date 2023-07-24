@@ -8,6 +8,12 @@ contains
 
 
    subroutine trav(dis, nx, tmin)
+!
+!  Args:
+!  dis: source-station distances to compute travel time
+!  nx: amount of destinations for which to compute travel time
+!  tmin: travel time at each source-station distance
+!
 !============================================================
 ! calculate travel time for horizontal layered model
 ! it outputs both times for first arrival and direct arrival
@@ -87,6 +93,12 @@ contains
 
 
    function function1(p, x, lmax) result(taup)
+!
+!  Args:
+!  p: 
+!  x: source-station distance
+!  lmax: layer of point source
+!
    use vel_model_data, only : slowness, new_thick, s_layer
 !c define function function1(p) = p x + eta h
    implicit none
@@ -106,6 +118,12 @@ contains
 
 
    function function2(x, p, lmax) result(dtdp)
+!
+!  Args:
+!  p: 
+!  x: distance
+!  lmax: layer of point source
+!
    use vel_model_data, only : slowness, new_thick, s_layer
 !c define function2 = d(tau)/dp
    implicit none

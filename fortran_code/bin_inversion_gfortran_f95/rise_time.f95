@@ -14,6 +14,12 @@ contains
 
 
    subroutine realtr(xr, xi, n)
+!
+!  Args:
+!  xr: real part of data vector
+!  xi: imaginary part of data vector
+!  n: length of data vector
+!
    implicit none
    real :: xr(*), xi(*)
    integer :: n
@@ -32,6 +38,13 @@ contains
 !
 
    subroutine fft(xr, xi, n, sn)
+!
+!  Args:
+!  xr: real part of data vector
+!  xi: imaginary part of data vector
+!  n: length of data vector
+!  sn: 1 or -1, whether to compute FFT or IFFT
+!
    implicit none
    real :: xr(*), xi(*), sn
    integer :: m(25), n
@@ -95,6 +108,12 @@ contains
 
 
    subroutine fourier_asym_cosine(omega, t1, t2, source)
+!
+!  Args:
+!  omega: frequency value
+!  t1: first parameter of asymmetric cosine function
+!  t2: second parameter of asymmetric cosine function
+!  source: FFT of asymetric cosine evaluated at frequency omega
 !
 ! analitic fourier transform of asymmetric cosine
 ! 

@@ -17,6 +17,12 @@ contains
 
 
    subroutine get_gf_data(gf_file, vel_model, gf_bank)
+!
+!  Args:
+!  gf_file: file with properties of GF bank
+!  vel_model: file with velocity model
+!  gf_bank: location of GF bank
+!
    implicit none
    character(len=100), intent(in) :: gf_file
    character(len=100), intent(out) :: vel_model, gf_bank

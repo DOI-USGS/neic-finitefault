@@ -26,6 +26,10 @@ contains
         
    subroutine define_slip_field(slip, rake)
 !
+!  Args:
+!  slip: slip at each subfault
+!  rake: rake at each subfault
+!
 !   Laplacian regularization of slip vector field
 !
    implicit none
@@ -45,6 +49,11 @@ contains
    
    subroutine modify_slip_field(subfault, slip_subf, rake_subf)
 !
+!  Args:
+!  subfault: current subfault
+!  slip_subf: slip at current subfault
+!  rake_subf: rake at current subfault
+!
 !   Laplacian regularization of slip vector field
 !
    implicit none
@@ -58,6 +67,9 @@ contains
 
 
    subroutine slip_laplace(err)
+!
+!  Args:
+!  err: laplacian slip regularization
 !
 !   Laplacian regularization of slip vector field
 !
@@ -138,6 +150,10 @@ contains
 
 
    pure subroutine time_laplace(tt, err)
+!
+!  Args:
+!  tt: rupture time at each subfault
+!  err: laplacian time regularization
 !
 !   Laplacian regularization of rupture initiation time
 !

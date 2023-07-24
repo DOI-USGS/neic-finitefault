@@ -44,6 +44,11 @@ contains
 
 
    subroutine get_ps_depth(dep_min0, dep_max0)
+!
+!  Args:
+!  dep_min0: minimum depth of point sources
+!  dep_max0: maximum depth of point sources
+!  
    implicit none
    real :: dep_min0, dep_max0, dep_p, niu
    integer :: i_seg, iys, iyp, subfault, psource
@@ -71,6 +76,10 @@ contains
 
 
    subroutine get_stations_data(disp)
+!
+!  Args:
+!  disp: True if data to be used is cGPS, False otherwise
+!  
    implicit none
    character(len=100) :: filter_file, wave_file, stat_file, event_file
    character(len=70) :: string1, string2

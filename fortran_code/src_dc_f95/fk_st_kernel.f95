@@ -44,6 +44,11 @@ contains
 
 
    subroutine kernel(k, u)!, ka, kb)
+!
+!  Args:
+!  k: wavenumber
+!  u: kernel of GF to be computed
+!
    IMPLICIT NONE
 !   real*8 kd,exa,exb,mu2
    integer stype,updn
@@ -126,6 +131,10 @@ contains
 
 
    subroutine separatS(ss)!, mu2, ra, rb, r, r1)
+!
+!  Args:
+!  ss: source vector (?) 
+!
    IMPLICIT NONE
    complex*16 ra, rb, r, r1
    real*8 mu2

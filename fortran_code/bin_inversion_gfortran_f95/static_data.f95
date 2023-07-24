@@ -39,6 +39,12 @@ contains
    
 
    subroutine initial_gps(slip, rake, many_events)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  many_events: True if modelling more than a single earthquake, False otherwise
+!
    implicit none
    integer k, j, segment, channel, no, i
    integer iys, ixs, n_tt, subfault, event
@@ -120,6 +126,12 @@ contains
 ! routine for loading static synthetic seismograms, given a rupture model
 !
    subroutine static_synthetic(slip, rake, err)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  err: static GPS misfit
+!
    implicit none
    real slip(:), rake(:)!, err
    integer k, j, segment, channel, subfault
@@ -153,6 +165,12 @@ contains
 ! subroutine for removing the static response of current subfault for all static stations
 !  
    subroutine static_remove_subfault(slip, rake, subfault)
+!
+!  Args:
+!  slip: slip value for this subfault
+!  rake: rake value for this subfault
+!  subfault: value of current subfault
+!
    implicit none
    real, intent(in) :: slip, rake
    integer, intent(in) :: subfault
@@ -180,6 +198,13 @@ contains
 ! we also give the misfit error of static data
 !
    pure subroutine static_modify_subfault(slip, rake, subfault, err)
+!
+!  Args:
+!  slip: slip value for this subfault
+!  rake: rake value for this subfault
+!  subfault: value of current subfault
+!  err: static GPS misfit
+!
    implicit none
    real, intent(in) :: slip, rake
    real, intent(out) :: err
@@ -213,6 +238,12 @@ contains
 ! we also give the misfit error of static data
 !
    subroutine static_add_subfault(slip, rake, subfault)
+!
+!  Args:
+!  slip: slip value for this subfault
+!  rake: rake value for this subfault
+!  subfault: value of current subfault
+!
    implicit none
    real, intent(in) :: slip, rake
    integer, intent(in) :: subfault
