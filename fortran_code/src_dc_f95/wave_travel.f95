@@ -24,6 +24,17 @@ contains
 
 
    subroutine trav_fk(dis,tmin,nx)
+!
+!  Args:
+!  dis: source-station distances to compute travel time
+!  nx: amount of destinations for which to compute travel time
+!  tmin: travel time at each source-station distance
+!
+!============================================================
+! calculate travel time for horizontal layered model
+! it outputs both times for first arrival and direct arrival
+!
+!============================================================
    IMPLICIT NONE
    real*8 ray_len(2,nlay)
    REAL*8 t, td, x, aa,t0,p0
@@ -114,6 +125,17 @@ contains
 !
 
    FUNCTION taup(p,x,ray_len,topp,bttm) result(taup1)
+!
+!  Args:
+!  dis: source-station distances to compute travel time
+!  nx: amount of destinations for which to compute travel time
+!  tmin: travel time at each source-station distance
+!
+!============================================================
+! calculate travel time for horizontal layered model
+! it outputs both times for first arrival and direct arrival
+!
+!============================================================
 ! define function tau(p) = p x + eta h
    IMPLICIT NONE
    real*8 ray_len(2,nlay)

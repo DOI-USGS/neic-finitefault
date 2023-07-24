@@ -78,6 +78,10 @@ contains
 
 
    subroutine is_ramp(ramp_gf_file)
+!
+!  Args:
+!  ramp_gf_file: True if there is a file with ramp GF data, False otherwise
+!
    implicit none
    integer :: point, i, track
    logical :: ramp_gf_file
@@ -117,6 +121,10 @@ contains
 
 
    subroutine initial_ramp(ramp)
+! 
+!  Args: 
+!  ramp: Value of insar ramp
+!
    implicit none
    real*8 :: ramp(36)
    integer :: i
@@ -131,6 +139,12 @@ contains
 
 
    subroutine initial_insar(slip, rake, ramp)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  ramp: Value of insar ramp, optional
+!
    implicit none
    real*8, optional :: ramp(36)
    integer k, j, segment, point, subfault
@@ -208,6 +222,13 @@ contains
 ! routine for loading static synthetic seismograms, given a rupture model
 !
    subroutine insar_synthetic(slip, rake, err, ramp)
+!
+!  Args:
+!  slip: array with model slip values for all subfaults
+!  rake: array with model rake values for all subfaults
+!  err: insar misfit
+!  ramp: Value of insar ramp, optional
+!
    implicit none
    real*8, optional :: ramp(36)
    real slip(:), rake(:)!, err
@@ -250,6 +271,12 @@ contains
 ! subroutine for removing the static response of current subfault for all static stations
 !  
    subroutine insar_remove_subfault(slip, rake, subfault)
+!
+!  Args:
+!  slip: slip value for this subfault
+!  rake: rake value for this subfault
+!  subfault: value of current subfault
+!
    implicit none
    real, intent(in) :: slip, rake
    integer, intent(in) :: subfault
@@ -278,6 +305,13 @@ contains
 ! we also give the misfit error of static data
 !
    pure subroutine insar_modify_subfault(slip, rake, subfault, err)
+!
+!  Args:
+!  slip: slip value for this subfault
+!  rake: rake value for this subfault
+!  subfault: value of current subfault
+!  err: insar misfit
+!
    implicit none
    real, intent(in) :: slip, rake
    real, intent(out) :: err
@@ -312,6 +346,12 @@ contains
 ! we also give the misfit error of static data
 !
    subroutine insar_add_subfault(slip, rake, subfault)
+!
+!  Args:
+!  slip: slip value for this subfault
+!  rake: rake value for this subfault
+!  subfault: value of current subfault
+!
    implicit none
    real, intent(in) :: slip, rake
    integer, intent(in) :: subfault
@@ -339,6 +379,10 @@ contains
 ! subroutine for removing the static response of current subfault for all static stations
 !  
    subroutine insar_remove_ramp(ramp)
+!
+!  Args:
+!  ramp: Value of insar ramp
+!
    implicit none
    real*8, intent(in) :: ramp(36)
    integer k, j, point
@@ -360,6 +404,11 @@ contains
 ! we also give the misfit error of static data
 !
    pure subroutine insar_modify_ramp(ramp, err)
+!
+!  Args:
+!  ramp: Value of insar ramp
+!  err: insar misfit
+!
    implicit none
    real*8, intent(in) :: ramp(36)
    real, intent(out) :: err
@@ -386,6 +435,10 @@ contains
 ! we also give the misfit error of static data
 !
    subroutine insar_add_ramp(ramp)
+!
+!  Args:
+!  ramp: Value of insar ramp
+!
    implicit none
    real*8, intent(in) :: ramp(36)
    integer k, j, point

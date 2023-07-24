@@ -33,6 +33,13 @@ contains
 
 
    subroutine sf_radiat(az,stk,dip,a)
+!
+!  Args:
+!  az: source-station azimuth 
+!  stk: strike of point source
+!  dip: dip of point source
+!  a: radiation pattern
+!
    real stk, dip, az,a(3),const
    real sstk, ddip
    parameter(const=3.14159265358979/180.0)

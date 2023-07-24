@@ -17,6 +17,10 @@ contains
 
 
    subroutine start_seed(idum)
+!
+!  Args:
+!  idum: seed value
+!
    implicit none
    integer, intent(in) :: idum
    seed = idum
@@ -93,6 +97,11 @@ contains
 
 
    subroutine cauchy(t, x)
+!
+!  Args:
+!  i: temṕerture of annealing method
+!  x: output
+!
    implicit none
    real, intent(in) :: t
    real, intent(out) :: x

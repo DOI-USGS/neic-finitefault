@@ -26,6 +26,16 @@ contains
 
 
    subroutine layerParameter(k, lay)!, kd, mu2, y, y1)
+!***************************************************************
+! compute some parameters for this layer
+!	IN:
+!		k   --- wave-number
+!		lay --- layer number
+!		volocity model passed in common/model/
+!	Out:
+!		common/layer/
+! called by: kernel()		in kernel.f
+!***************************************************************
    IMPLICIT NONE
    integer, intent(in) :: lay
    real*8, intent(in) :: k
@@ -38,6 +48,10 @@ contains
 
 
    subroutine haskellMatrix(a)!, exa, exb, kd, mu2, y, y1)
+!
+!  Args:
+!  a: 4x4 P-SV Haskell matrix for layer
+!
 !***************************************************************
 ! p-sv haskell matrix, scaled by exp(-2kd) to suppress overflow.
 !***************************************************************
@@ -78,6 +92,10 @@ contains
 
 
    subroutine compoundMatrix(a)!, exa, exb, kd, mu2, y, y1)
+!
+!  Args:
+!  a: compound matrix of the P-SV Haskell matrix
+!
 !***************************************************************
 ! p-sv compound matrix scaled by exb*exb; sh haskell matrix scaled by exb
 !***************************************************************
@@ -137,6 +155,10 @@ contains
 
 
    subroutine eVector(e)!, mu2, y, y1)
+!
+!  Args:
+!  e: comes from E the similarity matrix 
+!
 !***************************************************************
 ! e(1:5) = E_12^ij; e(6:7) is the 1st column of E_sh.
 !***************************************************************
@@ -156,6 +178,10 @@ contains
 
 
    subroutine initialG(g)!, mu2, y, y1)
+!
+!  Args:
+!  g: vector to be propagated
+!
 !**************************************************************
 ! Initialize the g row-vector. The first 5 elements are the
 ! inverse(E)|_{ij}^{12}, ij=12,13,23,24,34.

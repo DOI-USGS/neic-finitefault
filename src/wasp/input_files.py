@@ -311,18 +311,13 @@ def input_chen_tele_body(tensor_info, data_prop):
             arrivals = mng.theoretic_arrivals(model, dist, depth)
             p_slowness = arrivals['p_slowness']
             s_slowness = arrivals['s_slowness']
-            if channel == 'BHZ':
-                outfile.write(
-                    string_fun1(
-                        i + 1, name, dist, az, lat, lon, p_slowness, derivative
-                    )
+            slowness = p_slowness if channel == 'BHZ' else s_slowness
+            string_fun3 = string_fun1 if channel == 'BHZ' else string_fun2
+            outfile.write(
+                string_fun3(
+                    i + 1, name, dist, az, lat, lon, slowness, derivative
                 )
-            else:
-                outfile.write(
-                    string_fun2(
-                        i + 1, name, dist, az, lat, lon, s_slowness, derivative
-                    )
-                )
+            )
             i = i + 1
 
     with open('wavelets_body.txt', 'w') as file1, open('waveforms_body.txt', 'w') as file2:
@@ -420,7 +415,7 @@ def input_chen_tele_surf(tensor_info, data_prop):
     return
 
 
-def input_chen_strong_motion(tensor_info, data_prop):
+def input_chen_near_field(tensor_info, data_prop, data_type):
     """Based on the strong motion acquired, we write some text files with such
     data as input for Chen's fortran scripts.
 
@@ -434,10 +429,27 @@ def input_chen_strong_motion(tensor_info, data_prop):
         Make sure the filters of strong motion data agree with the values in
         sampling_filter.json!
     """
-    if not os.path.isfile('strong_motion_waves.json'):
+    if data_type == 'strong_motion':
+        dict1 = 'strong_motion_waves.json'
+        filename1 = 'filtro_strong.txt'
+        filtro = data_prop['strong_filter']
+        filename2 = 'channels_strong.txt'
+        filename3 = 'wavelets_strong.txt'
+        filename4 = 'waveforms_strong.txt'
+        filename5 = 'Wavelets_strong_motion.txt'
+    elif data_type == 'cgps':
+        dict1 = 'cgps_waves.json'
+        filename1 = 'filtro_cgps.txt'
+        filtro = data_prop['cgps_filter']
+        filename2 = 'channels_cgps.txt'
+        filename3 = 'wavelets_cgps.txt'
+        filename4 = 'waveforms_cgps.txt'
+        filename5 = 'Wavelets_cgps.txt'
+
+    if not os.path.isfile(dict1):
         return
 
-    traces_info = json.load(open('strong_motion_waves.json'))
+    traces_info = json.load(open(dict1))
     date_origin = tensor_info['date_origin']
     moment_mag = tensor_info['moment_mag']
     event_lat = tensor_info['lat']
@@ -445,13 +457,12 @@ def input_chen_strong_motion(tensor_info, data_prop):
     depth = tensor_info['depth']
     dt_strong = traces_info[0]['dt']
     dt_strong = round(dt_strong, 2)
-    filtro = data_prop['strong_filter']
     low_freq = filtro['low_freq']
     high_freq = filtro['high_freq']
 
     nsta = len(traces_info)
 
-    with open('filtro_strong.txt', 'w') as outfile:
+    with open(filename1, 'w') as outfile:
         outfile.write('Corners: {} {}'.format(low_freq, high_freq))
 
     disp_or_vel = 0
@@ -459,7 +470,7 @@ def input_chen_strong_motion(tensor_info, data_prop):
     string_fun = lambda i, name, lat, lon, a, w:\
         string.format(i + 1, name, lat, lon, a, w)
 
-    with open('channels_strong.txt', 'w') as outfile:
+    with open(filename2, 'w') as outfile:
         outfile.write('{}{}{}{}{}{}{}\n'.format(
             date_origin.year, date_origin.month, date_origin.day,
             date_origin.hour, date_origin.minute, date_origin.second,
@@ -476,76 +487,12 @@ def input_chen_strong_motion(tensor_info, data_prop):
             lat, lon = file['location']
             outfile.write(string_fun(i, name, lat, lon, channel, weight))
 
-    with open('wavelets_strong.txt', 'w') as file1, open('waveforms_strong.txt', 'w') as file2:
+    with open(filename3, 'w') as file1, open(filename4, 'w') as file2:
         write_files_wavelet_observed(
             file1, file2, dt_strong, data_prop, traces_info)
 
-    write_wavelet_freqs(dt_strong, 'Wavelets_strong_motion.txt')
+    write_wavelet_freqs(dt_strong, 'Wavelets_strong_motion')
     return 'strong_motion'
-
-
-def input_chen_cgps(tensor_info, data_prop):
-    """Based on the cGPS data acquired, we write some text files with such
-    data as input for Chen's fortran scripts.
-
-    :param tensor_info: dictionary with moment tensor information
-    :param data_prop: dictionary with properties of waveform data
-    :type tensor_info: dict
-    :type data_prop: dict
-
-    .. warning::
-
-        Make sure the filters of cGPS data agree with the values in
-        sampling_filter.json!
-    """
-    if not os.path.isfile('cgps_waves.json'):
-        return
-
-    traces_info = json.load(open('cgps_waves.json'))
-    date_origin = tensor_info['date_origin']
-    moment_mag = tensor_info['moment_mag']
-    event_lat = tensor_info['lat']
-    event_lon = tensor_info['lon']
-    depth = tensor_info['depth']
-    filtro = data_prop['strong_filter']
-    if 'cgps_filter' in data_prop:
-        filtro = data_prop['cgps_filter']
-    dt_cgps = traces_info[0]['dt']
-    dt_cgps = round(dt_cgps, 2)
-    low_freq = filtro['low_freq']
-    high_freq = filtro['high_freq']
-
-    nsta = len(traces_info)
-
-    with open('filtro_cgps.txt', 'w') as outfile:
-        outfile.write('Corners: {} {}'.format(low_freq, high_freq))
-
-    io_vd = 0
-    string = '{0:3d} {1:>5}{2:>9.3f}{3:>10.3f} 31{4:>5} {5} 0\n'
-    string_fun = lambda i, name, lat, lon, a, w:\
-    string.format(i + 1, name, lat, lon, a, w)
-
-    with open('channels_cgps.txt', 'w') as outfile:
-        outfile.write('{}{}{}{}{}{}{}\n'.format(
-            date_origin.year, date_origin.month, date_origin.day,
-            date_origin.hour, date_origin.minute, date_origin.second,
-            date_origin.microsecond))
-        outfile.write('{} {} {}\n'.format(event_lat, event_lon, depth))
-        outfile.write('10 {} {}\n'.format(dt_cgps, moment_mag))
-        outfile.write('{}\n'.format(io_vd))
-        outfile.write('{} {}\n'.format(nsta, nsta))
-        outfile.write('No STA Lat Lon M V H1 H2 Weight\n')
-        for i, file in enumerate(traces_info):
-            name = file['name']
-            channel = file['component']
-            lat, lon = file['location']
-            weight = file['trace_weight']
-            outfile.write(string_fun(i, name, lat, lon, channel, weight))
-
-    with open('wavelets_cgps.txt', 'w') as file1, open('waveforms_cgps.txt', 'w') as file2:
-        write_files_wavelet_observed(
-            file1, file2, dt_cgps, data_prop, traces_info, zero_start=True)
-    return 'cgps'
 
 
 def input_chen_static(tensor_info):
@@ -575,6 +522,63 @@ def input_chen_static(tensor_info):
                     ew_disp, ud_weight, ns_weight, ew_weight
                 )
             )
+
+
+def input_chen_dart(tensor_info, data_prop):
+    """Based on the cGPS data acquired, we write some text files with such
+    data as input for Chen's fortran scripts.
+
+    :param tensor_info: dictionary with moment tensor information
+    :param data_prop: dictionary with properties of waveform data
+    :type tensor_info: dict
+    :type data_prop: dict
+
+    .. warning::
+
+        Make sure the filters of cGPS data agree with the values in
+        sampling_filter.json!
+    """
+    if not os.path.isfile('dart_waves.json'):
+        return
+
+    traces_info = json.load(open('dart_waves.json'))
+    date_origin = tensor_info['date_origin']
+    moment_mag = tensor_info['moment_mag']
+    event_lat = tensor_info['lat']
+    event_lon = tensor_info['lon']
+    depth = tensor_info['depth']
+    dt_dart = traces_info[0]['dt']
+    dt_dart = round(dt_dart, 2)
+
+    nsta = len(traces_info)
+
+    io_vd = 0
+    string = '{0:3d} {1:>5}{2:>9.3f}{3:>10.3f} 31{4:>5} {5} 0\n'
+    string_fun = lambda i, name, lat, lon, a, w:\
+    string.format(i + 1, name, lat, lon, a, w)
+
+    with open('channels_dart.txt', 'w') as outfile:
+        outfile.write('{}{}{}{}{}{}{}\n'.format(
+            date_origin.year, date_origin.month, date_origin.day,
+            date_origin.hour, date_origin.minute, date_origin.second,
+            date_origin.microsecond))
+        outfile.write('{} {} {}\n'.format(event_lat, event_lon, depth))
+        outfile.write('10 {} {}\n'.format(dt_dart, moment_mag))
+        outfile.write('{}\n'.format(io_vd))
+        outfile.write('{} {}\n'.format(nsta, nsta))
+        outfile.write('No STA Lat Lon M V H1 H2 Weight\n')
+        for i, file in enumerate(traces_info):
+            name = file['name']
+            channel = file['component']
+            lat, lon = file['location']
+            weight = file['trace_weight']
+            outfile.write(string_fun(i, name, lat, lon, channel, weight))
+
+    with open('wavelets_dart.txt', 'w') as file1, open('waveforms_dart.txt', 'w') as file2:
+        write_files_wavelet_observed(
+            file1, file2, dt_dart, data_prop, traces_info,
+            dart=True, zero_start=True)
+    return 'cgps'
 
 
 def input_chen_insar():
@@ -936,9 +940,12 @@ def from_synthetic_to_obs(files, data_type, tensor_info, data_prop,
     if data_type == 'dart':
         max_val = 0.005
         # dt = 60.0
-        syn_file = 'synm.dart'
-        obser_file = 'Obser.dart'
+        syn_file = 'synthetics_dart.txt'
+        obser_file = 'waveforms_dart.txt'
         std_shift = 30
+        corners = []
+        filters = []
+        orders = []
 
     dart = 'dart' in data_type
     string = '{0:3d} {1:>5}{2:>10.3f}{3:>10.3f} {4} {5} {6} {7} {8} {9}\n'
@@ -1212,12 +1219,12 @@ if __name__ == '__main__':
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT),
                 'strong_motion_waves.json')
-        input_chen_strong_motion(tensor_info, data_prop)
+        input_chen_near_field(tensor_info, data_prop, 'strong_motion')
     if args.cgps:
         if not os.path.isfile('cgps_waves.json'):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), 'cgps_waves.json')
-        input_chen_cgps(tensor_info, data_prop)
+        input_chen_near_field(tensor_info, data_prop, 'cgps')
     if args.gps:
         if not os.path.isfile('static_data.json'):
             raise FileNotFoundError(

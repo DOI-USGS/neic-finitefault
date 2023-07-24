@@ -58,6 +58,11 @@ contains
 
 
    subroutine sh_ch(c,y,x,ex,a,kd)
+!
+!  Args:
+!  a: ?
+!  kd: ?
+!
 !***************************************************************
 ! compute c=cosh(a*kd); y=sinh(a*kd)/a; x=sinh(a*kd)*a
 ! and multiply them by ex=exp(-Real(a*kd)) to supress overflow
@@ -84,6 +89,10 @@ contains
 
 
    subroutine haskellMatrix(a)!, exa, exb, mu2, Ca, Cb, Ya, Yb, Xa, Xb, r, r1)
+!
+!  Args:
+!  a: 4x4 P-SV Haskell matrix for layer
+!
 !***************************************************************
 ! compute 4x4 P-SV Haskell a for the layer, the layer parameter
 ! is passed in by common /layer/.
@@ -128,6 +137,10 @@ contains
 
 
    subroutine compoundMatrix(a)!, exa, exb, Ca, Cb, Ya, Yb, Xa, Xb, kd, mu2, ra, rb, r, r1)
+!
+!  Args:
+!  a: compound matrix of the P-SV Haskell matrix
+!
 !***************************************************************
 ! The upper-left 5x5 is the 6x6 compound matrix of the P-SV Haskell matrix,
 !	a(ij,kl) = A|_kl^ij, ij=12,13,14,23,24,34,
@@ -201,6 +214,10 @@ contains
 
 
    subroutine eVector(e)!, ra, rb, r1, mu2)
+!
+!  Args:
+!  e: comes from E the similarity matrix 
+!
 !***************************************************************
 ! The first 5 members are E|_12^ij, ij=12,13,23,24,34.
 ! The last two are the first column of SH E matrix.
@@ -222,6 +239,10 @@ contains
 
 
    subroutine initialG(g)!, ra, rb, r, r1, mu2)
+!
+!  Args:
+!  g: vector to be propagated
+!
 !***************************************************************
 ! Initialize the g row-vector. The first 5 elements are the
 ! inverse(E)|_{ij}^{12}, ij=12,13,23,24,34.

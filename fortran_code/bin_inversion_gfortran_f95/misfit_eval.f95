@@ -24,6 +24,11 @@ contains
 
 
    pure subroutine misfit_channel(channel, wave_syn, error2)
+!
+!  Args:
+!  channel: number of current channel
+!  wave_syn: Wavelet coefficients of synthetic waveform for current channel
+!  error2: misfit between synthetic and observed wavelet coeficients for this channel
 !  
 !  Misfit between observed and synthetic waveforms, in wavelet domain.
 !
@@ -97,7 +102,6 @@ contains
    end do
    error2 = error2/(jmax-jmin+1)
    error2 = error2*weight(channel)
-!   error = real(error2)
    end subroutine misfit_channel
 
 

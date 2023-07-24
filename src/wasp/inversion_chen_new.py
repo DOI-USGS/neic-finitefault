@@ -348,18 +348,20 @@ def modelling_new_data(
             )
         p2.wait()
     data_type2 = []
-    if os.path.isfile("tele_waves.json"):
-        data_type2 = data_type2 + ["tele_body"]
-    if os.path.isfile("surf_waves.json"):
-        data_type2 = data_type2 + ["surf_tele"]
-    if os.path.isfile("strong_motion_waves.json"):
-        data_type2 = data_type2 + ["strong_motion"]
-    if os.path.isfile("cgps_waves.json"):
-        data_type2 = data_type2 + ["cgps"]
-    if os.path.isfile("static_data.json"):
-        data_type2 = data_type2 + ["gps"]
-    if os.path.isfile("insar_data.json"):
-        data_type2 = data_type2 + ["insar"]
+    if os.path.isfile('tele_waves.json'):
+        data_type2 = data_type2 + ['tele_body']
+    if os.path.isfile('surf_waves.json'):
+        data_type2 = data_type2 + ['surf_tele']
+    if os.path.isfile('strong_motion_waves.json'):
+        data_type2 = data_type2 + ['strong_motion']
+    if os.path.isfile('cgps_waves.json'):
+        data_type2 = data_type2 + ['cgps']
+    if os.path.isfile('static_data.json'):
+        data_type2 = data_type2 + ['gps']
+    if os.path.isfile('insar_data.json'):
+        data_type2 = data_type2 + ['insar']
+    if os.path.isfile('dart_waves.json'):
+        data_type2 = data_type2 + ['dart']
     manual_modelling(tensor_info, data_type2, default_dirs, segments_data)
     return
 
@@ -655,14 +657,17 @@ def writing_inputs0(tensor_info, data_type):
         input_files.input_chen_tele_body(tensor_info, data_prop)
     if "surf_tele" in data_type:
         input_files.input_chen_tele_surf(tensor_info, data_prop)
-    if "strong_motion" in data_type:
-        input_files.input_chen_strong_motion(tensor_info, data_prop)
-    if "cgps" in data_type:
-        input_files.input_chen_cgps(tensor_info, data_prop)
-    if "gps" in data_type:
+    if 'strong_motion' in data_type:
+        input_files.input_chen_near_field(
+            tensor_info, data_prop, 'strong_motion')
+    if 'cgps' in data_type:
+        input_files.input_chen_near_field(tensor_info, data_prop, 'cgps')
+    if 'gps' in data_type:
         input_files.input_chen_static(tensor_info)
     if "insar" in data_type:
         input_files.input_chen_insar()
+    if 'dart' in data_type:
+        input_files.input_chen_dart(tensor_info, data_prop)
 
 
 def writing_inputs(

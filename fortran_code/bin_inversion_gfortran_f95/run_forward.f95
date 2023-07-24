@@ -55,7 +55,8 @@ program run_forward
    call get_gf(strong, cgps, body, surf, dart, many_events)
    call staticdata_set_fault_parameters()
    call insardata_set_fault_parameters()
-   call write_forward(slip0, rake0, rupt_time0, t_rise0, t_fall0, strong, cgps, body, surf)
+   call write_forward(slip0, rake0, rupt_time0, t_rise0, t_fall0, &
+       &  strong, cgps, body, surf, dart)
    if (static) call initial_gps(slip0, rake0, many_events)
    if (insar) call get_insar_gf()
    if (insar) call get_insar_data()

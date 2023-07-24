@@ -16,3 +16,10 @@ coverage.xml
 dist
 htmlcov
 
+# fortran files
+run_modelling
+run_forward
+green_tele
+get_strong_motion
+gf_static_f95
+green_bank_openmp_f95
