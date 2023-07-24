@@ -92,6 +92,12 @@ Python Lint:
 
 Python Test:
   allow_failure: true
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+      junit: junit.xml
   image: "${WASP_IMAGE}"
   script:
     - poetry run poe test
