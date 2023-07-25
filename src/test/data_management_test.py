@@ -3,6 +3,7 @@ import os
 import pathlib
 import shutil
 import tempfile
+from glob import glob
 
 import numpy as np
 from obspy.io.sac import SACTrace
@@ -12,8 +13,13 @@ from wasp.data_management import (
     __is_number,
     __s2nr,
     __used_stations,
+    __wavelets_dart,
     _dict_trace,
     cgps_traces,
+    duration_dart,
+    duration_strong_motion,
+    duration_tele_waves,
+    filling_data_dicts,
     get_traces_files,
     insar_data,
     select_tele_stations,
@@ -21,7 +27,11 @@ from wasp.data_management import (
     strong_motion_traces,
     tele_body_traces,
     tele_surf_traces,
+    wavelets_body_waves,
+    wavelets_strong_motion,
+    wavelets_surf_tele,
 )
+from wasp.management import _distazbaz
 
 from .testutils import (
     RESULTS_DIR,
@@ -67,6 +77,136 @@ def test_cgps_traces():
         for idx, d in enumerate(new_cgps_waves):
             assert cgps_info[idx] == cgps_json[idx]
             assert cgps_info[idx] == d
+    finally:
+        shutil.rmtree(tempdir)
+
+
+def test_duration_dart():
+    depth = CMT["depth"]
+    # dont have dart records to made up some distances
+    distances = [20, 30, 40]
+    arrivals = [np.sqrt(dist**2 + depth**2) / 5 for dist in distances]
+    duration = duration_dart(distances, arrivals, CMT, 0.2)
+    assert duration == 950
+
+
+def test_duration_tele_waves():
+    for wavelet in TELE_WAVES:
+        duration = duration_tele_waves(CMT, wavelet["dt"])
+        assert duration == wavelet["duration"]
+
+
+def test_duration_strong_motion():
+    depth = CMT["depth"]
+    distances = [
+        _distazbaz(w["location"][0], w["location"][1], CMT["lat"], CMT["lon"])[0]
+        for w in STRONG_WAVES
+    ]
+    arrivals = [np.sqrt(dist**2 + depth**2) / 5 for dist in distances]
+    for wavelet in STRONG_WAVES:
+        duration = duration_strong_motion(distances, arrivals, CMT, 0.4)
+        assert duration == wavelet["duration"]
+
+
+def test_filling_data_dicts():
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        new_surf_waves = update_manager_file_locations(
+            SURF_WAVES, tempdir / "data", replace_dir=str(RESULTS_DIR / "data")
+        )
+        new_tele_waves = update_manager_file_locations(
+            TELE_WAVES, tempdir / "data", replace_dir=str(RESULTS_DIR / "data")
+        )
+        new_strong_waves = update_manager_file_locations(
+            STRONG_WAVES,
+            tempdir / "data",
+            replace_dir=str(RESULTS_DIR / "data"),
+        )
+        new_cgps_waves = update_manager_file_locations(
+            CGPS_WAVES, tempdir / "data", replace_dir=str(RESULTS_DIR / "data")
+        )
+        new_insar = update_manager_file_locations(
+            INSAR_DATA, tempdir, replace_dir=str(RESULTS_DIR / "NP1"), file_key="name"
+        )
+        os.mkdir(tempdir / "data")
+        os.mkdir(tempdir / "data" / "STR")
+        os.mkdir(tempdir / "data" / "cGPS")
+        os.mkdir(tempdir / "data" / "SH")
+        os.mkdir(tempdir / "data" / "P")
+        os.mkdir(tempdir / "data" / "LONG")
+        for a, b, c, d, e, f, g, h in zip(
+            SURF_WAVES,
+            new_surf_waves,
+            TELE_WAVES,
+            new_tele_waves,
+            STRONG_WAVES,
+            new_strong_waves,
+            CGPS_WAVES,
+            new_cgps_waves,
+        ):
+            shutil.copyfile(a["file"], b["file"])
+            shutil.copyfile(c["file"], d["file"])
+            shutil.copyfile(e["file"], f["file"])
+            shutil.copyfile(g["file"], h["file"])
+        for key in ["ascending", "descending"]:
+            for o, n in zip(INSAR_DATA[key], new_insar[key]):
+                shutil.copyfile(o["name"], n["name"])
+        shutil.copyfile(RESULTS_DIR / "NP1" / "gps_data", tempdir / "gps_data")
+        filling_data_dicts(
+            CMT,
+            ["cgps", "gps", "insar", "strong_motion", "surf_tele", "tele_body"],
+            SAMPLING_FILTER,
+            tempdir / "data",
+            [w["name"] for w in new_insar["ascending"]],
+            [w["name"] for w in new_insar["descending"]],
+            working_directory=tempdir,
+        )
+        print(glob(str(tempdir) + "/*"))
+        print(glob(str(tempdir) + "/*/*"))
+        for fname, target in zip(
+            [
+                "surf_waves.json",
+                "tele_waves.json",
+                "strong_motion_waves.json",
+                "cgps_waves.json",
+                "insar_data.json",
+                "static_data.json",
+            ],
+            [
+                new_surf_waves,
+                new_tele_waves,
+                new_strong_waves,
+                new_cgps_waves,
+                new_insar,
+                STATIC_DATA,
+            ],
+        ):
+            with open(tempdir / fname, "r") as f:
+                props = json.load(f)
+            if "insar" in fname:
+                for idx, d in enumerate(target["ascending"]):
+                    assert props["ascending"][idx] == d
+                for idx, d in enumerate(target["descending"]):
+                    assert props["descending"][idx] == d
+            elif "static" in fname:
+                for idx, d in enumerate(target):
+                    for key in [
+                        "duration",
+                        "start_signal",
+                        "trace_weight",
+                        "observed",
+                        "name",
+                        "component",
+                        "azimuth",
+                        "distance",
+                        "location",
+                        "derivative",
+                        "data_error",
+                    ]:
+                        assert props[idx][key] == d[key]
+            else:
+                for idx, d in enumerate(target):
+                    assert props[idx] == d
     finally:
         shutil.rmtree(tempdir)
 
@@ -255,108 +395,115 @@ def test_s2nr():
     )
 
 
-# def test_static_data():
-#     tempdir = pathlib.Path(tempfile.mkdtemp())
-#     try:
-#         new_cgps_waves = update_manager_file_locations(
-#             CGPS_WAVES, tempdir, replace_dir=str(RESULTS_DIR / "data")
-#         )
-#         os.mkdir(tempdir / "cGPS")
-#         for o, n in zip(CGPS_WAVES, new_cgps_waves):
-#             shutil.copyfile(o["file"], n["file"])
+def test_static_data():
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        new_cgps_waves = update_manager_file_locations(
+            CGPS_WAVES, tempdir, replace_dir=str(RESULTS_DIR / "data")
+        )
+        os.mkdir(tempdir / "cGPS")
+        for o, n in zip(CGPS_WAVES, new_cgps_waves):
+            shutil.copyfile(o["file"], n["file"])
 
-#         with open(tempdir / "cgps_waves.json", "w") as f:
-#             json.dump(new_cgps_waves, f)
+        with open(tempdir / "cgps_waves.json", "w") as f:
+            json.dump(new_cgps_waves, f)
 
-#         static_info1 = static_data(
-#             CMT,
-#             directory=tempdir,
-#         )
-#         with open(tempdir / "static_data.json", "r") as f:
-#             static_json1 = json.load(f)
-#         target_no_gps_data = [
-#             {
-#                 "azimuth": None,
-#                 "component": None,
-#                 "data_error": ["2.3578446", 0, 0],
-#                 "derivative": False,
-#                 "distance": None,
-#                 "dt": None,
-#                 "duration": 1,
-#                 "file": "None",
-#                 "location": [-30.6037540435791, -71.20388793945312],
-#                 "name": "ovll",
-#                 "observed": ["-11.523461", 0, 0],
-#                 "start_signal": 10,
-#                 "synthetic": None,
-#                 "trace_weight": ["0.5", 0, 0],
-#                 "wavelet_weight": None,
-#             },
-#             {
-#                 "azimuth": None,
-#                 "component": None,
-#                 "data_error": [0, 0, "2.5028799"],
-#                 "derivative": False,
-#                 "distance": None,
-#                 "dt": None,
-#                 "duration": 1,
-#                 "file": "None",
-#                 "location": [-30.674747467041016, -71.63543701171875],
-#                 "name": "pfrj",
-#                 "observed": [0, 0, "-140.64612"],
-#                 "start_signal": 10,
-#                 "synthetic": None,
-#                 "trace_weight": [0, 0, "1.0"],
-#                 "wavelet_weight": None,
-#             },
-#             {
-#                 "azimuth": None,
-#                 "component": None,
-#                 "data_error": ["2.9627585", 0, 0],
-#                 "derivative": False,
-#                 "distance": None,
-#                 "dt": None,
-#                 "duration": 1,
-#                 "file": "None",
-#                 "location": [-30.838970184326172, -70.68913269042969],
-#                 "name": "pedr",
-#                 "observed": ["-3.6849258", 0, 0],
-#                 "start_signal": 10,
-#                 "synthetic": None,
-#                 "trace_weight": ["0.5", 0, 0],
-#                 "wavelet_weight": None,
-#             },
-#         ]
-#         for idx, d in enumerate(target_no_gps_data):
-#             print(static_json1[idx], static_info1[idx], d)
-#             assert static_json1[idx] == static_info1[idx] == d
+        static_info1 = static_data(
+            CMT,
+            directory=tempdir,
+        )
+        with open(tempdir / "static_data.json", "r") as f:
+            static_json1 = json.load(f)
+        target_no_gps_data = [
+            {
+                "azimuth": None,
+                "component": None,
+                "data_error": ["2.3578446", 0, 0],
+                "derivative": False,
+                "distance": None,
+                "dt": None,
+                "duration": 1,
+                "file": "None",
+                "location": [-30.6037540435791, -71.20388793945312],
+                "name": "ovll",
+                "observed": ["-11.523461", 0, 0],
+                "start_signal": 10,
+                "synthetic": None,
+                "trace_weight": ["0.5", 0, 0],
+                "wavelet_weight": None,
+            },
+            {
+                "azimuth": None,
+                "component": None,
+                "data_error": [0, 0, "2.5028799"],
+                "derivative": False,
+                "distance": None,
+                "dt": None,
+                "duration": 1,
+                "file": "None",
+                "location": [-30.674747467041016, -71.63543701171875],
+                "name": "pfrj",
+                "observed": [0, 0, "-140.64612"],
+                "start_signal": 10,
+                "synthetic": None,
+                "trace_weight": [0, 0, "1.0"],
+                "wavelet_weight": None,
+            },
+            {
+                "azimuth": None,
+                "component": None,
+                "data_error": ["2.9627585", 0, 0],
+                "derivative": False,
+                "distance": None,
+                "dt": None,
+                "duration": 1,
+                "file": "None",
+                "location": [-30.838970184326172, -70.68913269042969],
+                "name": "pedr",
+                "observed": ["-3.6849258", 0, 0],
+                "start_signal": 10,
+                "synthetic": None,
+                "trace_weight": ["0.5", 0, 0],
+                "wavelet_weight": None,
+            },
+        ]
 
-#         shutil.copyfile(RESULTS_DIR / "NP1" / "gps_data", tempdir / "gps_data")
+        for idx, d in enumerate(target_no_gps_data):
+            match1 = False
+            match2 = False
+            for idy, props in enumerate(static_json1):
+                if props["name"] == d["name"]:
+                    assert static_json1[idy] == static_info1[idy] == d
+                    match = True
+            if not match:
+                raise Exception(f"No data from name, {d['name']}, found!")
 
-#         static_info2 = static_data(
-#             CMT,
-#             directory=tempdir,
-#         )
-#         with open(tempdir / "static_data.json", "r") as f:
-#             static_json2 = json.load(f)
-#         for idx, d in enumerate(STATIC_DATA):
-#             for key in [
-#                 "duration",
-#                 "start_signal",
-#                 "trace_weight",
-#                 "observed",
-#                 "name",
-#                 "component",
-#                 "azimuth",
-#                 "distance",
-#                 "location",
-#                 "derivative",
-#                 "data_error",
-#             ]:
-#                 assert static_info2[idx][key] == static_json2[idx][key]
-#                 assert static_info2[idx][key] == d[key]
-#     finally:
-#         shutil.rmtree(tempdir)
+        shutil.copyfile(RESULTS_DIR / "NP1" / "gps_data", tempdir / "gps_data")
+
+        static_info2 = static_data(
+            CMT,
+            directory=tempdir,
+        )
+        with open(tempdir / "static_data.json", "r") as f:
+            static_json2 = json.load(f)
+        for idx, d in enumerate(STATIC_DATA):
+            for key in [
+                "duration",
+                "start_signal",
+                "trace_weight",
+                "observed",
+                "name",
+                "component",
+                "azimuth",
+                "distance",
+                "location",
+                "derivative",
+                "data_error",
+            ]:
+                assert static_info2[idx][key] == static_json2[idx][key]
+                assert static_info2[idx][key] == d[key]
+    finally:
+        shutil.rmtree(tempdir)
 
 
 def test_strong_motion_traces():
@@ -446,3 +593,41 @@ def test_used_stations():
     assert __used_stations(8, files, CMT) == 5
     assert __used_stations(10, files, CMT) == 4
     assert __used_stations(12, files, CMT) == 4
+
+
+def test_wavelets_body_waves():
+    s1, s2 = SAMPLING_FILTER["wavelet_scales"]
+    filter = SAMPLING_FILTER["tele_filter"]
+    for wavelet in TELE_WAVES:
+        comp = wavelet["component"]
+        w0, w1 = wavelets_body_waves(wavelet["duration"], filter, wavelet["dt"], s1, s2)
+        if comp == "BHZ":
+            assert w0 == wavelet["wavelet_weight"]
+        else:
+            assert w1 == wavelet["wavelet_weight"]
+
+
+def test_wavelets_dart():
+    assert __wavelets_dart(1, 8) == "0 0 2 2 2 2 2 2\n"
+
+
+def test_wavelets_surf_waves():
+    s1, s2 = SAMPLING_FILTER["wavelet_scales"]
+    filter = SAMPLING_FILTER["surf_filter"]
+    for wavelet in SURF_WAVES:
+        comp = wavelet["component"]
+        w = wavelets_surf_tele(filter, s1, s2)
+        assert w == wavelet["wavelet_weight"]
+
+
+def test_wavelets_strong_motion():
+    s1, s2 = SAMPLING_FILTER["wavelet_scales"]
+    filter = SAMPLING_FILTER["strong_filter"]
+    for wavelet in STRONG_WAVES:
+        comp = wavelet["component"]
+        w = wavelets_strong_motion(wavelet["duration"], filter, wavelet["dt"], s1, s2)
+        assert w == wavelet["wavelet_weight"]
+    assert (
+        wavelets_strong_motion(wavelet["duration"], filter, wavelet["dt"], s1, s2, True)
+        == "0 0 0 2 2 2 2 0\n"
+    )

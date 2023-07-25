@@ -11,18 +11,17 @@ the files with the waveforms-
 
 import argparse
 import errno
-import glob
 import json
 import os
 import pathlib
+from glob import glob
 from typing import Dict, List, Literal, Optional, Tuple, Union
 
 import numpy as np
-from obspy import read
-from obspy.geodetics import kilometers2degrees
-from obspy.io.sac import SACTrace
-from obspy.taup import TauPyModel
-from scipy.stats import norm
+from obspy import read  # type: ignore
+from obspy.geodetics import kilometers2degrees  # type: ignore
+from obspy.io.sac import SACTrace  # type: ignore
+from obspy.taup import TauPyModel  # type: ignore
 
 import wasp.management as mng
 
@@ -36,13 +35,13 @@ def _dict_trace(
     dt: Optional[float],
     duration: float,
     n_start_obs: int,
-    trace_weight: float,
-    wavelet_weight: Optional[float],
-    synthetic_trace: Optional[List[float]] = None,
-    observed_trace: Optional[List[float]] = None,
-    location: Optional[Tuple[float, float]] = None,
+    trace_weight: Union[List[Union[float, int, str]], float, str],
+    wavelet_weight: Optional[Union[List[Union[float, int, str]], float, str]],
+    synthetic_trace: Optional[List[Union[float, int, str]]] = None,
+    observed_trace: Optional[List[Union[float, int, str]]] = None,
+    location: Optional[List[Union[float, int, str]]] = None,
     derivative: bool = False,
-) -> Dict[str, Union[List[int], Tuple[float, float], float, int, str]]:
+) -> dict:
     """Organize trace information into a dictionary
 
     :param file: The file associated with the waveform
@@ -62,15 +61,15 @@ def _dict_trace(
     :param n_start_obs: Number of observations before the arrival
     :type n_start_obs: int
     :param trace_weight: The weight of the trace
-    :type trace_weight: float
+    :type trace_weight: Union[List[Union[float, int, str]], float, str]
     :param wavelet_weight: The weight of the wavelet
-    :type wavelet_weight: Optional[float]
+    :type wavelet_weight: Optional[Union[List[Union[float, int, str]], float, str]]
     :param synthetic_trace: The synthetic trace, defaults to None
-    :type synthetic_trace:  Optional[List[float]]
+    :type synthetic_trace:  Optional[List[Union[float, int, str]]]
     :param observed_trace: The observed trace, defaults to None
-    :type observed_trace: Optional[List[float]]
+    :type observed_trace:  Optional[List[Union[float, int, str]]]
     :param location: The location (latitude, longitude), defaults to None
-    :type location: Optional[Tuple[float, float]], optional
+    :type location:  Optional[List[Union[float, int, str]]] = None, optional
     :param derivative: Whether a derivative, defaults to False
     :type derivative: bool, optional
     :return: The information dictionary
@@ -100,7 +99,7 @@ def tele_body_traces(
     tensor_info: dict,
     data_prop: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
-) -> dict:
+) -> List[dict]:
     """Write json dictionary with properties for teleseismic data
 
     :param files: List of files holding teleseismic data
@@ -112,7 +111,7 @@ def tele_body_traces(
     :param directory: Where the file should be written, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     :return: The teleseismic properties written to tele_waves.json
-    :rtype: dict
+    :rtype: List[dict]
 
     .. warning::
 
@@ -121,9 +120,9 @@ def tele_body_traces(
     """
     directory = pathlib.Path(directory)
     if len(files) == 0:
-        return
-    p_files = [file for file in files if "_BHZ" in file]
-    sh_files = [file for file in files if "_SH" in file]
+        return []
+    p_files = [file for file in files if "_BHZ" in str(file)]
+    sh_files = [file for file in files if "_SH" in str(file)]
     p_files = select_tele_stations(p_files, "P", tensor_info)
     sh_files = select_tele_stations(sh_files, "SH", tensor_info)
     files = p_files + sh_files
@@ -142,7 +141,6 @@ def tele_body_traces(
     event_lon = tensor_info["lon"]
     depth = tensor_info["depth"]
     model = TauPyModel(model="ak135f_no_mud")
-    header = (header for header in headers)
 
     for file, header in zip(files, headers):
         stream = read(file)
@@ -174,7 +172,7 @@ def tele_body_traces(
             trace_weight=weight,
             wavelet_weight=wavelet_weight,
             synthetic_trace=[],
-            location=[header.stla, header.stlo],
+            location=[float(header.stla), float(header.stlo)],
             derivative=False,
         )
         info_traces.append(info)
@@ -195,7 +193,7 @@ def tele_surf_traces(
     tensor_info: dict,
     data_prop: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
-):
+) -> List[dict]:
     """Write json dictionary with properties for surface wave data
 
     :param files: List of files holding surface wave  data
@@ -207,7 +205,7 @@ def tele_surf_traces(
     :param directory: Where the file should be written, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     :return: The surface wave properties written to surf_waves.json
-    :rtype: dict
+    :rtype: List[dict]
 
     .. warning::
 
@@ -216,9 +214,9 @@ def tele_surf_traces(
     """
     directory = pathlib.Path(directory)
     if len(files) == 0:
-        return
-    p_files = [file for file in files if "_BHZ." in file]
-    sh_files = [file for file in files if "_SH." in file]
+        return []
+    p_files = [file for file in files if "_BHZ." in str(file)]
+    sh_files = [file for file in files if "_SH." in str(file)]
     p_files = select_tele_stations(p_files, "Rayleigh", tensor_info)
     sh_files = select_tele_stations(sh_files, "Love", tensor_info)
     files = p_files + sh_files
@@ -260,7 +258,7 @@ def tele_surf_traces(
             trace_weight=1.0,
             wavelet_weight=wavelet_weight,
             synthetic_trace=[],
-            location=[header.stla, header.stlo],
+            location=[float(header.stla), float(header.stlo)],
         )
         info_traces.append(info)
     with open(directory / "surf_waves.json", "w") as f:
@@ -280,7 +278,7 @@ def strong_motion_traces(
     tensor_info: dict,
     data_prop: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
-) -> dict:
+) -> List[dict]:
     """Write json dictionary with properties for strong motion data
 
     :param files: List of files holding strong motion data
@@ -292,7 +290,7 @@ def strong_motion_traces(
     :param directory: Where the file should be written, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     :return: The strong motion properties written to strong_motion_waves.json
-    :rtype: dict
+    :rtype: List[dict]
 
     .. warning::
 
@@ -301,7 +299,7 @@ def strong_motion_traces(
     """
     directory = pathlib.Path(directory)
     if len(files) == 0:
-        return
+        return []
     event_lat = tensor_info["lat"]
     event_lon = tensor_info["lon"]
     depth = tensor_info["depth"]
@@ -320,8 +318,8 @@ def strong_motion_traces(
     wavelet_weight = wavelets_strong_motion(duration, filter0, dt_strong, n0, n1)
     black_list = {"PB02": ["HNE", "HNN", "HLE", "HLN"], "PX02": ["HNE", "HLE"]}
 
-    info_traces = []
-    outlier_traces = []
+    info_traces: List[SACTrace] = []
+    outlier_traces: List[SACTrace] = []
     streams = [read(file) for file in files]
     weights = [1.0 for st, file in zip(streams, files)]
     fun2 = (
@@ -329,13 +327,13 @@ def strong_motion_traces(
         and header.kcmpnm in black_list[header.kstnm]
     )
     zipped = zip(weights, headers)
-    weights = (0 if fun2(header) else weight for weight, header in zipped)
-    streams = (st for st in streams)
-    headers = (header for header in headers)
+    weights = [0 if fun2(header) else weight for weight, header in zipped]
+    streams = [st for st in streams]
+    headers = [header for header in headers]
 
-    zipped = zip(files, headers, weights, streams, arrivals)
-
-    for file, header, weight, stream, arrival in zipped:
+    for file, header, weight, stream, arrival in zip(
+        files, headers, weights, streams, arrivals
+    ):
         start = origin_time - stream[0].stats.starttime
         distance, azimuth, back_azimuth = mng._distazbaz(
             header.stla, header.stlo, event_lat, event_lon
@@ -381,7 +379,7 @@ def cgps_traces(
     tensor_info: dict,
     data_prop: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
-) -> dict:
+) -> List[dict]:
     """Write json dictionary with properties for cGPS data
 
     :param files: List of files holding cGPS data
@@ -393,7 +391,7 @@ def cgps_traces(
     :param directory: Where the file should be written, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     :return: The cGPS properties written to cgps_waves.json
-    :rtype: dict
+    :rtype: List[dict]
 
     .. warning::
 
@@ -402,7 +400,7 @@ def cgps_traces(
     """
     directory = pathlib.Path(directory)
     if len(files) == 0:
-        return
+        return []
     event_lat = tensor_info["lat"]
     event_lon = tensor_info["lon"]
     depth = tensor_info["depth"]
@@ -425,13 +423,14 @@ def cgps_traces(
     )
     info_traces = []
     vertical = ["LXZ", "LHZ", "LYZ"]
-    headers = (header for header in headers)
+    headers = [header for header in headers]
     streams = [read(file) for file in files]
     channels = (st[0].stats.channel for st in streams)
     is_horiz = lambda channel: channel not in vertical
-    zipped = zip(files, channels)
-    weights = (1.2 if is_horiz(channel) else 0.6 for file, channel in zipped)
-    streams = (st for st in streams)
+    weights = [
+        1.2 if is_horiz(channel) else 0.6 for file, channel in zip(files, channels)
+    ]
+    streams = [st for st in streams]
 
     for file, header, stream, weight in zip(files, headers, streams, weights):
         start = origin_time - stream[0].stats.starttime
@@ -469,7 +468,7 @@ def static_data(
     tensor_info: dict,
     unit: Literal["cm", "m", "mm"] = "m",
     directory: Union[pathlib.Path, str] = pathlib.Path(),
-) -> dict:
+) -> List[dict]:
     """Write json dictionary with properties for gps data
 
     :param tensor_info: The tensor information
@@ -479,7 +478,7 @@ def static_data(
     :param directory: Where the file should be written, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     :return: The gps properties written to static_data.json
-    :rtype: dict
+    :rtype: List[dict]
     """
     directory = pathlib.Path(directory)
     event_lat = tensor_info["lat"]
@@ -488,7 +487,7 @@ def static_data(
     if not os.path.isfile(directory / "cgps_waves.json") and not os.path.isfile(
         directory / "gps_data"
     ):
-        return
+        return []
 
     if os.path.isfile(directory / "cgps_waves.json") and not os.path.isfile(
         directory / "gps_data"
@@ -500,9 +499,9 @@ def static_data(
         names = list(set(names))
 
         for name in names:
-            observed = [0, 0, 0]
-            weights = [0, 0, 0]
-            error = [0, 0, 0]
+            observed: List[Union[str, int, float]] = [0, 0, 0]
+            weights: List[Union[str, int, float]] = [0, 0, 0]
+            error: List[Union[str, int, float]] = [0, 0, 0]
             for file in cgps_data:
                 name2 = file["name"]
                 if not name2 == name:
@@ -544,12 +543,15 @@ def static_data(
             info_traces.append(info)
 
     if os.path.isfile(directory / "gps_data"):
+        factor: Union[int, float] = 1
         if unit == "cm":
             factor = 1
         elif unit == "m":
             factor = 100
         elif unit == "mm":
             factor = 1 / 10
+        else:
+            raise ValueError(f"Unsupport unit '{unit}' specified!")
         with open(directory / "gps_data", "r") as infile:
             lines = [line.split() for line in infile]
 
@@ -621,8 +623,8 @@ def static_data(
 def insar_data(
     insar_asc: Optional[List[Union[pathlib.Path, str]]] = None,
     insar_desc: Optional[List[Union[pathlib.Path, str]]] = None,
-    ramp_asc: Optional[List[float]] = None,
-    ramp_desc: Optional[List[float]] = None,
+    ramp_asc: Optional[List[Union[float, None]]] = None,
+    ramp_desc: Optional[List[Union[float, None]]] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> dict:
     """Write json dictionary with properties for InSar data
@@ -632,22 +634,22 @@ def insar_data(
     :param insar_desc: The paths to descending InSar files, defaults to None
     :type insar_desc: Optional[List[Union[pathlib.Path, str]]], optional
     :param ramp_asc: The ascending ramp values, defaults to None
-    :type ramp_asc: Optional[List[float]], optional
+    :type ramp_asc: Optional[List[Union[float, None]]], optional
     :param ramp_desc: The descending ramp values, defaults to None
-    :type ramp_desc: Optional[List[float]], optional
-    :param directory: _description_, defaults to pathlib.Path()
+    :type ramp_desc: Optional[List[Union[float, None]]], optional
+    :param directory: The directory where the data is located, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     :raises ValueError: If the length of ascending ramps and files are different
     :raises ValueError: If the length of descending ramps and files are different
     :return: The InSar properties written to cgps_waves.json
-    :rtype: dict
+    :rtype: List[dict]
     """
     directory = pathlib.Path(directory)
     print("InSAR data")
     print(f"insar_asc: {insar_asc}")
     print(f"insar_desc: {insar_desc}")
     if not insar_asc and not insar_desc:
-        return
+        return {}
 
     insar_dict = {}
     if insar_asc:
@@ -659,7 +661,7 @@ def insar_data(
                 + " both the amount of ascending tracks and their ramp-types"
             )
         zipped = zip(insar_asc, ramp_asc)
-        properties = []
+        properties: List[dict] = []
         for track, ramp in zipped:
             new_dict = {"name": track, "weight": 1.0, "ramp": ramp}
             properties = properties + [new_dict]
@@ -694,7 +696,7 @@ def insar_data(
 
 def select_tele_stations(
     files: List[Union[pathlib.Path, str]],
-    phase: Literal["Love", "P", "Rayleigh", "SH"],
+    phase: Literal["Love", "P", "Rayleigh", "SH", "LONG"],
     tensor_info: dict,
 ) -> List[Union[pathlib.Path, str]]:
     """Select body and/or surface waves to use in finite fault modelling.
@@ -747,11 +749,11 @@ def select_tele_stations(
     # azimuth
 
     phase = "LONG" if phase in ["Rayleigh", "Love"] else phase
-    new_files = []
+    new_files: List[Union[pathlib.Path, str]] = []
     for az0 in range(0, 360, jump):
         az1 = az0 + jump
         best = ""
-        best_sta = ""
+        best_sta: Union[pathlib.Path, str] = ""
         best_score = -1.0
         add_channel = False
         for sacheader, snr, sac in zip(sacheaders, signal2noise, files):
@@ -760,7 +762,7 @@ def select_tele_stations(
             )
             if az0 > az or az >= az1 or snr <= min_snr:
                 continue
-            value = 1 if kilometers2degrees(dis) >= 45 else 0
+            value: Union[int, float] = 1 if kilometers2degrees(dis) >= 45 else 0
             value = value if phase in ["P", "SH"] else 1.0
             value = score(value, az, snr, az0, az1, min_snr)
             if value > best_score:
@@ -808,7 +810,7 @@ def __s2nr(sacfile: Union[pathlib.Path, str], phase: str, signal_length: int) ->
 
 
 def __used_stations(
-    jump: int, sacfiles: Union[pathlib.Path, str], tensor_info: dict
+    jump: int, sacfiles: List[Union[pathlib.Path, str]], tensor_info: dict
 ) -> int:
     """TODO: Define what this does and what jump is"""
     sacheaders = (SACTrace.read(sac) for sac in sacfiles)
@@ -852,36 +854,42 @@ def __failsafe(filtro: dict, header: SACTrace, cgps: bool = False):
 
 
 def filling_data_dicts(
-    tensor_info,
-    data_type,
-    data_prop,
-    data_folder,
-    insar_asc=None,
-    insar_desc=None,
-    ramp_asc=None,
-    ramp_desc=None,
+    tensor_info: dict,
+    data_types: List[
+        Literal["cgps", "gps", "insar", "strong_motion", "surf_tele", "tele_body"]
+    ],
+    data_prop: dict,
+    data_folder: Union[pathlib.Path, str],
+    insar_asc: Optional[List[Union[pathlib.Path, str]]] = None,
+    insar_desc: Optional[List[Union[pathlib.Path, str]]] = None,
+    ramp_asc: Optional[List[Union[float, None]]] = None,
+    ramp_desc: Optional[List[Union[float, None]]] = None,
+    working_directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """Routine to fill JSON dictionaries containing data properties, for all
-    data types selected.
+    data types specified
 
-    :param tensor_info: dictionary with moment tensor information
-    :param data_type: list with data types to use in modelling.
-    :param data_prop: dictionary with moment tensor information
-    :param data_folder: string with folder where data is located.
-    :param insar_asc: name of ascending insar track
-    :param insar_desc: name of descending insar track
-    :param ramp_asc: type of ramp to invert for ascending track
-    :param ramp_desc: type of ramp to invert for descending track
-    :type insar_asc: string, optional
-    :type insar_desc: string, optional
-    :type ramp_asc: string, optional
-    :type ramp_desc: string, optional
+    :param tensor_info: The tensor information (from tensor_info.json)
     :type tensor_info: dict
-    :type data_type: list
+    :param data_types: List of data types to populate property files for
+    :type data_type: List[ Literal[&quot;cgps&quot;, &quot;gps&quot;, &quot;insar&quot;, &quot;strong_motion&quot;, &quot;surf_tele&quot;, &quot;tele_body&quot;] ]
+    :param data_prop: The data properties (from sampling_filter.json)
     :type data_prop: dict
-    :type data_folder: string
+    :param data_folder: The path to the folder where the data exists and property
+                        files should be written
+    :type data_folder: Union[pathlib.Path, str]
+    :param insar_asc: List , defaults to None
+    :param insar_asc: The paths to ascending InSar files, defaults to None
+    :type insar_asc: Optional[List[Union[pathlib.Path, str]]], optional
+    :param insar_desc: The paths to descending InSar files, defaults to None
+    :type insar_desc: Optional[List[Union[float, None]]], optional
+    :param ramp_asc: The ascending ramp values, defaults to None
+    :type ramp_asc: Optional[List[Union[float, None]]], optional
+    :param ramp_desc: The descending ramp values, defaults to None
+    :param working_directory: The working directory, defaults to pathlib.Path()
+    :type working_directory: Union[pathlib.Path, str], optional
 
-    .. rubric:: Example:
+        .. rubric:: Example:
 
     >>> data_prop = {
             "sampling": {
@@ -918,46 +926,46 @@ def filling_data_dicts(
     >>> data_folder = '/path/to/data_folder'
     >>> filling_data_dicts(tensor_info, data_type, data_prop, data_folder)
     """
-    folder = os.path.abspath(os.getcwd())
-    if "tele_body" in data_type:
-        os.chdir(data_folder)
-        tele_traces = get_traces_files("tele_body")
-        os.chdir(folder)
-        if not os.path.isfile("tele_waves.json"):
-            tele_body_traces(tele_traces, tensor_info, data_prop)
-    if "surf_tele" in data_type:
-        os.chdir(data_folder)
-        surf_traces = get_traces_files("surf_tele")
-        os.chdir(folder)
-        if not os.path.isfile("surf_waves.json"):
-            tele_surf_traces(surf_traces, tensor_info, data_prop)
-    if "strong_motion" in data_type:
-        os.chdir(data_folder)
-        strong_traces = get_traces_files("strong_motion")
-        os.chdir(folder)
-        if not os.path.isfile("strong_motion_waves.json"):
-            strong_motion_traces(strong_traces, tensor_info, data_prop)
-    if "cgps" in data_type:
-        os.chdir(data_folder)
-        cgps_data = get_traces_files("cgps")
-        os.chdir(folder)
-        if not os.path.isfile("cgps_waves.json"):
-            cgps_traces(cgps_data, tensor_info, data_prop)
-    if "gps" in data_type:
-        static_data(tensor_info, unit="m")
-    if "insar" in data_type:
+    data_folder = pathlib.Path(data_folder)
+    working_directory = pathlib.Path(working_directory)
+    if "tele_body" in data_types:
+        tele_traces = get_traces_files("tele_body", directory=data_folder)
+        if not os.path.isfile(working_directory / "tele_waves.json"):
+            tele_body_traces(
+                tele_traces, tensor_info, data_prop, directory=working_directory
+            )
+    if "surf_tele" in data_types:
+        surf_traces = get_traces_files("surf_tele", directory=data_folder)
+        if not os.path.isfile(working_directory / "surf_waves.json"):
+            tele_surf_traces(
+                surf_traces, tensor_info, data_prop, directory=working_directory
+            )
+    if "strong_motion" in data_types:
+        strong_traces = get_traces_files("strong_motion", directory=data_folder)
+        if not os.path.isfile(working_directory / "strong_motion_waves.json"):
+            strong_motion_traces(
+                strong_traces, tensor_info, data_prop, directory=working_directory
+            )
+    if "cgps" in data_types:
+        cgps_data = get_traces_files("cgps", directory=data_folder)
+        if not os.path.isfile(working_directory / "cgps_waves.json"):
+            cgps_traces(cgps_data, tensor_info, data_prop, directory=working_directory)
+    if "gps" in data_types:
+        static_data(tensor_info, unit="m", directory=working_directory)
+    if "insar" in data_types:
         insar_data(
             insar_asc=insar_asc,
             insar_desc=insar_desc,
             ramp_asc=ramp_asc,
             ramp_desc=ramp_desc,
+            directory=working_directory,
         )
 
 
 def get_traces_files(
     data_type: Literal["cgps", "strong_motion", "surf_tele", "tele_body"],
     directory: Union[pathlib.Path, str] = pathlib.Path(),
-) -> List[str]:
+) -> List[Union[pathlib.Path, str]]:
     """Get list with waveform files (in sac format) for stations and
     channels selected for modelling
 
@@ -966,36 +974,41 @@ def get_traces_files(
     :param directory: The directory where files are located, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     :return: The list of sac files
-    :rtype: List[str]
+    :rtype: List[Union[pathlib.Path,str]]
     """
     directory = pathlib.Path(directory)
+    traces_files: List[Union[pathlib.Path, str]] = []
     if data_type == "tele_body":
-        p_traces_files = glob.glob(os.path.join(directory / "P", "final*"))
-        sh_traces_files = glob.glob(os.path.join(directory / "SH", "final*"))
-        traces_files = p_traces_files + sh_traces_files
+        p_traces_files = glob(os.path.join(directory / "P", "final*"))
+        sh_traces_files = glob(os.path.join(directory / "SH", "final*"))
+        traces_files = p_traces_files + sh_traces_files  # type: ignore
     if data_type == "surf_tele":
-        traces_files = glob.glob(os.path.join(directory / "LONG", "final*"))
+        traces_files = glob(os.path.join(directory / "LONG", "final*"))  # type: ignore
     if data_type == "strong_motion":
-        traces_files = glob.glob(os.path.join(directory / "STR", "final*"))
+        traces_files = glob(os.path.join(directory / "STR", "final*"))  # type: ignore
     if data_type == "cgps":
-        traces_files = glob.glob(os.path.join(directory / "cGPS", "final*"))
-    traces_files = [os.path.abspath(file) for file in traces_files]
+        traces_files = glob(os.path.join(directory / "cGPS", "final*"))  # type: ignore
+    traces_files = [os.path.abspath(file) for file in traces_files]  # type: ignore
     return traces_files
 
 
-def wavelets_body_waves(duration, filtro_tele, dt_tele, n_begin, n_end):
+def wavelets_body_waves(
+    duration: int, filtro_tele: dict, dt_tele: float, n_begin: int, n_end: int
+) -> Tuple[str, str]:
     """Automatic determination of weight of wavelet scales
 
-    :param duration: length of signal to be considered for modelling
-    :param filtro_tele: filtering properties for body waves
-    :param dt_tele: sampling interval for body waves
-    :param n_begin: minimum wavelet scale
-    :param n_end: maximum wavelet scale
-    :type duration: float
-    :type filtro_tele: float
+    :param duration: The duration of the waveform
+    :type duration: int
+    :param filtro_tele: The filter dictionary
+    :type filtro_tele: dict
+    :param dt_tele: The dt of the waveform
     :type dt_tele: float
+    :param n_begin: The minimum scale
     :type n_begin: int
+    :param n_end: The maximum scale
     :type n_end: int
+    :return: The wavelet scales
+    :rtype: Tuple[str, str]
     """
     low_freq = filtro_tele["low_freq"]
     min_wavelet = int(np.log2(3 * 2**8 * dt_tele * low_freq)) + 1
@@ -1003,27 +1016,27 @@ def wavelets_body_waves(duration, filtro_tele, dt_tele, n_begin, n_end):
     min_wavelet = max(min_wavelet, 10 - int(np.log2(min_index)))
     p_wavelet_weight = ["0"] + ["1"] * 7
     p_wavelet_weight[:min_wavelet] = ["0"] * min_wavelet
-    p_wavelet_weight = " ".join(p_wavelet_weight[n_begin - 1 : n_end])
-    p_wavelet_weight = "".join([p_wavelet_weight, "\n"])
+    p_wavelet_weight_str = " ".join(p_wavelet_weight[n_begin - 1 : n_end]) + "\n"
     #
     # the maximum frequency to be modelled for SH waves is 0.5 Hz
     #
     s_wavelet_weight = ["0"] + ["1"] * 6 + ["0"] if dt_tele <= 0.2 else ["1"] * 8
     s_wavelet_weight[:min_wavelet] = ["0"] * min_wavelet
-    s_wavelet_weight = " ".join(s_wavelet_weight[n_begin - 1 : n_end])
-    s_wavelet_weight = "".join([s_wavelet_weight, "\n"])
-    return p_wavelet_weight, s_wavelet_weight
+    s_wavelet_weight_str = " ".join(s_wavelet_weight[n_begin - 1 : n_end]) + "\n"
+    return p_wavelet_weight_str, s_wavelet_weight_str
 
 
-def wavelets_surf_tele(surf_filter, n_begin, n_end):
+def wavelets_surf_tele(surf_filter: dict, n_begin: int, n_end: int) -> str:
     """Automatic determination of weight of wavelet scales
 
     :param surf_filter: filtering properties of surface wave data
-    :param n_begin: minimum wavelet scale
-    :param n_end: maximum wavelet scale
     :type surf_filter: dict
+    :param n_begin: The minimum scale
     :type n_begin: int
+    :param n_end: The maximum scales
     :type n_end: int
+    :return: The wavelet scales
+    :rtype: str
     """
     low_freq = surf_filter["freq2"]
     high_freq = surf_filter["freq3"]
@@ -1036,42 +1049,49 @@ def wavelets_surf_tele(surf_filter, n_begin, n_end):
     wavelet_weight[:min_wavelet] = ["0"] * min_wavelet
     wavelet_weight = wavelet_weight[:n_end]
     wavelet_weight = wavelet_weight[:max_wavelet] + ["0"] * (n_end - max_wavelet)
-    wavelet_weight = " ".join(wavelet_weight[n_begin - 1 : n_end])
-    wavelet_weight = "".join([wavelet_weight, "\n"])
-    return wavelet_weight
+    wavelet_weight_str = " ".join(wavelet_weight[n_begin - 1 : n_end]) + "\n"
+    return wavelet_weight_str
 
 
-def __wavelets_dart(n_begin, n_end):
+def __wavelets_dart(n_begin: int, n_end: int) -> str:
     """Automatic determination of weight of wavelet scales
 
-    :param n_begin: minimum wavelet scale
-    :param n_end: maximum wavelet scale
+    :param n_begin: Minimum wavelet scale
     :type n_begin: int
+    :param n_end: Maximum wavelet scale
     :type n_end: int
+    :return: The wavelet scalse
+    :rtype: str
     """
     wavelet_weight = ["0"] * 2 + ["2"] * 6
-    wavelet_weight = " ".join(wavelet_weight[n_begin - 1 : n_end])
-    wavelet_weight = "".join([wavelet_weight, "\n"])
-    return wavelet_weight
+    wavelet_weight_str = " ".join(wavelet_weight[n_begin - 1 : n_end]) + "\n"
+    return wavelet_weight_str
 
 
 def wavelets_strong_motion(
-    duration, filtro_strong, dt_strong, n_begin, n_end, cgps=False
-):
+    duration: int,
+    filtro_strong: dict,
+    dt_strong: float,
+    n_begin: int,
+    n_end: int,
+    cgps: bool = False,
+) -> str:
     """Automatic determination of weight of wavelet scales
 
-    :param duration: length of signal to be considered for modelling
-    :param filtro_strong: filtering properties for strong motion data
-    :param dt_strong: sampling interval for strong motion data
-    :param n_begin: minimum wavelet scale
-    :param n_end: maximum wavelet scale
-    :param cgps: whether wavelet coefficients are for cGPS or strong motion data
-    :type duration: float
-    :type filtro_tele: float
-    :type dt_tele: float
+    :param duration: The duration of the waveform
+    :type duration: int
+    :param filtro_strong: The filter dictionary
+    :type filtro_strong: dict
+    :param dt_strong: The dt of the waveform
+    :type dt_strong: float
+    :param n_begin: The minimum scale
     :type n_begin: int
+    :param n_end: The maximum scale
     :type n_end: int
+    :param cgps: Whether a cgps, defaults to False
     :type cgps: bool, optional
+    :return: The wavelet scales
+    :rtype: str
     """
     low_freq = filtro_strong["low_freq"]
     high_freq = filtro_strong["high_freq"]
@@ -1088,18 +1108,19 @@ def wavelets_strong_motion(
     wavelet_weight[:min_wavelet] = ["0"] * min_wavelet
     wavelet_weight = wavelet_weight[:n_end]
     wavelet_weight = wavelet_weight[:max_wavelet] + ["0"] * (n_end - max_wavelet)
-    wavelet_weight = " ".join(wavelet_weight[n_begin - 1 : n_end])
-    wavelet_weight = "".join([wavelet_weight, "\n"])
-    return wavelet_weight
+    wavelet_weight_str = " ".join(wavelet_weight[n_begin - 1 : n_end]) + "\n"
+    return wavelet_weight_str
 
 
-def duration_tele_waves(tensor_info, dt_tele):
+def duration_tele_waves(tensor_info: dict, dt_tele: float) -> int:
     """Source duration plus depth phases
 
-    :param tensor_info: dictionary with properties of strong motion data
-    :param dt_tele: sampling interval for body waves
+    :param tensor_info: The tensor information
     :type tensor_info: dict
+    :param dt_tele: The dt of the waveform
     :type dt_tele: float
+    :return: The synthetic duration
+    :rtype: int
     """
     depth = tensor_info["depth"]
     time_shift = tensor_info["time_shift"]
@@ -1113,17 +1134,21 @@ def duration_tele_waves(tensor_info, dt_tele):
     return tele_syn_len
 
 
-def duration_strong_motion(distances, arrivals, tensor_info, dt_strong):
+def duration_strong_motion(
+    distances: List[float], arrivals: List[float], tensor_info: dict, dt_strong: float
+) -> int:
     """Maximum duration estimation for strong motion records
 
-    :param distances: distances from stations to hypocenter
-    :param arrivals: estimation of first arrival from hypocenter to station
-    :param dt_strong: sampling interval for strong motion data
-    :param tensor_info: dictionary with moment tensor properties
-    :type distances: array
-    :type arrivals: array
+    :param distances: Distances calculated with distazbaz
+    :type distances: List[float]
+    :param arrivals: Arrivals calculated with np.sqrt(dist**2 + depth**2) / 5
+    :type arrivals: List[float]
+    :param tensor_info: The tensor information
     :type tensor_info: dict
+    :param dt_strong: The time delta of the strong motion data
     :type dt_strong: float
+    :return: The duration estimation
+    :rtype: int
     """
     depth = float(tensor_info["depth"])
     time_shift = float(tensor_info["time_shift"])
@@ -1141,17 +1166,21 @@ def duration_strong_motion(distances, arrivals, tensor_info, dt_strong):
     return syn_len
 
 
-def duration_dart(distances, arrivals, tensor_info, dt_dart):
+def duration_dart(
+    distances: List[float], arrivals: List[float], tensor_info: dict, dt_dart: float
+) -> int:
     """Maximum duration estimation for DART records
 
-    :param distances: distances from stations to hypocenter
-    :param arrivals: estimation of first arrival from hypocenter to station
-    :param dt_dart: sampling interval for dart data
-    :param tensor_info: dictionary with moment tensor properties
-    :type distances: array
-    :type arrivals: array
+    :param distances: Distances from stations to hypocenter
+    :type distances: List[float]
+    :param arrivals: Estimation of first arrival from hypocenter to station
+    :type arrivals: List[float]
+    :param tensor_info: Tensor information
     :type tensor_info: dict
+    :param dt_dart: Time delta of data
     :type dt_dart: float
+    :return: The duration
+    :rtype: int
     """
     depth = float(tensor_info["depth"])
     time_shift = float(tensor_info["time_shift"])
