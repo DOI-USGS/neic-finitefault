@@ -362,7 +362,7 @@ contains
          end if
       end do
 !
-!  finally: Give the value range of up and down part
+!  Give the value range of up and down part
 !
       do i = 2, nxs_sub(segment)-1
          if (io_up .eq. 1) then
@@ -384,6 +384,86 @@ contains
             xyb(i, nys_sub(segment), 3) = nmed
          end if
       end do
+!
+!  upper left corner
+!
+      if ((io_up .eq. 1) .and. (io_left .eq. 1)) then
+         xyb(1, 1, 1) = min(zup_min, zleft_min)
+         xyb(1, 1, 2) = min(zup_max, zleft_max)
+         xyb(1, 1, 3) = min(nup2, nleft2)
+      elseif (io_up .eq. 1) then
+         xyb(1, 1, 1) = min(zup_min, zmed_min) 
+         xyb(1, 1, 2) = min(zup_max, zmed_max)
+         xyb(1, 1, 3) = min(nup2, nmed)
+      elseif (io_left .eq. 1) then
+         xyb(1, 1, 1) = min(zleft_min, zmed_min) 
+         xyb(1, 1, 2) = min(zleft_max, zmed_max)
+         xyb(1, 1, 3) = min(nleft2, nmed)
+      else
+         xyb(1, 1, 1) = zmed_min
+         xyb(1, 1, 2) = zmed_max
+         xyb(1, 1, 3) = nmed
+      end if
+!
+!  upper right corner
+!
+      if ((io_up .eq. 1) .and. (io_right .eq. 1)) then
+         xyb(nxs_sub(segment), 1, 1) = min(zup_min, zright_min)
+         xyb(nxs_sub(segment), 1, 2) = min(zup_max, zright_max)
+         xyb(nxs_sub(segment), 1, 3) = min(nup2, nright2)
+      elseif (io_up .eq. 1) then
+         xyb(nxs_sub(segment), 1, 1) = min(zup_min, zmed_min) 
+         xyb(nxs_sub(segment), 1, 2) = min(zup_max, zmed_max)
+         xyb(nxs_sub(segment), 1, 3) = min(nup2, nmed)
+      elseif (io_right .eq. 1) then
+         xyb(nxs_sub(segment), 1, 1) = min(zright_min, zmed_min) 
+         xyb(nxs_sub(segment), 1, 2) = min(zright_max, zmed_max)
+         xyb(nxs_sub(segment), 1, 3) = min(nright2, nmed)
+      else
+         xyb(nxs_sub(segment), 1, 1) = zmed_min
+         xyb(nxs_sub(segment), 1, 2) = zmed_max
+         xyb(nxs_sub(segment), 1, 3) = nmed
+      end if
+!
+!  lower left corner
+!
+      if ((io_down .eq. 1) .and. (io_left .eq. 1)) then
+         xyb(1, nys_sub(segment), 1) = min(zdown_min, zleft_min)
+         xyb(1, nys_sub(segment), 2) = min(zdown_max, zleft_max)
+         xyb(1, nys_sub(segment), 3) = min(ndown2, nleft2)
+      elseif (io_down .eq. 1) then
+         xyb(1, nys_sub(segment), 1) = min(zdown_min, zmed_min) 
+         xyb(1, nys_sub(segment), 2) = min(zdown_max, zmed_max)
+         xyb(1, nys_sub(segment), 3) = min(ndown2, nmed)
+      elseif (io_left .eq. 1) then
+         xyb(1, nys_sub(segment), 1) = min(zleft_min, zmed_min) 
+         xyb(1, nys_sub(segment), 2) = min(zleft_max, zmed_max)
+         xyb(1, nys_sub(segment), 3) = min(nleft2, nmed)
+      else
+         xyb(1, nys_sub(segment), 1) = zmed_min
+         xyb(1, nys_sub(segment), 2) = zmed_max
+         xyb(1, nys_sub(segment), 3) = nmed
+      end if
+!
+!  lower right corner
+!
+      if ((io_down .eq. 1) .and. (io_right .eq. 1)) then
+         xyb(nxs_sub(segment), nys_sub(segment), 1) = min(zdown_min, zright_min)
+         xyb(nxs_sub(segment), nys_sub(segment), 2) = min(zdown_max, zright_max)
+         xyb(nxs_sub(segment), nys_sub(segment), 3) = min(ndown2, nright2)
+      elseif (io_down .eq. 1) then
+         xyb(nxs_sub(segment), nys_sub(segment), 1) = min(zdown_min, zmed_min) 
+         xyb(nxs_sub(segment), nys_sub(segment), 2) = min(zdown_max, zmed_max)
+         xyb(nxs_sub(segment), nys_sub(segment), 3) = min(ndown2, nmed)
+      elseif (io_right .eq. 1) then
+         xyb(nxs_sub(segment), nys_sub(segment), 1) = min(zright_min, zmed_min) 
+         xyb(nxs_sub(segment), nys_sub(segment), 2) = min(zright_max, zmed_max)
+         xyb(nxs_sub(segment), nys_sub(segment), 3) = min(nright2, nmed)
+      else
+         xyb(nxs_sub(segment), nys_sub(segment), 1) = zmed_min
+         xyb(nxs_sub(segment), nys_sub(segment), 2) = zmed_max
+         xyb(nxs_sub(segment), nys_sub(segment), 3) = nmed
+      end if
 !
 !  Recheck the range of mediate part
 !

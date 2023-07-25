@@ -149,9 +149,8 @@ contains
 !  cgps: True if cGPS data are used, False otherwise
 !
    implicit none
-   integer channel0, channel1, ll_g, io_chan, j_con(11), k, i, no, &
-   &  n_wave_weight, ir_max, n_chan, &
-   &  nos(max_stations), io_mod(max_stations), n_chan3
+   integer channel0, channel1, ll_g, io_chan, j_con(11), k, i, int0, &
+   &  n_wave_weight, ir_max, n_chan, int1, int2, used_channels
    real dt, weig(max_stations), j_wig(11), dt_sample, lat_s, lon_s
    logical, parameter :: dart = .False.
    character(len=20) filename, string2, string1
@@ -162,7 +161,7 @@ contains
 
    if (strong) write(*,*)'Get strong motion stations metadata and waveforms...'
    if (cgps) write(*,*)'Get cGPS stations metadata and waveforms...'
-   n_chan3 = 0
+   used_channels = 0
 !
 !  suppose the ni = u3e+11, then then moment of 1cm*1km^2 
 !       subfault is 3e+21. The gfs is for Mo = 1e+20
@@ -199,22 +198,22 @@ contains
       cgps_channels(ll_g) = .False.
       if (cgps) cgps_channels(ll_g) = .True.
       dart_channels(ll_g) = .False.
-      read(9,*) no, sta_name(ll_g), lat_s, lon_s, io_mod(i), component(ll_g), weig(i), nos(i)
-      if (weig(i) .gt. 0) n_chan3 = n_chan3 + 1
+      read(9,*) int0, sta_name(ll_g), lat_s, lon_s, int1, component(ll_g), weig(i), int2
+      if (weig(i) .gt. 0) used_channels = used_channels + 1
    end do
    close(9)
-!   write(*,*)'n_chan: ', n_chan3
+!   write(*,*)'n_chan: ', used_channels
 
    filename = 'waveforms_strong.txt'
    if (cgps) filename = 'waveforms_cgps.txt'
    filename = trim(filename)
-   call get_waveforms(filename, ir_max, channel0, channel1)
+   call get_waveforms(filename, ir_max, channel0)
 
    do i = 1, ir_max
 
       io_chan = io_chan+1
       ll_g = io_chan+channel0
-      weight(ll_g) = weig(i) / n_chan3
+      weight(ll_g) = weig(i) / used_channels
       dt_channel(ll_g) = dt_sample
       
       do k = 1, 11
@@ -259,7 +258,7 @@ contains
 !
    implicit none
    integer channel0, channel1, ll_g, j_con(11), k, i, n_wave_weight, n_chan, &
-   &  nos, n_chan3, idts, love, int1 
+   &  int0, used_channels, int1, love, int2
    real lat_sta, lon_sta, j_wig(11), dt, & 
    &  rang, az, earth_angle, float1, float2
    logical, parameter :: cgps=.False., dart = .False.
@@ -270,7 +269,7 @@ contains
    logical :: is_file
 
    write(*,*)'Get body waves stations metadata and waveforms...'
-   n_chan3 = 0
+   used_channels = 0
 !
 !  suppose the ni = u3e+11, then then moment of 1cm*1km^2 
 !       subfault is 3e+21. The gfs is for Mo = 1e+20
@@ -282,7 +281,7 @@ contains
       stop
    end if
    read(9,*)
-   read(9,*) idts, lnpt, dt
+   read(9,*) int0, lnpt, dt
    read(9,*)
    read(9,*) n_chan
    call error1(channel0, n_chan)
@@ -295,28 +294,28 @@ contains
    do i = 1, n_chan
       ll_g = channel0+i
       read(14,*) weight(ll_g)
-      if (weight(ll_g) .gt. 0) n_chan3 = n_chan3 + 1
+      if (weight(ll_g) .gt. 0) used_channels = used_channels + 1
    end do
    rewind 14
    call set_params(lnpt, jmin, jmax, nlen, max_freq)
-!   write(*,*)'n_chan: ', n_chan3
+!   write(*,*)'n_chan: ', used_channels
    call error2(n_wave_weight, n_chan)
    
    filename = 'waveforms_body.txt'
    filename = trim(filename)
-   call get_waveforms(filename, n_chan, channel0, channel1)!, cgps, dart)
+   call get_waveforms(filename, n_chan, channel0)!, cgps, dart)
 
    do i = 1, n_chan
       ll_g = i+channel0
       cgps_channels(ll_g) = .False.
       dart_channels(ll_g) = .False.
-      read(9,*) nos, earth, sttyp, sta_name(ll_g), fname, &
+      read(9,*) int1, earth, sttyp, sta_name(ll_g), fname, &
       & rang, az, lat_sta, lon_sta, earth_angle, float1, &
-      & mmm(i), disp_or_vel(i), float2, llove(i), int1, idata(i)
+      & mmm(i), disp_or_vel(i), float2, llove(i), int2, idata(i)
       if (idata(i) .gt. 0 .or. mmm(i) .eq. 3) cycle
       dt_channel(ll_g) = dt
       read(14,*) weight(ll_g)
-      weight(ll_g) = weight(ll_g) / n_chan3
+      weight(ll_g) = weight(ll_g) / used_channels
       love = llove(i)
       component(ll_g) = 'P'
       if (love .gt. 0) component(ll_g) = 'SH'
@@ -363,10 +362,9 @@ contains
 !  channel1: number of final channel
 !
    implicit none
-   integer channel0, channel1, ll_g, io_chan, j_con(11), k, i, no, &
-   &  n_wave_weight, ir_max, n_chan, &
-   &  nos(max_stations), io_mod(max_stations), n_chan3, &
-   &  io_ns(max_stations), idts, io_ew(max_stations), io_str(max_stations)
+   integer channel0, channel1, ll_g, io_chan, j_con(11), k, i, int0, &
+   &  n_wave_weight, ir_max, n_chan, int1, int2, used_channels, &
+   &  io_ns(max_stations), io_ew(max_stations), io_str(max_stations)
    real lat_s(max_stations), lon_s(max_stations), dt, &
    &  ang_ns(max_stations), ang_ew(max_stations), weig(max_stations, 3), j_wig(11), dt_sample, &
    &  dip, rake, theta
@@ -378,7 +376,7 @@ contains
    logical :: is_file
 
    write(*,*)'Get stations metadata and waveforms for long period surface waves...'
-   n_chan3 = 0
+   used_channels = 0
 !
 !  suppose the ni = u3e+11, then then moment of 1cm*1km^2 
 !       subfault is 3e+21. The gfs is for Mo = 1e+20
@@ -390,7 +388,6 @@ contains
    read(15,*) jmin, jmax, max_freq
    read(15,'(a)')modes
    read(15,*) n_wave_weight
-   idts = 3
  
    read(9,*)
    read(9,*)
@@ -414,11 +411,11 @@ contains
       ll_g = i+channel0
       cgps_channels(ll_g) = .False.
       dart_channels(ll_g) = .False.
-      read(9,*) no, sta_name(ll_g), lat_s(i), lon_s(i), io_mod(i), &
+      read(9,*) int0, sta_name(ll_g), lat_s(i), lon_s(i), int1, &
       & io_up(i), io_ns(i), io_ew(i), ang_ns(i), ang_ew(i), &
-      & io_str(i),(weig(i, k), k = 1, 3), nos(i)
-      if ((weig(i, 1) .gt. 0) .and. (io_up(i) .eq. 1)) n_chan3 = n_chan3 + 1
-      if ((weig(i, 2) .gt. 0) .and. (io_ns(i) .eq. 1)) n_chan3 = n_chan3 + 1
+      & io_str(i),(weig(i, k), k = 1, 3), int2
+      if ((weig(i, 1) .gt. 0) .and. (io_up(i) .eq. 1)) used_channels = used_channels + 1
+      if ((weig(i, 2) .gt. 0) .and. (io_ns(i) .eq. 1)) used_channels = used_channels + 1
    end do
    close(9)
 
@@ -427,20 +424,20 @@ contains
       if (io_up(i) .eq. 1) then
          io_chan = io_chan + 1
          ll_g = io_chan + channel0
-         weight(ll_g) = weig(i, 1) / n_chan3
+         weight(ll_g) = weig(i, 1) / used_channels
          component(ll_g) = 'R'
       end if
       if (io_ns(i) .eq. 1) then
          io_chan = io_chan + 1
          ll_g = io_chan + channel0
-         weight(ll_g) = weig(i, 2) /n_chan3
+         weight(ll_g) = weig(i, 2) /used_channels
          component(ll_g) = 'L'
       end if
    end do
    
    filename = 'waveforms_surf.txt'
    filename = trim(filename)
-   call get_waveforms(filename, n_chan, channel0, channel1) 
+   call get_waveforms(filename, n_chan, channel0) 
 
    io_chan = 0
    do i = 1, n_chan
@@ -488,15 +485,15 @@ contains
 !  channel1: number of final channel
 !
    implicit none
-   integer channel0, channel1, ll_g, j_con(11), k, i, no, &
-   &  n_wave_weight, ir_max, n_chan, nos, io_mod, n_chan3
+   integer channel0, channel1, ll_g, j_con(11), k, i, int0, &
+   &  n_wave_weight, ir_max, n_chan, int1, int2, used_channels
    real :: lat_s, lon_s, dt, weig(max_stations), j_wig(11), dt_sample
    logical, parameter :: cgps=.False., dart=.True.
    character(len=20) filename
 !   character(len=6) sta_name(max_stations)
 !   character(len=3) component(max_stations)
 
-   n_chan3 = 0
+   used_channels = 0
 !
 !  suppose the ni = u3e+11, then then moment of 1cm*1km^2 
 !       subfault is 3e+21. The gfs is for Mo = 1e+20
@@ -524,19 +521,19 @@ contains
       ll_g = i+channel0
       cgps_channels(ll_g) = .False.
       dart_channels(ll_g) = .True.
-      read(9,*) no, sta_name(ll_g), lat_s, lon_s, io_mod, component(ll_g), weig(i), nos
-      if (weig(i) .gt. 0) n_chan3 = n_chan3 + 1
+      read(9,*) int0, sta_name(ll_g), lat_s, lon_s, int1, component(ll_g), weig(i), int2
+      if (weig(i) .gt. 0) used_channels = used_channels + 1
    end do
    close(9)
    
    filename = 'waveforms_dart.txt'
    filename = trim(filename)
-   call get_waveforms(filename, ir_max, channel0, channel1) 
+   call get_waveforms(filename, ir_max, channel0) 
 
    do i = 1, ir_max
 
       ll_g = i+channel0
-      weight(ll_g) = weig(i) / n_chan3
+      weight(ll_g) = weig(i) / used_channels
       dt_channel(ll_g) = dt_sample
       
       do k = 1, 11
@@ -560,16 +557,15 @@ contains
    end subroutine get_dart_stations
 
 
-   subroutine get_waveforms(filename, ir_max, channel0, channel1)
+   subroutine get_waveforms(filename, ir_max, channel0)
 !
 !  Args:
 !  filename: name of file with waveforms
 !  ir_max: amount of channels to be read
 !  channel0: number of initial channel
-!  channel1: number of final channel
 !
    implicit none
-   integer channel0, channel1, ll_g, i, j, ir_max
+   integer channel0, ll_g, i, j, ir_max
    real :: dto
    character(len=40) string
    character(len=20) filename
@@ -588,7 +584,6 @@ contains
       read(13,*)(obse(j, ll_g), j = 1, start(ll_g))
    enddo
    close(13)
-   channel1 = channel0 + ir_max
    end subroutine get_waveforms
 
 
