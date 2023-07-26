@@ -449,7 +449,7 @@ def plot_spectra(
 
     :param files: The file information dictionaries
     :type files: List[dict]
-    :param dt: The time delta
+    :param dt: The dt
     :type dt: float
     :param plot_directory: The directory where plots are saved, defaults to pathlib.Path()
     :type plot_directory: Union[pathlib.Path, str], optional

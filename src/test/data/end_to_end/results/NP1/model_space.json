@@ -1,0 +1,21 @@
+[
+    {
+        "max_center_slip": 2700,
+        "max_left_slip": 2700,
+        "max_lower_slip": 2700,
+        "max_right_slip": 2700,
+        "max_slip_delta": 2700,
+        "max_upper_slip": 2700,
+        "min_slip": 0,
+        "rake_max": 129.27817171619563,
+        "rake_min": 89.27817171619564,
+        "rake_step": 21,
+        "regularization": {
+            "neighbour_down": null,
+            "neighbour_left": null,
+            "neighbour_right": null,
+            "neighbour_up": null
+        },
+        "slip_step": 51
+    }
+]
