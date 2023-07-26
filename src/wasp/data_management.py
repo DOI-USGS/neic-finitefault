@@ -65,7 +65,7 @@ def _dict_trace(
     :param wavelet_weight: The weight of the wavelet
     :type wavelet_weight: Optional[Union[List[Union[float, int, str]], float, str]]
     :param synthetic_trace: The synthetic trace, defaults to None
-    :type synthetic_trace:  Optional[List[Union[float, int, str]]]
+    :type synthetic_trace: Optional[List[Union[float, int, str]]]
     :param observed_trace: The observed trace, defaults to None
     :type observed_trace:  Optional[List[Union[float, int, str]]]
     :param location: The location (latitude, longitude), defaults to None
@@ -196,7 +196,7 @@ def tele_surf_traces(
 ) -> List[dict]:
     """Write json dictionary with properties for surface wave data
 
-    :param files: List of files holding surface wave  data
+    :param files: List of files holding surface wave data
     :type files: List[Union[pathlib.Path, str]]
     :param tensor_info: The tensor information
     :type tensor_info: dict
@@ -812,7 +812,18 @@ def __s2nr(sacfile: Union[pathlib.Path, str], phase: str, signal_length: int) ->
 def __used_stations(
     jump: int, sacfiles: List[Union[pathlib.Path, str]], tensor_info: dict
 ) -> int:
-    """TODO: Define what this does and what jump is"""
+    """This function finds the maximum amount of far field data of a given type
+        to be selected given a size for the azimuth intervals
+
+    :param jump: The size of these azimuth intervals
+    :type jump: int
+    :param sacfiles: The list of waveform files
+    :type sacfiles: List[Union[pathlib.Path, str]]
+    :param tensor_info: The tensor information
+    :type tensor_info: dict
+    :return: The amount of farfield data
+    :rtype: int
+    """
     sacheaders = (SACTrace.read(sac) for sac in sacfiles)
     event_lat = tensor_info["lat"]
     event_lon = tensor_info["lon"]
@@ -1145,7 +1156,7 @@ def duration_strong_motion(
     :type arrivals: List[float]
     :param tensor_info: The tensor information
     :type tensor_info: dict
-    :param dt_strong: The time delta of the strong motion data
+    :param dt_strong: The dt of the strong motion data
     :type dt_strong: float
     :return: The duration estimation
     :rtype: int
@@ -1177,7 +1188,7 @@ def duration_dart(
     :type arrivals: List[float]
     :param tensor_info: Tensor information
     :type tensor_info: dict
-    :param dt_dart: Time delta of data
+    :param dt_dart: Dt of data
     :type dt_dart: float
     :return: The duration
     :rtype: int

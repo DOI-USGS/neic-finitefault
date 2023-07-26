@@ -3,7 +3,6 @@ import os
 import pathlib
 import shutil
 import tempfile
-from glob import glob
 
 import numpy as np
 from obspy.io.sac import SACTrace
@@ -161,8 +160,6 @@ def test_filling_data_dicts():
             [w["name"] for w in new_insar["descending"]],
             working_directory=tempdir,
         )
-        print(glob(str(tempdir) + "/*"))
-        print(glob(str(tempdir) + "/*/*"))
         for fname, target in zip(
             [
                 "surf_waves.json",
@@ -205,30 +202,58 @@ def test_filling_data_dicts():
                     ]:
                         assert props[idx][key] == d[key]
             else:
-                for idx, d in enumerate(target):
-                    assert props[idx] == d
+                for idx, t in enumerate(target):
+                    match = False
+                    for idy, d in enumerate(props):
+                        if t["name"] == d["name"] and t["component"] == d["component"]:
+                            assert t == d
+                            match = True
+                    if not match:
+                        raise Exception(
+                            f"No match found for target {t['name']} {t['component']}"
+                        )
     finally:
         shutil.rmtree(tempdir)
 
 
 def test_get_traces_files():
-    assert [
+    tele_files = [
         f.split("/")[-1] for f in get_traces_files("tele_body", RESULTS_DIR / "data")
-    ] == ["final_G_MPG_BHZ.sac", "final_IU_RCBR_BHZ.sac", "final_IU_MACI_BHZ.sac"]
-    assert [
+    ]
+    assert len(tele_files) == 3
+    for target in [
+        "final_G_MPG_BHZ.sac",
+        "final_IU_RCBR_BHZ.sac",
+        "final_IU_MACI_BHZ.sac",
+    ]:
+        assert target in tele_files
+    surf_files = [
         f.split("/")[-1] for f in get_traces_files("surf_tele", RESULTS_DIR / "data")
-    ] == ["final_G_MPG_BHZ.sac", "final_IU_RCBR_BHZ.sac", "final_IU_MACI_BHZ.sac"]
-    assert [
+    ]
+    assert len(surf_files) == 3
+    for target in [
+        "final_G_MPG_BHZ.sac",
+        "final_IU_RCBR_BHZ.sac",
+        "final_IU_MACI_BHZ.sac",
+    ]:
+        assert target in surf_files
+    sm_files = [
         f.split("/")[-1]
         for f in get_traces_files("strong_motion", RESULTS_DIR / "data")
-    ] == [
+    ]
+    assert len(sm_files) == 3
+    for target in [
         "final_vel_GO04_HNN_C.sac",
         "final_vel_VA03_HNZ_C1.sac",
         "final_vel_CO03_HNZ_C1.sac",
-    ]
-    assert [
+    ]:
+        assert target in sm_files
+    cgps_files = [
         f.split("/")[-1] for f in get_traces_files("cgps", RESULTS_DIR / "data")
-    ] == ["final_ovll_LXZ.sac", "final_pedr_LXZ.sac", "final_pfrj_LXE.sac"]
+    ]
+    assert len(cgps_files) == 3
+    for target in ["final_ovll_LXZ.sac", "final_pedr_LXZ.sac", "final_pfrj_LXE.sac"]:
+        assert target in cgps_files
 
 
 def test_failsafe():
