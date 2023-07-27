@@ -1,0 +1,19 @@
+{
+    "centroid_depth": 17.35,
+    "centroid_lat": -31.13,
+    "centroid_lon": -72.09,
+    "datetime": "2015-09-16T22:54:32",
+    "depth": 22.4,
+    "half_duration": 33.4,
+    "lat": -31.57,
+    "lon": -71.67,
+    "moment_mag": 3.2291872286240194e+28,
+    "mpp": -1.91e+28,
+    "mrp": -2.48e+28,
+    "mrr": 1.95e+28,
+    "mrt": 7.42e+27,
+    "mtp": 9.42e+26,
+    "mtt": -4.36e+26,
+    "time_shift": 49.98,
+    "timedelta": 247341228.121899
+}
