@@ -6,7 +6,7 @@ moving to a different folder.
 
 import os
 import pathlib
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from obspy.core.utcdatetime import UTCDateTime  # type: ignore
@@ -18,7 +18,7 @@ from wasp.read_config import read_config
 
 def theoretic_arrivals(
     model: TauPyModel, dist: float, depth: float
-) -> Dict[str, Union[Arrivals, float]]:
+) -> Dict[str, Arrivals]:
     """Get theoretic arrivals of some phases
 
     :param model: The obspy TauPyModel traveltime model
@@ -72,7 +72,7 @@ def default_dirs(
     :rtype: Dict[str,str]
     """
     if config_path is not None:
-        config = read_config(config_path=str(config_path))
+        config = read_config(config_path=pathlib.Path(config_path))
     else:
         config = read_config()
     paths = config["PATHS"]
