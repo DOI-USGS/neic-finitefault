@@ -69,7 +69,7 @@ def _dict_trace(
     :param observed_trace: The observed trace, defaults to None
     :type observed_trace:  Optional[List[Union[float, int, str]]]
     :param location: The location (latitude, longitude), defaults to None
-    :type location:  Optional[List[Union[float, int, str]]] = None, optional
+    :type location: Optional[List[Union[float, int, str]]] = None, optional
     :param derivative: Whether a derivative, defaults to False
     :type derivative: bool, optional
     :return: The information dictionary
