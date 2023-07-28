@@ -566,14 +566,14 @@ contains
    subroutine get_wavelet_obs(wave_obs, wmax, t_max_val)
 !
 !  Args:
-!  wave_obs: name of file with waveforms
-!  wmax: amount of channels to be read
-!  t_max_val: number of initial channel
+!  wave_obs: wavelet coefficients for channel waveform
+!  wmax: maximum wavelet coefficient
+!  t_max_val: wavelet atom belonging to maximum coefficient
 !
    implicit none
    real, intent(out) :: wave_obs(wave_pts2, max_stations), wmax(max_stations)
    integer, intent(out) :: t_max_val(max_stations)
-   integer nm, i, j, channel, start1, length, n_begin, n_delt
+   integer atom_max0, i, j, channel, start1, length, n_begin, n_delt
    real real1(wave_pts2), imag1(wave_pts2), obser(n_data), &
    &  amp_max, mean
    logical :: cgps, dart
@@ -603,11 +603,11 @@ contains
 
       call wavelet_obs(real1, imag1, obser)
       amp_max = 0.0
-      nm = 1
+      atom_max0 = 1
       do i = 1, nlen
          if (amp_max .lt. abs(obser(i))) then
             amp_max = abs(obser(i))
-            nm = i
+            atom_max0 = i
          end if
       end do
       if (dart) then
@@ -619,14 +619,14 @@ contains
             do i =1, length
                if (amp_max .lt. abs(obser(n_begin+i))) then
                   amp_max = abs(obser(n_begin+i))
-                  nm = n_begin+i
+                  atom_max0 = n_begin+i
                endif
             enddo
          enddo
       endif
 
       wmax(channel) = amp_max
-      t_max_val(channel) = nm
+      t_max_val(channel) = atom_max0
       do i = 1, nlen
          wave_obs(i, channel) = obser(i)/(amp_max)
       end do
@@ -641,14 +641,14 @@ contains
 !
    implicit none
    integer :: used_data
-   integer :: j, i, n_begin, n_delt, length
-   do i = 1, channels
-      if (weight(i) .gt. (1e-3)) then
+   integer :: j, channel, n_begin, n_delt, length
+   do channel = 1, channels
+      if (weight(channel) .gt. (1e-3)) then
          do j = jmin, jmax
             n_begin = 2**(j-1)
             n_delt = nlen/n_begin
-            length = int(t_max(i)/n_delt+0.5)-1
-            if (wavelet_weight(j, i) .gt. (1e-3)) then
+            length = int(t_max(channel)/n_delt+0.5)-1
+            if (wavelet_weight(j, channel) .gt. (1e-3)) then
                used_data = used_data + length
             endif
          end do
