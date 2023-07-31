@@ -9,12 +9,13 @@ END_TO_END_DIR = pathlib.Path(__file__).parent / "data" / "end_to_end"
 RESULTS_DIR = pathlib.Path(__file__).parent / "data" / "end_to_end" / "results"
 
 
-def get_cgps_json(min: int = 0, max: int = 3):
+def get_cgps_json(min: int = 0, max: int = 3, all: bool = False):
     """Get cgps_waves.json"""
     with open(RESULTS_DIR / "NP1" / "cgps_waves.json", "r") as f:
-        cgps_waves = cgps_waves = update_manager_file_locations(
-            json.load(f)[min:max], RESULTS_DIR / "data"
-        )
+        d = json.load(f)
+        if not all:
+            d = d[min:max]
+        cgps_waves = cgps_waves = update_manager_file_locations(d, RESULTS_DIR / "data")
     return cgps_waves
 
 
@@ -34,37 +35,50 @@ def get_sampling_filter():
     return sampling_filter
 
 
-def get_static_json(min: int = 0, max: int = 3):
+def get_segments_data():
+    """Get segments_data.json"""
+    with open(RESULTS_DIR / "NP1" / "segments_data.json", "r") as f:
+        segments = json.load(f)
+    return segments
+
+
+def get_static_json(min: int = 0, max: int = 3, all: bool = False):
     """Get static_data.json"""
     with open(RESULTS_DIR / "NP1" / "static_data.json", "r") as f:
-        static_data = json.load(f)[min:max]
+        d = json.load(f)
+        if not all:
+            d = d[min:max]
+        static_data = d
     return static_data
 
 
-def get_strong_motion_json(min: int = 0, max: int = 3):
+def get_strong_motion_json(min: int = 0, max: int = 3, all: bool = False):
     """Get strong_motion_waves.json"""
     with open(RESULTS_DIR / "NP1" / "strong_motion_waves.json", "r") as f:
-        sm_waves = update_manager_file_locations(
-            json.load(f)[min:max], RESULTS_DIR / "data"
-        )
+        d = json.load(f)
+        if not all:
+            d = d[min:max]
+        sm_waves = update_manager_file_locations(d, RESULTS_DIR / "data")
     return sm_waves
 
 
-def get_surf_waves_json(min: int = 0, max: int = 3):
+def get_surf_waves_json(min: int = 0, max: int = 3, all: bool = False):
     """Get surf_waves.json"""
     with open(RESULTS_DIR / "NP1" / "surf_waves.json", "r") as f:
-        surf_waves = update_manager_file_locations(
-            json.load(f)[min:max], RESULTS_DIR / "data"
-        )
+        d = json.load(f)
+        if not all:
+            d = d[min:max]
+        surf_waves = update_manager_file_locations(d, RESULTS_DIR / "data")
     return surf_waves
 
 
-def get_tele_waves_json(min: int = 0, max: int = 3):
+def get_tele_waves_json(min: int = 0, max: int = 3, all: bool = False):
     """Get tele_waves.json"""
     with open(RESULTS_DIR / "NP1" / "tele_waves.json", "r") as f:
-        tele_waves = update_manager_file_locations(
-            json.load(f)[min:max], RESULTS_DIR / "data"
-        )
+        d = json.load(f)
+        if not all:
+            d = d[min:max]
+        tele_waves = update_manager_file_locations(d, RESULTS_DIR / "data")
     return tele_waves
 
 
@@ -103,3 +117,10 @@ def update_manager_file_locations(
                         new_directory / manage_dicts[key][idx][file_key]
                     )
     return updated_managed_dicts
+
+
+def get_velmodel_data():
+    """Get velmodel_data.json"""
+    with open(RESULTS_DIR / "NP1" / "velmodel_data.json", "r") as f:
+        velmodel = json.load(f)
+    return velmodel
