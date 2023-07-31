@@ -339,8 +339,6 @@ def write_Okada_displacements(directory: Union[pathlib.Path, str] = pathlib.Path
             "#Longitude, Latitude, Elevation, Easting Displacement (m), Northing Displacement (m), Vertical Displacement (m)\n"
         )
         ko = 0
-        # for klon in range(len(xLons)):
-        #    for klat in range(len(xLats)):
         for klat in range(len(xLats)):
             for klon in range(len(xLons)):
                 DISPout.write(
@@ -621,12 +619,6 @@ def write_Coulomb_file(
         RAKE = []
         STRIKE = []
         DIP = []
-        # T_RUP=[]
-        # T_RIS=[]
-        # T_FAL=[]
-        # MO=[]
-        # SS_SLIP = []
-        # DS_SLIP = []
 
         with open(directory / "Solucion.txt") as param:
             for line in param:

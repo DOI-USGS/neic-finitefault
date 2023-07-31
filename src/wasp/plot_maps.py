@@ -74,7 +74,6 @@ def plot_map(
     max_val = max([np.amax(value) for value in values]) if not max_val else max_val
     zipped = zip(longitudes, latitudes, values)
     for longitude, latitude, value in zipped:
-        print(value)
         if np.prod(longitude.shape) > 1:
             cs = ax.pcolormesh(
                 longitude,
