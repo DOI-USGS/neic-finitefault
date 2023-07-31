@@ -67,7 +67,7 @@ contains
 !
    implicit none
 !
-   integer ll_in, ll_out
+   integer first, last
    logical :: strong, cgps, body, surf, dart, many_events
    allocate(green_dip(npuse, max_stations, max_subfaults))
    allocate(green_stk(npuse, max_stations, max_subfaults))
@@ -76,50 +76,50 @@ contains
 !
 !  Here, we load into memory the green functions for each subfault, for every used station
 !  
-   ll_in = 0
-   ll_out = 0
+   first = 0
+   last = 0
    if (strong) then
-      call get_near_field_gf(ll_in, ll_out, many_events, strong, .False.)
-      ll_in = ll_out
+      call get_near_field_gf(first, last, many_events, strong, .False.)
+      first = last
    end if
    if (cgps) then
-      call get_near_field_gf(ll_in, ll_out, many_events, .False., cgps)
-      ll_in = ll_out
+      call get_near_field_gf(first, last, many_events, .False., cgps)
+      first = last
    end if
    if (body) then
-      call get_body_waves_gf(ll_in, ll_out, many_events)
-      ll_in = ll_out
+      call get_body_waves_gf(first, last, many_events)
+      first = last
    end if
    if (surf) then
-      call get_surface_waves_gf(ll_in, ll_out, many_events)
-      ll_in = ll_out
+      call get_surface_waves_gf(first, last, many_events)
+      first = last
    end if
    if (dart) then
-      call get_dart_gf(ll_in, ll_out)
-      ll_in = ll_out
+      call get_dart_gf(first, last)
+      first = last
    end if
    end subroutine get_gf
 
 
-   subroutine get_near_field_gf(ll_in, ll_out, many_events, strong, cgps)
+   subroutine get_near_field_gf(first, last, many_events, strong, cgps)
 !
 !  Args:
-!  ll_in: number of initial channel
-!  ll_out: number of final channel
+!  first: number of initial channel
+!  last: number of final channel
 !  many_events: True if more than one event to be modelled, False otherwise
 !  strong: True if strong motion data are used, False otherwise
 !  cgps: True if cGPS data are used, False otherwise
 !
    implicit none
-   integer :: ll_in, ll_out, io_v_d, ll_g, ll, &
-   &  io_chan, i, segment, channel, channel_max, n_chan, &
+   integer :: first, last, channel, subfault, &
+   &  io_chan, i, j, segment, channel_max, n_chan, &
    &  ixs, iys, event
-   real :: omega, block, dt, df, dt_sample, w, tlen
+   real :: omega, factor, dt, df, dt_sample, w, tlen
    complex :: z0, z
    character(len=80) filename, filename2
-   character(len=3) comp!component(max_stations), comp
-   character(len=1) channel2!component(max_stations), comp
-   character(len=2) event2!component(max_stations), comp
+   character(len=3) comp
+   character(len=1) channel2
+   character(len=2) event2
    logical :: many_events, strong, cgps
    
    if (strong) write(*,*)'Store strong motion GF in memory...'
@@ -129,7 +129,7 @@ contains
 !  suppose the ni = u3e+11, then then moment of 1cm*1km^2 
 !       subfault is 3e+21. The gfs is for Mo = 1e+20
 !
-   block = dxs * dys * (1.e-10) 
+   factor = dxs * dys * (1.e-10) 
 
    filename = 'channels_strong.txt'
    if (cgps) filename = 'channels_cgps.txt'
@@ -139,7 +139,7 @@ contains
    read(9,*)
    read(9,*)
    read(9,*) lnpt, dt_sample
-   read(9,*) io_v_d
+   read(9,*)
    nlen = 2**lnpt
    dt = dt_sample
    tlen = dt*nlen
@@ -156,64 +156,65 @@ contains
    nlen = 2 ** lnpt
    tlen = nlen * dt
 
-   do channel = 1, channel_max
+   do i = 1, channel_max
 
       io_chan = io_chan+1
-      ll_g = io_chan+ll_in
-      comp = component(ll_g)
+      channel = io_chan+first
+      comp = component(channel)
       channel2 = comp(3:3)
-      filename2 = trim(sta_name(ll_g))//'.'//comp
+      filename2 = trim(sta_name(channel))//'.'//comp
       filename2 = trim(filename2)
 
       open(12, file=filename2, status='old', access='direct',recl=block_stg)
-      ll = 0
+      subfault = 0
 !
 !       Here, we read the green functions and derivate them
 !
-      if (many_events) event = event_sta(ll_g)
+      if (many_events) event = event_sta(channel)
       do segment = 1, segments
          do iys = 1, nys_sub(segment)
             do ixs = 1, nxs_sub(segment)
-               ll = ll+1
-               read(12, rec = ll) &
-               & (green_dip(i, ll_g, ll), i = 1, max_freq),(green_stk(i, ll_g, ll), i = 1, max_freq)
-               do i = 1, max_freq
+               subfault = subfault+1
+               read(12, rec = subfault) &
+               & (green_dip(j, channel, subfault), j = 1, max_freq),&
+               & (green_stk(j, channel, subfault), j = 1, max_freq)
+               do j = 1, max_freq
 !
 ! we eventually shift synthetics in time, in case the fault plane used has a delay
 !
-                  omega = twopi*(i-1)*df
+                  omega = twopi*(j-1)*df
                   w = -omega*delay_seg(segment)
                   z = cmplx(0.0, w)
                   z = cexp(z)
-                  green_dip(i, ll_g, ll) = green_dip(i, ll_g, ll)*z*block
-                  green_stk(i, ll_g, ll) = green_stk(i, ll_g, ll)*z*block
+                  green_dip(j, channel, subfault) = green_dip(j, channel, subfault)*z*factor
+                  green_stk(j, channel, subfault) = green_stk(j, channel, subfault)*z*factor
                end do
                if ((many_events) .and. (segment_in_event(segment, event) .eqv. .False.)) then
-                  green_dip(:max_freq, ll_g, ll) = 0.0
-                  green_stk(:max_freq, ll_g, ll) = 0.0
+                  green_dip(:max_freq, channel, subfault) = 0.0
+                  green_stk(:max_freq, channel, subfault) = 0.0
                endif
             end do
          end do
       enddo
       close(12)
    end do      
-   ll_out = ll_in+n_chan
+   last = first+n_chan
    end subroutine get_near_field_gf
 
 
-   subroutine get_body_waves_gf(ll_in, ll_out, many_events)
+   subroutine get_body_waves_gf(first, last, many_events)
 !
 !  Args:
-!  ll_in: number of initial channel
-!  ll_out: number of final channel
+!  first: number of initial channel
+!  last: number of final channel
 !  many_events: True if more than one event to be modelled, False otherwise
 !
    implicit none
    integer nstaon, channel, ll_g, k, nsta, n_chan, subfault, psource, &
    &  love, ll, segment, iys, iyp, io_seg, iys_c, iy_c, jf, i, ipy, npxy, &
    &  nkxy, nxs_c, nys_c, nxp_c, nyp_c, ll_s, kxy, ixs, kpxy, ixp, & 
-   &  ll_in, ll_out, event
-   real dt, df, ddelt, time, block, w, tlen!, &
+   &  first, last, event
+   real dt, df, ddelt, time, factor, w, tlen!, &
    real, allocatable :: tdel(:,:,:,:)
    complex :: z, z0, wsyn(wave_pts)
    complex :: kahan_y1(wave_pts2), kahan_t1(wave_pts2), kahan_c1(wave_pts2)
@@ -235,18 +236,18 @@ contains
    read(9,*)
    read(9,*)
    read(9,*) nstaON
-   block = dxs*dys*(1.0e-10)
-   block = block*1.e+4
+   factor = dxs*dys*(1.0e-10)
+   factor = factor*1.e+4
 !  
 !  Because the data is micrometer, so The amplitude of block should
 !  time e+4 Only in this test
 !
 
-   dt = dt_channel(ll_in + 1)
+   dt = dt_channel(first + 1)
    tlen = nlen*dt
    npxy = nx_p*ny_p
    do channel = 1, nstaon
-      ll_g = ll_in+channel
+      ll_g = first+channel
 
       if (idata(channel) .gt. 0 .or. mmm(channel) .eq. 3) cycle
       nsta = nstaON
@@ -288,9 +289,9 @@ contains
                end if
                do i = 1, 2*max_freq
                   green_dip0(i, ipy, iys, segment, channel) = &
-                  & block*green_dip0(i, ipy, iys, segment, channel)
+                  & factor*green_dip0(i, ipy, iys, segment, channel)
                   green_stk0(i, ipy, iys, segment, channel) = &
-                  & block*green_stk0(i, ipy, iys, segment, channel)
+                  & factor*green_stk0(i, ipy, iys, segment, channel)
                end do
             end do
          end do
@@ -332,7 +333,7 @@ contains
    close(9)
    
    do channel = 1, nstaon
-      ll_g = ll_in+channel
+      ll_g = first+channel
 
       do I = 1, wave_pts
          wsyn(i) = z0
@@ -394,22 +395,22 @@ contains
          end do
       end do
    end do
-   ll_out = ll_in+nstaon
+   last = first+nstaon
    deallocate(green_stk0)
    deallocate(green_dip0)
    deallocate(tdel)
    end subroutine get_body_waves_gf
 
 
-   subroutine get_surface_waves_gf(ll_in, ll_out, many_events)
+   subroutine get_surface_waves_gf(first, last, many_events)
 !
 !  Args:
-!  ll_in: number of initial channel
-!  ll_out: number of final channel
+!  first: number of initial channel
+!  last: number of final channel
 !  many_events: True if more than one event to be modelled, False otherwise
 !
    implicit none
-   integer ll_in, ll_out, nf1, nf2, nf3, nf4, no, subfault, psource, &
+   integer first, last, nf1, nf2, nf3, nf4, no, subfault, psource, &
    &  npp, ix, iy, segment_subfault, j, ll_g, ll, io_chan, i, k, io_mod(max_stations), &
    &  segment, channel, i_ch, channel_max, n_chan, event, &
    &  iys, ixs, io_up(max_stations), io_ew(max_stations), io_ns(max_stations)
@@ -418,7 +419,7 @@ contains
    real filter(wave_pts), f1, f2, f3, f4, const_c, tsub(max_psources), h, omega, &
    &  dist_min, dist_max, depth_sub, dep_min, dep_max, lat_p, lon_p, shear_subfault, &
    &  lat_sta, lon_sta, df_bank, tlen_bank, &
-   &  time, a, block, lat_s(max_stations), lon_s(max_stations), dt, rake, &
+   &  time, a, factor, lat_s(max_stations), lon_s(max_stations), dt, rake, &
    &  ang_ns(max_stations), ang_ew(max_stations), df, area, dt_sample, tlen
    
    complex :: kahan_y, kahan_t, kahan_c
@@ -437,7 +438,7 @@ contains
 !  the unit of surface wave is mm.
 !
    area = dxs*dys
-   block = 1000.0*area*(1.e-10)
+   factor = 1000.0*area*(1.e-10)
 
    open(9, file='surf_filter.txt', status='old')
    read(9,*)f1, f2, f3, f4
@@ -456,7 +457,7 @@ contains
       write(*,*)"please check input LNPT"
    end if
    nlen = 2**lnpt
-   dt = dt_channel(ll_in + 1)!dt_sample
+   dt = dt_channel(first + 1)!dt_sample
    tlen = dt*nlen
    df = 1.0/tlen
   
@@ -477,16 +478,16 @@ contains
    nf2 = int(f2/df)
    nf3 = int(f3/df)
    nf4 = int(f4/df)+1
-   do k = 1, nlen/2
-      filter(k) = 1.0
-      if (k .ge. nf4 .or. k .lt. nf1) filter(k) = 0.0
-      if (k .ge. nf1 .and. k .lt. nf2 .and. ((nf2-nf1) .gt. 0)) then
-         filter(k) = 0.5*(1.0-cos(pi*(k-nf1)/(nf2-nf1)))
+   do i = 1, nlen/2
+      filter(i) = 1.0
+      if (i .ge. nf4 .or. i .lt. nf1) filter(i) = 0.0
+      if (i .ge. nf1 .and. i .lt. nf2 .and. ((nf2-nf1) .gt. 0)) then
+         filter(i) = 0.5*(1.0-cos(pi*(i-nf1)/(nf2-nf1)))
       end if
-      if (k .gt. nf3 .and. k .lt. nf4 .and. ((nf4-nf3) .gt. 0)) then
-         filter(k) = 0.5*(1.0+cos(pi*(k-nf3)/(nf4-nf3)))
+      if (i .gt. nf3 .and. i .lt. nf4 .and. ((nf4-nf3) .gt. 0)) then
+         filter(i) = 0.5*(1.0+cos(pi*(i-nf3)/(nf4-nf3)))
       end if
-      filter(k) = filter(k)*block!/nlen !filter(k) = filter(k)*block
+      filter(i) = filter(i)*factor!/nlen !filter(k) = filter(k)*block
    end do
 
    io_chan = 0
@@ -583,7 +584,7 @@ contains
                   end if
 
                   io_chan = io_chan+1
-                  ll_g = io_chan+ll_in
+                  ll_g = io_chan+first
                   if (many_events) event = event_sta(ll_g)
                   call rad_coef(dip_segment, theta, az, rad_c, coef_v, coef_r)
                   do i = 1, max_freq
@@ -625,23 +626,23 @@ contains
    end do
 
    close(9)
-   ll_out = ll_in+n_chan
+   last = first+n_chan
 
    return
    end subroutine get_surface_waves_gf
 
 
-   subroutine get_dart_gf(ll_in, ll_out)
+   subroutine get_dart_gf(first, last)
 !
 !  Args:
-!  ll_in: number of initial channel
-!  ll_out: number of final channel
+!  first: number of initial channel
+!  last: number of final channel
 !
    implicit none
-   integer :: ll_in, ll_out, io_v_d, ll_g, subfault, psource, &
-   &  io_chan, i, segment, channel, channel_max, n_chan, &
-   &  ixs, iys, length, etc
-   real :: omega, dt, df, dt_sample, w, tlen, real, imag, time
+   integer :: first, last, channel, subfault, psource, &
+   &  i, j, segment, channel_max, n_chan, &
+   &  ixs, iys, etc
+   real :: omega, dt, df, dt_sample, w, tlen, real1, imag1, time
    complex :: z0, z
    character(len=80) filename
    
@@ -657,7 +658,7 @@ contains
    read(9,*)
    read(9,*)
    read(9,*) lnpt, dt_sample
-   read(9,*) io_v_d
+   read(9,*)
    nlen = 2**lnpt
    dt = dt_sample
    tlen = dt*nlen
@@ -665,7 +666,6 @@ contains
 
    read(9,*) channel_max, n_chan
    close(9)
-   io_chan = 0
 !       
 !       Here we read the green functions of strong motion waves
 !
@@ -674,12 +674,11 @@ contains
    tlen = nlen * dt
    psource = int(ny_p/2 + 1)*nx_p + int(nx_p/2 + 1)
 
-   do channel = 1, channel_max
+   do i = 1, channel_max
 
-      ll_g = ll_in+channel
-      filename = trim(sta_name(ll_g))//'_gf.txt'
+      channel = first+i
+      filename = trim(sta_name(channel))//'_gf.txt'
       open(12, file=filename, status='old')
-      io_chan = io_chan+1
 !
 !       Here, we read the green functions and derivate them
 !
@@ -689,29 +688,29 @@ contains
             do ixs = 1, nxs_sub(segment)
                subfault = subfault+1
                time = point_sources(4, psource, subfault)/v_ref
-               green_dip(:,ll_g,subfault) = z0
-               green_stk(:,ll_g,subfault) = z0
+               green_dip(:,channel,subfault) = z0
+               green_stk(:,channel,subfault) = z0
                read(12, *)etc, max_freq
-               do i = 1, max_freq
-                  read(12, *)real, imag
-                  green_dip(i, ll_g, subfault) = cmplx(real, imag)
+               do j = 1, max_freq
+                  read(12, *)real1, imag1
+                  green_dip(j, channel, subfault) = cmplx(real1, imag1)
                enddo
-               do i = 1, max_freq
+               do j = 1, max_freq
 !
 ! we eventually shift synthetics in time, in case the fault plane used has a delay
 !
-                  omega = twopi*(i-1)*df
+                  omega = twopi*(j-1)*df
                   w = -omega*(time+delay_seg(segment))
                   z = cmplx(0.0, w)
                   z = cexp(z)
-                  green_dip(i, ll_g, subfault) = green_dip(i, ll_g, subfault)*z
+                  green_dip(j, channel, subfault) = green_dip(j, channel, subfault)*z
                end do
             end do
          end do
       end do
       close(12)
    end do      
-   ll_out = ll_in+n_chan
+   last = first+n_chan
    end subroutine get_dart_gf
 
    
