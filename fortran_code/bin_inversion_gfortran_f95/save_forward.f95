@@ -9,7 +9,7 @@ module save_forward
    use rise_time, only : source, fourier_asym_cosine, realtr, fft
    implicit none
    integer, parameter :: nnsta_tele = 80
-   integer :: nxs_sub(max_seg), nys_sub(max_seg), msou, segments, subfaults
+   integer :: nxs_sub(max_seg), nys_sub(max_seg), windows, segments, subfaults
    real :: dta, ta0, dt_channel(max_stations)
    integer :: lnpt, max_freq, nlen
    character(len=15) :: sta_name(max_stations)
@@ -24,7 +24,7 @@ contains
    implicit none
    real :: dip(max_seg), strike(max_seg), delay_seg(max_seg)
    integer :: cum_subfaults(max_seg)
-   call get_rise_time(ta0, dta, msou)
+   call get_rise_time(ta0, dta, windows)
    call get_segments(nxs_sub, nys_sub, dip, strike, delay_seg, segments, subfaults, cum_subfaults)
    end subroutine saveforward_set_fault_parameters
 
@@ -107,10 +107,9 @@ contains
 !  cgps: True if cGPS data are used, False otherwise
 !
    implicit none
-   integer first, last, ll_g, isl, isr, channel_max, subfault, &
-   &  jf, i, j, segment, channel, n_chan
+   integer first, last, channel, channel_max, i, j, k, n_chan
    real slip(:), rake(:), rupt_time(:), &
-   &  tfall(:), trise(:), real1(wave_pts2), imag1(wave_pts2), r, time, dt
+   &  tfall(:), trise(:), real1(wave_pts2), imag1(wave_pts2), dt
    real*8 t1, t2, df
    complex forward(wave_pts2), z0, z
    complex :: source2(wave_pts, max_rise_time_range, max_rise_time_range)
@@ -139,18 +138,17 @@ contains
 !       make the rise time function
 !   
    dt = dt_channel(first + 1)
-   jf = 2**(lnpt-1)+1
    df = 1.d0/(2**lnpt)/dt
   
-   do isl = 1, msou
-      do isr = 1, msou
-         source2(:, isl, isr) = cmplx(0.0, 0.0)
-         t1 = ta0+(isl-1)*dta
-         t2 = ta0+(isr-1)*dta
+   do j = 1, windows
+      do k = 1, windows
+         source2(:, j, k) = cmplx(0.0, 0.0)
+         t1 = ta0+(j-1)*dta
+         t2 = ta0+(k-1)*dta
          if (t1 .lt. dt) t1 = dt
          if (t2 .lt. dt) t2 = dt
-         do i = 1, jf
-            call fourier_asym_cosine((i-1)*df, t1, t2, source2(i, isl, isr))
+         do i = 1, 2*max_freq
+            call fourier_asym_cosine((i-1)*df, t1, t2, source2(i, j, k))
 !                SOURCE(i, ISL, isr) = CMPLX(CR(i), CZ(i))*dt
          end do
       end do
@@ -169,11 +167,11 @@ contains
 !
    do i = 1, n_chan
    
-      ll_g = i+first
-      call create_waveform(slip, rake, rupt_time, trise, tfall, forward, source2, ll_g)
-      comp = component(ll_g)
+      channel = i+first
+      call create_waveform(slip, rake, rupt_time, trise, tfall, forward, source2, channel)
+      comp = component(channel)
 
-      do j = 1, jf
+      do j = 1, nlen
          if (j .le. max_freq) then
             real1(j) = real(forward(j))
             imag1(j) = aimag(forward(j))
@@ -186,7 +184,7 @@ contains
       call realtr(real1, imag1, lnpt)
       call fft(real1, imag1, lnpt, 1.)
     
-      write(18,*)nlen,dt,sta_name(ll_g),comp
+      write(18,*)nlen,dt,sta_name(channel),comp
       do j = 1, nlen
          write(18,*) real1(j), imag1(j)
       end do
@@ -209,10 +207,9 @@ contains
 !  last: number of final channel
 !
    implicit none
-   integer n_chan, channel, ll_g, subfault, &
-   &  segment, jf, i, j, isl, isr, nl, first, last
+   integer n_chan, channel, i, j, k, nl, first, last
    real slip(:), rake(:), rupt_time(:), tfall(:), trise(:), &
-   &  dt, azim, w, real1(wave_pts2), imag1(wave_pts2), sinal, cosal
+   &  dt, real1(wave_pts2), imag1(wave_pts2)
    real*8 t1, t2, df
    complex ::  z, z0, forward(wave_pts)
    complex :: source2(wave_pts, max_rise_time_range, max_rise_time_range)
@@ -228,16 +225,15 @@ contains
    z0 = cmplx(0.0, 0.0)
 
    dt = dt_channel(first + 1)
-   jf = 2**(lnpt-1)+1
    df = 1.d0/(2**lnpt)/dt
-   do isl = 1, msou
-      do isr = 1, msou
-         t1 = ta0+(isl-1)*dta
-         t2 = ta0+(isr-1)*dta
+   do j = 1, windows
+      do k = 1, windows
+         t1 = ta0+(j-1)*dta
+         t2 = ta0+(k-1)*dta
          if (t1 .lt. dt) t1 = dt
          if (t2 .lt. dt) t2 = dt
          do i = 1, 2*max_freq
-            call fourier_asym_cosine((i-1)*df, t1, t2, source2(i, isl, isr))
+            call fourier_asym_cosine((i-1)*df, t1, t2, source2(i, j, k))
          end do
       end do
    end do
@@ -250,9 +246,9 @@ contains
 !  Now, we compute the synthetic seismographs
 !
    do i = 1, n_chan
-      ll_g = first+i
-      call create_waveform(slip, rake, rupt_time, trise, tfall, forward, source2, ll_g)
-      do j = 1, jf
+      channel = first+i
+      call create_waveform(slip, rake, rupt_time, trise, tfall, forward, source2, channel)
+      do j = 1, nlen
          if (j .le. max_freq) then
             real1(j) = real(forward(j))
             imag1(j) = aimag(forward(j))
@@ -265,9 +261,9 @@ contains
       call fft(real1, imag1, lnpt, 1.0)
       nl = 2**lnpt
       if (llove(i) .eq. 0) then
-         write(18,*)nl,dt,sta_name(ll_g),'P'
+         write(18,*)nl,dt,sta_name(channel),'P'
       else
-         write(18,*)nl,dt,sta_name(ll_g),'SH'
+         write(18,*)nl,dt,sta_name(channel),'SH'
       end if
       do j = 1, nl
          write(18,*) real1(j), imag1(j)
@@ -291,8 +287,7 @@ contains
 !  last: number of final channel
 !
    implicit none
-   integer first, last, channel_max, subfault, &
-   &  ll_g, isl, isr, jf, i, j, segment, channel, n_chan
+   integer first, last, channel_max, k, i, j, channel, n_chan
 
    real slip(:), rake(:), rupt_time(:), tfall(:), trise(:), &
    &  real1(wave_pts2), imag1(wave_pts2), dt
@@ -319,16 +314,15 @@ contains
 !       make the rise time function
 !     
    dt = dt_channel(first + 1)
-   jf = 2**(lnpt-1)+1
    df = 1.d0/(2**lnpt)/4.d0
-   do isl = 1, msou
-      do isr = 1, msou
-         t1 = ta0+(isl-1)*dta
-         t2 = ta0+(isr-1)*dta
+   do j = 1, windows
+      do k = 1, windows
+         t1 = ta0+(j-1)*dta
+         t2 = ta0+(k-1)*dta
          if (t1 .lt. dt) t1 = dt
          if (t2 .lt. dt) t2 = dt
-         do i = 1, jf
-            call fourier_asym_cosine((i-1)*df, t1, t2, source2(i, isl, isr))
+         do i = 1, 2*max_freq
+            call fourier_asym_cosine((i-1)*df, t1, t2, source2(i, j, k))
          end do
       end do
    end do
@@ -341,9 +335,9 @@ contains
 !  and calculate the initial value of objective function
 !
    do i = 1, n_chan
-      ll_g = i+first
-      call create_waveform(slip, rake, rupt_time, trise, tfall, forward, source2, ll_g)
-      do j = 1, jf
+      channel = i+first
+      call create_waveform(slip, rake, rupt_time, trise, tfall, forward, source2, channel)
+      do j = 1, nlen
          if (j .le. max_freq) then
             real1(j) = real(forward(j))
             imag1(j) = aimag(forward(j))
@@ -357,9 +351,9 @@ contains
       call fft(real1, imag1, lnpt, 1.0)
    
       if (io_up(i) .eq. 1) then
-         write(18,*)nlen,dt,sta_name(ll_g),'P'
+         write(18,*)nlen,dt,sta_name(channel),'P'
       else
-         write(18,*)nlen,dt,sta_name(ll_g),'SH'
+         write(18,*)nlen,dt,sta_name(channel),'SH'
       end if
       do j = 1, nlen
          write(18,*) real1(j), imag1(j)
@@ -383,8 +377,7 @@ contains
 !  last: number of final channel
 !
    implicit none
-   integer first, last, ll_g, isl, isr, subfault, &
-   &  jf, i, j, segment, channel, n_chan, channel_max
+   integer first, last, k, i, j, channel, n_chan, channel_max
    real slip(:), rake(:), rupt_time(:), &
    &  tfall(:), trise(:), real1(wave_pts2), imag1(wave_pts2), &
    &  dt
@@ -409,16 +402,15 @@ contains
 !       make the rise time function
 !     
    dt = dt_channel(first + 1)
-   jf = 2**(lnpt-1)+1
    df = 1.d0/(2**lnpt)/dt
-   do isl = 1, msou
-      do isr = 1, msou
-         t1 = ta0+(isl-1)*dta
-         t2 = ta0+(isr-1)*dta
+   do j = 1, windows
+      do k = 1, windows
+         t1 = ta0+(j-1)*dta
+         t2 = ta0+(k-1)*dta
          if (t1 .lt. dt) t1 = dt
          if (t2 .lt. dt) t2 = dt
-         do i = 1, jf
-            call fourier_asym_cosine((i-1)*df, t1, t2, source2(i, isl, isr))
+         do i = 1, 2*max_freq
+            call fourier_asym_cosine((i-1)*df, t1, t2, source2(i, j, k))
          end do
       end do
    end do
@@ -431,10 +423,10 @@ contains
 !  and calculate the initial value of objective function
 !
    do i = 1, n_chan
-      ll_g = i+first
-      call create_waveform(slip, rake, rupt_time, trise, tfall, forward, source2, ll_g)
+      channel = i+first
+      call create_waveform(slip, rake, rupt_time, trise, tfall, forward, source2, channel)
    
-      do j = 1, jf
+      do j = 1, nlen
          if (j .le. max_freq) then
             real1(j) = real(forward(j))
             imag1(j) = aimag(forward(j))
@@ -447,7 +439,7 @@ contains
       call realtr(real1, imag1, lnpt)
       call fft(real1, imag1, lnpt, 1.)
    
-      write(18,*)nlen,dt,sta_name(ll_g),'dart'
+      write(18,*)nlen,dt,sta_name(channel),'dart'
       do j = 1, nlen
          write(18,*) real1(j), imag1(j)
       end do
@@ -457,7 +449,7 @@ contains
    end subroutine write_dart_forward
 
 
-   subroutine create_waveform(slip, rake, rupt_time, trise, tfall, forward, source2, ll_g)
+   subroutine create_waveform(slip, rake, rupt_time, trise, tfall, forward, source2, channel)
 !
 !  Args:
 !  slip: array with model slip values for all subfaults
@@ -467,37 +459,35 @@ contains
 !  tfall: array with model falltime values for all subfaults
 !  forward: synthetic for current channel given the input model
 !  source2: source function for given data type
-!  ll_g: index of current channel
+!  channel: index of current channel
 !
    implicit none
-   integer ll_g, isl, isr, jf, segment, &
-   &  i, k, subfault
+   integer channel, segment, i, j, k, subfault
    real slip(:), rake(:), rupt_time(:), &
-   &  tfall(:), trise(:), a, b, ww, dt, rake2
+   &  tfall(:), trise(:), slip_dip, slip_stk, shift, dt, rake2
    real*8 df
    complex :: forward(:), source2(:, :, :)
    complex :: z0, z
  
    z0 = cmplx(0.0, 0.0)
-   dt = dt_channel(ll_g)
-   jf = 2**(lnpt-1)+1
+   dt = dt_channel(channel)
    df = 1.d0/(2**lnpt)/dt
    
    do i = 1, wave_pts
       forward(i) = z0
    end do
    do subfault = 1, subfaults
-      isl = int((trise(subfault)-ta0)/dta+0.5)+1
-      isr = int((tfall(subfault)-ta0)/dta+0.5)+1
+      j = int((trise(subfault)-ta0)/dta+0.5)+1
+      k = int((tfall(subfault)-ta0)/dta+0.5)+1
       rake2 = rake(subfault)*dpi
-      a = sin(rake2)*slip(subfault)
-      b = cos(rake2)*slip(subfault)
+      slip_dip = sin(rake2)*slip(subfault)
+      slip_stk = cos(rake2)*slip(subfault)
       do i = 1, max_freq
-         ww = -(i-1)*twopi*df*rupt_time(subfault)
-         z = cmplx(cos(ww), sin(ww))
+         shift = -(i-1)*twopi*df*rupt_time(subfault)
+         z = cmplx(cos(shift), sin(shift))
          forward(i) = forward(i) &
-      & +(a*green_dip(i, ll_g, subfault)+b*green_stk(i, ll_g, subfault)) &
-      & *source2(i, isl, isr)*z
+      & +(slip_dip*green_dip(i, channel, subfault)+slip_stk*green_stk(i, channel, subfault)) &
+      & *source2(i, j, k)*z
       enddo
    end do
    end subroutine create_waveform
