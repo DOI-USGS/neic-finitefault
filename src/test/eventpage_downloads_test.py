@@ -144,6 +144,3 @@ def test_write_Okada_displacements():
         assert (tempdir / "Vertical_Surface_Displacement.png").exists()
     finally:
         shutil.rmtree(tempdir)
-
-
-test_write_Okada_displacements()
