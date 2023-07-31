@@ -9,7 +9,7 @@ module save_forward
    use rise_time, only : source, fourier_asym_cosine, realtr, fft
    implicit none
    integer, parameter :: nnsta_tele = 80
-   integer :: nxs_sub(max_seg), nys_sub(max_seg), nx_p, ny_p, msou, segments, subfaults
+   integer :: nxs_sub(max_seg), nys_sub(max_seg), msou, segments, subfaults
    real :: dta, ta0, dt_channel(max_stations)
    integer :: lnpt, max_freq, nlen
    character(len=15) :: sta_name(max_stations)
@@ -22,12 +22,10 @@ contains
    subroutine saveforward_set_fault_parameters()
    use model_parameters, only : get_rise_time, get_segments, get_subfaults
    implicit none
-   real :: dip(max_seg), strike(max_seg), delay_seg(max_seg), dxs, dys
+   real :: dip(max_seg), strike(max_seg), delay_seg(max_seg)
    integer :: cum_subfaults(max_seg)
-   real :: v_min, v_max, v_ref
    call get_rise_time(ta0, dta, msou)
    call get_segments(nxs_sub, nys_sub, dip, strike, delay_seg, segments, subfaults, cum_subfaults)
-   call get_subfaults(dxs, dys, nx_p, ny_p, v_min, v_max, v_ref)
    end subroutine saveforward_set_fault_parameters
 
 
@@ -110,7 +108,7 @@ contains
 !
    implicit none
    integer first, last, ll_g, isl, isr, channel_max, subfault, &
-   &  jf, i, k, segment_subfault, segment, channel, n_chan, ixs, iys
+   &  jf, i, j, segment, channel, n_chan
    real slip(:), rake(:), rupt_time(:), &
    &  tfall(:), trise(:), real1(wave_pts2), imag1(wave_pts2), r, time, dt
    real*8 t1, t2, df
@@ -165,24 +163,23 @@ contains
    if (cgps) filename2 = 'synthetics_cgps.txt'
    filename2 = trim(filename2)
    open(18,file=filename2)
-   k = 0
 !       
 !  set up the green function for every subfault
 !  and calculate the initial value of objective function
 !
-   do channel = 1, n_chan
+   do i = 1, n_chan
    
-      ll_g = channel+first
+      ll_g = i+first
       call create_waveform(slip, rake, rupt_time, trise, tfall, forward, source2, ll_g)
       comp = component(ll_g)
 
-      do i = 1, jf
-         if (i .le. max_freq) then
-            real1(i) = real(forward(i))
-            imag1(i) = aimag(forward(i))
+      do j = 1, jf
+         if (j .le. max_freq) then
+            real1(j) = real(forward(j))
+            imag1(j) = aimag(forward(j))
          else
-            real1(i) = 0.0
-            imag1(i) = 0.0
+            real1(j) = 0.0
+            imag1(j) = 0.0
          end if
       end do
        
@@ -190,8 +187,8 @@ contains
       call fft(real1, imag1, lnpt, 1.)
     
       write(18,*)nlen,dt,sta_name(ll_g),comp
-      do k = 1, nlen
-         write(18,*) real1(k), imag1(k)
+      do j = 1, nlen
+         write(18,*) real1(j), imag1(j)
       end do
    
    end do
@@ -212,9 +209,8 @@ contains
 !  last: number of final channel
 !
    implicit none
-   integer n_chan, channel, ll_g, k, subfault, &
-   &  segment, iys, jf, i, npxy, segment_subfault, ixs, isl, isr, nl, &
-   &  first, last
+   integer n_chan, channel, ll_g, subfault, &
+   &  segment, jf, i, j, isl, isr, nl, first, last
    real slip(:), rake(:), rupt_time(:), tfall(:), trise(:), &
    &  dt, azim, w, real1(wave_pts2), imag1(wave_pts2), sinal, cosal
    real*8 t1, t2, df
@@ -250,33 +246,31 @@ contains
 !
    OPEN(18,FILE = 'synthetics_body.txt')
 
-   k = 0
 !       
 !  Now, we compute the synthetic seismographs
 !
-   npxy = nx_p*ny_p
-   do channel = 1, n_chan
-      ll_g = first+channel
+   do i = 1, n_chan
+      ll_g = first+i
       call create_waveform(slip, rake, rupt_time, trise, tfall, forward, source2, ll_g)
-      do i = 1, jf
-         if (i .le. max_freq) then
-            real1(i) = real(forward(i))
-            imag1(i) = aimag(forward(i))
+      do j = 1, jf
+         if (j .le. max_freq) then
+            real1(j) = real(forward(j))
+            imag1(j) = aimag(forward(j))
          else
-            real1(i) = 0.0
-            imag1(i) = 0.0
+            real1(j) = 0.0
+            imag1(j) = 0.0
          end if
       end do
       call realtr(real1, imag1, lnpt)
       call fft(real1, imag1, lnpt, 1.0)
       nl = 2**lnpt
-      if (llove(channel) .eq. 0) then
+      if (llove(i) .eq. 0) then
          write(18,*)nl,dt,sta_name(ll_g),'P'
       else
          write(18,*)nl,dt,sta_name(ll_g),'SH'
       end if
-      do i = 1, nl
-         write(18,*) real1(i), imag1(i)
+      do j = 1, nl
+         write(18,*) real1(j), imag1(j)
       end do
    end do
 !
@@ -298,8 +292,7 @@ contains
 !
    implicit none
    integer first, last, channel_max, subfault, &
-   &  ll_g, isl, isr, jf, i, k, segment_subfault, segment, channel, n_chan, &
-   &  iys, ixs!, io_up(max_stations)
+   &  ll_g, isl, isr, jf, i, j, segment, channel, n_chan
 
    real slip(:), rake(:), rupt_time(:), tfall(:), trise(:), &
    &  real1(wave_pts2), imag1(wave_pts2), dt
@@ -343,34 +336,33 @@ contains
 !  end of rise time 
 !       
    open(18,file='synthetics_surf.txt')
-   k = 0
 !       
 !  set up the green function for every subfault
 !  and calculate the initial value of objective function
 !
-   do channel = 1, n_chan
-      ll_g = channel+first
+   do i = 1, n_chan
+      ll_g = i+first
       call create_waveform(slip, rake, rupt_time, trise, tfall, forward, source2, ll_g)
-      do i = 1, jf
-         if (i .le. max_freq) then
-            real1(i) = real(forward(i))
-            imag1(i) = aimag(forward(i))
+      do j = 1, jf
+         if (j .le. max_freq) then
+            real1(j) = real(forward(j))
+            imag1(j) = aimag(forward(j))
          else
-            real1(i) = 0.0
-            imag1(i) = 0.0
+            real1(j) = 0.0
+            imag1(j) = 0.0
          end if
       end do
      
       call realtr(real1, imag1, lnpt)
       call fft(real1, imag1, lnpt, 1.0)
    
-      if (io_up(channel) .eq. 1) then
+      if (io_up(i) .eq. 1) then
          write(18,*)nlen,dt,sta_name(ll_g),'P'
       else
          write(18,*)nlen,dt,sta_name(ll_g),'SH'
       end if
-      do k = 1, nlen
-         write(18,*) real1(k), imag1(k)
+      do j = 1, nlen
+         write(18,*) real1(j), imag1(j)
       end do
    end do   
    close(18)
@@ -392,7 +384,7 @@ contains
 !
    implicit none
    integer first, last, ll_g, isl, isr, subfault, &
-   &  jf, i, k, segment_subfault, segment, channel, n_chan, ixs, iys, channel_max
+   &  jf, i, j, segment, channel, n_chan, channel_max
    real slip(:), rake(:), rupt_time(:), &
    &  tfall(:), trise(:), real1(wave_pts2), imag1(wave_pts2), &
    &  dt
@@ -434,26 +426,30 @@ contains
 !  end of rise time 
 !       
    open(18,file='synthetics_dart.txt')
-   k = 0
 !       
 !  set up the green function for every subfault
 !  and calculate the initial value of objective function
 !
-   do channel = 1, n_chan
-      ll_g = channel+first
+   do i = 1, n_chan
+      ll_g = i+first
       call create_waveform(slip, rake, rupt_time, trise, tfall, forward, source2, ll_g)
    
-      do i = 1, jf
-         real1(i) = real(forward(i))
-         imag1(i) = aimag(forward(i))
+      do j = 1, jf
+         if (j .le. max_freq) then
+            real1(j) = real(forward(j))
+            imag1(j) = aimag(forward(j))
+         else
+            real1(j) = 0.0
+            imag1(j) = 0.0
+         end if
       end do
  
       call realtr(real1, imag1, lnpt)
       call fft(real1, imag1, lnpt, 1.)
    
       write(18,*)nlen,dt,sta_name(ll_g),'dart'
-      do k = 1, nlen
-         write(18,*) real1(k), imag1(k)
+      do j = 1, nlen
+         write(18,*) real1(j), imag1(j)
       end do
    end do   
    close(18)
@@ -475,7 +471,7 @@ contains
 !
    implicit none
    integer ll_g, isl, isr, jf, segment, &
-   &  i, k, subfault, ixs, iys, segment_subfault
+   &  i, k, subfault
    real slip(:), rake(:), rupt_time(:), &
    &  tfall(:), trise(:), a, b, ww, dt, rake2
    real*8 df
