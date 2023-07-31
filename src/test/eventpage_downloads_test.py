@@ -1,22 +1,26 @@
 import json
+import os
 import pathlib
 import shutil
 import tempfile
 from os import mkdir
 
-from wasp.eventpage_downloads import (
-    make_waveproperties_json,
-    temporary_file_reorganization_for_publishing,
-    write_CMTSOLUTION_file,
-    write_Coulomb_file,
-    write_Okada_displacements,
-)
+import pytest
 
 from .testutils import (
     END_TO_END_DIR,
     RESULTS_DIR,
     get_surf_waves_json,
     get_tele_waves_json,
+)
+
+RESULTS_DIR = pathlib.Path(__file__).parent / "data" / "end_to_end" / "results"
+from wasp.eventpage_downloads import (
+    make_waveproperties_json,
+    temporary_file_reorganization_for_publishing,
+    write_CMTSOLUTION_file,
+    write_Coulomb_file,
+    write_Okada_displacements,
 )
 
 
@@ -120,6 +124,10 @@ def test_write_Coulomb_file():
         shutil.rmtree(tempdir)
 
 
+@pytest.mark.skipif(
+    os.getenv("CI_REGISTRY") is not None,
+    reason="Build runner does not have the resources to run",
+)
 def test_write_Okada_displacements():
     tempdir = tempfile.mkdtemp()
     try:
@@ -136,3 +144,6 @@ def test_write_Okada_displacements():
         assert (tempdir / "Vertical_Surface_Displacement.png").exists()
     finally:
         shutil.rmtree(tempdir)
+
+
+test_write_Okada_displacements()
