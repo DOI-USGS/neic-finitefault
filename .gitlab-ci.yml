@@ -16,6 +16,7 @@ workflow:
     - if: $CI_COMMIT_TAG
     - if: $CI_COMMIT_BRANCH
 
+
 stages:
   - init
   - test
@@ -68,6 +69,10 @@ stages:
         - ubuntu
 
 .docker_login:
+  rules:
+    - *development-env
+    - *staging-env
+    - *production-env
   before_script:
     - |
       test -n "${CI_REGISTRY_USER}" -a -n "${CI_REGISTRY_PASSWORD}" \
@@ -95,6 +100,10 @@ Poetry:
       - dist/lambda
     expire_in: 1 week
   image: "${WASP_IMAGE}"
+  rules:
+    - *development-env
+    - *staging-env
+    - *production-env
   script:
     - poetry config virtualenvs.in-project true --local
     - poetry install
@@ -108,6 +117,10 @@ Poetry:
 Python Lint:
   allow_failure: true
   image: "${WASP_IMAGE}"
+  rules:
+    - *development-env
+    - *staging-env
+    - *production-env
   script:
     - poetry run poe lint
   stage: test
@@ -121,12 +134,20 @@ Python Test:
         path: coverage.xml
       junit: junit.xml
   image: "${WASP_IMAGE}"
+  rules:
+    - *development-env
+    - *staging-env
+    - *production-env
   script:
     - poetry run poe test
   stage: test
 
 Shell Check:
   image: usgs/ubuntu:latest
+  rules:
+    - *development-env
+    - *staging-env
+    - *production-env
   script:
     - apt install -y shellcheck
     - shellcheck install.sh -x
