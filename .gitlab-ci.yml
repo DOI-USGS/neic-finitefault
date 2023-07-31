@@ -21,6 +21,29 @@ stages:
   - test
   - deploy
 
+##
+# Define environment rules
+##
+
+.development-env: &development-env
+  if: $CI_PROJECT_PATH != 'ghsc/neic/algorithms/neic-finitefault'
+  tags:
+    - development
+
+.staging-env: &staging-env
+  if: >
+    $CI_PROJECT_PATH == 'ghsc/neic/algorithms/neic-finitefault'
+    && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  tags:
+    - staging
+
+.production-env: &production-env
+  if: >
+    $CI_PROJECT_PATH == 'ghsc/neic/algorithms/neic-finitefault'
+    && $CI_COMMIT_BRANCH == 'production'
+  tags:
+    - production
+
 
 ##
 # Define type of pipeline (on a fork or on the upstream project)
