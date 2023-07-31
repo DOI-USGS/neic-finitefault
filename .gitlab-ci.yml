@@ -35,6 +35,8 @@ stages:
   if: >
     $CI_PROJECT_PATH == 'ghsc/neic/algorithms/neic-finitefault'
     && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  extends:
+    - .get-tag
   variables:
     ENV: staging
 
