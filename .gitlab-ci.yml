@@ -1,9 +1,7 @@
 ---
-
 default:
   tags:
-    - chs-shared
-    - dind
+    - build
 
 variables:
   REPOSITORY: "ghsc/neic/algorithms/neic-finitefault"
