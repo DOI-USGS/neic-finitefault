@@ -16,6 +16,8 @@ program get_strong_motion
    implicit none
    character(len=100) :: vel_model, gf_file, gf_bank, filter_file, wave_file, stat_file
    character(len=70) :: string1, input
+   character(len=200) :: directory,filterfile,risetimefile,pointsourcefile
+   character(len=200) :: channelsfile,waveformsfile,responsefile
    character(len=10) :: sta_name(200)
    character(len=12) :: filename
    character(len=3) :: comp
@@ -56,6 +58,7 @@ program get_strong_motion
    logical :: disp, is_file
 
    call getarg(1, input)
+   call getarg(2, directory)
    disp = (input.eq.'cgps')
    write(*,'(/A/)')'METHOD TO STORE NEAR-FIELD GF'
 !
@@ -63,7 +66,8 @@ program get_strong_motion
 !
    call fourier_coefs()
    write(*,*)'Get fault segments data...'
-   open(22, file='fault&rise_time.txt', status='old')
+   risetimefile=trim(directory)//'fault&rise_time.txt'
+   open(22, file=risetimefile, status='old')
    read(22, *)integer1, integer2, c_depth
    read(22, *)n_seg, float1, float2, nxp, nyp
    read(22, *)float1, float2, integer1, v_ref
@@ -77,7 +81,8 @@ program get_strong_motion
       enddo
    enddo
    close(22)
-   open(22, file='point_sources.txt', status='old')
+   pointsourcefile=trim(directory)//'point_sources.txt'
+   open(22, file=pointsourcefile, status='old')
    do i_seg=1,n_seg
       read(22,*)
       do iys = 1, nys_sub(i_seg)
@@ -93,9 +98,10 @@ program get_strong_motion
    close(22)
 
    filter_file = 'filtro_strong.txt'
-   inquire( file = 'filtro_cgps.txt', exist = is_file )
+   inquire( file = trim(directory)//'filtro_cgps.txt', exist = is_file )
    if (is_file .and. disp) filter_file = 'filtro_cgps.txt'
-   open(1, file=filter_file, status='old')
+   filterfile=trim(directory)//filter_file
+   open(1, file=filterfile, status='old')
    read(1,*)string1, low_freq, high_freq
    close(1)
    write(*,*)high_freq
@@ -103,11 +109,11 @@ program get_strong_motion
 !
 !	Load vel. model into memory
 ! 
-   gf_file = 'Green_strong.txt'
-   if (disp) gf_file = 'Green_cgps.txt'
+   gf_file = trim(directory)//'Green_strong.txt'
+   if (disp) gf_file = trim(directory)//'Green_cgps.txt'
    call get_gf_data(gf_file, vel_model, gf_bank)
    write(*,*)'Get velocity model...'
-   call read_vel_model(vel_model)
+   call read_vel_model(trim(directory)//'vel_model.txt')
    dep_min = 1.e+10
    dep_max = 0.0
    do i_seg=1,n_seg
@@ -128,7 +134,8 @@ program get_strong_motion
 !
    wave_file = 'wavelets_strong.txt'
    if (disp) wave_file = 'wavelets_cgps.txt'
-   open(13, file=wave_file, status='old')
+   waveformsfile=trim(directory)//wave_file
+   open(13, file=waveformsfile, status='old')
    read(13,*)integer1, integer2, jfmax
    read(13,*)
    read(13,*)nsta
@@ -143,7 +150,8 @@ program get_strong_motion
    write(*,*)'Get near field stations data...'
    stat_file = 'channels_strong.txt'
    if (disp) stat_file = 'channels_cgps.txt'
-   open(12, file=stat_file, status='old')
+   channelsfile=trim(directory)//stat_file
+   open(12, file=channelsfile, status='old')
    read(12,*)
    read(12,*)lat_e, lon_e, dep_e
    read(12,*)lnpt,dt
@@ -191,7 +199,7 @@ program get_strong_motion
          nn_comp = 16
       endif
       filename = trim(sta_name(ir))//'.'//comp
-      open(20,file=filename,status='unknown',access='direct',recl=block_stg)
+      open(20,file=trim(directory)//filename,status='unknown',access='direct',recl=block_stg)
       ll = 0
       ky = 0
       do i_seg = 1,n_seg

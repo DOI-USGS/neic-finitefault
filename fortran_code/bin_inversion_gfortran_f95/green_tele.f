@@ -25,6 +25,9 @@ c
        dimension dip_sub(Max_seg),stk_sub(Max_seg)
        dimension nxs_sub(Max_seg),nys_sub(Max_seg),delay_sub(Max_seg)
        dimension nxys(max_seg)
+       CHARACTER*200 directory,filterfile,risetimefile,pointsourcefile
+       CHARACTER*200 velmodelfile,channelsfiles,waveformsfile,responsefile
+
 c     
        real afa, bta, ro, th, qa, qb, vpp, vs, den, thick
        integer jo
@@ -55,7 +58,7 @@ c
        DIMENSION PMD(3),PMU(3),SVMU(3),NOS(200)
 
 c     fau_mod  1:x, 2:y, 3:dis
-      CHARACTER*12 FNAME4,FNAME5
+      CHARACTER*200 FNAME4,FNAME5
       
 C      IDTS=6 FOR MOMENT SOURCE
 C      IDTS=3 FOR DISLOCATION SOURCE	
@@ -100,15 +103,19 @@ C
       RHO=2.7
       deg_arc=pi/180.0
       Z0=CMPLX(0.0,0.0)
-      
-      open(1,file='filtro_tele.txt')
+
+c get the directory files should be in 
+      call getarg(1, directory)       
+      filterfile=TRIM(directory)//'filtro_tele.txt'
+      open(1,file=filterfile)
       read(1,*)string, low_freq, high_freq
       read(1,*)string, dt
       close(1)
       
-c
+c     
       write(*,*)'Get fault segments data...'
-      OPEN(22,FILE='fault&rise_time.txt')
+      risetimefile=TRIM(directory)//'fault&rise_time.txt'
+      OPEN(22,FILE=risetimefile)
       READ(22,*)NXS0,NYS0,c_depth,lnpt_use
       READ(22,*)n_seg,DXS,DYS,nx_p,ny_p
       READ(22,*)TA0,DTA,MSOU,v_min,io_v_d
@@ -124,8 +131,8 @@ c
          nnn=nnn+nxy
       enddo
       close(22)
-
-      open(22,file='point_sources.txt')
+      pointsourcefile=TRIM(directory)//'point_sources.txt'
+      open(22,file=pointsourcefile)
       do i_seg=1,n_seg
          read(22,*)io_seg
          kxy=0
@@ -145,7 +152,8 @@ c
       close(22)
 
       write(*,*)'Get vel_model...'
-      open(15,file='vel_model.txt',status='old')
+      velmodelfile=TRIM(directory)//'vel_model.txt'
+      open(15,file=velmodelfile,status='old')
       lnpt=lnpt_use!lnpt_use - 1
       aw=0.01
       read(15,*) jo
@@ -192,9 +200,10 @@ c
 c
 c       End of Rise Time
 c
-
-      OPEN(9,FILE='channels_body.txt',STATUS='OLD')
-      OPEN(13,FILE='waveforms_body.txt',STATUS='UNKNOWN')
+      channelsfiles=TRIM(directory)//'channels_body.txt'
+      waveformsfile=TRIM(directory)//'waveforms_body.txt'
+      OPEN(9,FILE=channelsfiles,STATUS='OLD')
+      OPEN(13,FILE=waveformsfile,STATUS='UNKNOWN')
 C
 C    1993.6  SYNM6.FOR, SYNHAR.FOR(1996.6), SYNWWW.FOR(1997.1)  BY YAO
 C    M1=M33, M2=M13, M3=M23, M4=M11, M5=M22, M6=M12
@@ -230,13 +239,13 @@ C
          if (love.eq.0) then
             write(*,*)'Compute P response for station ', STNAME(IR)
             high_freq2 = high_freq
-            fname4 = trim(stname(ir))//'.GRE'
-            fname5 = trim(stname(ir))//'.TDE'
+            fname4 = TRIM(directory)//trim(stname(ir))//'.GRE'
+            fname5 = TRIM(directory)//trim(stname(ir))//'.TDE'
          else
             write(*,*)'Compute SH response for station ', STNAME(IR)
             high_freq2 = high_freq / 2.0
-            fname4 = trim(stname(ir))//'SH.GRE'
-            fname5 = trim(stname(ir))//'SH.TDE'
+            fname4 = TRIM(directory)//trim(stname(ir))//'SH.GRE'
+            fname5 = TRIM(directory)//trim(stname(ir))//'SH.TDE'
          endif
          OPEN(12,FILE=FNAME4,STATUS='UNKNOWN',ACCESS='DIRECT',
      *     RECL=LGREEN)
@@ -313,7 +322,7 @@ c
 c	Instrumental response. We give all the green functions the same
 c	instrumetnal response.
 c	
-         CALL INTBHZ(FINST,TTVL(IR),GDP,IR,IFLAG,MM)
+         CALL INTBHZ(FINST,TTVL(IR),GDP,IR,IFLAG,MM,directory)
 c	 IFALG=1
 c++++++++++++++++++++++++++++++++++++++++++++++++++++++++         
          DO I=1,NSYN
@@ -2484,11 +2493,12 @@ c      RETURN
 c      END
 
 
-        SUBROUTINE INTBHZ(FINST,TVL,GDP,IR,IFLAG,MM)
+        SUBROUTINE INTBHZ(FINST,TVL,GDP,IR,IFLAG,MM,DIRECTORY)
         implicit none
         complex finst(1024)
         real tvl, gdp
         integer iflag, mm, ir
+        CHARACTER*200 DIRECTORY
         CHARACTER*12 FRTDK
         integer lnpt, jf, nsyn
         real dt, df, aw
@@ -2502,11 +2512,13 @@ c
 c variables extras
 c
         character*80 pole_inf
+        character*200 responsefile
         real rr, ri, pi, w
         COMPLEX S,FLT(1024)
         integer i,ii,irr,jff,jj,nsta 
         IF(IFLAG.EQ.0) THEN
-           open(14,file='instrumental_response.txt',status='unknown')
+           responsefile=TRIM(DIRECTORY)//'instrumental_response.txt'
+           open(14,file=responsefile,status='unknown')
            READ(14,*)NSTA
            DO IRR=1,nsta
 c	 READ(14,12)A0(IRR),DS(IRR),DTT,NPOLES(IRR),NZEROES(IRR)
