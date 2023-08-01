@@ -112,9 +112,9 @@ contains
 !
    implicit none
    integer :: first, last, channel, subfault, &
-   &  io_chan, i, j, segment, channel_max, n_chan, &
-   &  ixs, iys, event
-   real :: omega, factor, dt, df, dt_sample, w, tlen
+   &  io_chan, i, j, segment, stations, n_chan, &
+   &  l, k, event
+   real :: omega, factor, start, dt, df, dt_sample, tlen
    complex :: z0, z
    character(len=80) filename, filename2
    character(len=3) comp
@@ -145,18 +145,15 @@ contains
    tlen = dt*nlen
    df = 1.0/tlen
 
-   read(9,*) channel_max, n_chan
+   read(9,*) stations, n_chan
    close(9)
    channel = 0
    io_chan = 0
 !       
 !       Here we read the green functions of strong motion waves
 !
-   df = 1. / ((2.0 ** lnpt) * dt)
-   nlen = 2 ** lnpt
-   tlen = nlen * dt
 
-   do i = 1, channel_max
+   do i = 1, stations
 
       io_chan = io_chan+1
       channel = io_chan+first
@@ -172,8 +169,8 @@ contains
 !
       if (many_events) event = event_sta(channel)
       do segment = 1, segments
-         do iys = 1, nys_sub(segment)
-            do ixs = 1, nxs_sub(segment)
+         do k = 1, nys_sub(segment)
+            do l = 1, nxs_sub(segment)
                subfault = subfault+1
                read(12, rec = subfault) &
                & (green_dip(j, channel, subfault), j = 1, max_freq),&
@@ -183,8 +180,8 @@ contains
 ! we eventually shift synthetics in time, in case the fault plane used has a delay
 !
                   omega = twopi*(j-1)*df
-                  w = -omega*delay_seg(segment)
-                  z = cmplx(0.0, w)
+                  start = -omega*delay_seg(segment)
+                  z = cmplx(0.0, start)
                   z = cexp(z)
                   green_dip(j, channel, subfault) = green_dip(j, channel, subfault)*z*factor
                   green_stk(j, channel, subfault) = green_stk(j, channel, subfault)*z*factor
@@ -210,13 +207,12 @@ contains
 !  many_events: True if more than one event to be modelled, False otherwise
 !
    implicit none
-   integer nstaon, channel, ll_g, k, nsta, n_chan, subfault, psource, &
-   &  love, ll, segment, iys, iyp, io_seg, iys_c, iy_c, jf, i, ipy, npxy, &
-   &  nkxy, nxs_c, nys_c, nxp_c, nyp_c, ll_s, kxy, ixs, kpxy, ixp, & 
-   &  first, last, event
-   real dt, df, ddelt, time, factor, w, tlen!, &
+   integer nstaon, channel0, channel, subfault, subfault1, psource, &
+   &  love, record, segment, iys, iyp, i, psources, &
+   &  subfaults, int1, int2, int3, int4, ixs, ixp, first, last, event
+   real dt, df, time, factor, w, tlen!, &
    real, allocatable :: tdel(:,:,:,:)
-   complex :: z, z0, wsyn(wave_pts)
+   complex :: z, z0
    complex :: kahan_y1(wave_pts2), kahan_t1(wave_pts2), kahan_c1(wave_pts2)
    complex :: kahan_y2(wave_pts2), kahan_t2(wave_pts2), kahan_c2(wave_pts2)
    complex, allocatable :: green_dip0(:,:,:,:,:)
@@ -245,84 +241,82 @@ contains
 
    dt = dt_channel(first + 1)
    tlen = nlen*dt
-   npxy = nx_p*ny_p
-   do channel = 1, nstaon
-      ll_g = first+channel
+   psources = nx_p*ny_p
+   do channel0 = 1, nstaon
+      channel = first+channel0
 
-      if (idata(channel) .gt. 0 .or. mmm(channel) .eq. 3) cycle
-      nsta = nstaON
-      n_chan = nstaon
-      love = llove(channel)
+      if (idata(channel0) .gt. 0 .or. mmm(channel0) .eq. 3) cycle
+      love = llove(channel0)
 !
 !  MM = 0 FOR FAR; MM = 1 FOR UPPER; MM = 3 FOR PNL
 !  Here we read the green functions of the teleseismic body waves
 !  
       if (love .eq. 0) then
-         fname4 = trim(sta_name(ll_g))//'.GRE'
-         fname6 = trim(sta_name(ll_g))//'.TDE'
+         fname4 = trim(sta_name(channel))//'.GRE'
+         fname6 = trim(sta_name(channel))//'.TDE'
       else
-         fname4 = trim(sta_name(ll_g))//'SH.GRE'
-         fname6 = trim(sta_name(ll_g))//'SH.TDE'
+         fname4 = trim(sta_name(channel))//'SH.GRE'
+         fname6 = trim(sta_name(channel))//'SH.TDE'
       end if
       open(12, file=fname4, status='old', access='direct', recl=block_far)
       open(32, file=fname6, status='old', access='direct', recl=ltde)
-      LL = 0
-      if (many_events) event = event_sta(ll_g)
+      record = 0
+      if (many_events) event = event_sta(channel)
       do segment = 1, segments
          do iys = 1, nys_sub(segment)
-            do IPY = 1, ny_p
-               LL = LL+1
-               read(12, rec = LL) io_seg, iys_c, iy_c, JF, DT, DF, &
-     &  (green_dip0(i, ipy, iys, segment, channel), i = 1, 2*max_freq)
-               LL = LL+1
-               read(12, rec = LL) io_seg, iys_c, iy_c, JF, LNPT, NLEN, &
-     &  (green_stk0(i, ipy, iys, segment, channel), I = 1, 2*max_freq)
+            do Iyp = 1, ny_p
+               record = record+1
+               read(12, rec = record) int1, int2, int3, int4, DT, DF, &
+     &  (green_dip0(i, iyp, iys, segment, channel0), i = 1, 2*max_freq)
+               record = record+1
+               read(12, rec = record) int1, int2, int3, int4, LNPT, NLEN, &
+     &  (green_stk0(i, iyp, iys, segment, channel0), I = 1, 2*max_freq)
 !
 !       Sanity checks
 !
-               if ((io_seg.ne.segment) .or. (iys_c.ne.iys) .or. (iy_c.ne.ipy)) then
-                  write(*,*)'io_seg vs segment: ', io_seg,segment
-                  write(*,*)'iys_c, iys: ', iys_c,iys
-                  write(*,*)'iy_c, ipy: ', iy_c,ipy
+               if ((int1.ne.segment) .or. (int2.ne.iys) .or. (int3.ne.iyp)) then
+                  write(*,*)'io_seg vs segment: ', int1,segment
+                  write(*,*)'iys_c, iys: ', int2,iys
+                  write(*,*)'iy_c, ipy: ', int3,iyp
                   write(*,*)"Green function is not matched with fault model"
                   stop
                end if
                do i = 1, 2*max_freq
-                  green_dip0(i, ipy, iys, segment, channel) = &
-                  & factor*green_dip0(i, ipy, iys, segment, channel)
-                  green_stk0(i, ipy, iys, segment, channel) = &
-                  & factor*green_stk0(i, ipy, iys, segment, channel)
+                  green_dip0(i, iyp, iys, segment, channel0) = &
+                  & factor*green_dip0(i, iyp, iys, segment, channel0)
+                  green_stk0(i, iyp, iys, segment, channel0) = &
+                  & factor*green_stk0(i, iyp, iys, segment, channel0)
                end do
             end do
          end do
-         nkxy = nxs_sub(segment)*nys_sub(segment)
-         read(32, rec = segment) nxs_c, nys_c, nxp_c, nyp_c, &
-     &  ((tdel(k, ll_s, segment, channel), k = 1, npxy), ll_s = 1, nkxy)
-         if ((nxs_c.ne.nxs_sub(segment)) .or. (nys_c.ne.nys_sub(segment)) &
-     &   .or.(nxp_c.ne.nx_p) .or. (nyp_c.ne.ny_p)) then
-            write(*,*)'nxs',nxs_c,nxs_sub(segment)
-            write(*,*)'nys',nys_c,nys_sub(segment)
-            write(*,*)'nxp',nxp_c,nx_p
-            write(*,*)'nyp',nyp_c,ny_p
+         subfaults = nxs_sub(segment)*nys_sub(segment)
+         read(32, rec = segment) int1, int2, int3, int4, &
+     &  ((tdel(i, subfault, segment, channel0), i = 1, psources), subfault = 1, subfaults)
+         if ((int1.ne.nxs_sub(segment)) .or. (int2.ne.nys_sub(segment)) &
+     &   .or.(int3.ne.nx_p) .or. (int4.ne.ny_p)) then
+            write(*,*)'Subfaults in strike direction',int1,nxs_sub(segment)
+            write(*,*)'Subfaults in dip direction',int2,nys_sub(segment)
+            write(*,*)'Point sources in strike direction',int3,nx_p
+            write(*,*)'Point sources in dip direction',int4,ny_p
             write(*,'(a)')'Mismatch in amount of point sources or subfaults &
             &between the specified in Fault.time, and those used in the &
             &green functions.'
             stop
          end if
          if (many_events .and. (segment_in_event(segment, event) .eqv. .False.)) then
-            npxy = nx_p*ny_p
-            nkxy = nxs_sub(segment)*nys_sub(segment)
+            psources = nx_p*ny_p
+            subfaults = nxs_sub(segment)*nys_sub(segment)
             do iys = 1, nys_sub(segment)
-               do ipy = 1, ny_p
+               do iyp = 1, ny_p
                   do i = 1, 2*max_freq
-                     green_dip0(i, ipy, iys, segment, channel) = z0
-                     green_stk0(i, ipy, iys, segment, channel) = z0
+                     green_dip0(i, iyp, iys, segment, channel0) = z0
+                     green_stk0(i, iyp, iys, segment, channel0) = z0
                   end do
                end do
             end do
-            do ll_s = 1, nkxy
-               do psource = 1, npxy
-                  tdel(psource, ll_s, segment, channel) = 0.0
+            do subfault = 1, subfaults
+               do psource = 1, psources
+                  tdel(psource, subfault, segment, channel0) = 0.0
                end do
             end do
          endif
@@ -332,25 +326,20 @@ contains
    end do
    close(9)
    
-   do channel = 1, nstaon
-      ll_g = first+channel
+   do channel0 = 1, nstaon
+      channel = first+channel0
 
-      do I = 1, wave_pts
-         wsyn(i) = z0
-      end do
-      LL = 0
-      ddelt = 0.0
       z = z0
       subfault = 0
       do segment = 1, segments
-         kxy = 0
+         subfault1 = 0
          do iys = 1, nys_sub(segment)
             do ixs = 1, nxs_sub(segment)
-               kxy = kxy+1
+               subfault1 = subfault1 + 1
                subfault = subfault+1
                do i = 1, 2*max_freq
-                  green_dip(i, ll_g, subfault) = z0
-                  green_stk(i, ll_g, subfault) = z0
+                  green_dip(i, channel, subfault) = z0
+                  green_stk(i, channel, subfault) = z0
                end do
                kahan_y1(:) = z0
                kahan_t1(:) = z0
@@ -363,31 +352,31 @@ contains
                   do ixp = 1, nx_p
                      psource = psource+1
                      time = point_sources(4, psource, subfault)/v_ref+delay_seg(segment)
-                     time = time + tdel(psource, kxy, segment, channel)
+                     time = time + tdel(psource, subfault1, segment, channel0)
                      do i = 1, 2*max_freq
                         W = -twopi*(i-1)*df*time
                         z = cmplx(0.0, w)
                         z = cexp(z)
-                        kahan_y1(i) = green_dip0(i, iyp, iys, segment, channel)*z - kahan_c1(i)
-                        kahan_t1(i) = green_dip(i, ll_g, subfault) + kahan_y1(i)
-                        kahan_c1(i) = (kahan_t1(i) - green_dip(i, ll_g, subfault)) - kahan_y1(i)
-                        green_dip(i, ll_g, subfault) = kahan_t1(i)
-                        kahan_y2(i) = green_stk0(i, iyp, iys, segment, channel)*z - kahan_c2(i)
-                        kahan_t2(i) = green_stk(i, ll_g, subfault) + kahan_y2(i)
-                        kahan_c2(i) = (kahan_t2(i) - green_stk(i, ll_g, subfault)) - kahan_y2(i)
-                        green_stk(i, ll_g, subfault) = kahan_t2(i)
+                        kahan_y1(i) = green_dip0(i, iyp, iys, segment, channel0)*z - kahan_c1(i)
+                        kahan_t1(i) = green_dip(i, channel, subfault) + kahan_y1(i)
+                        kahan_c1(i) = (kahan_t1(i) - green_dip(i, channel, subfault)) - kahan_y1(i)
+                        green_dip(i, channel, subfault) = kahan_t1(i)
+                        kahan_y2(i) = green_stk0(i, iyp, iys, segment, channel0)*z - kahan_c2(i)
+                        kahan_t2(i) = green_stk(i, channel, subfault) + kahan_y2(i)
+                        kahan_c2(i) = (kahan_t2(i) - green_stk(i, channel, subfault)) - kahan_y2(i)
+                        green_stk(i, channel, subfault) = kahan_t2(i)
                      end do
                   end do
                end do
                do i = 1, 2*max_freq
-                  if (disp_or_vel(channel) .eq. 0) then
+                  if (disp_or_vel(channel0) .eq. 0) then
                      z = cmplx(1.0, 0.0)
-                  elseif (disp_or_vel(channel) .eq. 1) then
+                  elseif (disp_or_vel(channel0) .eq. 1) then
                      w = twopi*(i-1)*df
                      z = cmplx(0.0, w)
                   end if
-                  green_dip(i, ll_g, subfault) = z*green_dip(i, ll_g, subfault)/npxy
-                  green_stk(i, ll_g, subfault) = z*green_stk(i, ll_g, subfault)/npxy
+                  green_dip(i, channel, subfault) = z*green_dip(i, channel, subfault)/psources
+                  green_stk(i, channel, subfault) = z*green_stk(i, channel, subfault)/psources
 !                  green_dip2(i, ll, ll_g) = green_dip(i, ll_g, ll)
 !                  green_stk2(i, ll, ll_g) = green_stk(i, ll_g, ll)
                end do
@@ -411,8 +400,8 @@ contains
 !
    implicit none
    integer first, last, nf1, nf2, nf3, nf4, no, subfault, psource, &
-   &  npp, ix, iy, segment_subfault, j, ll_g, ll, io_chan, i, k, io_mod(max_stations), &
-   &  segment, channel, i_ch, channel_max, n_chan, event, &
+   &  psources, ix, iy, segment_subfault, j, k, io_chan, i, io_mod, &
+   &  segment, channel, station, stations, n_chan, event, &
    &  iys, ixs, io_up(max_stations), io_ew(max_stations), io_ns(max_stations)
 
    real*8 :: dip_segment, theta, dis, az, baz, rad_c, coef_v(2, 3), coef_r(2, 5)
@@ -461,11 +450,11 @@ contains
    tlen = dt*nlen
    df = 1.0/tlen
   
-   read(9,*) channel_max, n_chan
+   read(9,*) stations, n_chan
    read(9,*)
-   do channel = 1, channel_max    
-      read(9,*) no, sta_name1, lat_s(channel), lon_s(channel), io_mod(channel), &
-      &  io_up(channel), io_ns(channel), io_ew(channel), ang_ns(channel), ang_ew(channel)
+   do station = 1, stations    
+      read(9,*) no, sta_name1, lat_s(station), lon_s(station), io_mod, &
+      &  io_up(station), io_ns(station), io_ew(station), ang_ns(station), ang_ew(station)
    end do
 !  int
 !  by default frequency window: 0.003 0.004 0.007 0.008
@@ -491,7 +480,7 @@ contains
    end do
 
    io_chan = 0
-   npp = nx_p*ny_p
+   psources = nx_p*ny_p
 !       
 !       Here we read the green functions of long period surface waves
 !
@@ -557,65 +546,65 @@ contains
                   sour_sub(i) = kahan_t
 !                  sour_sub(i) = sour_sub(i)+cmplx(cos(a), sin(a))
                end do
-               sour_sub(i) = sour_sub(i)*const_c/npp
+               sour_sub(i) = sour_sub(i)*const_c/psources
             end do
             io_chan = 0
-            do channel = 1, channel_max
-               lat_sta = lat_s(channel)
-               lon_sta = lon_s(channel)
+            do station = 1, stations
+               lat_sta = lat_s(station)
+               lon_sta = lon_s(station)
                call distaz(lat_sta, lon_sta, lat_p, lon_p, dis, az, baz)
                dis = dis/111.32
                green_s = interp_gf(dis, depth_sub, dist_min, dist_max, dep_min, dep_max)
-               do i_ch = 1, 3
-                  if (i_ch .eq. 1.and.io_up(channel).ne.1) then
+               do i = 1, 3
+                  if (i .eq. 1.and.io_up(station).ne.1) then
                      cycle
-                  elseif (i_ch .eq. 1 .and. io_up(channel) .eq. 1) then
+                  elseif (i .eq. 1 .and. io_up(station) .eq. 1) then
                      rad_c = 0.0
                   end if
-                  if (i_ch .eq. 2.and.io_ns(channel).ne.1) then
+                  if (i .eq. 2.and.io_ns(station).ne.1) then
                      cycle
-                  elseif (i_ch .eq. 2 .and. io_ns(channel) .eq. 1) then 
-                     rad_c = ang_ns(channel)
+                  elseif (i .eq. 2 .and. io_ns(station) .eq. 1) then 
+                     rad_c = ang_ns(station)
                   end if
-                  if (i_ch .eq. 3.and.io_ew(channel).ne.1) then
+                  if (i .eq. 3.and.io_ew(station).ne.1) then
                      cycle
-                  elseif (i_ch .eq. 3 .and. io_ew(channel) .eq. 1) then
-                     rad_c = ang_ew(channel)
+                  elseif (i .eq. 3 .and. io_ew(station) .eq. 1) then
+                     rad_c = ang_ew(station)
                   end if
 
                   io_chan = io_chan+1
-                  ll_g = io_chan+first
-                  if (many_events) event = event_sta(ll_g)
+                  channel = io_chan+first
+                  if (many_events) event = event_sta(channel)
                   call rad_coef(dip_segment, theta, az, rad_c, coef_v, coef_r)
-                  do i = 1, max_freq
+                  do j = 1, max_freq
                      www = cmplx(0.0, 0.0)
                      wss = cmplx(0.0, 0.0)
-                     if (i_ch .eq. 1) then
-                        do j = 1, 3
-                           www = www+coef_v(1, j)*green_s(i, j+5)
-                           wss = wss+coef_v(2, j)*green_s(i, j+5)
+                     if (i .eq. 1) then
+                        do k = 1, 3
+                           www = www+coef_v(1, k)*green_s(j, k+5)
+                           wss = wss+coef_v(2, k)*green_s(j, k+5)
                         end do
                      else
-                        do j = 1, 5
-                           www = www+coef_r(1, j)*green_s(i, j)
-                           wss = wss+coef_r(2, j)*green_s(i, j)
+                        do k = 1, 5
+                           www = www+coef_r(1, k)*green_s(j, k)
+                           wss = wss+coef_r(2, k)*green_s(j, k)
                         end do
                      end if
                      if (many_events) then
-                        if (i .le. max_freq .and. segment_in_event(segment, event)) then
-                           green_stk(i, ll_g, subfault) = wss*filter(i)*sour_sub(i)*shear_subfault
-                           green_dip(i, ll_g, subfault) = www*filter(i)*sour_sub(i)*shear_subfault
+                        if (j .le. max_freq .and. segment_in_event(segment, event)) then
+                           green_stk(j, channel, subfault) = wss*filter(j)*sour_sub(j)*shear_subfault
+                           green_dip(j, channel, subfault) = www*filter(j)*sour_sub(j)*shear_subfault
                         else
-                           green_dip(i, ll_g, subfault) = cmplx(0.0, 0.0)
-                           green_stk(i, ll_g, subfault) = cmplx(0.0, 0.0)
+                           green_dip(j, channel, subfault) = cmplx(0.0, 0.0)
+                           green_stk(j, channel, subfault) = cmplx(0.0, 0.0)
                         end if
                      else
-                        if (i .le. max_freq .and. segment .le. 10) then
-                           green_stk(i, ll_g, subfault) = wss*filter(i)*sour_sub(i)*shear_subfault
-                           green_dip(i, ll_g, subfault) = www*filter(i)*sour_sub(i)*shear_subfault
+                        if (j .le. max_freq .and. segment .le. 10) then
+                           green_stk(j, channel, subfault) = wss*filter(j)*sour_sub(j)*shear_subfault
+                           green_dip(j, channel, subfault) = www*filter(j)*sour_sub(j)*shear_subfault
                         else
-                           green_dip(i, ll_g, subfault) = cmplx(0.0, 0.0)
-                           green_stk(i, ll_g, subfault) = cmplx(0.0, 0.0)
+                           green_dip(j, channel, subfault) = cmplx(0.0, 0.0)
+                           green_stk(j, channel, subfault) = cmplx(0.0, 0.0)
                         end if
                      endif
                   end do
@@ -641,8 +630,8 @@ contains
    implicit none
    integer :: first, last, channel, subfault, psource, &
    &  i, j, segment, channel_max, n_chan, &
-   &  ixs, iys, etc
-   real :: omega, dt, df, dt_sample, w, tlen, real1, imag1, time
+   &  k, l, etc
+   real :: omega, dt, df, dt_sample, start, tlen, real1, imag1, time
    complex :: z0, z
    character(len=80) filename
    
@@ -684,8 +673,8 @@ contains
 !
       subfault = 0
       do segment = 1, segments
-         do iys = 1, nys_sub(segment)
-            do ixs = 1, nxs_sub(segment)
+         do k = 1, nys_sub(segment)
+            do l = 1, nxs_sub(segment)
                subfault = subfault+1
                time = point_sources(4, psource, subfault)/v_ref
                green_dip(:,channel,subfault) = z0
@@ -700,8 +689,8 @@ contains
 ! we eventually shift synthetics in time, in case the fault plane used has a delay
 !
                   omega = twopi*(j-1)*df
-                  w = -omega*(time+delay_seg(segment))
-                  z = cmplx(0.0, w)
+                  start = -omega*(time+delay_seg(segment))
+                  z = cmplx(0.0, start)
                   z = cexp(z)
                   green_dip(j, channel, subfault) = green_dip(j, channel, subfault)*z
                end do
