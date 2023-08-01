@@ -220,7 +220,7 @@ def test_get_traces_files():
     tele_files = [
         f.split("/")[-1] for f in get_traces_files("tele_body", RESULTS_DIR / "data")
     ]
-    assert len(tele_files) == 3
+    assert len(tele_files) == 20
     for target in [
         "final_G_MPG_BHZ.sac",
         "final_IU_RCBR_BHZ.sac",
@@ -230,7 +230,7 @@ def test_get_traces_files():
     surf_files = [
         f.split("/")[-1] for f in get_traces_files("surf_tele", RESULTS_DIR / "data")
     ]
-    assert len(surf_files) == 3
+    assert len(surf_files) == 20
     for target in [
         "final_G_MPG_BHZ.sac",
         "final_IU_RCBR_BHZ.sac",
@@ -241,7 +241,7 @@ def test_get_traces_files():
         f.split("/")[-1]
         for f in get_traces_files("strong_motion", RESULTS_DIR / "data")
     ]
-    assert len(sm_files) == 3
+    assert len(sm_files) == 9
     for target in [
         "final_vel_GO04_HNN_C.sac",
         "final_vel_VA03_HNZ_C1.sac",
@@ -251,7 +251,7 @@ def test_get_traces_files():
     cgps_files = [
         f.split("/")[-1] for f in get_traces_files("cgps", RESULTS_DIR / "data")
     ]
-    assert len(cgps_files) == 3
+    assert len(cgps_files) == 9
     for target in ["final_ovll_LXZ.sac", "final_pedr_LXZ.sac", "final_pfrj_LXE.sac"]:
         assert target in cgps_files
 
