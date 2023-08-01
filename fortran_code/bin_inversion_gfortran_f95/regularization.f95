@@ -66,155 +66,155 @@ contains
    end subroutine modify_slip_field
 
 
-   subroutine slip_laplace(err)
+   subroutine slip_laplace(laplacian)
 !
 !  Args:
-!  err: laplacian slip regularization
+!  laplacian: laplacian slip regularization
 !
 !   Laplacian regularization of slip vector field
 !
    implicit none
-   real, intent(out) :: err
+   real, intent(out) :: laplacian
    integer subfault, subfault2
-   integer n_is, nxx, nyy
-   real d11, d21, d31, d41!, error
-   real d12, d22, d32, d42!, error
-   real*8 :: err2, error, err3, err4
+   integer segment2, i, j
+   real slip11, slip21, slip31, slip41!, error
+   real slip12, slip22, slip32, slip42!, error
+   real*8 :: laplace2, diff
    
-   err2 = 0.d0
+   laplace2 = 0.d0
    do subfault = 1, subfaults
 !                 write(*,*)"segment", segment, nx, ny, n_sub, jj
 !       left
-      d11 = 0.0
-      d12 = 0.0
-      d21 = 0.0
-      d22 = 0.0
-      d31 = 0.0
-      d32 = 0.0
-      d41 = 0.0
-      d42 = 0.0
-      n_is = nleft(1, subfault)
-      nxx = nleft(2, subfault)
-      nyy = nleft(3, subfault)
-      subfault2 = cum_subfaults(n_is)
-      subfault2 = subfault2 + nxx+(nyy-1)*nxs_sub(n_is)
-      if (n_is .gt. 0) then
-         d11 = slip_field(1, subfault2)
-         d12 = slip_field(2, subfault2)
+      slip11 = 0.0
+      slip12 = 0.0
+      slip21 = 0.0
+      slip22 = 0.0
+      slip31 = 0.0
+      slip32 = 0.0
+      slip41 = 0.0
+      slip42 = 0.0
+      segment2 = nleft(1, subfault)
+      i = nleft(2, subfault)
+      j = nleft(3, subfault)
+      subfault2 = cum_subfaults(segment2)
+      subfault2 = subfault2 + i+(j-1)*nxs_sub(segment2)
+      if (segment2 .gt. 0) then
+         slip11 = slip_field(1, subfault2)
+         slip12 = slip_field(2, subfault2)
       end if
-!        write(*,*) n_is, nxx, nyy, ll,"left"
+!        write(*,*) segment2, nxx, nyy, ll,"left"
 !       right   
-      n_is = nright(1, subfault)
-      nxx = nright(2, subfault)
-      nyy = nright(3, subfault)
-      subfault2 = cum_subfaults(n_is)
-      subfault2 = subfault2 + nxx+(nyy-1)*nxs_sub(n_is)
-      if (n_is .gt. 0) then
-         d31 = slip_field(1, subfault2)
-         d32 = slip_field(2, subfault2)
+      segment2 = nright(1, subfault)
+      i = nright(2, subfault)
+      j = nright(3, subfault)
+      subfault2 = cum_subfaults(segment2)
+      subfault2 = subfault2 + i+(j-1)*nxs_sub(segment2)
+      if (segment2 .gt. 0) then
+         slip31 = slip_field(1, subfault2)
+         slip32 = slip_field(2, subfault2)
       end if
-!        write(*,*) n_is, nxx, nyy, ll,"right"
+!        write(*,*) segment2, nxx, nyy, ll,"right"
 !       up    
-      n_is = nup(1, subfault)
-      nxx = nup(2, subfault)
-      nyy = nup(3, subfault)
-      subfault2 = cum_subfaults(n_is)
-      subfault2 = subfault2 + nxx+(nyy-1)*nxs_sub(n_is)
-      if (n_is .gt. 0) then
-         d21 = slip_field(1, subfault2)
-         d22 = slip_field(2, subfault2)
+      segment2 = nup(1, subfault)
+      i = nup(2, subfault)
+      j = nup(3, subfault)
+      subfault2 = cum_subfaults(segment2)
+      subfault2 = subfault2 + i+(j-1)*nxs_sub(segment2)
+      if (segment2 .gt. 0) then
+         slip21 = slip_field(1, subfault2)
+         slip22 = slip_field(2, subfault2)
       end if
-!                    write(*,*) n_is, nxx, nyy, ll,"up"
+!                    write(*,*) segment2, nxx, nyy, ll,"up"
 !       down
-      n_is = ndown(1, subfault)
-      nxx = ndown(2, subfault)
-      nyy = ndown(3, subfault)
-      subfault2 = cum_subfaults(n_is)
-      subfault2 = subfault2 + nxx+(nyy-1)*nxs_sub(n_is)
-      if (n_is .gt. 0) then
-         d41 = slip_field(1, subfault2)
-         d42 = slip_field(2, subfault2)
+      segment2 = ndown(1, subfault)
+      i = ndown(2, subfault)
+      j = ndown(3, subfault)
+      subfault2 = cum_subfaults(segment2)
+      subfault2 = subfault2 + i+(j-1)*nxs_sub(segment2)
+      if (segment2 .gt. 0) then
+         slip41 = slip_field(1, subfault2)
+         slip42 = slip_field(2, subfault2)
       end if
-!                   write(*,*) n_is, nxx, nyy, ll,"down"
+!                   write(*,*) segment2, nxx, nyy, ll,"down"
 !
-      error = slip_field(1, subfault)-0.25*(d11+d21+d31+d41)
-      error = error*error
-      err2 = err2+error
-      error = slip_field(2, subfault)-0.25*(d12+d22+d32+d42)
-      error = error*error
-      err2 = err2+error
+      diff = slip_field(1, subfault)-0.25*(slip11+slip21+slip31+slip41)
+      diff = diff*diff
+      laplace2 = laplace2+diff
+      diff = slip_field(2, subfault)-0.25*(slip12+slip22+slip32+slip42)
+      diff = diff*diff
+      laplace2 = laplace2+diff
    end do
-   err2 = sqrt(err2/subfaults)
-   err = real(err2)
+   laplace2 = sqrt(laplace2/subfaults)
+   laplacian = real(laplace2)
    end subroutine slip_laplace
 
 
-   pure subroutine time_laplace(tt, err)
+   pure subroutine time_laplace(rupt_time, laplacian)
 !
 !  Args:
-!  tt: rupture time at each subfault
-!  err: laplacian time regularization
+!  rupt_time: rupture time at each subfault
+!  laplacian: laplacian time regularization
 !
 !   Laplacian regularization of rupture initiation time
 !
    implicit none
-   real, intent(in) :: tt(max_subfaults) 
-   real, intent(out) :: err
-   integer n_is
-   integer nxx, nyy
-   real d1, d2, d3, d4!, error
-   real*8 :: err2, error
-   integer subfault, subfault2, j
+   real, intent(in) :: rupt_time(max_subfaults) 
+   real, intent(out) :: laplacian
+   integer segment2
+   integer i, j
+   real time1, time2, time3, time4!, error
+   real*8 :: laplace2, diff
+   integer subfault, subfault2
 
-   err2 = 0.d0
+   laplace2 = 0.d0
    do subfault = 1, subfaults
-      d1 = tt(subfault)
-      d2 = tt(subfault)
-      d3 = tt(subfault)
-      d4 = tt(subfault)
+      time1 = rupt_time(subfault)
+      time2 = rupt_time(subfault)
+      time3 = rupt_time(subfault)
+      time4 = rupt_time(subfault)
 
 !       left
-      n_is = nleft(1, subfault)
-      nxx = nleft(2, subfault)
-      nyy = nleft(3, subfault)
-      subfault2 = cum_subfaults(n_is)
-      subfault2 = subfault2 + nxx+(nyy-1)*nxs_sub(n_is)
-      if (n_is .gt. 0) then
-         d1 = tt(subfault2)
+      segment2 = nleft(1, subfault)
+      i = nleft(2, subfault)
+      j = nleft(3, subfault)
+      subfault2 = cum_subfaults(segment2)
+      subfault2 = subfault2 + i+(j-1)*nxs_sub(segment2)
+      if (segment2 .gt. 0) then
+         time1 = rupt_time(subfault2)
       end if
 !       right   
-      n_is = nright(1, subfault)
-      nxx = nright(2, subfault)
-      nyy = nright(3, subfault)
-      subfault2 = cum_subfaults(n_is)
-      subfault2 = subfault2 + nxx+(nyy-1)*nxs_sub(n_is)
-      if (n_is .gt. 0) then
-         d3 = tt(subfault2)
+      segment2 = nright(1, subfault)
+      i = nright(2, subfault)
+      j = nright(3, subfault)
+      subfault2 = cum_subfaults(segment2)
+      subfault2 = subfault2 + i+(j-1)*nxs_sub(segment2)
+      if (segment2 .gt. 0) then
+         time3 = rupt_time(subfault2)
       end if
 !       up    
-      n_is = nup(1, subfault)
-      nxx = nup(2, subfault)
-      nyy = nup(3, subfault)
-      subfault2 = cum_subfaults(n_is)
-      subfault2 = subfault2 + nxx+(nyy-1)*nxs_sub(n_is)
-      if (n_is .gt. 0) then
-         d2 = tt(subfault2)
+      segment2 = nup(1, subfault)
+      i = nup(2, subfault)
+      j = nup(3, subfault)
+      subfault2 = cum_subfaults(segment2)
+      subfault2 = subfault2 + i+(j-1)*nxs_sub(segment2)
+      if (segment2 .gt. 0) then
+         time2 = rupt_time(subfault2)
       end if
 !       down
-      n_is = ndown(1, subfault)
-      nxx = ndown(2, subfault)
-      nyy = ndown(3, subfault)
-      subfault2 = cum_subfaults(n_is)
-      subfault2 = subfault2 + nxx+(nyy-1)*nxs_sub(n_is)
-      if (n_is .gt. 0) then
-         d4 = tt(subfault2)
+      segment2 = ndown(1, subfault)
+      i = ndown(2, subfault)
+      j = ndown(3, subfault)
+      subfault2 = cum_subfaults(segment2)
+      subfault2 = subfault2 + i+(j-1)*nxs_sub(segment2)
+      if (segment2 .gt. 0) then
+         time4 = rupt_time(subfault2)
       end if
-      error = tt(subfault)-0.25*(d1+d2+d3+d4)
-      error = error*error
-      err2 = err2+error
+      diff = rupt_time(subfault)-0.25*(time1+time2+time3+time4)
+      diff = diff*diff
+      laplace2 = laplace2+diff
    end do
-   err2 = sqrt(err2/subfaults)
-   err = real(err2)
+   laplace2 = sqrt(laplace2/subfaults)
+   laplacian = real(laplace2)
    end subroutine time_laplace
 
 

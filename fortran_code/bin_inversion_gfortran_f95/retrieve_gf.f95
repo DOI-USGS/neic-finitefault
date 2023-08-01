@@ -399,20 +399,20 @@ contains
 !  many_events: True if more than one event to be modelled, False otherwise
 !
    implicit none
-   integer first, last, nf1, nf2, nf3, nf4, no, subfault, psource, &
+   integer first, last, freq1, freq2, freq3, freq4, no, subfault, psource, &
    &  psources, ix, iy, segment_subfault, j, k, io_chan, i, io_mod, &
    &  segment, channel, station, stations, n_chan, event, &
    &  iys, ixs, io_up(max_stations), io_ew(max_stations), io_ns(max_stations)
 
    real*8 :: dip_segment, theta, dis, az, baz, rad_c, coef_v(2, 3), coef_r(2, 5)
-   real filter(wave_pts), f1, f2, f3, f4, const_c, tsub(max_psources), h, omega, &
+   real filter(wave_pts), freq01, freq02, freq03, freq04, const_c, dist0, omega, &
    &  dist_min, dist_max, depth_sub, dep_min, dep_max, lat_p, lon_p, shear_subfault, &
-   &  lat_sta, lon_sta, df_bank, tlen_bank, &
-   &  time, a, factor, lat_s(max_stations), lon_s(max_stations), dt, rake, &
+   &  lat_sta, lon_sta, df_bank, tlen_bank, start0, &
+   &  time, factor, lat_s(max_stations), lon_s(max_stations), dt, rake, &
    &  ang_ns(max_stations), ang_ew(max_stations), df, area, dt_sample, tlen
    
    complex :: kahan_y, kahan_t, kahan_c
-   complex sour_sub(wave_pts), green_s(wave_pts2, 10), www, wss, z0
+   complex start(wave_pts), green_s(wave_pts2, 10), green_dip0, green_stk0, z0
 
    character(len=250) modes
    character(len=100) surf_gf_bank
@@ -430,7 +430,7 @@ contains
    factor = 1000.0*area*(1.e-10)
 
    open(9, file='surf_filter.txt', status='old')
-   read(9,*)f1, f2, f3, f4
+   read(9,*)freq01, freq02, freq03, freq04
    close(9)
   
    open(9, file='channels_surf.txt', status='old')
@@ -463,18 +463,18 @@ contains
 !   f2 = 0.004
 !   f3 = 0.006
 !   f4 = 0.007
-   nf1 = int(f1/df)
-   nf2 = int(f2/df)
-   nf3 = int(f3/df)
-   nf4 = int(f4/df)+1
+   freq1 = int(freq01/df)
+   freq2 = int(freq02/df)
+   freq3 = int(freq03/df)
+   freq4 = int(freq04/df)+1
    do i = 1, nlen/2
       filter(i) = 1.0
-      if (i .ge. nf4 .or. i .lt. nf1) filter(i) = 0.0
-      if (i .ge. nf1 .and. i .lt. nf2 .and. ((nf2-nf1) .gt. 0)) then
-         filter(i) = 0.5*(1.0-cos(pi*(i-nf1)/(nf2-nf1)))
+      if (i .ge. freq4 .or. i .lt. freq1) filter(i) = 0.0
+      if (i .ge. freq1 .and. i .lt. freq2 .and. ((freq2-freq1) .gt. 0)) then
+         filter(i) = 0.5*(1.0-cos(pi*(i-freq1)/(freq2-freq1)))
       end if
-      if (i .gt. nf3 .and. i .lt. nf4 .and. ((nf4-nf3) .gt. 0)) then
-         filter(i) = 0.5*(1.0+cos(pi*(i-nf3)/(nf4-nf3)))
+      if (i .gt. freq3 .and. i .lt. freq4 .and. ((freq4-freq3) .gt. 0)) then
+         filter(i) = 0.5*(1.0+cos(pi*(i-freq3)/(freq4-freq3)))
       end if
       filter(i) = filter(i)*factor!/nlen !filter(k) = filter(k)*block
    end do
@@ -531,22 +531,21 @@ contains
             shear_subfault = shear(subfault)
             do i = 1, max_freq
                omega = (i-1)*df_bank*twopi
-               sour_sub(i) = cmplx(0.0, 0.0)
+               start(i) = cmplx(0.0, 0.0)
                kahan_y = z0
                kahan_t = z0
                kahan_c = z0
                do psource = 1, ny_p*nx_p
-                  h = point_sources(4, psource, subfault)
-                  time = h/v_ref
-                  tsub(1) = time+delay_seg(segment)
-                  a = -omega*tsub(1)
-                  kahan_y = cmplx(cos(a), sin(a)) - kahan_c
-                  kahan_t = sour_sub(i) + kahan_y
-                  kahan_c = (kahan_t - sour_sub(i)) - kahan_y
-                  sour_sub(i) = kahan_t
+                  dist0 = point_sources(4, psource, subfault)
+                  time = dist0/v_ref + delay_seg(segment)
+                  start0 = -omega*time
+                  kahan_y = cmplx(cos(start0), sin(start0)) - kahan_c
+                  kahan_t = start(i) + kahan_y
+                  kahan_c = (kahan_t - start(i)) - kahan_y
+                  start(i) = kahan_t
 !                  sour_sub(i) = sour_sub(i)+cmplx(cos(a), sin(a))
                end do
-               sour_sub(i) = sour_sub(i)*const_c/psources
+               start(i) = start(i)*const_c/psources
             end do
             io_chan = 0
             do station = 1, stations
@@ -577,31 +576,31 @@ contains
                   if (many_events) event = event_sta(channel)
                   call rad_coef(dip_segment, theta, az, rad_c, coef_v, coef_r)
                   do j = 1, max_freq
-                     www = cmplx(0.0, 0.0)
-                     wss = cmplx(0.0, 0.0)
+                     green_dip0 = cmplx(0.0, 0.0)
+                     green_stk0 = cmplx(0.0, 0.0)
                      if (i .eq. 1) then
                         do k = 1, 3
-                           www = www+coef_v(1, k)*green_s(j, k+5)
-                           wss = wss+coef_v(2, k)*green_s(j, k+5)
+                           green_dip0 = green_dip0+coef_v(1, k)*green_s(j, k+5)
+                           green_stk0 = green_stk0+coef_v(2, k)*green_s(j, k+5)
                         end do
                      else
                         do k = 1, 5
-                           www = www+coef_r(1, k)*green_s(j, k)
-                           wss = wss+coef_r(2, k)*green_s(j, k)
+                           green_dip0 = green_dip0+coef_r(1, k)*green_s(j, k)
+                           green_stk0 = green_stk0+coef_r(2, k)*green_s(j, k)
                         end do
                      end if
                      if (many_events) then
                         if (j .le. max_freq .and. segment_in_event(segment, event)) then
-                           green_stk(j, channel, subfault) = wss*filter(j)*sour_sub(j)*shear_subfault
-                           green_dip(j, channel, subfault) = www*filter(j)*sour_sub(j)*shear_subfault
+                           green_stk(j, channel, subfault) = green_stk0*filter(j)*start(j)*shear_subfault
+                           green_dip(j, channel, subfault) = green_dip0*filter(j)*start(j)*shear_subfault
                         else
                            green_dip(j, channel, subfault) = cmplx(0.0, 0.0)
                            green_stk(j, channel, subfault) = cmplx(0.0, 0.0)
                         end if
                      else
                         if (j .le. max_freq .and. segment .le. 10) then
-                           green_stk(j, channel, subfault) = wss*filter(j)*sour_sub(j)*shear_subfault
-                           green_dip(j, channel, subfault) = www*filter(j)*sour_sub(j)*shear_subfault
+                           green_stk(j, channel, subfault) = green_stk0*filter(j)*start(j)*shear_subfault
+                           green_dip(j, channel, subfault) = green_dip0*filter(j)*start(j)*shear_subfault
                         else
                            green_dip(j, channel, subfault) = cmplx(0.0, 0.0)
                            green_stk(j, channel, subfault) = cmplx(0.0, 0.0)
