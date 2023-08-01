@@ -34,7 +34,7 @@ def sampling(
 
     :param tensor_info: The tensor information
     :type tensor_info: Dict[str, Union[UTCDateTime, float, str]]
-    :param dt_cgps: The time delta of cgps, defaults to None
+    :param dt_cgps: The dt of cgps, defaults to None
     :type dt_cgps: Optional[float], optional
     :return: The sampling properties
     :rtype: Dict[str, float]
@@ -148,7 +148,7 @@ def properties_json(
 
     :param tensor_info: The tensor information
     :type tensor_info: Dict[str, Union[UTCDateTime, float, str]]
-    :param dt_cgps: The time delta for cgps data
+    :param dt_cgps: The dt for cgps data
     :type dt_cgps: Optional[float]
     :param data_directory: The data directory , defaults to pathlib.Path()
     :type data_directory: Union[pathlib.Path, str], optional

@@ -1,0 +1,9 @@
+{
+  "dt": 0.4,
+  "location": "/home/user/GF_cgps",
+  "max_depth": 49.8,
+  "max_dist": 1000,
+  "min_depth": 1,
+  "min_dist": 0,
+  "time_corr": 10
+}

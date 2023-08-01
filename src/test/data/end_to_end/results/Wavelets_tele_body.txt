@@ -1,0 +1,16 @@
+j :1
+Frequency range for these wavelet coefficients is: 0.0033 0.0130 Hz
+j :2
+Frequency range for these wavelet coefficients is: 0.0065 0.0260 Hz
+j :3
+Frequency range for these wavelet coefficients is: 0.0130 0.0521 Hz
+j :4
+Frequency range for these wavelet coefficients is: 0.0260 0.1042 Hz
+j :5
+Frequency range for these wavelet coefficients is: 0.0521 0.2083 Hz
+j :6
+Frequency range for these wavelet coefficients is: 0.1042 0.4167 Hz
+j :7
+Frequency range for these wavelet coefficients is: 0.2083 0.8333 Hz
+j :8
+Frequency range for these wavelet coefficients is: 0.4167 1.6667 Hz
