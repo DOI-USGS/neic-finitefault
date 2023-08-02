@@ -406,16 +406,16 @@ def __fault_plane_properties(
 ) -> dict:
     """Define dimensions of fault plane and subfaults
 
-     :param eq_time: The earthquake time
-     :type eq_time: int
-     :param tensor_info: Dictionary with moment tensor information
-     :type tensor_info: Dict[str, float]
+    :param eq_time: The earthquake time
+    :type eq_time: int
+    :param tensor_info: Dictionary with moment tensor information
+    :type tensor_info: Dict[str, float]
     :param plane_info: Dictionary with plane tensor information
-     :type plane_info: Dict[str, float]
-     :param water_level: The water level
-     :type water_level: float
-     :return: The fault/subfault dimensions
-     :rtype: dict
+    :type plane_info: Dict[str, float]
+    :param water_level: The water level
+    :type water_level: float
+    :return: The fault/subfault dimensions
+    :rtype: dict
     """
     #
     # Fault dimensions
