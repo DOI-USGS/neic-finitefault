@@ -270,6 +270,10 @@ def __rotation(tensor_info, used_sacs, rotate_RT=True, logger=None):
         streams_e2 = [st for st in streams2 if st[0].stats.channel[-1] in ["E", "2"]]
         if len(streams_n1) + len(streams_e2) < 2:
             continue
+        network1 = streams_n1[0][0].stats.network
+        network2 = streams_e2[0][0].stats.network
+        if not network1 == network2:
+            continue
         stream = streams_n1[0] + streams_e2[0]
         starttime1 = stream[0].stats.starttime
         starttime2 = stream[1].stats.starttime

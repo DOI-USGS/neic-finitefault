@@ -60,7 +60,8 @@ def automatic_usgs(
     sol_folder = os.path.abspath(sol_folder)
     time0 = time.time()
     if "gps" in data_type:
-        copy2(os.path.join("data", "gps_data"), sol_folder)
+        if os.path.isfile(os.path.join("data", "gps_data")):
+            copy2(os.path.join("data", "gps_data"), sol_folder)
     if "insar" in data_type:
         insar_files = glob.glob(os.path.join("data", "insar_a*txt"))
         insar_files = insar_files + glob.glob(os.path.join("data", "insar_d*txt"))
