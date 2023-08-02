@@ -4,6 +4,8 @@
 CVE-2023-3389
 CVE-2023-3090
 CVE-2023-3390
+CVE-2023-3611
+CVE-2023-3776
 
 # https://avd.aquasec.com/nvd/2022/cve-2022-42919/
 # running as non-root user, and not using non-default configuration
@@ -15,5 +17,4 @@ CVE-2022-42966
 
 # https://avd.aquasec.com/nvd/2022/cve-2022-43945/
 # not using nfsd
-
 CVE-2022-43945
