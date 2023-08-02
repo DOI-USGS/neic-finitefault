@@ -4,6 +4,10 @@
 """
 
 
+import pathlib
+from random import randint
+from typing import Literal, Optional, Union
+
 import numpy as np
 
 import wasp.plane_management as pl_mng
@@ -11,31 +15,34 @@ from wasp import get_outputs
 
 
 def load_ffm_model(
-    segments_data,
-    point_sources,
-    option="Solucion.txt",
-    max_slip=1000,
-    len_stk=4,
-    len_dip=4,
-):
-    """Load FFM model from some input file.
+    segments_data: dict,
+    point_sources: dict,
+    option: Literal[
+        "Checkerboard", "Patches", "Solucion.txt", "fault&rise_time.txt", "point_source"
+    ] = "Solucion.txt",
+    max_slip: float = 1000,
+    len_stk: int = 4,
+    len_dip: int = 4,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+) -> dict:
+    """Load a finite fault model from an input file (e.g. Solucion.txt)
 
-    :param segments_data: properties of fault segments and rise time
-    :param point_sources: properties of point sources
-    :param option: file from where to load the input kinematic model
-    :param max_slip: largest slip of kinematic model, when creating custom
-     kinematic model
-    :param len_stk: length of patches when creating checkerboard model
-    :param len_dip: width of patches when creating checkerboard model
-    :type point_sources: list
+    :param segments_data: The segment properties
     :type segments_data: dict
-    :type option: string, optional
+    :param point_sources: The point sources
+    :type point_sources: dict
+    :param option: The path to the solution file, defaults to Solucion.txt
+    :type option: str, optional
+    :param max_slip: The maximum slip, defaults to 1000
     :type max_slip: float, optional
+    :param len_stk: The length of strike, defaults to 4
     :type len_stk: int, optional
+    :param len_dip: The length of dip, defaults to 4
     :type len_dip: int, optional
+    :return: The finite fault model
+    :rtype: dict
     """
-    from random import randint
-
+    directory = pathlib.Path(directory)
     segments = segments_data["segments"]
     rise_time = segments_data["rise_time"]
 
@@ -46,14 +53,14 @@ def load_ffm_model(
     tfall = []
 
     if option == "Solucion.txt":
-        solution = get_outputs.read_solution_static_format(segments)
+        solution = get_outputs.read_solution_static_format(segments, data_dir=directory)
         slip = solution["slip"]
         rake = solution["rake"]
         trup = solution["rupture_time"]
         trise = solution["trise"]
         tfall = solution["tfall"]
 
-    with open("fault&rise_time.txt", "r") as input_file:
+    with open(directory / "fault&rise_time.txt", "r") as input_file:
         jk = [line.split() for line in input_file]
 
     faults_data = [
