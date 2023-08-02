@@ -84,7 +84,7 @@ def get_tele_waves_json(min: int = 0, max: int = 3, all: bool = False):
 
 def get_tensor_info():
     """Get the tensor information"""
-    return get_tensor(cmt_file=END_TO_END_DIR / "Illapel_CMTSOLUTION")
+    return get_tensor(cmt_file=END_TO_END_DIR / "info" / "20003k7a_cmt_CMT")
 
 
 def update_manager_file_locations(
