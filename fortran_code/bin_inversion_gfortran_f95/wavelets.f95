@@ -148,11 +148,11 @@ contains
    end subroutine wavelet_syn
 
 
-   pure subroutine cfft(xr, xi, n)
+   pure subroutine cfft(real1, imag1, n)
 !
 !  Args:
-!  xr: real part of data vector
-!  xi: imaginary part of data vector
+!  real1: real part of data vector
+!  imag1: imaginary part of data vector
 !  n: length of data vector
 !
 !
@@ -160,56 +160,56 @@ contains
 !
    implicit none
    integer, intent(in) :: n
-   real, intent(inout) :: xr(:), xi(:)
-   integer k, i, ib, nb, lx, l, lb, lbh, ist, jh, j1, j
-   real wkr, wki, qr, qi, holdr, holdi, flx
-   LX = 2**N
-   FLX = real(LX)
-   NB = 1
-   LB = LX
+   real, intent(inout) :: real1(:), imag1(:)
+   integer k, i, chunks, length1, l, length2, lbh, start, jh, j1, j
+   real real2, imag2, real3, imag3, norm
+   length1 = 2**n
+   norm = real(length1)
+   chunks = 1
+   length2 = length1
    DO L = 1, N
-      LBH = LB/2
-      DO IB = 1, NB           ! 2 ** (l-1) operaciones
-         WKR = cos_fft(ib)
-         WKI = -sin_fft(ib)
-         IST = LB*(IB-1)
-         DO J = IST+1, IST+LBH
-            JH = J+LBH
-            QR = XR(JH)*WKR-XI(JH)*WKI
-            QI = XR(JH)*WKI+XI(JH)*WKR
-            XR(JH) = (XR(J)-QR)
-            XI(JH) = (XI(J)-QI)
-            XR(J) = (XR(J)+QR)
-            XI(J) = (XI(J)+QI)
+      LBH = length2/2
+      DO i = 1, chunks           ! 2 ** (l-1) operaciones
+         real2 = cos_fft(i)
+         imag2 = -sin_fft(i)
+         start = length2*(i-1)
+         DO J = start+1, start+LBH
+            j1 = J+LBH
+            real3 = real1(j1)*real2-imag1(j1)*imag2
+            imag3 = real1(j1)*imag2+imag1(j1)*real2
+            real1(j1) = (real1(j)-real3)
+            imag1(j1) = (imag1(j)-imag3)
+            real1(j) = (real1(j)+real3)
+            imag1(j) = (imag1(j)+imag3)
          end do
       end do
-      NB = 2*NB
-      LB = LB / 2
+      chunks = 2*chunks
+      length2 = length2 / 2
    end do
    K = 0
-   DO J = 1, LX
+   DO J = 1, length1
       K = KKK(J, N)
       IF(K.LT.J) cycle
-      HOLDR = XR(J)
-      HOLDI = XI(J)
+      real2 = real1(J)
+      imag2 = imag1(J)
       J1 = K+1
-      XR(J) = XR(J1)
-      XI(J) = XI(J1)
-      XR(J1) = HOLDR
-      XI(J1) = HOLDI
+      real1(J) = real1(J1)
+      imag1(J) = imag1(J1)
+      real1(J1) = real2
+      imag1(J1) = imag2
    end do
-   DO I = 1, LX
-      XR(I) = XR(I)/FLX
-      XI(I) = XI(I)/FLX
+   DO I = 1, length1
+      real1(I) = real1(I)/norm
+      imag1(I) = imag1(I)/norm
    ENDDO
    END subroutine cfft
 
 
-   pure subroutine cifft(xr, xi, n)
+   pure subroutine cifft(real1, imag1, n)
 !
 !  Args:
-!  xr: real part of data vector
-!  xi: imaginary part of data vector
+!  real1: real part of data vector
+!  imag1: imaginary part of data vector
 !  n: length of data vector
 !
    implicit none
@@ -217,39 +217,39 @@ contains
 ! old version
 !
    integer, intent(in) :: n
-   real, intent(inout) :: xr(wave_pts2), xi(wave_pts2)
-   integer k, ib, nb, lx, l, lb, lbh, ist, jh, j1, j
-   real wkr, wki, qr, qi, holdr
-   LX = 2**N
-   NB = 1
-   LB = LX
+   real, intent(inout) :: real1(wave_pts2), imag1(wave_pts2)
+   integer k, i, chunks, length1, l, length2, lbh, start, jh, j1, j
+   real real2, imag2, real3, imag3
+   length1 = 2**n
+   chunks = 1
+   length2 = length1
    DO L = 1, N
-      LBH = LB/2
-      DO IB = 1, NB           ! 2 ** n operations
-         WKR = cos_fft(ib)
-         WKI = sin_fft(ib)
-         IST = LB*(IB-1)
-         DO J = IST+1, IST+LBH
-            JH = J+LBH
-            QR = XR(JH)*WKR-XI(JH)*WKI
-            QI = XR(JH)*WKI+XI(JH)*WKR
-            XR(JH) = XR(J)-QR
-            XI(JH) = XI(J)-QI
-            XR(J) = XR(J)+QR
-            XI(J) = XI(J)+QI
+      LBH = length2/2
+      DO i = 1, chunks           ! 2 ** n operations
+         real2 = cos_fft(i)
+         imag2 = sin_fft(i)
+         start = length2*(i-1)
+         DO J = start+1, start+LBH
+            j1 = J+LBH
+            real3 = real1(j1)*real2-imag1(j1)*imag2
+            imag3 = real1(j1)*imag2+imag1(j1)*real2
+            real1(j1) = real1(j)-real3
+            imag1(j1) = imag1(j)-imag3
+            real1(j) = real1(j)+real3
+            imag1(j) = imag1(j)+imag3
          ENDDO
       ENDDO
-      NB = 2*NB
-      LB = LB / 2
+      chunks = 2*chunks
+      length2 = length2 / 2
    ENDDO
    K = 0
-   DO J = 1, LX
+   DO J = 1, length1
       K = KKK(j, N)
       IF(K.LT.J) cycle
-      HOLDR = XR(J)
+      real2 = real1(J)
       J1 = K+1
-      XR(J) = XR(J1)
-      XR(J1) = HOLDR
+      real1(J) = real1(J1)
+      real1(J1) = real2
    end do
    end subroutine cifft
 
@@ -334,7 +334,7 @@ contains
    integer :: i, j, k
    real*8, parameter :: p43 = 4.d0*pi/3.d0, p23 = 2.d0*pi/3.d0
    real*8 :: g(2), p(2), fw, wf, wd, wp, wg, ww, hw, cct
-   complex*16 :: pp, a
+   complex*16 :: wave0, a
    complex :: wave1
    hw = w*0.5d0
    a = cmplx(cos(hw),-sin(hw), kind(1.d0))
@@ -357,24 +357,24 @@ contains
       wf = exp(-1.d0/wp/wp)
       cct = exp(-0.5d0/wp/wp) / sqrt(wg + wf)
    endif
-   pp = a*cct
+   wave0 = a*cct
    if (ic .eq. 1) then
-      wave1 = pp 
+      wave1 = wave0 
    else
-      wave1 = cmplx(real(pp),-aimag(pp))    
+      wave1 = cmplx(real(wave0),-aimag(wave0))    
    end if
    end function wave
 
 
-   subroutine realtr(xr, xi, n)
+   subroutine realtr(real1, imag1, n)
 !
 !  Args:
-!  xr: real part of data vector
-!  xi: imaginary part of data vector
+!  real1: real part of data vector
+!  imag1: imaginary part of data vector
 !  n: length of data vector
 !
    implicit none
-   real xr(:), xi(:)
+   real real1(:), imag1(:)
    integer :: n
    integer :: i, i1, i2, lh, lb
    lh = 2**(n-1)
@@ -383,10 +383,10 @@ contains
    do i = 1, lb
       i1 = lh+I
       i2 = lh-I
-      xr(i1) = xr(i2)
-      xi(i1) = -xi(i2)
+      real1(i1) = real1(i2)
+      imag1(i1) = -imag1(i2)
    end do
-   xi(lh) = 0.0
+   imag1(lh) = 0.0
    end subroutine realtr
 
 
