@@ -22,7 +22,6 @@ import wasp.plane_management as pl_mng
 
 
 def read_solution_static_format(
-<<<<<<< HEAD
     segments: List[Dict[str, str]], data_dir: Union[str, pathlib.Path] = pathlib.Path()
 ) -> dict:
     """Read the solution file in static format
@@ -53,29 +52,6 @@ def read_solution_static_format(
     if not os.path.isfile(data_dir / "Solucion.txt"):
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), "Solucion.txt")
     with open(data_dir / "Solucion.txt", "r") as input_file:
-=======
-    segments, directory: Union[pathlib.Path, str] = pathlib.Path()
-):
-    """We read a solution file in static format.
-
-    :param segments: dictionary with properties of the fault segments
-    :type segments: dict
-    """
-    directory = pathlib.Path(directory)
-    lat = []
-    lon = []
-    depth = []
-    slip = []
-    rake = []
-    trup = []
-    trise = []
-    tfall = []
-    moment = []
-
-    if not os.path.isfile(directory / "Solucion.txt"):
-        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), "Solucion.txt")
-    with open(directory / "Solucion.txt", "r") as input_file:
->>>>>>> Add static2fsp.py test coverage=72%
         jk = [line.split() for line in input_file]
 
     faults_data = [
