@@ -317,6 +317,7 @@ def __strike_dip_rake_from_ln(
         This routine is copied from the same routine in ``instaseis`` library.
         The only modification is here we work in xyz coordinates, as opposed
         to mrt as in said routine.
+        https://github.com/krischer/instaseis/blob/master/instaseis/source.py#L85
     """
     l_norm = slip_vector / np.linalg.norm(slip_vector, 2)
     n_norm = fault_normal / np.linalg.norm(fault_normal, 2)
@@ -344,7 +345,7 @@ def __strike_dip_rake_from_ln(
 
 
 def __get_moment_mag(moment_tensor: np.ndarray) -> float:
-    """Calculate the moment magnitude from the moment tensor (Herrmann 1989)
+    """Calculate the moment magnitude from the moment tensor following Herrmann, 1989
 
     :param moment_tensor: The moment tensor array
     :type moment_tensor: np.ndarray
