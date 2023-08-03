@@ -3,7 +3,7 @@ module get_stations_data
 
    use constants, only : max_stations, max_seg, npuse, wave_pts2, wave_pts, n_data
    use wavelet_param, only : set_params
-   use wavelets, only : wavelet_obs
+   use wavelets, only : wavelet_obs, wavelet_syn, cfft
    implicit none
    integer, parameter :: nnsta_tele = 150
    real :: weight(max_stations), dt_channel(max_stations)
@@ -601,7 +601,8 @@ contains
          imag1(i) = 0.0
       enddo
 
-      call wavelet_obs(real1, imag1, obser)
+      call cfft(real1, imag1, lnpt)
+      call wavelet_syn(real1, imag1, obser)
       amp_max = 0.0
       atom_max0 = 1
       do i = 1, nlen
