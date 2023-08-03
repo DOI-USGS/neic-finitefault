@@ -1,5 +1,3 @@
-import pathlib
-import shutil
 from tempfile import mkdtemp
 
 import cartopy.crs as ccrs

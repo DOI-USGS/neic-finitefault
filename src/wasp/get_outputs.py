@@ -245,6 +245,7 @@ def get_data_dict(
     observed: bool = True,
     obs_file: Optional[Union[pathlib.Path, str]] = None,
     margin: int = 10,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> List[dict]:
     """Fill dictionary with synthetic data at station and channel
 
@@ -258,12 +259,15 @@ def get_data_dict(
     :type obs_file: Optional[Union[pathlib.Path, str]], optional
     :param margin: The file margin, defaults to 10
     :type margin: int, optional
+    :param directory: Where the files should be read from, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
     :return: The updated traces_info dictionaries
     :rtype: List[dict]
     """
+    directory = pathlib.Path(directory)
     used_channels: List[List[str]] = []
     if syn_file:
-        with open(syn_file, "r") as infile:
+        with open(directory / syn_file, "r") as infile:
             lines = [line.split() for line in infile]
 
         lines0 = [i for i, line in enumerate(lines) if len(line) > 2]
