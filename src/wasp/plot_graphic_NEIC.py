@@ -15,21 +15,9 @@ from shutil import copy2, move
 import cartopy.crs as ccrs
 import cartopy.feature as cf
 import cartopy.io.shapereader as shpreader
-
-# from clawpack.geoclaw import dtopotools
-#
-# local modules
-#
-import fault_plane as pf
-import get_outputs
-import load_ffm_model
 import matplotlib
 import numpy as np
 import pandas as pd
-import plane_management as pl_mng
-import seismic_tensor as tensor
-import shakemap_tools as shakemap
-import velocity_models as mv
 from cartopy.io.img_tiles import Stamen
 from matplotlib import cm, colors, gridspec, patches
 from matplotlib import pyplot as plt
@@ -38,12 +26,23 @@ from matplotlib.colors import ListedColormap
 from matplotlib.patches import Rectangle
 from obspy.imaging.beachball import beach, beachball
 from obspy.imaging.scripts import mopad
-from plot_maps_NEIC import plot_borders, plot_map, set_map_cartopy
 from pyproj import Geod
 from scipy.interpolate import griddata
-from static2fsp import static_to_fsp
-from static2srf import static_to_srf
-from waveform_plots_NEIC import plot_waveform_fits
+
+# from clawpack.geoclaw import dtopotools
+#
+# local modules
+#
+import wasp.fault_plane as pf
+import wasp.plane_management as pl_mng
+import wasp.seismic_tensor as tensor
+import wasp.shakemap_tools as shakemap
+import wasp.velocity_models as mv
+from wasp import get_outputs, load_ffm_model
+from wasp.plot_maps_NEIC import plot_borders, plot_map, set_map_cartopy
+from wasp.static2fsp import static_to_fsp
+from wasp.static2srf import static_to_srf
+from wasp.waveform_plots_NEIC import plot_waveform_fits
 
 """
 Set colorbar for slip
