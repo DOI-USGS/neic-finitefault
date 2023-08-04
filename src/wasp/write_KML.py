@@ -184,7 +184,6 @@ def _write_KML(
                 ) != collections.Counter(min1):
                     min2 = corners[:, i]
 
-            # updip = np.c_[min1,min2]
             corners = np.c_[corners, cornerA]
             # write outline of segments to kml file: #
             kml.write(" <Placemark>\n")
@@ -322,14 +321,12 @@ def _PlotMap_KML(
     max_lats = [max(segment_lat.flatten()) for segment_lat in segments_lats]
     min_lons = [min(segment_lon.flatten()) for segment_lon in segments_lons]
     max_lons = [max(segment_lon.flatten()) for segment_lon in segments_lons]
-    min_lat = np.min(min_lats)  # - 0.5
-    max_lat = np.max(max_lats)  # + 0.5
-    min_lon = np.min(min_lons)  # - 0.5
-    max_lon = np.max(max_lons)  # + 0.5
+    min_lat = np.min(min_lats)
+    max_lat = np.max(max_lats)
+    min_lon = np.min(min_lons)
+    max_lon = np.max(max_lons)
 
-    margin = (
-        1.3 * (stk_subfaults * delta_strike) / 111.19
-    )  # min(3 * (stk_subfaults * delta_strike) / 111.19, 10)
+    margin = 1.3 * (stk_subfaults * delta_strike) / 111.19
     lat0 = tensor_info["lat"]
     lon0 = tensor_info["lon"]
     tectonic: Optional[str] = "{}.shp".format(default_dirs["trench_graphics"])
@@ -338,7 +335,6 @@ def _PlotMap_KML(
             lon0, lat0, standard_parallels=(lat0 - 3.0, lat0 + 3)
         ),
         "transform": ccrs.PlateCarree(),
-        #'facecolor': '#eafff5'
         "facecolor": "None",
     }
 
@@ -378,8 +374,6 @@ def _PlotMap_KML(
                 transform=dictn["transform"],
                 zorder=4,
             )
-            # ax.text(lonp + 0.02, latp + 0.02, '{}'.format(name),
-            #        transform=dictn['projection'], zorder=4)
     if stations_cgps is not None:
         for file in stations_cgps:
             name = file["name"]
@@ -401,9 +395,6 @@ def _PlotMap_KML(
                 transform=dictn["transform"],
                 zorder=4,
             )
-            # ax.text(lonp + 0.02, latp + 0.02, '{}'.format(name),
-            #        transform=dictn['projection'], zorder=4)
-
     if stations_gps is not None:
         max_obs = np.zeros(3)
         stations_gps2: List[List[Union[float, np.ndarray, str]]] = []
@@ -657,7 +648,6 @@ def _PlotMap_KML(
         cmap=slipcpt, norm=plt.Normalize(vmin=0.0, vmax=max_slip / 100.0)
     )
 
-    #    cb_ax = inset_axes(ax, width = "30%", height = "5%", loc = 'lower left')
     cb_ax = ax.inset_axes([0.06, 0.03, 0.3, 0.02])
     cbar = plt.colorbar(sm, cax=cb_ax, orientation="horizontal")
     cbar.outline.set_linewidth(3)
@@ -710,7 +700,6 @@ def set_KML_map_cartopy(
     """
     directory = pathlib.Path(directory)
     ax.set_extent(margins)
-    #    ax.coastlines(resolution='10m', zorder=3)
     ax.spines["bottom"].set_linewidth(10)
     ax.spines["top"].set_linewidth(10)
     ax.spines["left"].set_linewidth(10)
@@ -720,7 +709,6 @@ def set_KML_map_cartopy(
     gl.right_labels = False
     gl.left_labels = False
     gl.bottom_labels = False
-    # ax.add_feature(cartopy.feature.OCEAN)
     ocean = cartopy.feature.NaturalEarthFeature(
         "physical",
         "ocean",
@@ -728,7 +716,6 @@ def set_KML_map_cartopy(
         edgecolor="none",
         facecolor=cartopy.feature.COLORS["water"],
     )
-    #    ax.add_feature(ocean)
     if tectonic:
         ax.add_feature(tectonic)
     if countries:
@@ -771,8 +758,6 @@ def set_KML_map_cartopy(
 
 
 if __name__ == "__main__":
-    # directory = '/Users/degoldberg/Desktop/'
-    # eventID='testevent'
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -846,7 +831,6 @@ if __name__ == "__main__":
         tensor_info = tensor.get_tensor(cmt_file=cmt_file)
     else:
         tensor_info = tensor.get_tensor()
-    #    segments, rise_time, point_sources = pl_mng.__read_planes_info() # Loads point sources and segments information
     segments_data = json.load(open("segments_data.json"))
     segments = segments_data["segments"]
     rise_time = segments_data["rise_time"]
