@@ -20,40 +20,45 @@ ARG GMT_VERSION
 ARG GSHHG_VERSION
 ARG GEOS_VERSION
 ARG PROJ_VERSION
+ARG FD_BANK
+ARG LITHO1
+ARG FD_BANK="${FD_BANK:-download}"
+ARG LITHO1="${LITHO1:-download}"
 
 USER root
 
+COPY . /home/usgs-user/finitefault/
 ## GMT
-COPY install.d/gmt.sh ./install.d/
+COPY install.d/* ./install.d/
 RUN bash install.d/gmt.sh true "${DCW_VERSION}" "${GMT_VERSION}" "${GSHHG_VERSION}"
 ENV PATH "/usr/local/bin/gmt:${PATH}"
 ## GEOS
-COPY install.d/libgeos.sh ./install.d/
 RUN bash install.d/libgeos.sh true "${GEOS_VERSION}"
 ENV PATH "/usr/local/bin/geosop:${PATH}"
 ENV GEOS_INCLUDE_PATH "/usr/local/include"
 ENV GEOS_LIBRARY_PATH "/usr/local/lib"
 ## PROJ
-COPY install.d/proj.sh ./install.d/
 RUN bash install.d/proj.sh true "${PROJ_VERSION}"
 ## environment variables
 ENV PATH "/usr/local/bin/gmt:${PATH}"
 ENV GEOS_INCLUDE_PATH "/usr/local/include"
 ENV GEOS_LIBRARY_PATH "/usr/local/lib"
 ENV PATH "/usr/local/bin/proj:${PATH}"
+# get data dependencies
+ENV FINITEFAULT_DIR /home/usgs-user/finitefault
+RUN bash ./install.d/data_dependencies.sh \
+    "${FINITEFAULT_DIR}" \
+    --fd-bank "${FINITEFAULT_DIR}/${FD_BANK}" \
+    --lith "${FINITEFAULT_DIR}/${LITHO1}"
 ## cleanup scripts
-RUN rm -rf install.d
+RUN rm -rf install.d fortran_code src poetry.lock pyproject.toml
+RUN if [ "${FD_BANK}" != "fortran_code/gfs_nm/long/fd_bank" ]; then rm -f "${FINITEFAULT_DIR}/${FD_BANK}"; fi
+RUN if [ "${LITHO1}" != "fortran_code/info/LITHO1.0.nc" ]; then rm -f "${FINITEFAULT_DIR}/${LITHO1}"; fi
 
 USER usgs-user
 
-
-
 # Add and install/compile code
 FROM dependencies as finitefault
-ARG FD_BANK
-ARG LITHO1
-ARG FD_BANK="${FD_BANK:-download}"
-ARG LITHO1="${LITHO1:-download}"
 
 USER root
 
@@ -62,13 +67,10 @@ RUN mkdir /home/usgs-user/finitefault
 COPY . /home/usgs-user/finitefault/
 ENV FINITEFAULT_DIR /home/usgs-user/finitefault
 
-
 ## compile fortran code
 RUN cd $FINITEFAULT_DIR \
     && bash install.d/wasp.sh \
-    "${FINITEFAULT_DIR}" \
-    --fd-bank "${FINITEFAULT_DIR}/${FD_BANK}" \
-    --lith "${FINITEFAULT_DIR}/${LITHO1}"
+    "${FINITEFAULT_DIR}"
 ## install python dependencies
 RUN cd $FINITEFAULT_DIR && poetry build 
 RUN pip install $FINITEFAULT_DIR/dist/neic_finitefault*.whl
@@ -78,8 +80,6 @@ RUN chown -R usgs-user:usgs-user "${FINITEFAULT_DIR}"
 RUN chmod -R 777 "${FINITEFAULT_DIR}"
 ## cleanup
 RUN rm -rf "${FINITEFAULT_DIR}/install.d"
-RUN if [ "${FD_BANK}" != "fortran_code/gfs_nm/long/fd_bank" ]; then rm -f "${FINITEFAULT_DIR}/${FD_BANK}"; fi
-RUN if [ "${LITHO1}" != "fortran_code/info/LITHO1.0.nc" ]; then rm -f "${FINITEFAULT_DIR}/${LITHO1}"; fi
 RUN apt remove -y \
     cmake \
     curl \
