@@ -22,7 +22,6 @@ from scipy.signal import butter, filtfilt  # type: ignore
 import wasp.fault_plane as pf
 import wasp.get_outputs as get_outputs
 import wasp.management as mng
-import wasp.plane_management as pl_mng
 import wasp.seismic_tensor as tensor
 
 ################################

@@ -3,8 +3,6 @@ import os
 import pathlib
 import shutil
 import tempfile
-from glob import glob
-from test.modify_sacs_test import TELE_WAVES
 
 import numpy as np
 
