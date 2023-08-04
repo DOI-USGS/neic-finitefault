@@ -101,6 +101,9 @@ Python Test:
       junit: junit.xml
   image: "${WASP_IMAGE}"
   script:
+    - source ./environment.d/ubuntu.sh
+    - cp "/home/usgs-user/finitefault/fortran_code/gfs_nm/long/fd_bank" ./fortran_code/gfs_nm/long/fd_bank
+    - cp "/home/usgs-user/finitefault/fortran_code/info/LITHO1.0.nc" ./fortran_code/info/LITHO1.0.nc
     - poetry run poe test
   stage: test
 
