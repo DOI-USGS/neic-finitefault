@@ -240,14 +240,8 @@ def load_ffm_model(
 
             for patch in range(patches):
                 n_sub_xc = randint(0, n_sub_stk - 1)
-                n_sub_yc = 0  # randint(0, 2)#n_sub_dip - 1)
-                #                if patch == 0:
-                #                    n_sub_xc = hyp_stk - 1#randint(0, 2)
-                #                    n_sub_yc = hyp_dip - 1#randint(4, 6)
-                #                if patch == 1:
-                #                    n_sub_xc = hyp_stk + 1#randint(n_sub_stk - 2, n_sub_stk)
-                #                    n_sub_yc = hyp_dip + 1#randint(4, 6)
-                length = randint(3, 4)  # length = 2
+                n_sub_yc = 0
+                length = randint(3, 4)
                 for ny in range(n_sub_dip):
                     for nx in range(n_sub_stk):
                         dist = (n_sub_yc - ny) ** 2 + (n_sub_xc - nx) ** 2
