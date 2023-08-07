@@ -220,10 +220,7 @@ def test_input_chen_surf_body():
         with open(tempdir / "surf_waves.json", "w") as tw:
             json.dump(new_surfwaves, tw)
         with open(
-            pathlib.Path(__file__).parent.parent.parent
-            / "docs"
-            / "examples"
-            / "config.ini",
+            pathlib.Path(__file__).parent / "data" / "config.ini",
             "r",
         ) as c:
             config = c.read()

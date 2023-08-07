@@ -11,7 +11,7 @@ function usage {
     echo "The source code is then compiled with cmake."
     echo "----------------------------------------------------------------"
     echo ""
-    echo "  CLEANUP bool            version of DCW data to support GMT"
+    echo "  CLEANUP bool            Whether to delete build directories after global install"
     echo "                          default=false"
     echo "                          (example: true)"
     echo "  PROJ_VERSION string     version of PROJ to install"

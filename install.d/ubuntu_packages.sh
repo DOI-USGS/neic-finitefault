@@ -60,6 +60,7 @@ apt install -y \
   git \
   libnetcdf-dev \
   libgdal-dev \
+  libgeos-dev \
   "python${PYTHON_VERSION}-dev" \
   sqlite3 \
   && apt clean;

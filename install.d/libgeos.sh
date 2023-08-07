@@ -11,12 +11,12 @@ function usage {
     echo "The source code is then compiled with cmake."
     echo "----------------------------------------------------------------"
     echo ""
-    echo "  CLEANUP bool            version of DCW data to support GMT"
+    echo "  CLEANUP bool            Whether to delete build directories after global install"
     echo "                          default=false"
     echo "                          (example: true)"
     echo "  GEOS_VERSION string     version of GEOS to install"
-    echo "                          default=3.11.2"
-    echo "                          (example: 3.11.2)"
+    echo "                          default=3.9.4"
+    echo "                          (example: 3.9.4)"
 }
 ## parse arguments
 REQUIRED_ARGS=()
@@ -41,7 +41,7 @@ done
 ### set positional argument's defaults
 set -- "${REQUIRED_ARGS[@]}" # restore positional parameters
 CLEANUP=${1:-false}
-GEOS_VERSION=${2:-"3.11.2"}
+GEOS_VERSION=${2:-"3.9.4"}
 
 # ==============================================================================
 # Download and install GEOS
@@ -57,7 +57,7 @@ echo "Installing GEOS with cmake"
 cd "/opt/geos-${GEOS_VERSION}" \
     && mkdir -p build \
     && cd build \
-    && cmake -DBUILD_TESTING=OFF .. \
+    && cmake -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local .. \
     && make \
     && make install;
 
