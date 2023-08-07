@@ -3,67 +3,73 @@
 Map plot with PyGMT
 """
 import argparse
-import errno
+import collections
 import json
 import os
-from datetime import datetime
+import pathlib
 from glob import glob
-from shutil import copy2, move
+from typing import List, Optional, Union
 
-import cartopy.crs as ccrs
-import cartopy.feature as cf
-import cartopy.io.shapereader as shpreader
+import numpy as np
+import pandas as pd  # type:ignore
+import pygmt  # type:ignore
 
-# from clawpack.geoclaw import dtopotools
 #
 # local modules
 #
-import fault_plane as pf
-import get_outputs
-import load_ffm_model
-import matplotlib
-import numpy as np
-import pandas as pd
-import plane_management as pl_mng
-import seismic_tensor as tensor
-import shakemap_tools as shakemap
-import velocity_models as mv
-from cartopy.io.img_tiles import Stamen
-from matplotlib import cm, colors, gridspec, patches
-from matplotlib import pyplot as plt
-from matplotlib import ticker
-from matplotlib.colors import ListedColormap
-from matplotlib.patches import Rectangle
-from obspy.imaging.beachball import beach
-from plot_graphic_NEIC import __redefine_lat_lon
-from plot_maps_NEIC import plot_borders, plot_map, set_map_cartopy
-from scipy.interpolate import griddata
-from static2fsp import static_to_fsp
-from waveform_plots_NEIC import plot_waveform_fits
+import wasp.fault_plane as pf
+import wasp.plane_management as pl_mng
+import wasp.seismic_tensor as tensor
+import wasp.velocity_models as mv
+from wasp import get_outputs
+from wasp.plot_graphic_NEIC import __redefine_lat_lon
 
 
 def _PlotMap(
-    tensor_info,
-    segments,
-    point_sources,
-    solution,
-    default_dirs,
-    convex_hulls=[],
-    files_str=None,
-    stations_gps=None,
-    stations_cgps=None,
-    option="Solucion.txt",
-    max_slip=None,
-    legend_len=None,
-    scale=None,
-    limits=[None, None, None, None],
+    tensor_info: dict,
+    segments: dict,
+    point_sources: np.ndarray,
+    solution: dict,
+    default_dirs: dict,
+    files_str: Optional[dict] = None,
+    stations_gps: Optional[zip] = None,
+    stations_cgps: Optional[str] = None,
+    max_slip: Optional[float] = None,
+    legend_len: Optional[int] = None,
+    scale: Optional[int] = None,
+    limits: List[Optional[float]] = [None, None, None, None],
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
+    """Plot the slip map to KML
 
-    import collections
-
-    import numpy as np
-    import pygmt
-
+    :param tensor_info: The tensor information
+    :type tensor_info: dict
+    :param segments: The segment properties
+    :type segments: dict
+    :param point_sources: The point source locations
+    :type point_sources: np.ndarray
+    :param solution: The solution read from Solucion.txt
+    :type solution: dict
+    :param default_dirs: The location of default directories
+    :type default_dirs: dict
+    :param files_str: The stations file properties, defaults to None
+    :type files_str:Optional[dict], optional
+    :param stations_gps: The gps stations description, defaults to None
+    :type stations_gps:  Optional[zip], optional
+    :param stations_cgps: The cgps stations description, defaults to None
+    :type stations_cgps: Optional[str], optional
+    :param max_slip: A specified maximum slip, defaults to None
+    :type max_slip: Optional[float], optional
+    :param legend_len: The length of the legend, defaults to None
+    :type legend_len: Optional[int], optional
+    :param scale: The scale, defaults to None
+    :type scale: Optional[int], optional
+    :param limits: The extent of the map, defaults to [None, None, None, None]
+    :type limits: List[Optional[float]], optional
+    :param directory: The directory to read/write to, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
+    """
+    directory = pathlib.Path(directory)
     ################################
     ### GET DESIRED PLOT REGION ####
     ################################
@@ -101,7 +107,7 @@ def _PlotMap(
             max_lon = max(max_lon, lonp)
     if stations_gps is not None:
         max_obs = np.zeros(3)
-        stations_gps2 = []
+        stations_gps2: List[List[Union[float, np.ndarray, str]]] = []
         for name, sta_lat, sta_lon, obs, syn, error in stations_gps:
             min_lat = min(min_lat, sta_lat)
             max_lat = max(max_lat, sta_lat)
@@ -109,7 +115,7 @@ def _PlotMap(
             max_lon = max(max_lon, sta_lon)
             stations_gps2 = stations_gps2 + [[name, sta_lat, sta_lon, obs, syn, error]]
             max_obs = np.maximum([abs(float(v)) for v in obs], max_obs)
-        max_obs = np.max(max_obs)
+        max_obs = np.max(max_obs)  # type:ignore
         if legend_len == None:
             if max_obs < 5:
                 legend_len = 1
@@ -121,7 +127,7 @@ def _PlotMap(
                 legend_len = 20
         if scale == None:
             scale = 2
-        max_obs = max_obs / scale
+        max_obs = max_obs / scale  # type:ignore
 
     if limits == [None, None, None, None]:
         region = [min_lon - 0.5, max_lon + 0.5, min_lat - 0.5, max_lat + 0.5]
@@ -179,7 +185,7 @@ def _PlotMap(
     fig.basemap(region=region, projection=projection, frame="ag1", map_scale=map_scale)
     fig.coast(resolution="h", shorelines=True)
 
-    faults = glob("*.fault")
+    faults = glob(str(directory) + "/*.fault")
     if len(faults) > 0:
         for kfault in range(len(faults)):
             print("...Adding fault trace from: " + str(faults[kfault]))
@@ -190,9 +196,13 @@ def _PlotMap(
     ###############################
     ### PLOT FINITE FAULT MODEL ###
     ###############################
-    segments_data = json.load(open("segments_data.json"))
+    with open(directory / "segments_data.json") as sf:
+        segments_data = json.load(sf)
     segments = segments_data["segments"]
-    solution = get_outputs.read_solution_static_format(segments)
+    rise_time = segments_data["rise_time"]
+    solution = get_outputs.read_solution_static_format(
+        segments, data_dir=directory  # type:ignore
+    )
     plane_info = segments[0]
     (
         stk_subfaults,
@@ -213,11 +223,11 @@ def _PlotMap(
         maxslip = 0
         for segment in range(len(segments_lats)):
             slips = slip[segment].flatten()
-            maxslip = np.max([maxslip, np.array(slips).max() / 100])
+            maxslip = np.max([maxslip, np.array(slips).max() / 100])  # type:ignore
     else:
-        maxslip = max_slip
+        maxslip = max_slip  # type:ignore
     pygmt.makecpt(
-        cmap=str(default_dirs["root_dir"]) + "/python_code/fault2.cpt",
+        cmap=str(default_dirs["root_dir"]) + "/src/wasp/fault2.cpt",
         series=[0, maxslip],
     )
 
@@ -264,7 +274,7 @@ def _PlotMap(
     )
 
     ### PLOT AFTERSHOCKS OVER TOP ###
-    aftershocks = glob("*aftershock*")
+    aftershocks = glob(str(directory) + "/*aftershock*")
     if len(aftershocks) > 0:
         for kafter in range(len(aftershocks)):
             print("...Adding aftershocks from: " + str(aftershocks[kafter]))
@@ -503,12 +513,12 @@ def _PlotMap(
         )
         static_legend = pd.DataFrame(
             data={
-                "x": [region[1]],
+                "x": [region[1]],  # type:ignore
                 "y": [region[2]],
-                "east_velocity": [legend_len / max_obs],
-                "north_velocity": [0],
-                "east_sigma": [legend_len / max_obs / 10],
-                "north_sigma": [legend_len / max_obs / 10],
+                "east_velocity": [legend_len / max_obs],  # type:ignore
+                "north_velocity": [0],  # type:ignore
+                "east_sigma": [legend_len / max_obs / 10],  # type:ignore
+                "north_sigma": [legend_len / max_obs / 10],  # type:ignore
                 "correlation_EN": [0],
             }
         )
@@ -563,20 +573,20 @@ def _PlotMap(
         fig.text(
             x=region[1],
             y=region[2],
-            text=str(legend_len * 10) + "+/-" + str(legend_len) + " mm",
+            text=str(legend_len * 10) + "+/-" + str(legend_len) + " mm",  # type:ignore
             xshift="a-60p",
             yshift="a-20p",
             no_clip=True,
             justify="ML",
         )
 
-    fig.savefig("PyGMT_Map.png")
+    fig.savefig(directory / "PyGMT_Map.png")
 
 
 if __name__ == "__main__":
     """ """
-    import eventpage_downloads as dwnlds
-    import management as mng
+    import wasp.eventpage_downloads as dwnlds
+    import wasp.management as mng
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -685,7 +695,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     os.chdir(args.folder)
-    used_data = []
+    used_data: List[str] = []
     used_data = used_data + ["strong_motion"] if args.strong else used_data
     used_data = used_data + ["cgps"] if args.cgps else used_data
     used_data = used_data + ["tele_body"] if args.tele else used_data
@@ -742,7 +752,7 @@ if __name__ == "__main__":
             vel_model = mv.select_velmodel(tensor_info, default_dirs)
         else:
             vel_model = json.load(open("velmodel_data.json"))
-        shear = pf.shear_modulous(point_sources, velmodel=vel_model)
+        shear = pf.shear_modulous(point_sources, velmodel=vel_model)  # type:ignore
         if args.option == "autoscale":
             autosize = True
         else:
@@ -759,14 +769,13 @@ if __name__ == "__main__":
         _PlotMap(
             tensor_info,
             segments,
-            point_sources,
+            point_sources,  # type:ignore
             solution,
             default_dirs,
             convex_hulls=[],
             files_str=traces_info,
             stations_gps=stations_gps,
             stations_cgps=traces_info_cgps,
-            option="Solucion.txt",
             max_slip=maxval,
             legend_len=legend_len,
             scale=scale,
