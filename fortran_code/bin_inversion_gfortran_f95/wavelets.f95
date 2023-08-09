@@ -53,9 +53,9 @@ contains
    call realtr(real1, imag1, lnpt)
    do j = 1, nlen
       fft_array(j) = cmplx(real1(j), imag1(j))
-!      real1(j) = 0.0
-!      imag1(j) = 0.0
-!      coeffs(j) = 0.0
+      real1(j) = 0.0
+      imag1(j) = 0.0
+      coeffs(j) = 0.0
    end do
 !
 ! c1 = wave(pi2, 2), c2 = wave(pi, 2).
@@ -113,6 +113,9 @@ contains
    do j = 1, nlen
       real0(j) = real1(j)/nlen
       imag0(j) = imag1(j)/nlen
+!      real1(j) = 0.0
+!      imag1(j) = 0.0
+      coeffs(j) = 0.0
    end do
 !
 ! c1 = wave(pi2, 2), c2 = wave(pi, 2).

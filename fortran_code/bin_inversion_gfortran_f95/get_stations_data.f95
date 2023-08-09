@@ -9,7 +9,7 @@ module get_stations_data
    real :: weight(max_stations), dt_channel(max_stations)
    integer :: misfit_type(12, max_stations)
    integer :: t_min(max_stations), t_max(max_stations), channels
-   real :: wavelet_weight(12, max_stations), obse(n_data, max_stations)
+   real :: wavelet_weight(12, max_stations), observed(n_data, max_stations)
    character(len=15) :: sta_name(max_stations)
    character(len=3) :: component(max_stations)
    integer :: mmm(max_stations), llove(max_stations), io_up(max_stations), idata(max_stations), &
@@ -557,7 +557,7 @@ contains
       read(13,*) string, start(channel)
       read(13,*) string, t_max(channel)
       read(13,*)
-      read(13,*)(obse(j, channel), j = 1, start(channel))
+      read(13,*)(observed(j, channel), j = 1, start(channel))
    enddo
    close(13)
    end subroutine get_waveforms
@@ -574,8 +574,9 @@ contains
    real, intent(out) :: wave_obs(wave_pts2, max_stations), wmax(max_stations)
    integer, intent(out) :: t_max_val(max_stations)
    integer atom_max0, i, j, channel, start1, length, n_begin, n_delt
-   real real1(wave_pts2), imag1(wave_pts2), obser(n_data), &
+   real real1(wave_pts2), imag1(wave_pts2), observed2(n_data), &
    &  amp_max, mean
+   real :: coeffs_obs(n_data)
    logical :: cgps, dart
 !
 ! TODO : how to implement this in a more elegant way?
@@ -584,30 +585,30 @@ contains
       start1 = start(channel)
       cgps = cgps_channels(channel)
       dart = dart_channels(channel)
-      mean = sum(obse(start1 - 20:start1, channel)) / 20.0
+      mean = sum(observed(start1 - 20:start1, channel)) / 20.0
       do i = 1, wave_pts2
          real1(i) = 0.0
          imag1(i) = 0.0
          if (i .lt. start1) then
-            obser(i) = obse(i, channel)
+            observed2(i) = observed(i, channel)
          else
-            obser(i) = 0.0
-            if (cgps) obser(i) = mean 
+            observed2(i) = 0.0
+            if (cgps) observed2(i) = mean 
          endif
          
       end do
       do i = 1,nlen
-         real1(i) = obser(i)
+         real1(i) = observed2(i)*nlen
          imag1(i) = 0.0
       enddo
 
       call cfft(real1, imag1, lnpt)
-      call wavelet_syn(real1, imag1, obser)
+      call wavelet_syn(real1, imag1, coeffs_obs)
       amp_max = 0.0
       atom_max0 = 1
       do i = 1, nlen
-         if (amp_max .lt. abs(obser(i))) then
-            amp_max = abs(obser(i))
+         if (amp_max .lt. abs(coeffs_obs(i))) then
+            amp_max = abs(coeffs_obs(i))
             atom_max0 = i
          end if
       end do
@@ -618,8 +619,8 @@ contains
             n_delt = nlen/n_begin
             length = int(t_max(channel)/n_delt+0.5)-1
             do i =1, length
-               if (amp_max .lt. abs(obser(n_begin+i))) then
-                  amp_max = abs(obser(n_begin+i))
+               if (amp_max .lt. abs(coeffs_obs(n_begin+i))) then
+                  amp_max = abs(coeffs_obs(n_begin+i))
                   atom_max0 = n_begin+i
                endif
             enddo
@@ -629,7 +630,7 @@ contains
       wmax(channel) = amp_max
       t_max_val(channel) = atom_max0
       do i = 1, nlen
-         wave_obs(i, channel) = obser(i)/(amp_max)
+         wave_obs(i, channel) = coeffs_obs(i)/(amp_max)
       end do
    enddo
    end subroutine get_wavelet_obs 
