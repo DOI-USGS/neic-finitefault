@@ -170,9 +170,9 @@ contains
    real*8, optional :: ramp(:)
    real :: slip(:), rake(:), rupt_time(:)
    real :: t_rise(:), t_fall(:)
-   real amp, moment, moment_reg, dt, value1, er0, slip_reg, gps_misfit, insar_misfit, &
+   real amp, moment, moment_reg, dt, value1, slip_reg, gps_misfit, insar_misfit, &
       & time_reg, forward_real3(wave_pts2, max_stations), a, b, &
-      & forward_imag3(wave_pts2, max_stations), cr(wave_pts2), cz(wave_pts2), forward2(wave_pts2)
+      & forward_imag3(wave_pts2, max_stations), real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2)
    real :: rake2, delta_freq, delta_freq0, moment0, kahan_y, kahan_t, kahan_c
    real*8 :: omega, misfit2, ex
    integer :: i, segment, channel, isl, isr, jf, k, subfault, used_data
@@ -223,11 +223,11 @@ contains
       do i = 1, wave_pts
          forward_real3(i, channel) = real(forward(i))
          forward_imag3(i, channel) = aimag(forward(i))
-         cr(i) = forward_real3(i, channel)
-         cz(i) = forward_imag3(i, channel)
+         real1(i) = forward_real3(i, channel)
+         imag1(i) = forward_imag3(i, channel)
       end do
-      call wavelet_syn(cr, cz, forward2)
-      call misfit_channel(channel, forward2, ex)
+      call wavelet_syn(real1, imag1, coeffs_syn)
+      call misfit_channel(channel, coeffs_syn, ex)
       misfit2 = misfit2 + ex
    end do
 
@@ -350,9 +350,9 @@ contains
    real*8, optional :: ramp(:)
    real :: slip(:), rake(:), rupt_time(:)
    real :: t_rise(:), t_fall(:)
-   real amp, moment, moment_reg(10), moment_reg2, dt, value1, er0, slip_reg, gps_misfit, insar_misfit, &
+   real amp, moment, moment_reg(10), moment_reg2, dt, value1, slip_reg, gps_misfit, insar_misfit, &
       & time_reg, forward_real3(wave_pts2, max_stations), a, b, &
-      & forward_imag3(wave_pts2, max_stations), cr(wave_pts2), cz(wave_pts2), forward2(wave_pts2)
+      & forward_imag3(wave_pts2, max_stations), real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2)
    real :: rake2, delta_freq, delta_freq0, moment0(10), kahan_y, kahan_t, kahan_c
    real*8 :: omega, misfit2, ex
    integer :: i, segment, channel, isl, isr, jf, k, subfault, used_data
@@ -403,11 +403,11 @@ contains
       do i = 1, wave_pts
          forward_real3(i, channel) = real(forward(i))
          forward_imag3(i, channel) = aimag(forward(i))
-         cr(i) = forward_real3(i, channel)
-         cz(i) = forward_imag3(i, channel)
+         real1(i) = forward_real3(i, channel)
+         imag1(i) = forward_imag3(i, channel)
       end do
-      call wavelet_syn(cr, cz, forward2)
-      call misfit_channel(channel, forward2, ex)
+      call wavelet_syn(real1, imag1, coeffs_syn)
+      call misfit_channel(channel, coeffs_syn, ex)
       misfit2 = misfit2 + ex
    end do
 
@@ -541,10 +541,10 @@ contains
    & n_total, j
 !   real, allocatable :: forward_real(:, :), forward_imag(:, :)
    real :: duse, ause, vuse, &
-   & de, rand, c, aux, dpb, amp, moment_reg, value1, gps_misfit, &
+   & diff, rand, c, aux, dpb, amp, moment_reg, value1, gps_misfit, &
    & moment, d_sub, a_sub, slip_reg, a, b, moment0, &
    & time_reg, t_save, a_save, d_save, x, kahan_y, kahan_t, kahan_c, &
-   & l_save, r_save, cr(wave_pts2), cz(wave_pts2), forward2(wave_pts2), &
+   & l_save, r_save, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
    & slip_beg, slip_max, slip_end, angle_beg, angle_end, angle_max, &
    & rupt_beg, rupt_end, rupt_max, rise_time_beg, rise_time_end, rise_time_max
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
@@ -764,7 +764,7 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, omega, z, z1, green_subf, cr, cz, forward2, ex)
+!$omp& private(channel, delta_freq, j, omega, z, z1, green_subf, real1, imag1, coeffs_syn, ex)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
@@ -777,12 +777,12 @@ contains
                green_subf = &
                & (a*green_dip(j, channel, subfault)+b*green_stk(j, channel, subfault))* &
                & source(j, channel, isl, isr)*z
-               cr(j) = real(green_subf)+forward_real(j, channel)
-               cz(j) = aimag(green_subf)+forward_imag(j, channel)
+               real1(j) = real(green_subf)+forward_real(j, channel)
+               imag1(j) = aimag(green_subf)+forward_imag(j, channel)
                z = z*z1    ! we may need to increase numerical precision
             end do
-            call wavelet_syn(cr, cz, forward2)
-            call misfit_channel(channel, forward2, ex)     
+            call wavelet_syn(real1, imag1, coeffs_syn)
+            call misfit_channel(channel, coeffs_syn, ex)     
             misfit2 = misfit2 + ex    ! we may need to increase numerical precision
          end do
 !$omp end do
@@ -805,12 +805,12 @@ contains
          value1 = misfit2+moment_reg*coef_moment+amp*slip_reg*coef_slip
          value1 = value1+coef_time*time_reg+coef_gps*gps_misfit
          moment0 = moment0-duse*shear(subfault)
-         de = value1-current_value
+         diff = value1-current_value
 !  
 !  Now, we update the kinematic model.
 !  
          rand = ran1()
-         aux = exp(-de/t)
+         aux = exp(-diff/t)
          if (aux .gt. rand) then
             current_value = value1
             slip(subfault) = duse
@@ -890,10 +890,10 @@ contains
    & n_total, j
 !   real, allocatable :: forward_real(:, :), forward_imag(:, :)
    real :: duse, ause, vuse, &
-   & de, rand, c, aux, dpb, amp, moment_reg, value1, gps_misfit, insar_misfit, &
+   & diff, rand, c, aux, dpb, amp, moment_reg, value1, gps_misfit, insar_misfit, &
    & moment, d_sub, a_sub, slip_reg, a, b, kahan_y, kahan_c, kahan_t, &
    & time_reg, t_save, a_save, d_save, x, moment0, &
-   & l_save, r_save, cr(wave_pts2), cz(wave_pts2), forward2(wave_pts2), &
+   & l_save, r_save, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
    & slip_beg, slip_max, slip_end, angle_beg, angle_end, angle_max, &
    & rupt_beg, rupt_end, rupt_max, rise_time_beg, rise_time_end, rise_time_max
    real ramp_beg, ramp_end, ramp_max, ramp_use
@@ -1119,7 +1119,7 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, omega, z, z1, green_subf, cr, cz, forward2, ex)
+!$omp& private(channel, delta_freq, j, omega, z, z1, green_subf, real1, imag1, coeffs_syn, ex)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
@@ -1130,12 +1130,12 @@ contains
                green_subf = &
                &  (a*green_dip(j, channel, subfault)+b*green_stk(j, channel, subfault)) &
                &  *source(j, channel, isl, isr)*z
-               cr(j) = real(green_subf)+forward_real(j, channel)
-               cz(j) = aimag(green_subf)+forward_imag(j, channel)
+               real1(j) = real(green_subf)+forward_real(j, channel)
+               imag1(j) = aimag(green_subf)+forward_imag(j, channel)
                z = z*z1    ! we may need to increase numerical precision
             end do
-            call wavelet_syn(cr, cz, forward2)
-            call misfit_channel(channel, forward2, ex)     
+            call wavelet_syn(real1, imag1, coeffs_syn)
+            call misfit_channel(channel, coeffs_syn, ex)     
             misfit2 = misfit2 + ex    ! we may need to increase numerical precision
          end do
 !$omp end do
@@ -1161,12 +1161,12 @@ contains
          value1 = value1+coef_time*time_reg
          value1 = value1+coef_gps*gps_misfit+coef_insar*insar_misfit
          moment0 = moment0-duse*shear(subfault)
-         de = value1-current_value
+         diff = value1-current_value
 !  
 !  Now, we update the kinematic model.
 !  
          rand = ran1()
-         aux = exp(-de/t)
+         aux = exp(-diff/t)
          if (aux .gt. rand) then
             current_value = value1
             insar_misfit0 = insar_misfit
@@ -1253,12 +1253,12 @@ contains
             end do
             
             call insar_modify_ramp(ramp1, insar_misfit)
-            de = insar_misfit-insar_misfit0
+            diff = insar_misfit-insar_misfit0
 !  
 !  Now, we update the ramp.
 !  
             rand = ran1()
-            aux = exp(-de/t)
+            aux = exp(-diff/t)
             if (aux .gt. rand) then
                current_value = current_value + coef_insar*(insar_misfit - insar_misfit0)
                insar_misfit0 = insar_misfit
@@ -1301,10 +1301,10 @@ contains
    & n_total, j, event
 !   real, allocatable :: forward_real(:, :), forward_imag(:, :)
    real :: duse, ause, vuse, &
-   & de, rand, c, aux, dpb, amp, moment_reg(10), moment_reg2, value1, gps_misfit, &
+   & diff, rand, c, aux, dpb, amp, moment_reg(10), moment_reg2, value1, gps_misfit, &
    & moment, d_sub, a_sub, slip_reg, a, b, moment0(10), &
    & time_reg, t_save, a_save, d_save, x, kahan_y, kahan_t, kahan_c, &
-   & l_save, r_save, cr(wave_pts2), cz(wave_pts2), forward2(wave_pts2), &
+   & l_save, r_save, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
    & slip_beg, slip_max, slip_end, angle_beg, angle_end, angle_max, &
    & rupt_beg, rupt_end, rupt_max, rise_time_beg, rise_time_end, rise_time_max
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
@@ -1541,7 +1541,7 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, omega, z, z1, green_subf, cr, cz, forward2, ex)
+!$omp& private(channel, delta_freq, j, omega, z, z1, green_subf, real1, imag1, coeffs_syn, ex)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
@@ -1554,12 +1554,12 @@ contains
                green_subf = &
                & (a*green_dip(j, channel, subfault)+b*green_stk(j, channel, subfault))* &
                & source(j, channel, isl, isr)*z
-               cr(j) = real(green_subf)+forward_real(j, channel)
-               cz(j) = aimag(green_subf)+forward_imag(j, channel)
+               real1(j) = real(green_subf)+forward_real(j, channel)
+               imag1(j) = aimag(green_subf)+forward_imag(j, channel)
                z = z*z1    ! we may need to increase numerical precision
             end do
-            call wavelet_syn(cr, cz, forward2)
-            call misfit_channel(channel, forward2, ex)     
+            call wavelet_syn(real1, imag1, coeffs_syn)
+            call misfit_channel(channel, coeffs_syn, ex)     
             misfit2 = misfit2 + ex    ! we may need to increase numerical precision
          end do
 !$omp end do
@@ -1584,12 +1584,12 @@ contains
          value1 = value1+coef_time*time_reg+coef_gps*gps_misfit
          moment0(event) = moment0(event)-duse*shear(subfault)
          moment_reg2 = moment_reg2 - moment_reg(event)
-         de = value1-current_value
+         diff = value1-current_value
 !  
 !  Now, we update the kinematic model.
 !  
          rand = ran1()
-         aux = exp(-de/t)
+         aux = exp(-diff/t)
          if (aux .gt. rand) then
             current_value = value1
             slip(subfault) = duse
@@ -1678,10 +1678,10 @@ contains
    & n_total, j, event
 !   real, allocatable :: forward_real(:, :), forward_imag(:, :)
    real :: duse, ause, vuse, &
-   & de, rand, c, aux, dpb, amp, moment_reg(10), moment_reg2, value1, gps_misfit, insar_misfit, &
+   & diff, rand, c, aux, dpb, amp, moment_reg(10), moment_reg2, value1, gps_misfit, insar_misfit, &
    & moment, d_sub, a_sub, slip_reg, a, b, kahan_y, kahan_c, kahan_t, &
    & time_reg, t_save, a_save, d_save, x, moment0(10), &
-   & l_save, r_save, cr(wave_pts2), cz(wave_pts2), forward2(wave_pts2), &
+   & l_save, r_save, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
    & slip_beg, slip_max, slip_end, angle_beg, angle_end, angle_max, &
    & rupt_beg, rupt_end, rupt_max, rise_time_beg, rise_time_end, rise_time_max
    real ramp_beg, ramp_end, ramp_max, ramp_use
@@ -1925,7 +1925,7 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, omega, z, z1, green_subf, cr, cz, forward2, ex)
+!$omp& private(channel, delta_freq, j, omega, z, z1, green_subf, real1, imag1, coeffs_syn, ex)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
@@ -1936,12 +1936,12 @@ contains
                green_subf = &
                &  (a*green_dip(j, channel, subfault)+b*green_stk(j, channel, subfault)) &
                &  *source(j, channel, isl, isr)*z
-               cr(j) = real(green_subf)+forward_real(j, channel)
-               cz(j) = aimag(green_subf)+forward_imag(j, channel)
+               real1(j) = real(green_subf)+forward_real(j, channel)
+               imag1(j) = aimag(green_subf)+forward_imag(j, channel)
                z = z*z1    ! we may need to increase numerical precision
             end do
-            call wavelet_syn(cr, cz, forward2)
-            call misfit_channel(channel, forward2, ex)     
+            call wavelet_syn(real1, imag1, coeffs_syn)
+            call misfit_channel(channel, coeffs_syn, ex)     
             misfit2 = misfit2 + ex    ! we may need to increase numerical precision
          end do
 !$omp end do
@@ -1969,12 +1969,12 @@ contains
          value1 = value1+coef_gps*gps_misfit+coef_insar*insar_misfit
          moment0(event) = moment0(event)-duse*shear(subfault)
          moment_reg2 = moment_reg2 - moment_reg(event)
-         de = value1-current_value
+         diff = value1-current_value
 !  
 !  Now, we update the kinematic model.
 !  
          rand = ran1()
-         aux = exp(-de/t)
+         aux = exp(-diff/t)
          if (aux .gt. rand) then
             current_value = value1
             insar_misfit0 = insar_misfit
@@ -2069,12 +2069,12 @@ contains
             end do
             
             call insar_modify_ramp(ramp1, insar_misfit)
-            de = insar_misfit-insar_misfit0
+            diff = insar_misfit-insar_misfit0
 !  
 !  Now, we update the ramp.
 !  
             rand = ran1()
-            aux = exp(-de/t)
+            aux = exp(-diff/t)
             if (aux .gt. rand) then
                current_value = current_value + coef_insar*(insar_misfit - insar_misfit0)
                insar_misfit0 = insar_misfit

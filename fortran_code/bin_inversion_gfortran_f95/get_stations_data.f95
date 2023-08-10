@@ -563,19 +563,19 @@ contains
    end subroutine get_waveforms
 
 
-   subroutine get_wavelet_obs(wave_obs, wmax, t_max_val)
+   subroutine get_wavelet_obs(wave_obs, max_coeff, t_max_val)
 !
 !  Args:
 !  wave_obs: wavelet coefficients for channel waveform
-!  wmax: maximum wavelet coefficient
+!  max_coeff: maximum wavelet coefficient
 !  t_max_val: wavelet atom belonging to maximum coefficient
 !
    implicit none
-   real, intent(out) :: wave_obs(wave_pts2, max_stations), wmax(max_stations)
+   real, intent(out) :: wave_obs(wave_pts2, max_stations), max_coeff(max_stations)
    integer, intent(out) :: t_max_val(max_stations)
    integer atom_max0, i, j, channel, start1, length, n_begin, n_delt
    real real1(wave_pts2), imag1(wave_pts2), observed2(n_data), &
-   &  amp_max, mean
+   &  max_coeff0, mean
    real :: coeffs_obs(n_data)
    logical :: cgps, dart
 !
@@ -604,33 +604,33 @@ contains
 
       call cfft(real1, imag1, lnpt)
       call wavelet_syn(real1, imag1, coeffs_obs)
-      amp_max = 0.0
+      max_coeff0 = 0.0
       atom_max0 = 1
       do i = 1, nlen
-         if (amp_max .lt. abs(coeffs_obs(i))) then
-            amp_max = abs(coeffs_obs(i))
+         if (max_coeff0 .lt. abs(coeffs_obs(i))) then
+            max_coeff0 = abs(coeffs_obs(i))
             atom_max0 = i
          end if
       end do
       if (dart) then
-         amp_max = 0.0
+         max_coeff0 = 0.0
          do j = jmin, jmax
             n_begin = 2**(j-1)
             n_delt = nlen/n_begin
             length = int(t_max(channel)/n_delt+0.5)-1
             do i =1, length
-               if (amp_max .lt. abs(coeffs_obs(n_begin+i))) then
-                  amp_max = abs(coeffs_obs(n_begin+i))
+               if (max_coeff0 .lt. abs(coeffs_obs(n_begin+i))) then
+                  max_coeff0 = abs(coeffs_obs(n_begin+i))
                   atom_max0 = n_begin+i
                endif
             enddo
          enddo
       endif
 
-      wmax(channel) = amp_max
+      max_coeff(channel) = max_coeff0
       t_max_val(channel) = atom_max0
       do i = 1, nlen
-         wave_obs(i, channel) = coeffs_obs(i)/(amp_max)
+         wave_obs(i, channel) = coeffs_obs(i)/(max_coeff0)
       end do
    enddo
    end subroutine get_wavelet_obs 
