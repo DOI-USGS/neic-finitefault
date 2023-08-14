@@ -4,7 +4,7 @@ module annealing_static
    use constants, only : pi, max_stations, dpi, twopi, max_subf, max_seg, wave_pts2, &
             &   max_subfaults2, wave_pts, max_subfaults
    use random_gen, only : ran1, cauchy
-   use modelling_inputs, only : smooth_moment, smooth_slip, io_re, moment_input, emin0
+   use modelling_inputs, only : smooth_moment, smooth_slip, moment_input, emin0
    use regularization, only : slip_laplace, define_slip_field, modify_slip_field
    use static_data, only : static_synthetic, static_remove_subfault, &
                        &   static_modify_subfault, static_add_subfault

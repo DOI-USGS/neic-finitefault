@@ -113,15 +113,15 @@ contains
    use model_parameters, only : slip0, rake0, rupt_time0, t_rise0, t_fall0
    implicit none
    real :: slip(:), rake(:), rupt_time(:), t_rise(:), t_fall(:)
-   real :: x(max_subfaults2)
-   integer :: nxy, i, segment, k, npa, subfault, etc
+   real :: random(max_subfaults2)
+   integer :: nxy, i, segment, k, parameters, subfault
    
-   npa = 0
+   parameters = 0
    do segment = 1, segments
-      npa = npa + 4*nxs_sub(segment)*nys_sub(segment)
+      parameters = parameters + 4*nxs_sub(segment)*nys_sub(segment)
    end do
-   do k = 1, npa
-      x(k) = beg(k)+int(ran1()*np(k)-1.0)*dp(k)
+   do k = 1, parameters
+      random(k) = beg(k)+int(ran1()*np(k)-1.0)*dp(k)
    end do
    if (io_re .eq. 0) then
       k = 0
@@ -132,9 +132,9 @@ contains
          do i = 1, nxy
             subfault = subfault + 1
             k = k + 1
-            slip(subfault) = x(k)
+            slip(subfault) = random(k)
             k = k + 1
-            rake(subfault) = x(k)
+            rake(subfault) = random(k)
             k = k + 2
             t_rise(subfault) = (ta0+int(ran1()*msou)*dta)
             t_fall(subfault) = (ta0+int(ran1()*msou)*dta)

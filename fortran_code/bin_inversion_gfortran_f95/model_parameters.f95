@@ -33,8 +33,8 @@ contains
 
    subroutine get_faults_data()
    implicit none
-   integer io_x, io_y, ixs, iys, io_v_d, k, psource, nxys(max_seg), &
-   &  segment, ix, iy, ll, io_seg, kxy, kpxy, nx_c, ny_c, subfault
+   integer int1, int2, int3, io_v_d, psource, subfaults_seg, &
+   &  segment, i, j, nx_c, ny_c, subfault
    real dist, t_ref, t_max, t_min, delta, dip_s, stk_s
    real :: shear2(max_subf, max_seg)
    allocate(point_sources(7, max_psources, max_subfaults))
@@ -50,9 +50,9 @@ contains
    cum_subfaults(:) = 0
    do segment = 1, segments
       cum_subfaults(segment) = subfault
-      read(12,*) io_seg, dip(segment), strike(segment)
+      read(12,*) int1, dip(segment), strike(segment)
       read(12,*) nxs_sub(segment), nys_sub(segment), delay_seg(segment)
-      do ll = 1, nxs_sub(segment) * nys_sub(segment)
+      do i = 1, nxs_sub(segment) * nys_sub(segment)
          subfault = subfault + 1
          read(12,*) slip0(subfault), rake0(subfault), &
          & rupt_time0(subfault), t_rise0(subfault), t_fall0(subfault)
@@ -70,7 +70,7 @@ contains
    open(12, file='point_sources.txt', status='old')
    subfault = 0
    do segment = 1, segments
-      read(12,*) io_seg, dip_s, stk_s
+      read(12,*) int1, dip_s, stk_s
       if ((abs(dip_s-dip(segment)) .gt. 1.e-2).or. &
       &  (abs(stk_s-strike(segment)) .gt. 1.e-2)) then
          write(*,*)'Fault mechanism in Fault.pos is not matched with that in Fault.das'
@@ -79,10 +79,11 @@ contains
          write(*,*) stk_s, strike(segment)
       end if
 
-      do IYS = 1, NYS_sub(segment)*NXS_sub(segment)
+      subfaults_seg = nxs_sub(segment)*nys_sub(segment)
+      do i = 1, subfaults_seg
          subfault = subfault+1
          do psource = 1, ny_p*nx_p
-            read(12,*)(point_sources(k, psource, subfault), k = 1, 7)
+            read(12,*)(point_sources(j, psource, subfault), j = 1, 7)
          end do
       end do
    end do
@@ -119,19 +120,19 @@ contains
 !  Input shear modulous Model
 !
    open(12, file='shear_model.txt', status='old')
-   read(12,*) io_x
-   if (io_x.ne.segments) then
+   read(12,*) int1
+   if (int1.ne.segments) then
       write(*,*)'Amount of fault segments is different between mu file and Fault file'
       stop
    end if
    subfault = 0
    do segment = 1, segments
-      read(12,*) io_seg, io_x, io_y
-      nxys(segment) = io_x*io_y
-      read(12,*)(shear2(k, segment), k = 1, nxys(segment))
-      do k = 1, nxys(segment)
+      read(12,*) int1, int2, int3
+      subfaults_seg = nxs_sub(segment)*nys_sub(segment)
+      read(12,*)(shear2(i, segment), i = 1, subfaults_seg)
+      do i = 1, subfaults_seg
          subfault = subfault + 1
-         shear(subfault) = shear2(k, segment) 
+         shear(subfault) = shear2(i, segment) 
       enddo
    end do 
    close(12)
@@ -274,14 +275,15 @@ contains
 !
    integer :: nx0, ny0
    parameter(nx0 = max_stk_subfaults*2, ny0 = max_dip_subfaults*2)
-   integer :: io_surf, nblock, npa, k, segment, io_right, io_left, io_up, io_down 
+   integer :: io_surf, nblock, parameters, k, segment, io_right, io_left, io_up, io_down 
    real :: delt_x, delt_y, zmed_max, zmed_min, zleft_max, zleft_min
    real :: zright_max, zright_min, zup_max, zup_min, zdown_max, zdown_min
    real :: angle_max, angle_min, vel_max, vel_min
    real :: ddx1, ddx2, ddy1, ddy2
    integer :: io_seg, nmed, nleft2, nright2, nup2, ndown2, nangle, npv, nb, nsour
    integer :: nx, ny, i, j, k_s, i_ss, i_x, i_y
-   real :: surface(1000, 4), xyb(nx0, ny0, 3), xr(5), u0(max_subfaults2, 4)
+   real :: surface(1000, 4), slip_boundary(nx0, ny0, 3), xr(5)
+   real :: model_boundary(max_subfaults2, 4)
    open(17, file='model_space.txt', status='old')
    read(17,*) io_surf
    if (io_surf .eq. 1) then
@@ -292,7 +294,7 @@ contains
       end do
       close(16)
    end if
-   npa = 0
+   parameters = 0
    k = 0
    do segment = 1, segments
       read(17,*) io_seg
@@ -310,7 +312,7 @@ contains
       ny = nys_sub(segment)
       rake_min = angle_min
 !
-!  check whether the contrains is frighting eath other
+!  check whether the contrains is frighting each other
 !
       if (io_right .eq. 1 .or. io_left .eq. 1) then
          ddx1 = (zmed_max-zleft_max)/(int((nx+1)/2))
@@ -333,9 +335,9 @@ contains
 
       do i = 2, nxs_sub(segment)-1
          do j = 2, nys_sub(segment)-1
-            xyb(i, j, 1) = zmed_min
-            xyb(i, j, 2) = zmed_max
-            xyb(i, j, 3) = nmed
+            slip_boundary(i, j, 1) = zmed_min
+            slip_boundary(i, j, 2) = zmed_max
+            slip_boundary(i, j, 3) = nmed
          end do
       end do
 !
@@ -343,22 +345,22 @@ contains
 !
       do j = 1, nys_sub(segment)
          if (io_left .eq. 1) then
-            xyb(1, j, 1) = zleft_min
-            xyb(1, j, 2) = zleft_max
-            xyb(1, j, 3) = nleft2
+            slip_boundary(1, j, 1) = zleft_min
+            slip_boundary(1, j, 2) = zleft_max
+            slip_boundary(1, j, 3) = nleft2
          else
-            xyb(1, j, 1) = zmed_min
-            xyb(1, j, 2) = zmed_max
-            xyb(1, j, 3) = nmed
+            slip_boundary(1, j, 1) = zmed_min
+            slip_boundary(1, j, 2) = zmed_max
+            slip_boundary(1, j, 3) = nmed
          end if
          if (io_right .eq. 1) then
-            xyb(nxs_sub(segment), j, 1) = zright_min
-            xyb(nxs_sub(segment), j, 2) = zright_max
-            xyb(nxs_sub(segment), j, 3) = nright2
+            slip_boundary(nx, j, 1) = zright_min
+            slip_boundary(nx, j, 2) = zright_max
+            slip_boundary(nx, j, 3) = nright2
          else
-            xyb(nxs_sub(segment), j, 1) = zmed_min
-            xyb(nxs_sub(segment), j, 2) = zmed_max
-            xyb(nxs_sub(segment), j, 3) = nmed
+            slip_boundary(nx, j, 1) = zmed_min
+            slip_boundary(nx, j, 2) = zmed_max
+            slip_boundary(nx, j, 3) = nmed
          end if
       end do
 !
@@ -366,103 +368,103 @@ contains
 !
       do i = 2, nxs_sub(segment)-1
          if (io_up .eq. 1) then
-            xyb(i, 1, 1) = zup_min
-            xyb(i, 1, 2) = zup_max
-            xyb(i, 1, 3) = nup2
+            slip_boundary(i, 1, 1) = zup_min
+            slip_boundary(i, 1, 2) = zup_max
+            slip_boundary(i, 1, 3) = nup2
          else
-            xyb(i, 1, 1) = zmed_min
-            xyb(i, 1, 2) = zmed_max
-            xyb(i, 1, 3) = nmed
+            slip_boundary(i, 1, 1) = zmed_min
+            slip_boundary(i, 1, 2) = zmed_max
+            slip_boundary(i, 1, 3) = nmed
          end if
          if (io_down .eq. 1) then
-            xyb(i, nys_sub(segment), 1) = zdown_min
-            xyb(i, nys_sub(segment), 2) = zdown_max
-            xyb(i, nys_sub(segment), 3) = ndown2
+            slip_boundary(i, ny, 1) = zdown_min
+            slip_boundary(i, ny, 2) = zdown_max
+            slip_boundary(i, ny, 3) = ndown2
          else
-            xyb(i, nys_sub(segment), 1) = zmed_min
-            xyb(i, nys_sub(segment), 2) = zmed_max
-            xyb(i, nys_sub(segment), 3) = nmed
+            slip_boundary(i, ny, 1) = zmed_min
+            slip_boundary(i, ny, 2) = zmed_max
+            slip_boundary(i, ny, 3) = nmed
          end if
       end do
 !
 !  upper left corner
 !
       if ((io_up .eq. 1) .and. (io_left .eq. 1)) then
-         xyb(1, 1, 1) = min(zup_min, zleft_min)
-         xyb(1, 1, 2) = min(zup_max, zleft_max)
-         xyb(1, 1, 3) = min(nup2, nleft2)
+         slip_boundary(1, 1, 1) = min(zup_min, zleft_min)
+         slip_boundary(1, 1, 2) = min(zup_max, zleft_max)
+         slip_boundary(1, 1, 3) = min(nup2, nleft2)
       elseif (io_up .eq. 1) then
-         xyb(1, 1, 1) = min(zup_min, zmed_min) 
-         xyb(1, 1, 2) = min(zup_max, zmed_max)
-         xyb(1, 1, 3) = min(nup2, nmed)
+         slip_boundary(1, 1, 1) = min(zup_min, zmed_min) 
+         slip_boundary(1, 1, 2) = min(zup_max, zmed_max)
+         slip_boundary(1, 1, 3) = min(nup2, nmed)
       elseif (io_left .eq. 1) then
-         xyb(1, 1, 1) = min(zleft_min, zmed_min) 
-         xyb(1, 1, 2) = min(zleft_max, zmed_max)
-         xyb(1, 1, 3) = min(nleft2, nmed)
+         slip_boundary(1, 1, 1) = min(zleft_min, zmed_min) 
+         slip_boundary(1, 1, 2) = min(zleft_max, zmed_max)
+         slip_boundary(1, 1, 3) = min(nleft2, nmed)
       else
-         xyb(1, 1, 1) = zmed_min
-         xyb(1, 1, 2) = zmed_max
-         xyb(1, 1, 3) = nmed
+         slip_boundary(1, 1, 1) = zmed_min
+         slip_boundary(1, 1, 2) = zmed_max
+         slip_boundary(1, 1, 3) = nmed
       end if
 !
 !  upper right corner
 !
       if ((io_up .eq. 1) .and. (io_right .eq. 1)) then
-         xyb(nxs_sub(segment), 1, 1) = min(zup_min, zright_min)
-         xyb(nxs_sub(segment), 1, 2) = min(zup_max, zright_max)
-         xyb(nxs_sub(segment), 1, 3) = min(nup2, nright2)
+         slip_boundary(nx, 1, 1) = min(zup_min, zright_min)
+         slip_boundary(nx, 1, 2) = min(zup_max, zright_max)
+         slip_boundary(nx, 1, 3) = min(nup2, nright2)
       elseif (io_up .eq. 1) then
-         xyb(nxs_sub(segment), 1, 1) = min(zup_min, zmed_min) 
-         xyb(nxs_sub(segment), 1, 2) = min(zup_max, zmed_max)
-         xyb(nxs_sub(segment), 1, 3) = min(nup2, nmed)
+         slip_boundary(nx, 1, 1) = min(zup_min, zmed_min) 
+         slip_boundary(nx, 1, 2) = min(zup_max, zmed_max)
+         slip_boundary(nx, 1, 3) = min(nup2, nmed)
       elseif (io_right .eq. 1) then
-         xyb(nxs_sub(segment), 1, 1) = min(zright_min, zmed_min) 
-         xyb(nxs_sub(segment), 1, 2) = min(zright_max, zmed_max)
-         xyb(nxs_sub(segment), 1, 3) = min(nright2, nmed)
+         slip_boundary(nx, 1, 1) = min(zright_min, zmed_min) 
+         slip_boundary(nx, 1, 2) = min(zright_max, zmed_max)
+         slip_boundary(nx, 1, 3) = min(nright2, nmed)
       else
-         xyb(nxs_sub(segment), 1, 1) = zmed_min
-         xyb(nxs_sub(segment), 1, 2) = zmed_max
-         xyb(nxs_sub(segment), 1, 3) = nmed
+         slip_boundary(nx, 1, 1) = zmed_min
+         slip_boundary(nx, 1, 2) = zmed_max
+         slip_boundary(nx, 1, 3) = nmed
       end if
 !
 !  lower left corner
 !
       if ((io_down .eq. 1) .and. (io_left .eq. 1)) then
-         xyb(1, nys_sub(segment), 1) = min(zdown_min, zleft_min)
-         xyb(1, nys_sub(segment), 2) = min(zdown_max, zleft_max)
-         xyb(1, nys_sub(segment), 3) = min(ndown2, nleft2)
+         slip_boundary(1, ny, 1) = min(zdown_min, zleft_min)
+         slip_boundary(1, ny, 2) = min(zdown_max, zleft_max)
+         slip_boundary(1, ny, 3) = min(ndown2, nleft2)
       elseif (io_down .eq. 1) then
-         xyb(1, nys_sub(segment), 1) = min(zdown_min, zmed_min) 
-         xyb(1, nys_sub(segment), 2) = min(zdown_max, zmed_max)
-         xyb(1, nys_sub(segment), 3) = min(ndown2, nmed)
+         slip_boundary(1, ny, 1) = min(zdown_min, zmed_min) 
+         slip_boundary(1, ny, 2) = min(zdown_max, zmed_max)
+         slip_boundary(1, ny, 3) = min(ndown2, nmed)
       elseif (io_left .eq. 1) then
-         xyb(1, nys_sub(segment), 1) = min(zleft_min, zmed_min) 
-         xyb(1, nys_sub(segment), 2) = min(zleft_max, zmed_max)
-         xyb(1, nys_sub(segment), 3) = min(nleft2, nmed)
+         slip_boundary(1, ny, 1) = min(zleft_min, zmed_min) 
+         slip_boundary(1, ny, 2) = min(zleft_max, zmed_max)
+         slip_boundary(1, ny, 3) = min(nleft2, nmed)
       else
-         xyb(1, nys_sub(segment), 1) = zmed_min
-         xyb(1, nys_sub(segment), 2) = zmed_max
-         xyb(1, nys_sub(segment), 3) = nmed
+         slip_boundary(1, ny, 1) = zmed_min
+         slip_boundary(1, ny, 2) = zmed_max
+         slip_boundary(1, ny, 3) = nmed
       end if
 !
 !  lower right corner
 !
       if ((io_down .eq. 1) .and. (io_right .eq. 1)) then
-         xyb(nxs_sub(segment), nys_sub(segment), 1) = min(zdown_min, zright_min)
-         xyb(nxs_sub(segment), nys_sub(segment), 2) = min(zdown_max, zright_max)
-         xyb(nxs_sub(segment), nys_sub(segment), 3) = min(ndown2, nright2)
+         slip_boundary(nx, ny, 1) = min(zdown_min, zright_min)
+         slip_boundary(nx, ny, 2) = min(zdown_max, zright_max)
+         slip_boundary(nx, ny, 3) = min(ndown2, nright2)
       elseif (io_down .eq. 1) then
-         xyb(nxs_sub(segment), nys_sub(segment), 1) = min(zdown_min, zmed_min) 
-         xyb(nxs_sub(segment), nys_sub(segment), 2) = min(zdown_max, zmed_max)
-         xyb(nxs_sub(segment), nys_sub(segment), 3) = min(ndown2, nmed)
+         slip_boundary(nx, ny, 1) = min(zdown_min, zmed_min) 
+         slip_boundary(nx, ny, 2) = min(zdown_max, zmed_max)
+         slip_boundary(nx, ny, 3) = min(ndown2, nmed)
       elseif (io_right .eq. 1) then
-         xyb(nxs_sub(segment), nys_sub(segment), 1) = min(zright_min, zmed_min) 
-         xyb(nxs_sub(segment), nys_sub(segment), 2) = min(zright_max, zmed_max)
-         xyb(nxs_sub(segment), nys_sub(segment), 3) = min(nright2, nmed)
+         slip_boundary(nx, ny, 1) = min(zright_min, zmed_min) 
+         slip_boundary(nx, ny, 2) = min(zright_max, zmed_max)
+         slip_boundary(nx, ny, 3) = min(nright2, nmed)
       else
-         xyb(nxs_sub(segment), nys_sub(segment), 1) = zmed_min
-         xyb(nxs_sub(segment), nys_sub(segment), 2) = zmed_max
-         xyb(nxs_sub(segment), nys_sub(segment), 3) = nmed
+         slip_boundary(nx, ny, 1) = zmed_min
+         slip_boundary(nx, ny, 2) = zmed_max
+         slip_boundary(nx, ny, 3) = nmed
       end if
 !
 !  Recheck the range of mediate part
@@ -473,9 +475,9 @@ contains
             xr(2) = (nxs_sub(segment)-i)*delt_x+zright_max
             xr(3) = (j-1)*delt_y+zup_max
             xr(4) = (nys_sub(segment)-j)*delt_y+zdown_max
-            xr(5) = xyb(i, j, 2)
+            xr(5) = slip_boundary(i, j, 2)
             call bbsort(xr, 1, 5)
-            xyb(i, j, 2) = xr(1)
+            slip_boundary(i, j, 2) = xr(1)
          end do
       end do
 !  
@@ -487,43 +489,43 @@ contains
             if (i_ss .eq. segment) then
                i_y = 1
                i_x = int(surface(k_s, 2)+0.1)
-               xyb(i_x, i_y, 1) = surface(k_s, 3)
-               xyb(i_x, i_y, 2) = surface(k_s, 4)
+               slip_boundary(i_x, i_y, 1) = surface(k_s, 3)
+               slip_boundary(i_x, i_y, 2) = surface(k_s, 4)
             end if
          end do
       end if
 !
-!  Change xy_range to xyb    
+!  Change xy_range to slip_boundary    
 !
-      npa = npa+4*nxs_sub(segment)*nys_sub(segment)
+      parameters = parameters+4*nxs_sub(segment)*nys_sub(segment)
       do j = 1, nys_sub(segment)
          do i = 1, nxs_sub(segment)
             k = k+1
-            u0(k, 1) = xyb(i, j, 1)
-            u0(k, 2) = xyb(i, j, 2)
-            u0(k, 3) = xyb(i, j, 3)
+            model_boundary(k, 1) = slip_boundary(i, j, 1)
+            model_boundary(k, 2) = slip_boundary(i, j, 2)
+            model_boundary(k, 3) = slip_boundary(i, j, 3)
             k = k+1
-            u0(k, 1) = angle_min
-            u0(k, 2) = angle_max
-            u0(k, 3) = nangle
+            model_boundary(k, 1) = angle_min
+            model_boundary(k, 2) = angle_max
+            model_boundary(k, 3) = nangle
             k = k+1
-            u0(k, 1) = vel_min
-            u0(k, 2) = vel_max
-            u0(k, 3) = npv
+            model_boundary(k, 1) = vel_min
+            model_boundary(k, 2) = vel_max
+            model_boundary(k, 3) = npv
             k = k+1
-            u0(k, 1) = 1
-            u0(k, 2) = msou
-            u0(k, 3) = msou
+            model_boundary(k, 1) = 1
+            model_boundary(k, 2) = msou
+            model_boundary(k, 3) = msou
          end do
       end do
    end do
    close(17)
 
-   do k = 1, npa
-      beg(k) = u0(k, 1)
-      np(k) = int(u0(k, 3) + 0.1)
+   do k = 1, parameters
+      beg(k) = model_boundary(k, 1)
+      np(k) = int(model_boundary(k, 3) + 0.1)
       if (np(k) .gt. 1) then
-         dp(k) = (u0(k, 2)-u0(k, 1))/(np(k)-1)
+         dp(k) = (model_boundary(k, 2)-model_boundary(k, 1))/(np(k)-1)
       else
          dp(k) = 0
       end if
@@ -562,29 +564,31 @@ contains
 
    subroutine get_special_boundaries()
    implicit none
-   integer :: nm, nn, iss, ixs, iys, ll, segment, kxy
+   integer :: nm, i, iss, ixs, iys, segment
+   integer :: subfault0, subfault1
 !   real :: dd(max_subf, max_seg), aa(max_subf, max_seg)
 !
 !  special boundary
 !
    open(12, file='special_model_space.txt', status='old')
    read(12,*) nm
-   do nn = 1, nm
+   do i = 1, nm
       read(12,*) iss, ixs, iys
-      ll = 0
-      do segment = 1, iss-1
-         ll = ll+nxs_sub(segment)*nys_sub(segment)
-      end do
-      kxy = ixs+(iys-1)*nxs_sub(iss)
-      ll = ll+ixs+(iys-1)*nxs_sub(iss)
-      np(4*(ll-1)+1) = 2
-      dp(4*(ll-1)+1) = 10
-      beg(4*(11-1)+1) = 1
-!      dd(kxy, iss) = beg(4*(ll-1)+1)
-      np(4*(ll-1)+2) = 2
-!      aa(kxy, iss) = beg(4*(ll-1)+2)
-      np(4*(ll-1)+3) = 2
-      np(4*(ll-1)+4) = 2
+!      ll = 0
+!      do segment = 1, iss-1
+!         ll = ll+nxs_sub(segment)*nys_sub(segment)
+!      end do
+      subfault0 = cum_subfaults(iss)
+      subfault1 = ixs+(iys-1)*nxs_sub(iss)
+      subfault0 = subfault0+subfault1!ixs+(iys-1)*nxs_sub(iss)
+      np(4*(subfault0-1)+1) = 2
+      dp(4*(subfault0-1)+1) = 10
+      beg(4*(subfault0-1)+1) = 1
+!      dd(subfault1, iss) = beg(4*(subfault0-1)+1)
+      np(4*(subfault0-1)+2) = 2
+!      aa(subfault1, iss) = beg(4*(subfault0-1)+2)
+      np(4*(subfault0-1)+3) = 2
+      np(4*(subfault0-1)+4) = 2
    end do
    close(12)
    end subroutine get_special_boundaries
