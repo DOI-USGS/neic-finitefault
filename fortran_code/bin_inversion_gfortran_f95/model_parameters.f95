@@ -15,7 +15,7 @@ module model_parameters
    real :: ta0, dta
    real :: time_min(max_subfaults), time_max(max_subfaults), rake_min
    real :: time_ref(max_subfaults)
-   integer :: msou
+   integer :: windows
    real :: beg(max_subfaults2), dp(max_subfaults2)
    integer :: np(max_subfaults2)
    integer :: subfaults, cum_subfaults(max_seg)
@@ -45,7 +45,7 @@ contains
    open(12, file='fault&rise_time.txt', status='old')
    read(12,*) nxs0, nys0, c_depth
    read(12,*) segments, dxs, dys, nx_p, ny_p, v_min, v_max, tbl, tbr
-   read(12,*) ta0, dta, msou, v_ref, io_v_d
+   read(12,*) ta0, dta, windows, v_ref, io_v_d
    subfault = 0
    cum_subfaults(:) = 0
    do segment = 1, segments
@@ -166,18 +166,18 @@ contains
    end subroutine events_segments
 
 
-   subroutine write_model(slip, rake, tt, tl, tr, use_waveforms)
+   subroutine write_model(slip, rake, rupt_time, trise, tfall, use_waveforms)
 !
 !  Args:
 !  slip: array with model slip values for all subfaults
 !  rake: array with model rake values for all subfaults
-!  tt: array with model rupture time values for all subfaults
-!  tl: array with model risetime values for all subfaults
-!  tr: array with model falltime values for all subfaults
+!  rupt_time: array with model rupture time values for all subfaults
+!  trise: array with model risetime values for all subfaults
+!  tfall: array with model falltime values for all subfaults
 !  use_waveforms: True if some waveform data used in modelling, False otherwise
 !
-   real :: slip(:), rake(:), tt(:)
-   real :: tl(:), tr(:)
+   real :: slip(:), rake(:), rupt_time(:)
+   real :: trise(:), tfall(:)
    real :: latitude_ep, longitude_ep, t_ref, moment_sol
    integer :: segment, iys, ixs, iy, ix, kp, subfault, psource
    logical :: use_waveforms
@@ -247,8 +247,8 @@ contains
             write(13, 133) point_sources(1, 1, subfault), &
          &  point_sources(2, 1, subfault), point_sources(3, 1, subfault), &
          &  slip(subfault), rake(subfault), strike(segment), dip(segment), &
-         &  tt(subfault) + t_ref + delay_seg(segment), tl(subfault), &
-         &  tr(subfault), moment_sol
+         &  rupt_time(subfault) + t_ref + delay_seg(segment), trise(subfault), &
+         &  tfall(subfault), moment_sol
 133  format(f14.6, f14.6, f14.6, f14.6, f14.6, f14.6, f14.6, f14.6, f14.6, f14.6, e14.6)
          end do
       else
@@ -279,10 +279,10 @@ contains
    real :: delt_x, delt_y, zmed_max, zmed_min, zleft_max, zleft_min
    real :: zright_max, zright_min, zup_max, zup_min, zdown_max, zdown_min
    real :: angle_max, angle_min, vel_max, vel_min
-   real :: ddx1, ddx2, ddy1, ddy2
-   integer :: io_seg, nmed, nleft2, nright2, nup2, ndown2, nangle, npv, nb, nsour
-   integer :: nx, ny, i, j, k_s, i_ss, i_x, i_y
-   real :: surface(1000, 4), slip_boundary(nx0, ny0, 3), xr(5)
+   real :: step1, step2
+   integer :: io_seg, nmed, nleft2, nright2, nup2, ndown2, nangle, npv, int1, int2
+   integer :: nx, ny, i, j, segment2, i_x, i_y
+   real :: surface(1000, 4), slip_boundary(nx0, ny0, 3), upper_bounds(5)
    real :: model_boundary(max_subfaults2, 4)
    open(17, file='model_space.txt', status='old')
    read(17,*) io_surf
@@ -307,7 +307,7 @@ contains
       read(17,*) zdown_max, zdown_min, ndown2
       read(17,*) angle_max, angle_min, nangle
       read(17,*) vel_max, vel_min, npv
-      read(17,*) nb, nsour
+      read(17,*) int1, int2
       nx = nxs_sub(segment)
       ny = nys_sub(segment)
       rake_min = angle_min
@@ -315,17 +315,17 @@ contains
 !  check whether the contrains is frighting each other
 !
       if (io_right .eq. 1 .or. io_left .eq. 1) then
-         ddx1 = (zmed_max-zleft_max)/(int((nx+1)/2))
-         ddx2 = (zmed_max-zright_max)/(int((nx+1)/2))
-         if (delt_x .lt. ddx1 .or. delt_x .lt. ddx2) then
+         step1 = (zmed_max-zleft_max)/(int((nx+1)/2))
+         step2 = (zmed_max-zright_max)/(int((nx+1)/2))
+         if (delt_x .lt. step1 .or. delt_x .lt. step2) then
             write(*,*)'the constrain of left or right boundary is error'
             stop
          end if
       end if
       if (io_down .eq. 1 .or. io_up .eq. 1) then
-         ddy1 = (zmed_max-zup_max)/(int((ny+1)/2))
-         ddy2 = (zmed_max-zdown_max)/(int((ny+1)/2))
-         if (delt_y .lt. ddy1 .or. delt_y .lt. ddy2) then
+         step1 = (zmed_max-zup_max)/(int((ny+1)/2))
+         step2 = (zmed_max-zdown_max)/(int((ny+1)/2))
+         if (delt_y .lt. step1 .or. delt_y .lt. step2) then
             write(*,*)'the constrain of left or right boundary is error'
             stop
          end if
@@ -471,26 +471,25 @@ contains
 !
       do i = 2, nxs_sub(segment)-1
          do j = 2, nys_sub(segment)-1
-            xr(1) = (i-1)*delt_x+zleft_max
-            xr(2) = (nxs_sub(segment)-i)*delt_x+zright_max
-            xr(3) = (j-1)*delt_y+zup_max
-            xr(4) = (nys_sub(segment)-j)*delt_y+zdown_max
-            xr(5) = slip_boundary(i, j, 2)
-            call bbsort(xr, 1, 5)
-            slip_boundary(i, j, 2) = xr(1)
+            upper_bounds(1) = (i-1)*delt_x+zleft_max
+            upper_bounds(2) = (nxs_sub(segment)-i)*delt_x+zright_max
+            upper_bounds(3) = (j-1)*delt_y+zup_max
+            upper_bounds(4) = (nys_sub(segment)-j)*delt_y+zdown_max
+            upper_bounds(5) = slip_boundary(i, j, 2)
+            slip_boundary(i, j, 2) = minval(upper_bounds)
          end do
       end do
 !  
 !  check the surface constrain
 !  
       if (io_surf .eq. 1) then
-         do k_s = 1, nblock
-            i_ss = int(surface(k_s, 1)+0.1)
-            if (i_ss .eq. segment) then
+         do i = 1, nblock
+            segment2 = int(surface(i, 1)+0.1)
+            if (segment2 .eq. segment) then
                i_y = 1
-               i_x = int(surface(k_s, 2)+0.1)
-               slip_boundary(i_x, i_y, 1) = surface(k_s, 3)
-               slip_boundary(i_x, i_y, 2) = surface(k_s, 4)
+               i_x = int(surface(i, 2)+0.1)
+               slip_boundary(i_x, i_y, 1) = surface(i, 3)
+               slip_boundary(i_x, i_y, 2) = surface(i, 4)
             end if
          end do
       end if
@@ -514,8 +513,8 @@ contains
             model_boundary(k, 3) = npv
             k = k+1
             model_boundary(k, 1) = 1
-            model_boundary(k, 2) = msou
-            model_boundary(k, 3) = msou
+            model_boundary(k, 2) = windows
+            model_boundary(k, 3) = windows
          end do
       end do
    end do
@@ -533,60 +532,31 @@ contains
    end subroutine get_model_space
 
    
-   subroutine bbsort(a, mm, nn)
-!
-!  Args:
-!  a: array of values
-!  mm: 
-!  nn: 
-!  
-   implicit none
-   real :: a(:), d
-   integer :: mm, nn, m, j, i
-   m = nn-mm+1
-   do while (m .gt. 0)
-! 10      if (m .gt. 0) then
-      j = m+mm-2
-      m = 0
-      do i = mm, j
-         if (a(i) .gt. a(i+1)) then
-            d = a(i)
-            a(i) = a(i+1)
-            a(i+1) = d
-            m = i-mm+1
-         end if
-      end do
-   end do
-!        go to 10
-!        end if
-   end subroutine bbsort
-
-
    subroutine get_special_boundaries()
    implicit none
-   integer :: nm, i, iss, ixs, iys, segment
+   integer :: special_subfaults, i, ixs, iys, segment
    integer :: subfault0, subfault1
 !   real :: dd(max_subf, max_seg), aa(max_subf, max_seg)
 !
 !  special boundary
 !
    open(12, file='special_model_space.txt', status='old')
-   read(12,*) nm
-   do i = 1, nm
-      read(12,*) iss, ixs, iys
+   read(12,*) special_subfaults
+   do i = 1, special_subfaults
+      read(12,*) segment, ixs, iys
 !      ll = 0
-!      do segment = 1, iss-1
+!      do segment = 1, segment-1
 !         ll = ll+nxs_sub(segment)*nys_sub(segment)
 !      end do
-      subfault0 = cum_subfaults(iss)
-      subfault1 = ixs+(iys-1)*nxs_sub(iss)
-      subfault0 = subfault0+subfault1!ixs+(iys-1)*nxs_sub(iss)
+      subfault0 = cum_subfaults(segment)
+      subfault1 = ixs+(iys-1)*nxs_sub(segment)
+      subfault0 = subfault0+subfault1!ixs+(iys-1)*nxs_sub(segment)
       np(4*(subfault0-1)+1) = 2
       dp(4*(subfault0-1)+1) = 10
       beg(4*(subfault0-1)+1) = 1
-!      dd(subfault1, iss) = beg(4*(subfault0-1)+1)
+!      dd(subfault1, segment) = beg(4*(subfault0-1)+1)
       np(4*(subfault0-1)+2) = 2
-!      aa(subfault1, iss) = beg(4*(subfault0-1)+2)
+!      aa(subfault1, segment) = beg(4*(subfault0-1)+2)
       np(4*(subfault0-1)+3) = 2
       np(4*(subfault0-1)+4) = 2
    end do
@@ -596,109 +566,107 @@ contains
    
    subroutine subfault_positions()
    implicit none
-   integer k, nn_use
-   integer n_is, subfault, subfault2
-   integer ix, iy, nxx, nyy, io_change
-   character(len=80) aaaa
-   integer i_s
+   integer k, special_subfaults
+   integer segment2, subfault, subfault2
+   integer ix, iy, stk_subf2, dip_subf2, change_neighbour
+   character(len=80) char1
+   integer segment
 !
 !  We detect adjacent subfaults and their relative location
 !  
    subfault = 0
-   do i_s = 1, segments
-      do iy = 1, nys_sub(i_s)
-         do ix = 1, nxs_sub(i_s)
+   do segment = 1, segments
+      do iy = 1, nys_sub(segment)
+         do ix = 1, nxs_sub(segment)
             subfault = subfault + 1
-            nup(1, subfault) = i_s
+            nup(1, subfault) = segment
             nup(2, subfault) = ix
             nup(3, subfault) = iy-1
-            ndown(1, subfault) = i_s
+            ndown(1, subfault) = segment
             ndown(2, subfault) = ix
             ndown(3, subfault) = iy+1
-            nleft(1, subfault) = i_s
+            nleft(1, subfault) = segment
             nleft(2, subfault) = ix-1
             nleft(3, subfault) = iy
-            nright(1, subfault) = i_s
+            nright(1, subfault) = segment
             nright(2, subfault) = ix+1
             nright(3, subfault) = iy
          end do
       end do
    end do
    open(22, file='regularization_borders.txt', status='old')
-   do I_s = 1, segments
-      subfault = cum_subfaults(i_s)
+   do segment = 1, segments
+      subfault = cum_subfaults(segment)
 !      up 
       read(22,*)
-      read(22,*) n_is, nyy
+      read(22,*) segment2, dip_subf2
       subfault2 = subfault
-      do ix = 1, nxs_sub(I_s)
+      do ix = 1, nxs_sub(segment)
          subfault2 = subfault2 + 1
-         nup(1, subfault2) = n_is
+         nup(1, subfault2) = segment2
          nup(2, subfault2) = ix
-         nup(3, subfault2) = nyy
+         nup(3, subfault2) = dip_subf2
       end do
 !      down
-      read(22,*) n_is, nyy
-      nn_use = nys_sub(i_s)
-      subfault2 = subfault + (nys_sub(i_s)-1)*nxs_sub(i_s)
-      do ix = 1, nxs_sub(I_s)
+      read(22,*) segment2, dip_subf2
+      subfault2 = subfault + (nys_sub(segment)-1)*nxs_sub(segment)
+      do ix = 1, nxs_sub(segment)
          subfault2 = subfault2 + 1
-         ndown(1, subfault2) = n_is
+         ndown(1, subfault2) = segment2
          ndown(2, subfault2) = ix
-         ndown(3, subfault2) = nyy
+         ndown(3, subfault2) = dip_subf2
       end do
 !      left
-      read(22,*) n_is, nxx
+      read(22,*) segment2, stk_subf2
       subfault2 = subfault + 1
-      do iy = 1, nys_sub(I_s)
-         nleft(1, subfault2) = n_is
-         nleft(2, subfault2) = nxx
+      do iy = 1, nys_sub(segment)
+         nleft(1, subfault2) = segment2
+         nleft(2, subfault2) = stk_subf2
          nleft(3, subfault2) = iy
-         subfault2 = subfault2 + nxs_sub(i_s)
+         subfault2 = subfault2 + nxs_sub(segment)
       end do
 !      right
-      read(22,*) n_is, nxx
-      nn_use = nxs_sub(i_s)
+      read(22,*) segment2, stk_subf2
       subfault2 = subfault
-      do iy = 1, nys_sub(I_s)
-         subfault2 = subfault2 + nxs_sub(i_s)
-         nright(1, subfault2) = n_is
-         nright(2, subfault2) = nxx
+      do iy = 1, nys_sub(segment)
+         subfault2 = subfault2 + nxs_sub(segment)
+         nright(1, subfault2) = segment2
+         nright(2, subfault2) = stk_subf2
          nright(3, subfault2) = iy
       end do
    end do
    close(22)   
    open(22, file='special_regularization_borders.txt', status='old')
-   read(22,*) nn_use
-   do k = 1, nn_use
-      read(22,'(a)')aaaa
+   read(22,*) special_subfaults
+   do k = 1, special_subfaults
+      read(22,'(a)')char1
 ! 1  format(a)
 !      write(*,'(a)')aaaa
-      read(22,*) i_s, ix, iy
-      read(22,*) io_change, n_is, nxx, nyy
-      subfault = cum_subfaults(i_s) + nxs_sub(i_s)*iy + ix
-      if (io_change .eq. 1) then
-         nup(1, subfault) = n_is
-         nup(2, subfault) = nxx
-         nup(3, subfault) = nyy
+      read(22,*) segment, ix, iy
+      read(22,*) change_neighbour, segment2, stk_subf2, dip_subf2
+      subfault = cum_subfaults(segment) + nxs_sub(segment)*iy + ix
+      if (change_neighbour .eq. 1) then
+         nup(1, subfault) = segment2
+         nup(2, subfault) = stk_subf2
+         nup(3, subfault) = dip_subf2
       end if
-      read(22,*) io_change, n_is, nxx, nyy
-      if (io_change .eq. 1) then
-         ndown(1, subfault) = n_is
-         ndown(2, subfault) = nxx
-         ndown(3, subfault) = nyy
+      read(22,*) change_neighbour, segment2, stk_subf2, dip_subf2
+      if (change_neighbour .eq. 1) then
+         ndown(1, subfault) = segment2
+         ndown(2, subfault) = stk_subf2
+         ndown(3, subfault) = dip_subf2
       end if
-      read(22,*) io_change, n_is, nxx, nyy
-      if (io_change .eq. 1) then
-         nleft(1, subfault) = n_is
-         nleft(2, subfault) = nxx
-         nleft(3, subfault) = nyy
+      read(22,*) change_neighbour, segment2, stk_subf2, dip_subf2
+      if (change_neighbour .eq. 1) then
+         nleft(1, subfault) = segment2
+         nleft(2, subfault) = stk_subf2
+         nleft(3, subfault) = dip_subf2
       end if
-      read(22,*) io_change, n_is, nxx, nyy
-      if (io_change .eq. 1) then
-         nright(1, subfault) = n_is
-         nright(2, subfault) = nxx
-         nright(3, subfault) = nyy
+      read(22,*) change_neighbour, segment2, stk_subf2, dip_subf2
+      if (change_neighbour .eq. 1) then
+         nright(1, subfault) = segment2
+         nright(2, subfault) = stk_subf2
+         nright(3, subfault) = dip_subf2
       end if
    end do
    close(22)
@@ -719,19 +687,19 @@ contains
    end subroutine get_events_segments
 
 
-   subroutine get_rise_time(ta00, dta0, msou0)
+   subroutine get_rise_time(ta00, dta0, windows0)
 !
 !  Args:
 !  ta00: first parameter of rise time function
 !  dta0: second parameter of rise time function
-!  msou: time windows for rise time function
+!  windows: time windows for rise time function
 !  
    implicit none
    real :: ta00, dta0
-   integer :: msou0 
+   integer :: windows0 
    ta00 = ta0
    dta0 = dta
-   msou0 = msou
+   windows0 = windows
    end subroutine get_rise_time
 
    
