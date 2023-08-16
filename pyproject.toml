@@ -27,6 +27,7 @@ netCDF4 = "^1.6.4"
 numpy = "^1.25.0"
 obspy = "^1.4.0"
 pygmt = "^0.9.0"
+pyproj = "^3.3.0"
 scipy = "^1.11.1"
 shapely = "1.7.1"
 

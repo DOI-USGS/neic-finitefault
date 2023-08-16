@@ -2,6 +2,7 @@
 
 # GMT variable(s)
 export PATH="/usr/local/bin/gmt:${PATH}"
+export GMT_LIBRARY_PATH="/usr/local/lib"
 
 # GEOS variable(s)
 export PATH="/usr/local/bin/geosop:${PATH}"

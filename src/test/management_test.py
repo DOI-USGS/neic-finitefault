@@ -69,7 +69,7 @@ def test_distazbaz():
 
 
 def test_default_dirs():
-    examples = pathlib.Path(__file__).parent.parent.parent / "docs" / "examples"
+    examples = pathlib.Path(__file__).parent / "data"
     config_path = examples / "config.ini"
     target_code_path = "/home/user/neic-finitefault"
     target_compute_near_gf = f"{target_code_path}/fortran_code/src_dc_f95"

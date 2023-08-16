@@ -75,6 +75,9 @@ Poetry:
     expire_in: 1 week
   image: "${WASP_IMAGE}"
   script:
+    - ls /usr/local/lib
+    - ls /usr/local/bin/gmt
+    - ls /usr/local/bin
     - poetry config virtualenvs.in-project true --local
     - poetry install
     - poetry run poe okada
@@ -104,7 +107,7 @@ Python Test:
     - source ./environment.d/ubuntu.sh
     - cp "/home/usgs-user/finitefault/fortran_code/gfs_nm/long/fd_bank" ./fortran_code/gfs_nm/long/fd_bank
     - cp "/home/usgs-user/finitefault/fortran_code/info/LITHO1.0.nc" ./fortran_code/info/LITHO1.0.nc
-    - poetry run poe test
+    - source ./environment.d/ubuntu.sh && poetry run poe test
   stage: test
 
 Shell Check:

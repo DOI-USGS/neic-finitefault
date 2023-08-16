@@ -17,9 +17,6 @@ def test_read_config():
 
     # should path if the config file is as expected
     config = read_config(
-        config_path=pathlib.Path(__file__).parent.parent.parent
-        / "docs"
-        / "examples"
-        / "config.ini"
+        config_path=pathlib.Path(__file__).parent / "data" / "config.ini"
     )
     assert isinstance(config, configparser.ConfigParser)
