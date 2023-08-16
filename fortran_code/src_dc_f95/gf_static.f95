@@ -14,6 +14,7 @@ program gf_static
    use geodesics, only : distaz
    implicit none
    character(len=10) sta_name(9000), input
+   character(len=200) :: directory,risetimefile,pointsourcefile
    character(len=100) vel_model, filename, filename2
    real*8 :: ang_d(ndis), dip, theta, azi(ndis)
    real lat_s(9000),lon_s(9000), area
@@ -43,12 +44,13 @@ program gf_static
 !   allocate(green_stk(3, max_stk_subfaults, max_dip_subfaults, max_seg, 1000))
    
    call getarg(1, input)
+   call getarg(2, directory)
    gps = (input.eq.'gps')
    insar = (input.eq.'insar')
-   if (gps) filename = 'static_data.txt'
-   if (insar) filename = 'insar_data.txt'
-   if (gps) filename2 = 'Green_static_subfault.txt'
-   if (insar) filename2 = 'Insar_static_subfault.txt'
+   if (gps) filename = trim(directory)//'static_data.txt'
+   if (insar) filename = trim(directory)//'insar_data.txt'
+   if (gps) filename2 = trim(directory)//'Green_static_subfault.txt'
+   if (insar) filename2 = trim(directory)//'Insar_static_subfault.txt'
    
    disp = .False.
 !
@@ -65,8 +67,9 @@ program gf_static
    close(12)
 !
 !	Input the Latitude and Longtitude and depth of epicenter
-!
-   open(22, file='fault&rise_time.txt', status='old')
+!  
+   risetimefile=trim(directory)//'fault&rise_time.txt'
+   open(22, file=risetimefile, status='old')
    read(22,*)nxs0,nys0,c_depth
    read(22,*)n_seg,dxs,dys,nxp,nyp
    read(22,*)ta0,dta,msou
@@ -83,7 +86,8 @@ program gf_static
 !
 !	Input the position of point source and epicenter position
 !
-   open(22, file='point_sources.txt', status='old')
+   pointsourcefile=trim(directory)//'point_sources.txt'
+   open(22, file=pointsourcefile, status='old')
    do i_seg=1,n_seg
       read(22,*)io_seg
       do iys=1,nys_sub(i_seg)
@@ -104,7 +108,7 @@ program gf_static
 !
 ! input velocity model
 !
-   vel_model = 'vel_model.txt'
+   vel_model = trim(directory)//'vel_model.txt'
    vel_model = trim(vel_model)
    call read_vel_model(vel_model)
    do ll=1,ndis
