@@ -21,7 +21,7 @@ module annealing_static
    integer, parameter :: double = kind(1.d0)
    integer, private :: threads
    integer, parameter, private :: max_move=50, accept_max=5
-   real :: beg(max_subfaults2), dp(max_subfaults2)
+   real :: minimum(max_subfaults2), dp(max_subfaults2)
    integer :: np(max_subfaults2), segments, subfaults
    real :: shear(max_subfaults), dxs, dys
    integer :: nxs_sub(max_seg), nys_sub(max_seg) 
@@ -40,7 +40,7 @@ contains
    call get_shear(shear)
    call get_segments(nxs_sub, nys_sub, dip, strike, delay_seg, segments, subfaults, cum_subfaults)
    call get_subfaults(dxs, dys, nx_p, ny_p, v_min, v_max, v_ref)
-   call get_space(time_min, time_max, time_ref, beg, dp, np)
+   call get_space(time_min, time_max, time_ref, minimum, dp, np)
    end subroutine annealingstatic_set_fault_properties
 
 
@@ -282,7 +282,7 @@ contains
 !
       npb = np(4*(subfault-1)+1)
       dpb = dp(4*(subfault-1)+1)
-      slip_beg = beg(4*(subfault-1)+1)
+      slip_beg = minimum(4*(subfault-1)+1)
       slip_max = (npb-1)*dpb
       slip_end = slip_beg+slip_max
 !
@@ -290,7 +290,7 @@ contains
 !  
       npb = np(4*(subfault-1)+2)
       dpb = dp(4*(subfault-1)+2)
-      angle_beg = beg(4*(subfault-1)+2)
+      angle_beg = minimum(4*(subfault-1)+2)
       angle_max = (npb-1)*dpb
       angle_end = angle_beg+angle_max
       do i = 1, max_move

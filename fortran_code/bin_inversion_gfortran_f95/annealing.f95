@@ -29,7 +29,7 @@ module annealing
    integer, private :: threads
    integer, parameter, private :: max_move=50, accept_max=5
    integer :: segments, msou, nxs_sub(max_seg), nys_sub(max_seg), subfaults
-   real :: beg(max_subfaults2), dp(max_subfaults2)
+   real :: minimum(max_subfaults2), dp(max_subfaults2)
    integer :: np(max_subfaults2)
    real :: time_min(max_subfaults), time_max(max_subfaults)
    real :: shear(max_subfaults), ta0, dta, dxs, dys
@@ -67,7 +67,7 @@ contains
    call get_shear(shear)
    call get_segments(nxs_sub, nys_sub, dip, strike, delay_seg, segments, subfaults, cum_subfaults)
    call get_subfaults(dxs, dys, nx_p, ny_p, v_min, v_max, v_ref)
-   call get_space(time_min, time_max, time_ref, beg, dp, np)
+   call get_space(time_min, time_max, time_ref, minimum, dp, np)
    call get_events_segments(segment_in_event, subfault_in_event)
    end subroutine annealing_set_fault_parameters
 
@@ -121,7 +121,7 @@ contains
       parameters = parameters + 4*nxs_sub(segment)*nys_sub(segment)
    end do
    do k = 1, parameters
-      random(k) = beg(k)+int(ran1()*np(k)-1.0)*dp(k)
+      random(k) = minimum(k)+int(ran1()*np(k)-1.0)*dp(k)
    end do
    if (io_re .eq. 0) then
       k = 0
@@ -684,7 +684,7 @@ contains
 !
       npb = np(4*(subfault-1)+1)
       dpb = dp(4*(subfault-1)+1)
-      slip_beg = beg(4*(subfault-1)+1)
+      slip_beg = minimum(4*(subfault-1)+1)
       slip_max = (npb-1)*dpb
       slip_end = slip_beg+slip_max
 !
@@ -692,7 +692,7 @@ contains
 !  
       npb = np(4*(subfault-1)+2)
       dpb = dp(4*(subfault-1)+2)
-      angle_beg = beg(4*(subfault-1)+2)
+      angle_beg = minimum(4*(subfault-1)+2)
       angle_max = (npb-1)*dpb
       angle_end = angle_beg+angle_max
 ! 
@@ -1039,7 +1039,7 @@ contains
 !
       npb = np(4*(subfault-1)+1)
       dpb = dp(4*(subfault-1)+1)
-      slip_beg = beg(4*(subfault-1)+1)
+      slip_beg = minimum(4*(subfault-1)+1)
       slip_max = (npb-1)*dpb
       slip_end = slip_beg+slip_max
 !
@@ -1047,7 +1047,7 @@ contains
 !  
       npb = np(4*(subfault-1)+2)
       dpb = dp(4*(subfault-1)+2)
-      angle_beg = beg(4*(subfault-1)+2)
+      angle_beg = minimum(4*(subfault-1)+2)
       angle_max = (npb-1)*dpb
       angle_end = angle_beg+angle_max
 ! 
@@ -1461,7 +1461,7 @@ contains
 !
       npb = np(4*(subfault-1)+1)
       dpb = dp(4*(subfault-1)+1)
-      slip_beg = beg(4*(subfault-1)+1)
+      slip_beg = minimum(4*(subfault-1)+1)
       slip_max = (npb-1)*dpb
       slip_end = slip_beg+slip_max
 !
@@ -1469,7 +1469,7 @@ contains
 !  
       npb = np(4*(subfault-1)+2)
       dpb = dp(4*(subfault-1)+2)
-      angle_beg = beg(4*(subfault-1)+2)
+      angle_beg = minimum(4*(subfault-1)+2)
       angle_max = (npb-1)*dpb
       angle_end = angle_beg+angle_max
 ! 
@@ -1845,7 +1845,7 @@ contains
 !
       npb = np(4*(subfault-1)+1)
       dpb = dp(4*(subfault-1)+1)
-      slip_beg = beg(4*(subfault-1)+1)
+      slip_beg = minimum(4*(subfault-1)+1)
       slip_max = (npb-1)*dpb
       slip_end = slip_beg+slip_max
 !
@@ -1853,7 +1853,7 @@ contains
 !  
       npb = np(4*(subfault-1)+2)
       dpb = dp(4*(subfault-1)+2)
-      angle_beg = beg(4*(subfault-1)+2)
+      angle_beg = minimum(4*(subfault-1)+2)
       angle_max = (npb-1)*dpb
       angle_end = angle_beg+angle_max
 ! 

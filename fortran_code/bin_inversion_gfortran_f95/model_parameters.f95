@@ -11,12 +11,12 @@ module model_parameters
    real :: dip(max_seg), strike(max_seg), delay_seg(max_seg)
    real, allocatable :: point_sources(:, :, :)
    real :: shear(max_subfaults)
-   real :: c_depth, dxs, dys, v_ref, v_min, v_max, tbl, tbr
+   real :: dxs, dys, v_ref, v_min, v_max, lower_bound, upper_bound
    real :: ta0, dta
    real :: time_min(max_subfaults), time_max(max_subfaults), rake_min
    real :: time_ref(max_subfaults)
    integer :: windows
-   real :: beg(max_subfaults2), dp(max_subfaults2)
+   real :: minimum(max_subfaults2), dp(max_subfaults2)
    integer :: np(max_subfaults2)
    integer :: subfaults, cum_subfaults(max_seg)
    logical :: segment_in_event(max_seg, 10)
@@ -33,9 +33,9 @@ contains
 
    subroutine get_faults_data()
    implicit none
-   integer int1, int2, int3, io_v_d, psource, subfaults_seg, &
+   integer int1, int2, int3, psource, subfaults_seg, &
    &  segment, i, j, nx_c, ny_c, subfault
-   real dist, t_ref, t_max, t_min, delta, dip_s, stk_s
+   real dist, t_ref, t_max, t_min, delta, dip1, strike1, float1
    real :: shear2(max_subf, max_seg)
    allocate(point_sources(7, max_psources, max_subfaults))
 !
@@ -43,9 +43,9 @@ contains
 !
    write(*,*)'Read and store fault segments data to memory...'
    open(12, file='fault&rise_time.txt', status='old')
-   read(12,*) nxs0, nys0, c_depth
-   read(12,*) segments, dxs, dys, nx_p, ny_p, v_min, v_max, tbl, tbr
-   read(12,*) ta0, dta, windows, v_ref, io_v_d
+   read(12,*) nxs0, nys0, float1
+   read(12,*) segments, dxs, dys, nx_p, ny_p, v_min, v_max, lower_bound, upper_bound
+   read(12,*) ta0, dta, windows, v_ref, int1
    subfault = 0
    cum_subfaults(:) = 0
    do segment = 1, segments
@@ -70,13 +70,13 @@ contains
    open(12, file='point_sources.txt', status='old')
    subfault = 0
    do segment = 1, segments
-      read(12,*) int1, dip_s, stk_s
-      if ((abs(dip_s-dip(segment)) .gt. 1.e-2).or. &
-      &  (abs(stk_s-strike(segment)) .gt. 1.e-2)) then
+      read(12,*) int1, dip1, strike1
+      if ((abs(dip1-dip(segment)) .gt. 1.e-2).or. &
+      &  (abs(strike1-strike(segment)) .gt. 1.e-2)) then
          write(*,*)'Fault mechanism in Fault.pos is not matched with that in Fault.das'
          write(*,*) segment
-         write(*,*) dip_s, dip(segment)
-         write(*,*) stk_s, strike(segment)
+         write(*,*) dip1, dip(segment)
+         write(*,*) strike1, strike(segment)
       end if
 
       subfaults_seg = nxs_sub(segment)*nys_sub(segment)
@@ -103,17 +103,17 @@ contains
       if (t_min .gt. t_latest) t_min = t_latest
       if (t_max .gt. t_latest) t_max = t_latest
       delta = t_min-t_ref
-      if (tbl .lt. delta) then
+      if (lower_bound .lt. delta) then
          time_min(subfault) = delta
       else
-         time_min(subfault) = tbl
+         time_min(subfault) = lower_bound
       end if
 !      time_ref(kxy, segment) = time_min(kxy, segment) + t_ref
       delta = t_max - t_ref
-      if (tbr .gt. delta) then
+      if (upper_bound .gt. delta) then
          time_max(subfault) = delta
       else
-         time_max(subfault) = tbr
+         time_max(subfault) = upper_bound
       end if
    end do
 !  
@@ -178,8 +178,8 @@ contains
 !
    real :: slip(:), rake(:), rupt_time(:)
    real :: trise(:), tfall(:)
-   real :: latitude_ep, longitude_ep, t_ref, moment_sol
-   integer :: segment, iys, ixs, iy, ix, kp, subfault, psource
+   real :: latitude_ep, longitude_ep, lat0, lon0, depth0, t_ref, moment_sol
+   integer :: segment, iys, ixs, iy, ix, subfault, psource
    logical :: use_waveforms
    latitude_ep = 0.0
    longitude_ep = 0.0
@@ -210,29 +210,35 @@ contains
 132           format(a, i4, a, i2, a, i2, a, f10.4, a, f10.4)
       write(13,*)'#Lon.  Lat.  Depth'
       subfault = cum_subfaults(segment) + 1
-      write(13,*) point_sources(2, 1, subfault), &! ix, iy, ixs, iys, segment),
-     &  point_sources(1, 1, subfault), point_sources(3, 1, subfault)
+      lat0 = point_sources(1, 1, subfault)
+      lon0 = point_sources(2, 1, subfault)
+      depth0 = point_sources(3, 1, subfault)
+      write(13,*) lon0, lat0, depth0
       subfault = cum_subfaults(segment)
       subfault = subfault + (nys_sub(segment)-1)*nxs_sub(segment) + 1
       psource = (ny_p-1)*nx_p + 1
-      write(13,*) point_sources(2, psource, subfault),  &
-     &  point_sources(1, psource, subfault),  &
-     &  point_sources(3, psource, subfault) 
+      lat0 = point_sources(1, psource, subfault)
+      lon0 = point_sources(2, psource, subfault)
+      depth0 = point_sources(3, psource, subfault)
+      write(13,*) lon0, lat0, depth0 
       subfault = cum_subfaults(segment)
       subfault = subfault + nxs_sub(segment)*nys_sub(segment)
       psource = nx_p*ny_p
-      write(13,*) &
-     &  point_sources(2, psource, subfault), &
-     &  point_sources(1, psource, subfault), &
-     &  point_sources(3, psource, subfault)
+      lat0 = point_sources(1, psource, subfault)
+      lon0 = point_sources(2, psource, subfault)
+      depth0 = point_sources(3, psource, subfault)
+      write(13,*) lon0, lat0, depth0
       subfault = cum_subfaults(segment) + nxs_sub(segment)
       psource = nx_p
-      write(13,*) point_sources(2, psource, subfault), &
-     &  point_sources(1, psource, subfault), &
-     &  point_sources(3, psource, subfault)
+      lat0 = point_sources(1, psource, subfault)
+      lon0 = point_sources(2, psource, subfault)
+      depth0 = point_sources(3, psource, subfault)
+      write(13,*) lon0, lat0, depth0
       subfault = cum_subfaults(segment) + 1
-      write(13,*) point_sources(2, 1, subfault),  &
-     &  point_sources(1, 1, subfault), point_sources(3, 1, subfault)
+      lat0 = point_sources(1, 1, subfault)
+      lon0 = point_sources(2, 1, subfault)
+      depth0 = point_sources(3, 1, subfault)
+      write(13,*) lon0, lat0, depth0
       write(13,*)'#Lat. Lon. depth slip rake strike dip t_rup t_ris t_fal mo'
       ix = int(nx_p / 2) + 1
       iy = int(ny_p / 2) + 1
@@ -244,8 +250,10 @@ contains
             t_ref = point_sources(5, psource, subfault)
             t_ref = min(t_ref, t_latest)
             moment_sol = slip(subfault) * shear(subfault) * dxs * dys * (1e10)
-            write(13, 133) point_sources(1, 1, subfault), &
-         &  point_sources(2, 1, subfault), point_sources(3, 1, subfault), &
+            lat0 = point_sources(1, 1, subfault)
+            lon0 = point_sources(2, 1, subfault)
+            depth0 = point_sources(3, 1, subfault)
+            write(13, 133) lat0, lon0, depth0, &
          &  slip(subfault), rake(subfault), strike(segment), dip(segment), &
          &  rupt_time(subfault) + t_ref + delay_seg(segment), trise(subfault), &
          &  tfall(subfault), moment_sol
@@ -257,8 +265,10 @@ contains
             t_ref = point_sources(5, psource, subfault)
             t_ref = min(t_ref, t_latest)
             moment_sol = slip(subfault) * shear(subfault) * dxs * dys * (1e10)
-            write(13, 133) point_sources(1, 1, subfault), &
-         &  point_sources(2, 1, subfault), point_sources(3, 1, subfault), &
+            lat0 = point_sources(1, 1, subfault)
+            lon0 = point_sources(2, 1, subfault)
+            depth0 = point_sources(3, 1, subfault)
+            write(13, 133) lat0, lon0, depth0, &
          &  slip(subfault), rake(subfault), strike(segment), dip(segment), &
          &  0.0, 0.0, 0.0, moment_sol
          end do
@@ -521,7 +531,7 @@ contains
    close(17)
 
    do k = 1, parameters
-      beg(k) = model_boundary(k, 1)
+      minimum(k) = model_boundary(k, 1)
       np(k) = int(model_boundary(k, 3) + 0.1)
       if (np(k) .gt. 1) then
          dp(k) = (model_boundary(k, 2)-model_boundary(k, 1))/(np(k)-1)
@@ -553,10 +563,10 @@ contains
       subfault0 = subfault0+subfault1!ixs+(iys-1)*nxs_sub(segment)
       np(4*(subfault0-1)+1) = 2
       dp(4*(subfault0-1)+1) = 10
-      beg(4*(subfault0-1)+1) = 1
-!      dd(subfault1, segment) = beg(4*(subfault0-1)+1)
+      minimum(4*(subfault0-1)+1) = 1
+!      dd(subfault1, segment) = minimum(4*(subfault0-1)+1)
       np(4*(subfault0-1)+2) = 2
-!      aa(subfault1, segment) = beg(4*(subfault0-1)+2)
+!      aa(subfault1, segment) = minimum(4*(subfault0-1)+2)
       np(4*(subfault0-1)+3) = 2
       np(4*(subfault0-1)+4) = 2
    end do
@@ -765,25 +775,25 @@ contains
    end subroutine get_subfaults
    
 
-   subroutine get_space(time_min0, time_max0, time_ref0, beg0, dp0, np0)
+   subroutine get_space(time_min0, time_max0, time_ref0, minimum0, dp0, np0)
 !
 !  Args:
 !  time_min0: minimum allowed time of rupture initiation at each subfault
 !  time_max0: maximum allowed time of rupture initiation at each subfault
 !  time_ref0: reference time of rupture initiation at each subfault
-!  beg0: minimum value of slip and rake at each subfault
+!  minimum0: minimum value of slip and rake at each subfault
 !  dp0: delta slip and delta rake at each subfault
 !  np0: allowed amount of options for slip and rake values at each subfault
 !  
    implicit none
    real :: time_min0(max_subfaults), time_max0(max_subfaults)
    real :: time_ref0(max_subfaults)
-   real :: beg0(max_subfaults2), dp0(max_subfaults2)
+   real :: minimum0(max_subfaults2), dp0(max_subfaults2)
    integer :: np0(max_subfaults2)
    time_min0(:) = time_min(:)
    time_max0(:) = time_max(:)
    time_ref0(:) = time_ref(:)
-   beg0(:) = beg(:)
+   minimum0(:) = minimum(:)
    dp0(:) = dp(:)
    np0(:) = np(:)
    end subroutine get_space
