@@ -2,13 +2,24 @@
 """
 The routines here calcaulte the shakemap polygon from the FFM 
 """
+from typing import Tuple, Union
+
 import numpy as np
 from pyproj import Geod
 
 geod = Geod(ellps="WGS84")
 
 
-def equivalent_slip_length(slip_array, subfault_len):
+def equivalent_slip_length(slip_array: np.ndarray, subfault_len: int) -> int:
+    """Get the length of the equivalent slip
+
+    :param slip_array: The array of slip
+    :type slip_array: np.ndarray
+    :param subfault_len: The length of subfaults
+    :type subfault_len: int
+    :return: The length of equivalent slip
+    :rtype: int
+    """
     ### ALONG STRIKE AUTOCORRELATION ###
     autocorr = np.zeros(len(slip_array))
     for i in range(len(slip_array)):
@@ -39,7 +50,20 @@ def equivalent_slip_length(slip_array, subfault_len):
     return equivalent_len
 
 
-def locate_equivalent_slip(slip_array, subfault_len, eq_len):
+def locate_equivalent_slip(
+    slip_array: np.ndarray, subfault_len: int, eq_len: int
+) -> float:
+    """Locate the left edge of the equivalent slip
+
+    :param slip_array: The array of slip
+    :type slip_array: np.ndarray
+    :param subfault_len: The length of subfaults
+    :type subfault_len: int
+    :param eq_len: The length of the equivalent slip
+    :type eq_len: int
+    :return: the location of the equivalent slip
+    :rtype: float
+    """
     num_subfaults = eq_len / subfault_len
     num_subfaults = int(round(num_subfaults, 0))
     excess_len = eq_len - (num_subfaults * subfault_len)
@@ -50,7 +74,7 @@ def locate_equivalent_slip(slip_array, subfault_len, eq_len):
         if total_slip > max_slip:
             max_slip = total_slip
             left_edge_ind = edge_location
-    left_edge = left_edge_ind * subfault_len
+    left_edge: Union[float, int] = left_edge_ind * subfault_len
     left_edge = left_edge - (excess_len / 2)
     left_edge = left_edge - (subfault_len / 2)
 
@@ -58,8 +82,15 @@ def locate_equivalent_slip(slip_array, subfault_len, eq_len):
 
 
 def translate_xy_to_latlondep(
-    segment, hyp_lon, hyp_lat, hyp_dep, eq_len_AS, eq_len_AD, left_edge_AS, left_edge_AD
-):
+    segment: dict,
+    hyp_lon: float,
+    hyp_lat: float,
+    hyp_dep: float,
+    eq_len_AS: int,
+    eq_len_AD: int,
+    left_edge_AS: float,
+    left_edge_AD: float,
+) -> Tuple[str, str, str, str]:
     strk = segment["strike"]
     dip = segment["dip"]
     ### calculate upper and lower latitudes at same along-strike location as hypocenter###
