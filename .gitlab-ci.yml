@@ -147,6 +147,8 @@ Docker Deploy:
       if [[ ${TARGET} == "dependencies" ]]; then
         ARGS+=("--target" "${TARGET}");
         BUILD="-dependencies";
+      else
+        ARGS+=("--target" "${TARGET}");
       fi
     - echo "BUILD= ${BUILD}"
     - echo "TARGET= ${TARGET}"
