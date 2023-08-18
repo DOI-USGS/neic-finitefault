@@ -16,8 +16,8 @@ module model_parameters
    real :: time_min(max_subfaults), time_max(max_subfaults), rake_min
    real :: time_ref(max_subfaults)
    integer :: windows
-   real :: minimum(max_subfaults2), dp(max_subfaults2)
-   integer :: np(max_subfaults2)
+   real :: minimum(max_subfaults2), delta(max_subfaults2)
+   integer :: n_values(max_subfaults2)
    integer :: subfaults, cum_subfaults(max_seg)
    logical :: segment_in_event(max_seg, 10)
    logical :: subfault_in_event(max_subfaults, 10)
@@ -532,11 +532,11 @@ contains
 
    do k = 1, parameters
       minimum(k) = model_boundary(k, 1)
-      np(k) = int(model_boundary(k, 3) + 0.1)
-      if (np(k) .gt. 1) then
-         dp(k) = (model_boundary(k, 2)-model_boundary(k, 1))/(np(k)-1)
+      n_values(k) = int(model_boundary(k, 3) + 0.1)
+      if (n_values(k) .gt. 1) then
+         delta(k) = (model_boundary(k, 2)-model_boundary(k, 1))/(n_values(k)-1)
       else
-         dp(k) = 0
+         delta(k) = 0
       end if
    end do
    end subroutine get_model_space
@@ -561,14 +561,14 @@ contains
       subfault0 = cum_subfaults(segment)
       subfault1 = ixs+(iys-1)*nxs_sub(segment)
       subfault0 = subfault0+subfault1!ixs+(iys-1)*nxs_sub(segment)
-      np(4*(subfault0-1)+1) = 2
-      dp(4*(subfault0-1)+1) = 10
+      n_values(4*(subfault0-1)+1) = 2
+      delta(4*(subfault0-1)+1) = 10
       minimum(4*(subfault0-1)+1) = 1
 !      dd(subfault1, segment) = minimum(4*(subfault0-1)+1)
-      np(4*(subfault0-1)+2) = 2
+      n_values(4*(subfault0-1)+2) = 2
 !      aa(subfault1, segment) = minimum(4*(subfault0-1)+2)
-      np(4*(subfault0-1)+3) = 2
-      np(4*(subfault0-1)+4) = 2
+      n_values(4*(subfault0-1)+3) = 2
+      n_values(4*(subfault0-1)+4) = 2
    end do
    close(12)
    end subroutine get_special_boundaries
@@ -775,27 +775,27 @@ contains
    end subroutine get_subfaults
    
 
-   subroutine get_space(time_min0, time_max0, time_ref0, minimum0, dp0, np0)
+   subroutine get_space(time_min0, time_max0, time_ref0, minimum0, delta0, n_values0)
 !
 !  Args:
 !  time_min0: minimum allowed time of rupture initiation at each subfault
 !  time_max0: maximum allowed time of rupture initiation at each subfault
 !  time_ref0: reference time of rupture initiation at each subfault
 !  minimum0: minimum value of slip and rake at each subfault
-!  dp0: delta slip and delta rake at each subfault
-!  np0: allowed amount of options for slip and rake values at each subfault
+!  delta0: delta slip and delta rake at each subfault
+!  n_valuesp0: allowed amount of options for slip and rake values at each subfault
 !  
    implicit none
    real :: time_min0(max_subfaults), time_max0(max_subfaults)
    real :: time_ref0(max_subfaults)
-   real :: minimum0(max_subfaults2), dp0(max_subfaults2)
-   integer :: np0(max_subfaults2)
+   real :: minimum0(max_subfaults2), delta0(max_subfaults2)
+   integer :: n_values0(max_subfaults2)
    time_min0(:) = time_min(:)
    time_max0(:) = time_max(:)
    time_ref0(:) = time_ref(:)
    minimum0(:) = minimum(:)
-   dp0(:) = dp(:)
-   np0(:) = np(:)
+   delta0(:) = delta(:)
+   n_values0(:) = n_values(:)
    end subroutine get_space
 
    

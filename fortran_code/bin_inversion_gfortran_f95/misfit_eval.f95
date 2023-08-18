@@ -61,7 +61,7 @@ contains
       scale_size = nlen/start_scale
       n1 = start_scale+int(t_min(channel)/scale_size)
       n2 = start_scale+int(t_max(channel)/scale_size+0.5)-1
-      if (n2 .lt. n1) n2 = n1
+      n2 = max(n1, n2)
 !  j = 1 L1 Norm
       select case (misfit_type0)
          case (1)      

@@ -29,8 +29,8 @@ module annealing
    integer, private :: threads
    integer, parameter, private :: max_move=50, accept_max=5
    integer :: segments, msou, nxs_sub(max_seg), nys_sub(max_seg), subfaults
-   real :: minimum(max_subfaults2), dp(max_subfaults2)
-   integer :: np(max_subfaults2)
+   real :: minimum(max_subfaults2), delta(max_subfaults2)
+   integer :: n_values(max_subfaults2)
    real :: time_min(max_subfaults), time_max(max_subfaults)
    real :: shear(max_subfaults), ta0, dta, dxs, dys
    integer :: max_freq, lnpt, channels
@@ -67,7 +67,7 @@ contains
    call get_shear(shear)
    call get_segments(nxs_sub, nys_sub, dip, strike, delay_seg, segments, subfaults, cum_subfaults)
    call get_subfaults(dxs, dys, nx_p, ny_p, v_min, v_max, v_ref)
-   call get_space(time_min, time_max, time_ref, minimum, dp, np)
+   call get_space(time_min, time_max, time_ref, minimum, delta, n_values)
    call get_events_segments(segment_in_event, subfault_in_event)
    end subroutine annealing_set_fault_parameters
 
@@ -121,7 +121,7 @@ contains
       parameters = parameters + 4*nxs_sub(segment)*nys_sub(segment)
    end do
    do k = 1, parameters
-      random(k) = minimum(k)+int(ran1()*np(k)-1.0)*dp(k)
+      random(k) = minimum(k)+int(ran1()*n_values(k)-1.0)*delta(k)
    end do
    if (io_re .eq. 0) then
       k = 0
@@ -618,6 +618,7 @@ contains
    do k = 1, subfaults-1
       nran = k
       do while (nran .eq. k .or. nran .gt. subfaults)
+         !call random_number(x)
          x = ran1()
          nran = int(x*(subfaults-k)+k+1)
       end do
@@ -677,21 +678,21 @@ contains
       moment0 = kahan_t
 !  
       n_accept = 0
-      npb = np(4*(subfault-1)+1)
+      npb = n_values(4*(subfault-1)+1)
       if (npb .lt. 2) exit
 !
 !  slip extreme values
 !
-      npb = np(4*(subfault-1)+1)
-      dpb = dp(4*(subfault-1)+1)
+      npb = n_values(4*(subfault-1)+1)
+      dpb = delta(4*(subfault-1)+1)
       slip_beg = minimum(4*(subfault-1)+1)
       slip_max = (npb-1)*dpb
       slip_end = slip_beg+slip_max
 !
 !  rake extreme values
 !  
-      npb = np(4*(subfault-1)+2)
-      dpb = dp(4*(subfault-1)+2)
+      npb = n_values(4*(subfault-1)+2)
+      dpb = delta(4*(subfault-1)+2)
       angle_beg = minimum(4*(subfault-1)+2)
       angle_max = (npb-1)*dpb
       angle_end = angle_beg+angle_max
@@ -809,6 +810,7 @@ contains
 !  
 !  Now, we update the kinematic model.
 !  
+         !call random_number(rand)
          rand = ran1()
          aux = exp(-diff/t)
          if (aux .gt. rand) then
@@ -974,6 +976,7 @@ contains
    do k = 1, subfaults-1
       nran = k
       do while (nran .eq. k .or. nran .gt. subfaults)
+         !call random_number(x)
          x = ran1()
          nran = int(x*(subfaults-k)+k+1)
       end do
@@ -1032,21 +1035,21 @@ contains
       moment0 = kahan_t
 !  
       n_accept = 0
-      npb = np(4*(subfault-1)+1)
+      npb = n_values(4*(subfault-1)+1)
       if (npb .lt. 2) exit
 !
 !  slip extreme values
 !
-      npb = np(4*(subfault-1)+1)
-      dpb = dp(4*(subfault-1)+1)
+      npb = n_values(4*(subfault-1)+1)
+      dpb = delta(4*(subfault-1)+1)
       slip_beg = minimum(4*(subfault-1)+1)
       slip_max = (npb-1)*dpb
       slip_end = slip_beg+slip_max
 !
 !  rake extreme values
 !  
-      npb = np(4*(subfault-1)+2)
-      dpb = dp(4*(subfault-1)+2)
+      npb = n_values(4*(subfault-1)+2)
+      dpb = delta(4*(subfault-1)+2)
       angle_beg = minimum(4*(subfault-1)+2)
       angle_max = (npb-1)*dpb
       angle_end = angle_beg+angle_max
@@ -1165,6 +1168,7 @@ contains
 !  
 !  Now, we update the kinematic model.
 !  
+         !call random_number(rand)
          rand = ran1()
          aux = exp(-diff/t)
          if (aux .gt. rand) then
@@ -1257,6 +1261,7 @@ contains
 !  
 !  Now, we update the ramp.
 !  
+            !call random_number(rand)
             rand = ran1()
             aux = exp(-diff/t)
             if (aux .gt. rand) then
@@ -1391,6 +1396,7 @@ contains
    do k = 1, subfaults-1
       nran = k
       do while (nran .eq. k .or. nran .gt. subfaults)
+         !call random_number(x)
          x = ran1()
          nran = int(x*(subfaults-k)+k+1)
       end do
@@ -1454,21 +1460,21 @@ contains
       moment_reg2 = moment_reg2 - moment_reg(event)
 !  
       n_accept = 0
-      npb = np(4*(subfault-1)+1)
+      npb = n_values(4*(subfault-1)+1)
       if (npb .lt. 2) exit
 !
 !  slip extreme values
 !
-      npb = np(4*(subfault-1)+1)
-      dpb = dp(4*(subfault-1)+1)
+      npb = n_values(4*(subfault-1)+1)
+      dpb = delta(4*(subfault-1)+1)
       slip_beg = minimum(4*(subfault-1)+1)
       slip_max = (npb-1)*dpb
       slip_end = slip_beg+slip_max
 !
 !  rake extreme values
 !  
-      npb = np(4*(subfault-1)+2)
-      dpb = dp(4*(subfault-1)+2)
+      npb = n_values(4*(subfault-1)+2)
+      dpb = delta(4*(subfault-1)+2)
       angle_beg = minimum(4*(subfault-1)+2)
       angle_max = (npb-1)*dpb
       angle_end = angle_beg+angle_max
@@ -1587,7 +1593,8 @@ contains
          diff = value1-current_value
 !  
 !  Now, we update the kinematic model.
-!  
+! 
+         !call random_number(rand) 
          rand = ran1()
          aux = exp(-diff/t)
          if (aux .gt. rand) then
@@ -1776,6 +1783,7 @@ contains
    do k = 1, subfaults-1
       nran = k
       do while (nran .eq. k .or. nran .gt. subfaults)
+         !call random_number(x)
          x = ran1()
          nran = int(x*(subfaults-k)+k+1)
       end do
@@ -1838,21 +1846,21 @@ contains
       moment_reg2 = moment_reg2 - moment_reg(event)
 !  
       n_accept = 0
-      npb = np(4*(subfault-1)+1)
+      npb = n_values(4*(subfault-1)+1)
       if (npb .lt. 2) exit
 !
 !  slip extreme values
 !
-      npb = np(4*(subfault-1)+1)
-      dpb = dp(4*(subfault-1)+1)
+      npb = n_values(4*(subfault-1)+1)
+      dpb = delta(4*(subfault-1)+1)
       slip_beg = minimum(4*(subfault-1)+1)
       slip_max = (npb-1)*dpb
       slip_end = slip_beg+slip_max
 !
 !  rake extreme values
 !  
-      npb = np(4*(subfault-1)+2)
-      dpb = dp(4*(subfault-1)+2)
+      npb = n_values(4*(subfault-1)+2)
+      dpb = delta(4*(subfault-1)+2)
       angle_beg = minimum(4*(subfault-1)+2)
       angle_max = (npb-1)*dpb
       angle_end = angle_beg+angle_max
@@ -1972,7 +1980,8 @@ contains
          diff = value1-current_value
 !  
 !  Now, we update the kinematic model.
-!  
+! 
+         !call random_number(rand) 
          rand = ran1()
          aux = exp(-diff/t)
          if (aux .gt. rand) then
@@ -2072,7 +2081,8 @@ contains
             diff = insar_misfit-insar_misfit0
 !  
 !  Now, we update the ramp.
-!  
+! 
+            !call random_number(rand) 
             rand = ran1()
             aux = exp(-diff/t)
             if (aux .gt. rand) then
