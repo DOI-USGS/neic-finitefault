@@ -226,6 +226,10 @@ def test__plot_vel_model():
         shutil.rmtree(tempdir)
 
 
+@pytest.mark.skipif(
+    os.getenv("CI_REGISTRY") is not None,
+    reason="Build runner does not have the resources to run",
+)
 def test__PlotComparisonMap():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -258,10 +262,6 @@ def test___PlotCumulativeSlip():
         shutil.rmtree(tempdir)
 
 
-@pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None,
-    reason="Build runner does not have the resources to run",
-)
 def test__PlotInsar():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
