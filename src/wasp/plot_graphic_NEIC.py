@@ -21,9 +21,9 @@ import matplotlib  # type: ignore
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
 import pygmt  # type: ignore
+from matplotlib import ticker  # type: ignore
 from matplotlib import cm, colors, gridspec  # type: ignore
 from matplotlib import pyplot as plt
-from matplotlib import ticker
 from matplotlib.colors import ListedColormap  # type: ignore
 from matplotlib.image import AxesImage  # type: ignore
 from obspy.imaging.beachball import beach, beachball  # type: ignore
@@ -852,7 +852,6 @@ def _PlotSlipTimes(
         rupt_vel[idx0] = vrup_ref
         idx10 = np.where(slip_seg > 0.05 * max_slip)  # type:ignore
         mean_vrup = np.mean(rupt_vel[idx10].flatten())
-        ## failed attempt to do a subfault-by-subfault vrup calculation. maybe later...
         contplot = ax2.contour(
             XCOLS,
             YROWS,
@@ -2846,7 +2845,7 @@ def _plot_waveforms(
     :type type_str: str
     :param start_margin: Where to start, defaults to 10
     :type start_margin: int, optional
-    :param forward: whether model is result of kinematic modelling or not,
+    :param forward: Whether model is result of kinematic modelling or not,
                     defaults to False
     :type forward: bool, optional
     :param directory: Where to write the files, defaults to pathlib.Path()
