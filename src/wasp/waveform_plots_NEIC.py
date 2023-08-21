@@ -289,7 +289,7 @@ def add_metadata(
 
 def plot_waveform_fits(
     files: List[dict],
-    components: List[str],
+    components: list,
     type_str: str,
     start_margin: int = 10,
     plot_directory: Union[pathlib.Path, str] = pathlib.Path(),
@@ -299,7 +299,7 @@ def plot_waveform_fits(
     :param files: Waveform files to plot
     :type files: List[dict]
     :param components: Components (channels) of data selected for plotting
-    :type components: List[str]
+    :type components: list
     :param type_str: Data type of given waveform files
     :type type_str: str
     :param start_margin: Start margin of data for plotting, defaults to 10
