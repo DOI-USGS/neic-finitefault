@@ -6,11 +6,13 @@
 import datetime
 import json
 import os
+import pathlib
+from typing import List, Tuple, Union
 
 import numpy as np
-import pandas as pd
-from obspy.geodetics import flinnengdahl
-from pyproj import Geod
+import pandas as pd  # type:ignore
+from obspy.geodetics import flinnengdahl  # type:ignore
+from pyproj import Geod  # type:ignore
 
 import wasp.fault_plane as pf
 import wasp.plane_management as pl_mng
@@ -18,20 +20,30 @@ import wasp.seismic_tensor as tensor
 from wasp import get_outputs
 
 
-def static_to_srf(tensor_info, segments_data, used_data, vel_model, solution):
+def static_to_srf(
+    tensor_info: dict,
+    segments_data: dict,
+    used_data: List[str],
+    vel_model: dict,
+    solution: dict,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+):
     """Write SRF file with the solution of FFM modelling from file Solucion.txt
 
-    :param tensor_info: dictionary with moment tensor information
-    :param segments_data: list of dictionaries with properties of fault segments
-    :param used_data: list with data types to be used in modelling
-    :param solution: dictionary with output kinematic model properties
-    :param vel_model: dictionary with velocity model properties
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
-    :type segments_data: list
-    :type used_data: list
-    :type solution: dict
+    :param segments_data: The fault segments data
+    :type segments_data: dict
+    :param used_data: The data types used in modelling
+    :type used_data: List[str]
+    :param vel_model: The velocity model parameters
     :type vel_model: dict
+    :param solution: The solution
+    :type solution: dict
+    :param directory: Where to read/write files, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
     """
+    directory = pathlib.Path(directory)
     print("Writing SRF file output")
     locator = flinnengdahl.FlinnEngdahl()
     segments = segments_data["segments"]
@@ -85,7 +97,7 @@ def static_to_srf(tensor_info, segments_data, used_data, vel_model, solution):
     strong_phimx = 0
     strong_r = 0
     if "strong_motion" in used_data:
-        strong_data = pd.read_json("strong_motion_waves.json")
+        strong_data = pd.read_json(directory / "strong_motion_waves.json")
         quantity_strong = int(
             len(strong_data) / 3
         )  # divide by 3 for number of stations rather than number of channels
@@ -97,7 +109,7 @@ def static_to_srf(tensor_info, segments_data, used_data, vel_model, solution):
     cgps_phimx = 0
     cgps_r = 0
     if "cgps" in used_data:
-        cgps_data = pd.read_json("cgps_waves.json")
+        cgps_data = pd.read_json(directory / "cgps_waves.json")
         quantity_cgps = int(len(cgps_data) / 3)
         cgps_r = min(cgps_data["distance"])
         cgps_az = np.sort(cgps_data["azimuth"].values.tolist())
@@ -107,7 +119,7 @@ def static_to_srf(tensor_info, segments_data, used_data, vel_model, solution):
     gps_phimx = 0
     gps_r = 0
     if "gps" in used_data:
-        gps_data = pd.read_json("static_data.json")
+        gps_data = pd.read_json(directory / "static_data.json")
         quantity_gps = len(gps_data)
         gps_r = min(gps_data["distance"])
         gps_az = np.sort(gps_data["azimuth"].values.tolist())
@@ -117,7 +129,7 @@ def static_to_srf(tensor_info, segments_data, used_data, vel_model, solution):
     tele_phimx = 0
     tele_r = 0
     if "tele_body" in used_data:
-        tele_data = pd.read_json("tele_waves.json")
+        tele_data = pd.read_json(directory / "tele_waves.json")
         quantity_tele = len(tele_data)
         tele_r = min(tele_data["distance"])
         tele_az = np.sort(tele_data["azimuth"].values.tolist())
@@ -127,7 +139,7 @@ def static_to_srf(tensor_info, segments_data, used_data, vel_model, solution):
     surf_phimx = 0
     surf_r = 0
     if "surf_tele" in used_data:
-        surf_data = pd.read_json("surf_waves.json")
+        surf_data = pd.read_json(directory / "surf_waves.json")
         quantity_surf = len(surf_data)
         surf_r = min(surf_data["distance"])
         surf_az = np.sort(surf_data["azimuth"].values.tolist())
@@ -137,21 +149,21 @@ def static_to_srf(tensor_info, segments_data, used_data, vel_model, solution):
     quantity_insar_points = 0
     insar_r = 0
     if "insar" in used_data:
-        insar_data = pd.read_json("insar_data.json")
+        insar_data = pd.read_json(directory / "insar_data.json")
         if "ascending" in insar_data:
             asc_insar = len(insar_data["ascending"])
             quantity_insar_scenes += asc_insar
         if "descending" in insar_data:
             desc_insar = len(insar_data["descending"])
             quantity_insar_scenes += desc_insar
-        with open("insar_data.txt") as f:
+        with open(directory / "insar_data.txt") as f:
             first_line = f.readline().strip("\n")
             quantity_insar_points = int(first_line)
     quantity_dart = 0
     dart_phimx = 0
     dart_r = 0
     if "dart" in used_data:
-        dart_data = pd.read_json("dart_data.json")
+        dart_data = pd.read_json(directory / "dart_data.json")
         quantity_dart = len(dart_data)
         dart_r = min(dart_data["distance"])
         dart_az = np.sort(dart_data["azimuth"].values.tolist())
@@ -182,7 +194,7 @@ def static_to_srf(tensor_info, segments_data, used_data, vel_model, solution):
         moment,
     )
 
-    with open("srf_sol_file.txt", "w") as outfile:
+    with open(directory / "srf_sol_file.txt", "w") as outfile:
         outfile.write("2.0\n")
 
         outfile.write(
@@ -212,14 +224,9 @@ def static_to_srf(tensor_info, segments_data, used_data, vel_model, solution):
         )
         outfile.write(
             "# Rmin :\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t--\t{:.2f}\t0.0\t0.0\t0.0\n".format(
-                tele_r, surf_r, strong_r, cgps_r, gps_r, insar_r, dart_r
+                tele_r, surf_r, strong_r, cgps_r, gps_r, insar_r, dart_r  # type:ignore
             )
         )
-
-        # outfile.write('#\n# Data : SGM TELE TRIL LEVEL GPS cGPS INSAR SURF OTHER\n')
-        # outfile.write('# Data : {} {} 0 0 {} {} 0 {} '\
-        #    '0\n'.format(quantity_strong, quantity_tele, quantity_gps, quantity_cgps,
-        #                 quantity_surf))
 
         outfile.write("#{}FINITE-SOURCE RUPTURE " "MODEL{}\n#\n".format(string, string))
         outfile.write("# Event : {} {} NEIC\n".format(location, date))
@@ -327,8 +334,6 @@ def static_to_srf(tensor_info, segments_data, used_data, vel_model, solution):
             moment,
         )
         stf_dt = 1  # seconds
-        #        vs = 2.80000e+05    #Default value for not known
-        #        density = 2.70000e+00 #default value for not known
         vs = -1  # if not known
         density = -1  # if not known
         for i_segment, fault_segment_data in enumerate(zipped2):
@@ -421,17 +426,35 @@ def static_to_srf(tensor_info, segments_data, used_data, vel_model, solution):
                         outfile.write(
                             "%s%.6e%s" % (pre_white_space, stf[kstf], white_space)
                         )
-    outfile.close()
 
 
 def build_source_time_function(
-    t_ris, t_fal, dt, total_time, scale=True, scale_value=1.0
-):
-    """
-    Compute source time function for a given rise time
+    t_ris: np.ndarray,
+    t_fal: np.ndarray,
+    dt: float,
+    total_time: int,
+    scale: bool = True,
+    scale_value: float = 1.0,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Compute source time function for a given rise time
+
+    :param t_ris: The rise time
+    :type t_ris: np.ndarray
+    :param t_fal: The fall time
+    :type t_fal: np.ndarray
+    :param dt: _description_
+    :type dt: float
+    :param total_time: The total time
+    :type total_time: int
+    :param scale: Whether to scale, defaults to True
+    :type scale: bool, optional
+    :param scale_value: The scale value, defaults to 1.0
+    :type scale_value: float, optional
+    :return: Time and Mdot arrays
+    :rtype: Tuple[np.ndarray, np.ndarray]
     """
     from numpy import arange, cos, exp, isnan, pi, roll, sin, where, zeros
-    from scipy.integrate import trapz
+    from scipy.integrate import trapz  # type:ignore
 
     # Initialize outputs
     t = arange(0, total_time + dt, dt)
@@ -464,7 +487,7 @@ def build_source_time_function(
     # Check for errors
     if isnan(Mdot[0]) == True:
         print("ERROR: whoops, STF has nan values!")
-        return
+        return  # type:ignore
 
     return t, Mdot
 
@@ -473,7 +496,7 @@ if __name__ == "__main__":
     import argparse
     import errno
 
-    import manage_parser as mp
+    import wasp.manage_parser as mp
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
