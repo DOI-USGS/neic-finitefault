@@ -46,8 +46,8 @@ contains
 !  many_events: True if modelling more than a single earthquake, False otherwise
 !
    implicit none
-   integer k, j, segment, channel, no, i
-   integer iys, ixs, n_tt, subfault, event
+   integer k, j, segment, channel, i
+   integer iys, ixs, int1, subfault, event
    real slip(:), rake(:)
    real :: cosal, sinal, angle
    real*8 :: disp
@@ -61,7 +61,7 @@ contains
       read(9,*) n_chan
       read(9,*)
       do i = 1, n_chan
-         read(9,*) no, sta_name(i), lat(i), lon(i), (obse(i, k), k = 1, 3), (weight(i, k), k = 1, 3)
+         read(9,*) int1, sta_name(i), lat(i), lon(i), (obse(i, k), k = 1, 3), (weight(i, k), k = 1, 3)
          do k = 1, 3
             weight_sum = weight_sum + weight(i, k)
          end do
@@ -80,7 +80,7 @@ contains
       endif
 
       open(33, file='Green_static_subfault.txt', status='old')
-      read(33,*) n_tt
+      read(33,*) int1
       do channel = 1, n_chan
          if (many_events) event = event_sta(channel)
          read(33,*)

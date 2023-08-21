@@ -171,10 +171,10 @@ contains
    real :: slip(:), rake(:), rupt_time(:)
    real :: t_rise(:), t_fall(:)
    real amp, moment, moment_reg, dt, value1, slip_reg, gps_misfit, insar_misfit, &
-      & time_reg, forward_real3(wave_pts2, max_stations), a, b, &
+      & time_reg, forward_real3(wave_pts2, max_stations), slip_dip, slip_stk, &
       & forward_imag3(wave_pts2, max_stations), real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2)
    real :: rake2, delta_freq, delta_freq0, moment0, kahan_y, kahan_t, kahan_c
-   real*8 :: omega, misfit2, ex
+   real*8 :: shift, misfit2, misfit1
    integer :: i, segment, channel, isl, isr, jf, k, subfault, used_data
    complex*16 :: z0, forward(wave_pts), z, z1
    logical :: static, get_coeff, insar
@@ -205,16 +205,16 @@ contains
       end do
       do subfault = 1, subfaults
          rake2 = rake(subfault)*dpi
-         a = sin(rake2)*slip(subfault)
-         b = cos(rake2)*slip(subfault)
+         slip_dip = sin(rake2)*slip(subfault)
+         slip_stk = cos(rake2)*slip(subfault)
          isl = int((t_rise(subfault)-ta0)/dta+0.5)+1
          isr = int((t_fall(subfault)-ta0)/dta+0.5)+1
-         omega = -twopi*delta_freq*rupt_time(subfault)
-         z1 = cmplx(cos(omega), sin(omega), double)
+         shift = -twopi*delta_freq*rupt_time(subfault)
+         z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
          do i = 1, max_freq
             forward(i) = forward(i) &
-         &  +(a*green_dip(i, channel, subfault)+b*green_stk(i, channel, subfault)) &
+         &  +(slip_dip*green_dip(i, channel, subfault)+slip_stk*green_stk(i, channel, subfault)) &
          &  *source(i, channel, isl, isr)*z
             z = z*z1
          end do
@@ -227,8 +227,8 @@ contains
          imag1(i) = forward_imag3(i, channel)
       end do
       call wavelet_syn(real1, imag1, coeffs_syn)
-      call misfit_channel(channel, coeffs_syn, ex)
-      misfit2 = misfit2 + ex
+      call misfit_channel(channel, coeffs_syn, misfit1)
+      misfit2 = misfit2 + misfit1
    end do
 
    amp = 1.0
@@ -351,10 +351,10 @@ contains
    real :: slip(:), rake(:), rupt_time(:)
    real :: t_rise(:), t_fall(:)
    real amp, moment, moment_reg(10), moment_reg2, dt, value1, slip_reg, gps_misfit, insar_misfit, &
-      & time_reg, forward_real3(wave_pts2, max_stations), a, b, &
+      & time_reg, forward_real3(wave_pts2, max_stations), slip_dip, slip_stk, &
       & forward_imag3(wave_pts2, max_stations), real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2)
    real :: rake2, delta_freq, delta_freq0, moment0(10), kahan_y, kahan_t, kahan_c
-   real*8 :: omega, misfit2, ex
+   real*8 :: shift, misfit2, misfit1
    integer :: i, segment, channel, isl, isr, jf, k, subfault, used_data
    complex*16 :: z0, forward(wave_pts), z, z1
    logical :: static, get_coeff, insar
@@ -385,16 +385,16 @@ contains
       end do
       do subfault = 1, subfaults
          rake2 = rake(subfault)*dpi
-         a = sin(rake2)*slip(subfault)
-         b = cos(rake2)*slip(subfault)
+         slip_dip = sin(rake2)*slip(subfault)
+         slip_stk = cos(rake2)*slip(subfault)
          isl = int((t_rise(subfault)-ta0)/dta+0.5)+1
          isr = int((t_fall(subfault)-ta0)/dta+0.5)+1
-         omega = -twopi*delta_freq*rupt_time(subfault)
-         z1 = cmplx(cos(omega), sin(omega), double)
+         shift = -twopi*delta_freq*rupt_time(subfault)
+         z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
          do i = 1, max_freq
             forward(i) = forward(i) &
-         &  +(a*green_dip(i, channel, subfault)+b*green_stk(i, channel, subfault)) &
+         &  +(slip_dip*green_dip(i, channel, subfault)+slip_stk*green_stk(i, channel, subfault)) &
          &  *source(i, channel, isl, isr)*z
             z = z*z1
          end do
@@ -407,8 +407,8 @@ contains
          imag1(i) = forward_imag3(i, channel)
       end do
       call wavelet_syn(real1, imag1, coeffs_syn)
-      call misfit_channel(channel, coeffs_syn, ex)
-      misfit2 = misfit2 + ex
+      call misfit_channel(channel, coeffs_syn, misfit1)
+      misfit2 = misfit2 + misfit1
    end do
 
    amp = 1.0
@@ -540,16 +540,16 @@ contains
    & nbb, i, k, npb, nn, nran, subfault_seg, segment, channel, subfault, &
    & n_total, j
 !   real, allocatable :: forward_real(:, :), forward_imag(:, :)
-   real :: duse, ause, vuse, &
-   & diff, rand, c, aux, dpb, amp, moment_reg, value1, gps_misfit, &
-   & moment, d_sub, a_sub, slip_reg, a, b, moment0, &
-   & time_reg, t_save, a_save, d_save, x, kahan_y, kahan_t, kahan_c, &
-   & l_save, r_save, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
+   real :: slip1, rake1, rupt_time1, &
+   & diff, random0, aux, dpb, amp, moment_reg, value1, gps_misfit, &
+   & moment, slip_reg, slip_dip, slip_stk, moment0, &
+   & time_reg, rupt_time0, rake0, slip0, kahan_y, kahan_t, kahan_c, &
+   & trise0, tfall0, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
    & slip_beg, slip_max, slip_end, angle_beg, angle_end, angle_max, &
    & rupt_beg, rupt_end, rupt_max, rise_time_beg, rise_time_end, rise_time_max
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
    real :: delta_freq0, delta_freq, rake2!, ex!, misfit2
-   real*8 :: omega, misfit2, ex
+   real*8 :: shift, misfit2, misfit1
    complex :: green_subf
    complex*16 :: z, z1, forward(wave_pts), z0
 
@@ -569,18 +569,18 @@ contains
       forward(:) = z0
       do subfault = 1, subfaults
          rake2 = rake(subfault)*dpi
-         a = sin(rake2)*slip(subfault)
-         b = cos(rake2)*slip(subfault)
+         slip_dip = sin(rake2)*slip(subfault)
+         slip_stk = cos(rake2)*slip(subfault)
          isl = int((t_rise(subfault)-ta0)/dta+0.5)+1
          isr = int((t_fall(subfault)-ta0)/dta+0.5)+1
-         omega = -twopi*delta_freq*rupt_time(subfault)
-         z1 = cmplx(cos(omega), sin(omega), double)
+         shift = -twopi*delta_freq*rupt_time(subfault)
+         z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
          do i = 1, max_freq
-!            omega = -twopi*delta_freq*rupt_time(subfault)*(i-1)
-!            z = cmplx(cos(omega), sin(omega))
+!            shift = -twopi*delta_freq*rupt_time(subfault)*(i-1)
+!            z = cmplx(cos(shift), sin(shift))
             forward(i) = forward(i) &
-            & +(a*green_dip(i, channel, subfault)+b*green_stk(i, channel, subfault)) &
+            & +(slip_dip*green_dip(i, channel, subfault)+slip_stk*green_stk(i, channel, subfault)) &
             & *source(i, channel, isl, isr)*z
             z = z*z1    ! we may need to increase numerical precision
          end do
@@ -619,8 +619,8 @@ contains
       nran = k
       do while (nran .eq. k .or. nran .gt. subfaults)
          !call random_number(x)
-         x = ran1()
-         nran = int(x*(subfaults-k)+k+1)
+         random0 = ran1()
+         nran = int(random0*(subfaults-k)+k+1)
       end do
       nbb = n_subfault(nran)
       nn = n_subfault(k)
@@ -643,24 +643,29 @@ contains
       do i = 1, segment-1
          subfault_seg = subfault_seg-subfaults_segment(i)
       end do
-      isl = int((t_rise(subfault)-ta0)/dta+0.5)+1
-      isr = int((t_fall(subfault)-ta0)/dta+0.5)+1
-      rake2 = rake(subfault)*dpi
-      a = sin(rake2)*slip(subfault)
-      b = cos(rake2)*slip(subfault)
+      rupt_time0 = rupt_time(subfault)
+      slip0 = slip(subfault)
+      rake0 = rake(subfault)
+      trise0 = t_rise(subfault)
+      tfall0 = t_fall(subfault)
+      isl = int((trise0-ta0)/dta+0.5)+1
+      isr = int((tfall0-ta0)/dta+0.5)+1
+      rake2 = rake0*dpi
+      slip_dip = sin(rake2)*slip0
+      slip_stk = cos(rake2)*slip0
 !
 !  make up unchange graph
 !
       do channel = 1, channels
          delta_freq = delta_freq0/dt_channel(channel)
-         omega = -twopi*delta_freq*rupt_time(subfault)
-         z1 = cmplx(cos(omega), sin(omega), double)
+         shift = -twopi*delta_freq*rupt_time0
+         z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
          do i = 1, max_freq
-!            omega = -twopi*delta_freq*(i-1)*rupt_time(subfault)
-!            z = cmplx(cos(omega), sin(omega))
+!            shift = -twopi*delta_freq*(i-1)*rupt_time(subfault)
+!            z = cmplx(cos(shift), sin(shift))
             green_subf = &
-            & (a*green_dip(i, channel, subfault)+b*green_stk(i, channel, subfault))* &
+            & (slip_dip*green_dip(i, channel, subfault)+slip_stk*green_stk(i, channel, subfault))* &
             & source(i, channel, isl, isr)*z
 !            forward_real(i, channel) = forward_real(i, channel)-real(green_subf)
 !            forward_imag(i, channel) = forward_imag(i, channel)-aimag(green_subf)
@@ -672,7 +677,7 @@ contains
          end do
       end do
 !      moment0 = moment0-slip(subfault_seg, segment)*shear(subfault_seg, segment)
-      kahan_y = -slip(subfault)*shear(subfault)-kahan_c 
+      kahan_y = -slip0*shear(subfault)-kahan_c 
       kahan_t = moment0+kahan_y
       kahan_c = (kahan_t-moment0)-kahan_y
       moment0 = kahan_t
@@ -712,83 +717,83 @@ contains
 !
 !       Save values before the perturbation
 !
-         t_save = rupt_time(subfault)
-         d_save = slip(subfault)
-         a_save = rake(subfault)
-         l_save = t_rise(subfault)
-         r_save = t_fall(subfault)
+         rupt_time0 = rupt_time(subfault)
+         slip0 = slip(subfault)
+         rake0 = rake(subfault)
+         trise0 = t_rise(subfault)
+         tfall0 = t_fall(subfault)
 !
 !  Perturb the slip
 !
-         duse = slip_beg - 1.
-         do while ((duse .le. slip_beg) .or. (duse .ge. slip_end))
-            call cauchy(t, c)                           
-            duse = d_save+c*slip_max
+         slip1 = slip_beg - 1.
+         do while ((slip1 .le. slip_beg) .or. (slip1 .ge. slip_end))
+            call cauchy(t, random0)                           
+            slip1 = slip0+random0*slip_max
          end do
 !
 !  Perturb the rake
 !
-         ause = angle_beg - 1.
-         do while ((ause .lt. angle_beg) .or. (ause .gt. angle_end))
-            call cauchy(t, c)                          
-            ause = a_save+c*angle_max
+         rake1 = angle_beg - 1.
+         do while ((rake1 .lt. angle_beg) .or. (rake1 .gt. angle_end))
+            call cauchy(t, random0)                           
+            rake1 = rake0+random0*angle_max
          end do
 ! 
 !  Perturb the rupture time.
 !
-         vuse = rupt_beg - 0.1
+         rupt_time1 = rupt_beg - 0.1
          if (rupt_max .gt. min_dt) then
-            do while ((vuse .lt. rupt_beg) .or. (vuse .gt. rupt_end))
-               call cauchy(t, c)                       
-               vuse = min_dt*int((t_save+c*rupt_max)/min_dt+0.5)     
+            do while ((rupt_time1 .lt. rupt_beg) .or. (rupt_time1 .gt. rupt_end))
+               call cauchy(t, random0)                           
+               rupt_time1 = min_dt*int((rupt_time0+random0*rupt_max)/min_dt+0.5)     
             end do
          else
-            vuse = rupt_beg
+            rupt_time1 = rupt_beg
          end if             
 !
 !  Perturb rise time parameters
 !  
          isl = 0
          do while (isl .lt. 1 .or. isl .gt. msou)
-            call cauchy(t, c)                         
-            isl = int((l_save+c*rise_time_max-ta0)/dta+0.5)+1
+            call cauchy(t, random0)                           
+            isl = int((trise0+random0*rise_time_max-ta0)/dta+0.5)+1
          end do   
          isr = 0
          do while (isr .lt. 1 .or. isr .gt. msou)
-            call cauchy(t, c)                         
-            isr = int((r_save+c*rise_time_max-ta0)/dta+0.5)+1
+            call cauchy(t, random0)                           
+            isr = int((tfall0+random0*rise_time_max-ta0)/dta+0.5)+1
          end do
          
-         rake2 = ause*dpi
-         a = duse*sin(rake2)
-         b = duse*cos(rake2)
+         rake2 = rake1*dpi
+         slip_dip = slip1*sin(rake2)
+         slip_stk = slip1*cos(rake2)
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, omega, z, z1, green_subf, real1, imag1, coeffs_syn, ex)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
-            omega = -twopi*delta_freq*vuse
-            z1 = cmplx(cos(omega), sin(omega), double) 
+            shift = -twopi*delta_freq*rupt_time1
+            z1 = cmplx(cos(shift), sin(shift), double) 
             z = cmplx(1.d0, 0.d0, double)
             do j = 1, max_freq
-!               omega = -twopi_0*delta_freq*(i-1)*vuse
-!               z = cmplx(cos(omega), sin(omega)) 
+!               shift = -twopi_0*delta_freq*(i-1)*rupt_time1
+!               z = cmplx(cos(shift), sin(shift)) 
                green_subf = &
-               & (a*green_dip(j, channel, subfault)+b*green_stk(j, channel, subfault))* &
+               & (slip_dip*green_dip(j, channel, subfault)+slip_stk*green_stk(j, channel, subfault))* &
                & source(j, channel, isl, isr)*z
                real1(j) = real(green_subf)+forward_real(j, channel)
                imag1(j) = aimag(green_subf)+forward_imag(j, channel)
                z = z*z1    ! we may need to increase numerical precision
             end do
             call wavelet_syn(real1, imag1, coeffs_syn)
-            call misfit_channel(channel, coeffs_syn, ex)     
-            misfit2 = misfit2 + ex    ! we may need to increase numerical precision
+            call misfit_channel(channel, coeffs_syn, misfit1)     
+            misfit2 = misfit2 + misfit1    ! we may need to increase numerical precision
          end do
 !$omp end do
 !$omp end parallel
-         moment0 = moment0+duse*shear(subfault)
+         moment0 = moment0+slip1*shear(subfault)
          moment = moment0*area
          moment_reg = (moment/moment_input)-1
          if(abs(moment_reg) .ge. 0.10)then
@@ -798,35 +803,35 @@ contains
          endif
 !         moment_reg = (moment/moment_input)
          amp = 1.0
-         call modify_slip_field(subfault, duse, ause)
+         call modify_slip_field(subfault, slip1, rake1)
          call slip_laplace(slip_reg)
-         rupt_time(subfault) = vuse
+         rupt_time(subfault) = rupt_time1
          call time_laplace(rupt_time, time_reg)
 
          value1 = misfit2+moment_reg*coef_moment+amp*slip_reg*coef_slip
          value1 = value1+coef_time*time_reg+coef_gps*gps_misfit
-         moment0 = moment0-duse*shear(subfault)
+         moment0 = moment0-slip1*shear(subfault)
          diff = value1-current_value
 !  
 !  Now, we update the kinematic model.
 !  
          !call random_number(rand)
-         rand = ran1()
+         random0 = ran1()
          aux = exp(-diff/t)
-         if (aux .gt. rand) then
+         if (aux .gt. random0) then
             current_value = value1
-            slip(subfault) = duse
-            rake(subfault) = ause
-            rupt_time(subfault) = vuse
+            slip(subfault) = slip1
+            rake(subfault) = rake1
+            rupt_time(subfault) = rupt_time1
             t_rise(subfault) = (isl-1)*dta+ta0
             t_fall(subfault) = (isr-1)*dta+ta0
             n_accept = n_accept+1
          else
-            rupt_time(subfault) = t_save
-            t_rise(subfault) = l_save
-            t_fall(subfault) = r_save
-            slip(subfault) = d_save
-            rake(subfault) = a_save
+            rupt_time(subfault) = rupt_time0
+            t_rise(subfault) = trise0
+            t_fall(subfault) = tfall0
+            slip(subfault) = slip0
+            rake(subfault) = rake0
          end if
          min_value = min(min_value, value1)
          if (n_accept .gt. accept_max) exit
@@ -835,25 +840,28 @@ contains
 !  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 !  finish the perturbation of subevent (segment, subfault_seg)
 !
-      rake2 = rake(subfault)*dpi
-      a = sin(rake2)*slip(subfault)
-      b = cos(rake2)*slip(subfault)
-      isl = int((t_rise(subfault)-ta0)/dta+0.5)+1
-      isr = int((t_fall(subfault)-ta0)/dta+0.5)+1
-      kahan_y = slip(subfault)*shear(subfault)-kahan_c 
+      rupt_time0 = rupt_time(subfault)
+      slip0 = slip(subfault)
+      rake0 = rake(subfault)
+      trise0 = t_rise(subfault)
+      tfall0 = t_fall(subfault)
+      rake2 = rake0*dpi
+      slip_dip = sin(rake2)*slip0
+      slip_stk = cos(rake2)*slip0
+      isl = int((trise0-ta0)/dta+0.5)+1
+      isr = int((tfall0-ta0)/dta+0.5)+1
+      kahan_y = slip0*shear(subfault)-kahan_c 
       kahan_t = moment0+kahan_y
       kahan_c = (kahan_t-moment0)-kahan_y
       moment0 = kahan_t
-      d_sub = slip(subfault)
-      a_sub = rake(subfault)
-      call modify_slip_field(subfault, d_sub, a_sub)
+      call modify_slip_field(subfault, slip0, rake0)
       do channel = 1, channels
          delta_freq = delta_freq0/dt_channel(channel)
-         omega = -twopi*delta_freq*rupt_time(subfault)
-         z1 = cmplx(cos(omega), sin(omega), double)
+         shift = -twopi*delta_freq*rupt_time0
+         z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
          do i = 1, max_freq
-            green_subf = (a*green_dip(i, channel, subfault)+b*green_stk(i, channel, subfault)) &
+            green_subf = (slip_dip*green_dip(i, channel, subfault)+slip_stk*green_stk(i, channel, subfault)) &
             &   *source(i, channel, isl, isr)*z
             forward_real2(i, channel) = forward_real2(i, channel)+real(green_subf)
             forward_imag2(i, channel) = forward_imag2(i, channel)+aimag(green_subf)
@@ -891,17 +899,17 @@ contains
    & nbb, i, k, npb, nn, nran, subfault_seg, segment, channel, subfault, &
    & n_total, j
 !   real, allocatable :: forward_real(:, :), forward_imag(:, :)
-   real :: duse, ause, vuse, &
-   & diff, rand, c, aux, dpb, amp, moment_reg, value1, gps_misfit, insar_misfit, &
-   & moment, d_sub, a_sub, slip_reg, a, b, kahan_y, kahan_c, kahan_t, &
-   & time_reg, t_save, a_save, d_save, x, moment0, &
-   & l_save, r_save, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
+   real :: slip1, rake1, rupt_time1, &
+   & diff, random0, aux, dpb, amp, moment_reg, value1, gps_misfit, insar_misfit, &
+   & moment, slip_reg, slip_dip, slip_stk, kahan_y, kahan_c, kahan_t, &
+   & time_reg, rupt_time0, rake0, slip0, moment0, &
+   & trise0, tfall0, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
    & slip_beg, slip_max, slip_end, angle_beg, angle_end, angle_max, &
    & rupt_beg, rupt_end, rupt_max, rise_time_beg, rise_time_end, rise_time_max
    real ramp_beg, ramp_end, ramp_max, ramp_use
    real*8 :: ramp0(36), ramp1(36)
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
-   real*8 :: omega, misfit2, ex
+   real*8 :: shift, misfit2, misfit1
    real :: delta_freq, delta_freq0, rake2!, ex
    complex :: green_subf
    complex*16 :: z, z1, forward(wave_pts), z0
@@ -921,16 +929,16 @@ contains
       forward(:) = z0
       do subfault = 1, subfaults
          rake2 = rake(subfault)*dpi
-         a = sin(rake2)*slip(subfault)
-         b = cos(rake2)*slip(subfault)
+         slip_dip = sin(rake2)*slip(subfault)
+         slip_stk = cos(rake2)*slip(subfault)
          isl = int((t_rise(subfault)-ta0)/dta+0.5)+1
          isr = int((t_fall(subfault)-ta0)/dta+0.5)+1
-         omega = -twopi*delta_freq*rupt_time(subfault)
-         z1 = cmplx(cos(omega), sin(omega), double)
+         shift = -twopi*delta_freq*rupt_time(subfault)
+         z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
          do i = 1, max_freq
             forward(i) = forward(i) &
-            & +(a*green_dip(i, channel, subfault)+b*green_stk(i, channel, subfault)) &
+            & +(slip_dip*green_dip(i, channel, subfault)+slip_stk*green_stk(i, channel, subfault)) &
             & *source(i, channel, isl, isr)*z
             z = z*z1    ! we may need to increase numerical precision
          end do
@@ -977,8 +985,8 @@ contains
       nran = k
       do while (nran .eq. k .or. nran .gt. subfaults)
          !call random_number(x)
-         x = ran1()
-         nran = int(x*(subfaults-k)+k+1)
+         random0 = ran1()
+         nran = int(random0*(subfaults-k)+k+1)
       end do
       nbb = n_subfault(nran)
       nn = n_subfault(k)
@@ -1001,24 +1009,27 @@ contains
       do i = 1, segment-1
          subfault_seg = subfault_seg-subfaults_segment(i)
       end do
-      d_sub = slip(subfault)
-      a_sub = rake(subfault)
-      isl = int((t_rise(subfault)-ta0)/dta+0.5)+1
-      isr = int((t_fall(subfault)-ta0)/dta+0.5)+1
-      rake2 = a_sub*dpi
-      a = sin(rake2)*d_sub
-      b = cos(rake2)*d_sub
+      rupt_time0 = rupt_time(subfault)
+      slip0 = slip(subfault)
+      rake0 = rake(subfault)
+      trise0 = t_rise(subfault)
+      tfall0 = t_fall(subfault)
+      isl = int((trise0-ta0)/dta+0.5)+1
+      isr = int((tfall0-ta0)/dta+0.5)+1
+      rake2 = rake0*dpi
+      slip_dip = sin(rake2)*slip0
+      slip_stk = cos(rake2)*slip0
 !
 !  make up unchange graph
 !
       do channel = 1, channels
          delta_freq = delta_freq0/dt_channel(channel)
-         omega = -twopi*delta_freq*rupt_time(subfault)
-         z1 = cmplx(cos(omega), sin(omega), double)
+         shift = -twopi*delta_freq*rupt_time0
+         z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
          do i = 1, max_freq
             green_subf = &
-            &  (a*green_dip(i, channel, subfault)+b*green_stk(i, channel, subfault)) &
+            &  (slip_dip*green_dip(i, channel, subfault)+slip_stk*green_stk(i, channel, subfault)) &
             &  *source(i, channel, isl, isr)*z
             forward_real2(i, channel) = forward_real2(i, channel)-real(green_subf)
             forward_imag2(i, channel) = forward_imag2(i, channel)-aimag(green_subf)
@@ -1027,8 +1038,8 @@ contains
             z = z*z1    ! we may need to increase numuerical precision
          end do
       end do
-      if (static) call static_remove_subfault(d_sub, a_sub, subfault)
-      if (insar) call insar_remove_subfault(d_sub, a_sub, subfault)
+      if (static) call static_remove_subfault(slip0, rake0, subfault)
+      if (insar) call insar_remove_subfault(slip0, rake0, subfault)
       kahan_y = -slip(subfault)*shear(subfault)-kahan_c 
       kahan_t = moment0+kahan_y
       kahan_c = (kahan_t-moment0)-kahan_y
@@ -1069,81 +1080,81 @@ contains
 !
 !       Save values before the perturbation
 !
-         t_save = rupt_time(subfault)
-         d_save = slip(subfault)
-         a_save = rake(subfault)
-         l_save = t_rise(subfault)
-         r_save = t_fall(subfault)
+         rupt_time0 = rupt_time(subfault)
+         slip0 = slip(subfault)
+         rake0 = rake(subfault)
+         trise0 = t_rise(subfault)
+         tfall0 = t_fall(subfault)
 !
 !  Perturb the slip
 !
-         duse = slip_beg - 1.
-         do while ((duse .le. slip_beg) .or. (duse .ge. slip_end))
-            call cauchy(t, c)                           
-            duse = d_save+c*slip_max
+         slip1 = slip_beg - 1.
+         do while ((slip1 .le. slip_beg) .or. (slip1 .ge. slip_end))
+            call cauchy(t, random0)                           
+            slip1 = slip0+random0*slip_max
          end do
 !
 !  Perturb the rake
 !
-         ause = angle_beg - 1.
-         do while ((ause .lt. angle_beg) .or. (ause .gt. angle_end))
-            call cauchy(t, c)                          
-            ause = a_save+c*angle_max
+         rake1 = angle_beg - 1.
+         do while ((rake1 .lt. angle_beg) .or. (rake1 .gt. angle_end))
+            call cauchy(t, random0)                           
+            rake1 = rake0+random0*angle_max
          end do
 ! 
 !  Perturb the rupture time.
 !
-         vuse = rupt_beg - 0.1
+         rupt_time1 = rupt_beg - 0.1
          if (rupt_max .gt. min_dt) then
-            do while ((vuse .lt. rupt_beg) .or. (vuse .gt. rupt_end))
-               call cauchy(t, c)                       
-               vuse = min_dt*int((t_save+c*rupt_max)/min_dt+0.5)     
+            do while ((rupt_time1 .lt. rupt_beg) .or. (rupt_time1 .gt. rupt_end))
+               call cauchy(t, random0)                           
+               rupt_time1 = min_dt*int((rupt_time0+random0*rupt_max)/min_dt+0.5)     
             end do
          else
-            vuse = rupt_beg
+            rupt_time1 = rupt_beg
          end if             
 !
 !  Perturb rise time parameters
 !  
          isl = 0
          do while (isl .lt. 1 .or. isl .gt. msou)
-            call cauchy(t, c)                         
-            isl = int((l_save+c*rise_time_max-ta0)/dta+0.5)+1
+            call cauchy(t, random0)                           
+            isl = int((trise0+random0*rise_time_max-ta0)/dta+0.5)+1
          end do   
          isr = 0
          do while (isr .lt. 1 .or. isr .gt. msou)
-            call cauchy(t, c)                         
-            isr = int((r_save+c*rise_time_max-ta0)/dta+0.5)+1
+            call cauchy(t, random0)                           
+            isr = int((tfall0+random0*rise_time_max-ta0)/dta+0.5)+1
          end do
          
-         rake2 = ause*dpi
-         a = duse*sin(rake2)
-         b = duse*cos(rake2)
+         rake2 = rake1*dpi
+         slip_dip = slip1*sin(rake2)
+         slip_stk = slip1*cos(rake2)
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, omega, z, z1, green_subf, real1, imag1, coeffs_syn, ex)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
-            omega = -twopi*delta_freq*vuse
-            z1 = cmplx(cos(omega), sin(omega), double)
+            shift = -twopi*delta_freq*rupt_time1
+            z1 = cmplx(cos(shift), sin(shift), double)
             z = cmplx(1.d0, 0.d0, double)
             do j = 1, max_freq
                green_subf = &
-               &  (a*green_dip(j, channel, subfault)+b*green_stk(j, channel, subfault)) &
+               &  (slip_dip*green_dip(j, channel, subfault)+slip_stk*green_stk(j, channel, subfault)) &
                &  *source(j, channel, isl, isr)*z
                real1(j) = real(green_subf)+forward_real(j, channel)
                imag1(j) = aimag(green_subf)+forward_imag(j, channel)
                z = z*z1    ! we may need to increase numerical precision
             end do
             call wavelet_syn(real1, imag1, coeffs_syn)
-            call misfit_channel(channel, coeffs_syn, ex)     
-            misfit2 = misfit2 + ex    ! we may need to increase numerical precision
+            call misfit_channel(channel, coeffs_syn, misfit1)     
+            misfit2 = misfit2 + misfit1    ! we may need to increase numerical precision
          end do
 !$omp end do
 !$omp end parallel
-         moment0 = moment0+duse*shear(subfault)
+         moment0 = moment0+slip1*shear(subfault)
          moment = moment0*area
          moment_reg = (moment/moment_input) - 1
          if(abs(moment_reg) .ge. 0.10)then
@@ -1153,39 +1164,39 @@ contains
          endif
 !         moment_reg = (moment/moment_input)
          amp = 1.0
-         if (static) call static_modify_subfault(duse, ause, subfault, gps_misfit)
-         if (insar) call insar_modify_subfault(duse, ause, subfault, insar_misfit)
-         call modify_slip_field(subfault, duse, ause)
+         if (static) call static_modify_subfault(slip1, rake1, subfault, gps_misfit)
+         if (insar) call insar_modify_subfault(slip1, rake1, subfault, insar_misfit)
+         call modify_slip_field(subfault, slip1, rake1)
          call slip_laplace(slip_reg)
-         rupt_time(subfault) = vuse
+         rupt_time(subfault) = rupt_time1
          call time_laplace(rupt_time, time_reg)
 
          value1 = misfit2+moment_reg*coef_moment+amp*slip_reg*coef_slip
          value1 = value1+coef_time*time_reg
          value1 = value1+coef_gps*gps_misfit+coef_insar*insar_misfit
-         moment0 = moment0-duse*shear(subfault)
+         moment0 = moment0-slip1*shear(subfault)
          diff = value1-current_value
 !  
 !  Now, we update the kinematic model.
 !  
          !call random_number(rand)
-         rand = ran1()
+         random0 = ran1()
          aux = exp(-diff/t)
-         if (aux .gt. rand) then
+         if (aux .gt. random0) then
             current_value = value1
             insar_misfit0 = insar_misfit
-            slip(subfault) = duse
-            rake(subfault) = ause
-            rupt_time(subfault) = vuse
+            slip(subfault) = slip1
+            rake(subfault) = rake1
+            rupt_time(subfault) = rupt_time1
             t_rise(subfault) = (isl-1)*dta+ta0
             t_fall(subfault) = (isr-1)*dta+ta0
             n_accept = n_accept+1
          else
-            rupt_time(subfault) = t_save
-            t_rise(subfault) = l_save
-            t_fall(subfault) = r_save
-            slip(subfault) = d_save
-            rake(subfault) = a_save
+            rupt_time(subfault) = rupt_time0
+            t_rise(subfault) = trise0
+            t_fall(subfault) = tfall0
+            slip(subfault) = slip0
+            rake(subfault) = rake0
          end if
          min_value = min(min_value, value1)
          if (n_accept .gt. accept_max) exit
@@ -1194,25 +1205,28 @@ contains
 !  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 !  finish the perturbation of subevent (segment, subfault_seg)
 !
-      rake2 = rake(subfault)*dpi
-      a = sin(rake2)*slip(subfault)
-      b = cos(rake2)*slip(subfault)
-      isl = int((t_rise(subfault)-ta0)/dta+0.5)+1
-      isr = int((t_fall(subfault)-ta0)/dta+0.5)+1
-      kahan_y = slip(subfault)*shear(subfault)-kahan_c 
+      rupt_time0 = rupt_time(subfault)
+      slip0 = slip(subfault)
+      rake0 = rake(subfault)
+      trise0 = t_rise(subfault)
+      tfall0 = t_fall(subfault)
+      rake2 = rake0*dpi
+      slip_dip = sin(rake2)*slip0
+      slip_stk = cos(rake2)*slip0
+      isl = int((trise0-ta0)/dta+0.5)+1
+      isr = int((tfall0-ta0)/dta+0.5)+1
+      kahan_y = slip0*shear(subfault)-kahan_c 
       kahan_t = moment0+kahan_y
       kahan_c = (kahan_t-moment0)-kahan_y
       moment0 = kahan_t
-      d_sub = slip(subfault)
-      a_sub = rake(subfault)
-      call modify_slip_field(subfault, d_sub, a_sub)
+      call modify_slip_field(subfault, slip0, rake0)
       do channel = 1, channels
          delta_freq = delta_freq0/dt_channel(channel)
-         omega = -twopi*delta_freq*rupt_time(subfault)
-         z1 = cmplx(cos(omega), sin(omega), double)   
+         shift = -twopi*delta_freq*rupt_time0
+         z1 = cmplx(cos(shift), sin(shift), double)   
          z = cmplx(1.d0, 0.d0, double)
          do i = 1, max_freq
-            green_subf = (a*green_dip(i, channel, subfault)+b*green_stk(i, channel, subfault)) &
+            green_subf = (slip_dip*green_dip(i, channel, subfault)+slip_stk*green_stk(i, channel, subfault)) &
             &   *source(i, channel, isl, isr)*z
             forward_real2(i, channel) = forward_real2(i, channel)+real(green_subf)
             forward_imag2(i, channel) = forward_imag2(i, channel)+aimag(green_subf)
@@ -1221,8 +1235,8 @@ contains
             z = z*z1
          end do
       end do
-      if (static) call static_add_subfault(d_sub, a_sub, subfault)
-      if (insar) call insar_add_subfault(d_sub, a_sub, subfault)
+      if (static) call static_add_subfault(slip0, rake0, subfault)
+      if (insar) call insar_add_subfault(slip0, rake0, subfault)
    end do
 
 !
@@ -1250,8 +1264,8 @@ contains
             do j = 1, ramp_length
                ramp_use = ramp_beg - 1.
                do while ((ramp_use .lt. ramp_beg) .or. (ramp_use .gt. ramp_end))
-                  call cauchy(t, c)
-                  ramp_use = ramp1(j)+c*ramp_max
+                  call cauchy(t, random0)
+                  ramp_use = ramp1(j)+random0*ramp_max
                end do
                ramp1(j) = ramp_use
             end do
@@ -1262,9 +1276,9 @@ contains
 !  Now, we update the ramp.
 !  
             !call random_number(rand)
-            rand = ran1()
+            random0 = ran1()
             aux = exp(-diff/t)
-            if (aux .gt. rand) then
+            if (aux .gt. random0) then
                current_value = current_value + coef_insar*(insar_misfit - insar_misfit0)
                insar_misfit0 = insar_misfit
                ramp(:) = ramp1(:)
@@ -1305,16 +1319,16 @@ contains
    & nbb, i, k, npb, nn, nran, subfault_seg, segment, channel, subfault, &
    & n_total, j, event
 !   real, allocatable :: forward_real(:, :), forward_imag(:, :)
-   real :: duse, ause, vuse, &
-   & diff, rand, c, aux, dpb, amp, moment_reg(10), moment_reg2, value1, gps_misfit, &
-   & moment, d_sub, a_sub, slip_reg, a, b, moment0(10), &
-   & time_reg, t_save, a_save, d_save, x, kahan_y, kahan_t, kahan_c, &
-   & l_save, r_save, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
+   real :: slip1, rake1, rupt_time1, &
+   & diff, random0, aux, dpb, amp, moment_reg(10), moment_reg2, value1, gps_misfit, &
+   & moment, slip_reg, slip_dip, slip_stk, moment0(10), &
+   & time_reg, rupt_time0, rake0, slip0, kahan_y, kahan_t, kahan_c, &
+   & trise0, tfall0, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
    & slip_beg, slip_max, slip_end, angle_beg, angle_end, angle_max, &
    & rupt_beg, rupt_end, rupt_max, rise_time_beg, rise_time_end, rise_time_max
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
    real :: delta_freq0, delta_freq, rake2!, ex!, misfit2
-   real*8 :: omega, misfit2, ex
+   real*8 :: shift, misfit2, misfit1
    complex :: green_subf
    complex*16 :: z, z1, forward(wave_pts), z0
 
@@ -1334,18 +1348,18 @@ contains
       forward(:) = z0
       do subfault = 1, subfaults
          rake2 = rake(subfault)*dpi
-         a = sin(rake2)*slip(subfault)
-         b = cos(rake2)*slip(subfault)
+         slip_dip = sin(rake2)*slip(subfault)
+         slip_stk = cos(rake2)*slip(subfault)
          isl = int((t_rise(subfault)-ta0)/dta+0.5)+1
          isr = int((t_fall(subfault)-ta0)/dta+0.5)+1
-         omega = -twopi*delta_freq*rupt_time(subfault)
-         z1 = cmplx(cos(omega), sin(omega), double)
+         shift = -twopi*delta_freq*rupt_time(subfault)
+         z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
          do i = 1, max_freq
-!            omega = -twopi*delta_freq*rupt_time(subfault)*(i-1)
-!            z = cmplx(cos(omega), sin(omega))
+!            shift = -twopi*delta_freq*rupt_time(subfault)*(i-1)
+!            z = cmplx(cos(shift), sin(shift))
             forward(i) = forward(i) &
-            & +(a*green_dip(i, channel, subfault)+b*green_stk(i, channel, subfault)) &
+            & +(slip_dip*green_dip(i, channel, subfault)+slip_stk*green_stk(i, channel, subfault)) &
             & *source(i, channel, isl, isr)*z
             z = z*z1    ! we may need to increase numerical precision
          end do
@@ -1397,8 +1411,8 @@ contains
       nran = k
       do while (nran .eq. k .or. nran .gt. subfaults)
          !call random_number(x)
-         x = ran1()
-         nran = int(x*(subfaults-k)+k+1)
+         random0 = ran1()
+         nran = int(random0*(subfaults-k)+k+1)
       end do
       nbb = n_subfault(nran)
       nn = n_subfault(k)
@@ -1424,24 +1438,29 @@ contains
       do i = 1, segment-1
          subfault_seg = subfault_seg-subfaults_segment(i)
       end do
-      isl = int((t_rise(subfault)-ta0)/dta+0.5)+1
-      isr = int((t_fall(subfault)-ta0)/dta+0.5)+1
-      rake2 = rake(subfault)*dpi
-      a = sin(rake2)*slip(subfault)
-      b = cos(rake2)*slip(subfault)
+      rupt_time0 = rupt_time(subfault)
+      slip0 = slip(subfault)
+      rake0 = rake(subfault)
+      trise0 = t_rise(subfault)
+      tfall0 = t_fall(subfault)
+      isl = int((trise0-ta0)/dta+0.5)+1
+      isr = int((tfall0-ta0)/dta+0.5)+1
+      rake2 = rake0*dpi
+      slip_dip = sin(rake2)*slip0
+      slip_stk = cos(rake2)*slip0
 !
 !  make up unchange graph
 !
       do channel = 1, channels
          delta_freq = delta_freq0/dt_channel(channel)
-         omega = -twopi*delta_freq*rupt_time(subfault)
-         z1 = cmplx(cos(omega), sin(omega), double)
+         shift = -twopi*delta_freq*rupt_time0
+         z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
          do i = 1, max_freq
-!            omega = -twopi*delta_freq*(i-1)*rupt_time(subfault)
-!            z = cmplx(cos(omega), sin(omega))
+!            shift = -twopi*delta_freq*(i-1)*rupt_time(subfault)
+!            z = cmplx(cos(shift), sin(shift))
             green_subf = &
-            & (a*green_dip(i, channel, subfault)+b*green_stk(i, channel, subfault))* &
+            & (slip_dip*green_dip(i, channel, subfault)+slip_stk*green_stk(i, channel, subfault))* &
             & source(i, channel, isl, isr)*z
 !            forward_real(i, channel) = forward_real(i, channel)-real(green_subf)
 !            forward_imag(i, channel) = forward_imag(i, channel)-aimag(green_subf)
@@ -1494,83 +1513,83 @@ contains
 !
 !       Save values before the perturbation
 !
-         t_save = rupt_time(subfault)
-         d_save = slip(subfault)
-         a_save = rake(subfault)
-         l_save = t_rise(subfault)
-         r_save = t_fall(subfault)
+         rupt_time0 = rupt_time(subfault)
+         slip0 = slip(subfault)
+         rake0 = rake(subfault)
+         trise0 = t_rise(subfault)
+         tfall0 = t_fall(subfault)
 !
 !  Perturb the slip
 !
-         duse = slip_beg - 1.
-         do while ((duse .le. slip_beg) .or. (duse .ge. slip_end))
-            call cauchy(t, c)                           
-            duse = d_save+c*slip_max
+         slip1 = slip_beg - 1.
+         do while ((slip1 .le. slip_beg) .or. (slip1 .ge. slip_end))
+            call cauchy(t, random0)                           
+            slip1 = slip0+random0*slip_max
          end do
 !
 !  Perturb the rake
 !
-         ause = angle_beg - 1.
-         do while ((ause .lt. angle_beg) .or. (ause .gt. angle_end))
-            call cauchy(t, c)                          
-            ause = a_save+c*angle_max
+         rake1 = angle_beg - 1.
+         do while ((rake1 .lt. angle_beg) .or. (rake1 .gt. angle_end))
+            call cauchy(t, random0)                          
+            rake1 = rake0+random0*angle_max
          end do
 ! 
 !  Perturb the rupture time.
 !
-         vuse = rupt_beg - 0.1
+         rupt_time1 = rupt_beg - 0.1
          if (rupt_max .gt. min_dt) then
-            do while ((vuse .lt. rupt_beg) .or. (vuse .gt. rupt_end))
-               call cauchy(t, c)                       
-               vuse = min_dt*int((t_save+c*rupt_max)/min_dt+0.5)     
+            do while ((rupt_time1 .lt. rupt_beg) .or. (rupt_time1 .gt. rupt_end))
+               call cauchy(t, random0)                       
+               rupt_time1 = min_dt*int((rupt_time0+random0*rupt_max)/min_dt+0.5)     
             end do
          else
-            vuse = rupt_beg
+            rupt_time1 = rupt_beg
          end if             
 !
 !  Perturb rise time parameters
 !  
          isl = 0
          do while (isl .lt. 1 .or. isl .gt. msou)
-            call cauchy(t, c)                         
-            isl = int((l_save+c*rise_time_max-ta0)/dta+0.5)+1
+            call cauchy(t, random0)                         
+            isl = int((trise0+random0*rise_time_max-ta0)/dta+0.5)+1
          end do   
          isr = 0
          do while (isr .lt. 1 .or. isr .gt. msou)
-            call cauchy(t, c)                         
-            isr = int((r_save+c*rise_time_max-ta0)/dta+0.5)+1
+            call cauchy(t, random0)                         
+            isr = int((tfall0+random0*rise_time_max-ta0)/dta+0.5)+1
          end do
          
-         rake2 = ause*dpi
-         a = duse*sin(rake2)
-         b = duse*cos(rake2)
+         rake2 = rake1*dpi
+         slip_dip = slip1*sin(rake2)
+         slip_stk = slip1*cos(rake2)
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, omega, z, z1, green_subf, real1, imag1, coeffs_syn, ex)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
-            omega = -twopi*delta_freq*vuse
-            z1 = cmplx(cos(omega), sin(omega), double) 
+            shift = -twopi*delta_freq*rupt_time1
+            z1 = cmplx(cos(shift), sin(shift), double) 
             z = cmplx(1.d0, 0.d0, double)
             do j = 1, max_freq
-!               omega = -twopi_0*delta_freq*(i-1)*vuse
-!               z = cmplx(cos(omega), sin(omega)) 
+!               shift = -twopi_0*delta_freq*(i-1)*rupt_time1
+!               z = cmplx(cos(shift), sin(shift)) 
                green_subf = &
-               & (a*green_dip(j, channel, subfault)+b*green_stk(j, channel, subfault))* &
+               & (slip_dip*green_dip(j, channel, subfault)+slip_stk*green_stk(j, channel, subfault))* &
                & source(j, channel, isl, isr)*z
                real1(j) = real(green_subf)+forward_real(j, channel)
                imag1(j) = aimag(green_subf)+forward_imag(j, channel)
                z = z*z1    ! we may need to increase numerical precision
             end do
             call wavelet_syn(real1, imag1, coeffs_syn)
-            call misfit_channel(channel, coeffs_syn, ex)     
-            misfit2 = misfit2 + ex    ! we may need to increase numerical precision
+            call misfit_channel(channel, coeffs_syn, misfit1)     
+            misfit2 = misfit2 + misfit1    ! we may need to increase numerical precision
          end do
 !$omp end do
 !$omp end parallel
-         moment0(event) = moment0(event)+duse*shear(subfault)
+         moment0(event) = moment0(event)+slip1*shear(subfault)
          moment = moment0(event)*area
          moment_reg(event) = (moment/moment_event(event))-1
          if(abs(moment_reg(event)) .ge. 0.10)then
@@ -1581,36 +1600,36 @@ contains
          moment_reg2 = moment_reg(event) + moment_reg2
 !         moment_reg = (moment/moment_input)
          amp = 1.0
-         call modify_slip_field(subfault, duse, ause)
+         call modify_slip_field(subfault, slip1, rake1)
          call slip_laplace(slip_reg)
-         rupt_time(subfault) = vuse
+         rupt_time(subfault) = rupt_time1
          call time_laplace(rupt_time, time_reg)
 
          value1 = misfit2+moment_reg2*coef_moment+amp*slip_reg*coef_slip
          value1 = value1+coef_time*time_reg+coef_gps*gps_misfit
-         moment0(event) = moment0(event)-duse*shear(subfault)
+         moment0(event) = moment0(event)-slip1*shear(subfault)
          moment_reg2 = moment_reg2 - moment_reg(event)
          diff = value1-current_value
 !  
 !  Now, we update the kinematic model.
 ! 
          !call random_number(rand) 
-         rand = ran1()
+         random0 = ran1()
          aux = exp(-diff/t)
-         if (aux .gt. rand) then
+         if (aux .gt. random0) then
             current_value = value1
-            slip(subfault) = duse
-            rake(subfault) = ause
-            rupt_time(subfault) = vuse
+            slip(subfault) = slip1
+            rake(subfault) = rake1
+            rupt_time(subfault) = rupt_time1
             t_rise(subfault) = (isl-1)*dta+ta0
             t_fall(subfault) = (isr-1)*dta+ta0
             n_accept = n_accept+1
          else
-            rupt_time(subfault) = t_save
-            t_rise(subfault) = l_save
-            t_fall(subfault) = r_save
-            slip(subfault) = d_save
-            rake(subfault) = a_save
+            rupt_time(subfault) = rupt_time0
+            t_rise(subfault) = trise0
+            t_fall(subfault) = tfall0
+            slip(subfault) = slip0
+            rake(subfault) = rake0
          end if
          min_value = min(min_value, value1)
          if (n_accept .gt. accept_max) exit
@@ -1619,12 +1638,17 @@ contains
 !  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 !  finish the perturbation of subevent (segment, subfault_seg)
 !
-      rake2 = rake(subfault)*dpi
-      a = sin(rake2)*slip(subfault)
-      b = cos(rake2)*slip(subfault)
-      isl = int((t_rise(subfault)-ta0)/dta+0.5)+1
-      isr = int((t_fall(subfault)-ta0)/dta+0.5)+1
-      kahan_y = slip(subfault)*shear(subfault)-kahan_c 
+      rupt_time0 = rupt_time(subfault)
+      slip0 = slip(subfault)
+      rake0 = rake(subfault)
+      trise0 = t_rise(subfault)
+      tfall0 = t_fall(subfault)
+      rake2 = rake0*dpi
+      slip_dip = sin(rake2)*slip0
+      slip_stk = cos(rake2)*slip0
+      isl = int((trise0-ta0)/dta+0.5)+1
+      isr = int((tfall0-ta0)/dta+0.5)+1
+      kahan_y = slip0*shear(subfault)-kahan_c 
       kahan_t = moment0(event)+kahan_y
       kahan_c = (kahan_t-moment0(event))-kahan_y
       moment0(event) = kahan_t
@@ -1636,16 +1660,14 @@ contains
          moment_reg(event) = (10*abs(moment_reg(event)))**4
       endif
       moment_reg2 = moment_reg2 + moment_reg(event)
-      d_sub = slip(subfault)
-      a_sub = rake(subfault)
-      call modify_slip_field(subfault, d_sub, a_sub)
+      call modify_slip_field(subfault, slip0, rake0)
       do channel = 1, channels
          delta_freq = delta_freq0/dt_channel(channel)
-         omega = -twopi*delta_freq*rupt_time(subfault)
-         z1 = cmplx(cos(omega), sin(omega), double)
+         shift = -twopi*delta_freq*rupt_time0
+         z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
          do i = 1, max_freq
-            green_subf = (a*green_dip(i, channel, subfault)+b*green_stk(i, channel, subfault)) &
+            green_subf = (slip_dip*green_dip(i, channel, subfault)+slip_stk*green_stk(i, channel, subfault)) &
             &   *source(i, channel, isl, isr)*z
             forward_real2(i, channel) = forward_real2(i, channel)+real(green_subf)
             forward_imag2(i, channel) = forward_imag2(i, channel)+aimag(green_subf)
@@ -1684,17 +1706,17 @@ contains
    & nbb, i, k, npb, nn, nran, subfault_seg, segment, channel, subfault, &
    & n_total, j, event
 !   real, allocatable :: forward_real(:, :), forward_imag(:, :)
-   real :: duse, ause, vuse, &
-   & diff, rand, c, aux, dpb, amp, moment_reg(10), moment_reg2, value1, gps_misfit, insar_misfit, &
-   & moment, d_sub, a_sub, slip_reg, a, b, kahan_y, kahan_c, kahan_t, &
-   & time_reg, t_save, a_save, d_save, x, moment0(10), &
-   & l_save, r_save, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
+   real :: slip1, rake1, rupt_time1, &
+   & diff, random0, aux, dpb, amp, moment_reg(10), moment_reg2, value1, gps_misfit, insar_misfit, &
+   & moment, slip_reg, slip_dip, slip_stk, kahan_y, kahan_c, kahan_t, &
+   & time_reg, rupt_time0, rake0, slip0, moment0(10), &
+   & trise0, tfall0, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
    & slip_beg, slip_max, slip_end, angle_beg, angle_end, angle_max, &
    & rupt_beg, rupt_end, rupt_max, rise_time_beg, rise_time_end, rise_time_max
    real ramp_beg, ramp_end, ramp_max, ramp_use
    real*8 :: ramp0(36), ramp1(36)
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
-   real*8 :: omega, misfit2, ex
+   real*8 :: shift, misfit2, misfit1
    real :: delta_freq, delta_freq0, rake2!, ex
    complex :: green_subf
    complex*16 :: z, z1, forward(wave_pts), z0
@@ -1714,16 +1736,16 @@ contains
       forward(:) = z0
       do subfault = 1, subfaults
          rake2 = rake(subfault)*dpi
-         a = sin(rake2)*slip(subfault)
-         b = cos(rake2)*slip(subfault)
+         slip_dip = sin(rake2)*slip(subfault)
+         slip_stk = cos(rake2)*slip(subfault)
          isl = int((t_rise(subfault)-ta0)/dta+0.5)+1
          isr = int((t_fall(subfault)-ta0)/dta+0.5)+1
-         omega = -twopi*delta_freq*rupt_time(subfault)
-         z1 = cmplx(cos(omega), sin(omega), double)
+         shift = -twopi*delta_freq*rupt_time(subfault)
+         z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
          do i = 1, max_freq
             forward(i) = forward(i) &
-            & +(a*green_dip(i, channel, subfault)+b*green_stk(i, channel, subfault)) &
+            & +(slip_dip*green_dip(i, channel, subfault)+slip_stk*green_stk(i, channel, subfault)) &
             & *source(i, channel, isl, isr)*z
             z = z*z1    ! we may need to increase numerical precision
          end do
@@ -1784,8 +1806,8 @@ contains
       nran = k
       do while (nran .eq. k .or. nran .gt. subfaults)
          !call random_number(x)
-         x = ran1()
-         nran = int(x*(subfaults-k)+k+1)
+         random0 = ran1()
+         nran = int(random0*(subfaults-k)+k+1)
       end do
       nbb = n_subfault(nran)
       nn = n_subfault(k)
@@ -1811,24 +1833,27 @@ contains
       do i = 1, segment-1
          subfault_seg = subfault_seg-subfaults_segment(i)
       end do
-      d_sub = slip(subfault)
-      a_sub = rake(subfault)
-      isl = int((t_rise(subfault)-ta0)/dta+0.5)+1
-      isr = int((t_fall(subfault)-ta0)/dta+0.5)+1
-      rake2 = a_sub*dpi
-      a = sin(rake2)*d_sub
-      b = cos(rake2)*d_sub
+      rupt_time0 = rupt_time(subfault)
+      slip0 = slip(subfault)
+      rake0 = rake(subfault)
+      trise0 = t_rise(subfault)
+      tfall0 = t_fall(subfault)
+      isl = int((trise0-ta0)/dta+0.5)+1
+      isr = int((tfall0-ta0)/dta+0.5)+1
+      rake2 = rake0*dpi
+      slip_dip = sin(rake2)*slip0
+      slip_stk = cos(rake2)*slip0
 !
 !  make up unchange graph
 !
       do channel = 1, channels
          delta_freq = delta_freq0/dt_channel(channel)
-         omega = -twopi*delta_freq*rupt_time(subfault)
-         z1 = cmplx(cos(omega), sin(omega), double)
+         shift = -twopi*delta_freq*rupt_time0
+         z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
          do i = 1, max_freq
             green_subf = &
-            &  (a*green_dip(i, channel, subfault)+b*green_stk(i, channel, subfault)) &
+            &  (slip_dip*green_dip(i, channel, subfault)+slip_stk*green_stk(i, channel, subfault)) &
             &  *source(i, channel, isl, isr)*z
             forward_real2(i, channel) = forward_real2(i, channel)-real(green_subf)
             forward_imag2(i, channel) = forward_imag2(i, channel)-aimag(green_subf)
@@ -1837,8 +1862,8 @@ contains
             z = z*z1    ! we may need to increase numuerical precision
          end do
       end do
-      if (static) call static_remove_subfault(d_sub, a_sub, subfault)
-      if (insar) call insar_remove_subfault(d_sub, a_sub, subfault)
+      if (static) call static_remove_subfault(slip0, rake0, subfault)
+      if (insar) call insar_remove_subfault(slip0, rake0, subfault)
       kahan_y = -slip(subfault)*shear(subfault)-kahan_c 
       kahan_t = moment0(event)+kahan_y
       kahan_c = (kahan_t-moment0(event))-kahan_y
@@ -1880,81 +1905,81 @@ contains
 !
 !       Save values before the perturbation
 !
-         t_save = rupt_time(subfault)
-         d_save = slip(subfault)
-         a_save = rake(subfault)
-         l_save = t_rise(subfault)
-         r_save = t_fall(subfault)
+         rupt_time0 = rupt_time(subfault)
+         slip0 = slip(subfault)
+         rake0 = rake(subfault)
+         trise0 = t_rise(subfault)
+         tfall0 = t_fall(subfault)
 !
 !  Perturb the slip
 !
-         duse = slip_beg - 1.
-         do while ((duse .le. slip_beg) .or. (duse .ge. slip_end))
-            call cauchy(t, c)                           
-            duse = d_save+c*slip_max
+         slip1 = slip_beg - 1.
+         do while ((slip1 .le. slip_beg) .or. (slip1 .ge. slip_end))
+            call cauchy(t, random0)                           
+            slip1 = slip0+random0*slip_max
          end do
 !
 !  Perturb the rake
 !
-         ause = angle_beg - 1.
-         do while ((ause .lt. angle_beg) .or. (ause .gt. angle_end))
-            call cauchy(t, c)                          
-            ause = a_save+c*angle_max
+         rake1 = angle_beg - 1.
+         do while ((rake1 .lt. angle_beg) .or. (rake1 .gt. angle_end))
+            call cauchy(t, random0)                          
+            rake1 = rake0+random0*angle_max
          end do
 ! 
 !  Perturb the rupture time.
 !
-         vuse = rupt_beg - 0.1
+         rupt_time1 = rupt_beg - 0.1
          if (rupt_max .gt. min_dt) then
-            do while ((vuse .lt. rupt_beg) .or. (vuse .gt. rupt_end))
-               call cauchy(t, c)                       
-               vuse = min_dt*int((t_save+c*rupt_max)/min_dt+0.5)     
+            do while ((rupt_time1 .lt. rupt_beg) .or. (rupt_time1 .gt. rupt_end))
+               call cauchy(t, random0)                       
+               rupt_time1 = min_dt*int((rupt_time0+random0*rupt_max)/min_dt+0.5)     
             end do
          else
-            vuse = rupt_beg
+            rupt_time1 = rupt_beg
          end if             
 !
 !  Perturb rise time parameters
 !  
          isl = 0
          do while (isl .lt. 1 .or. isl .gt. msou)
-            call cauchy(t, c)                         
-            isl = int((l_save+c*rise_time_max-ta0)/dta+0.5)+1
+            call cauchy(t, random0)                         
+            isl = int((trise0+random0*rise_time_max-ta0)/dta+0.5)+1
          end do   
          isr = 0
          do while (isr .lt. 1 .or. isr .gt. msou)
-            call cauchy(t, c)                         
-            isr = int((r_save+c*rise_time_max-ta0)/dta+0.5)+1
+            call cauchy(t, random0)                         
+            isr = int((tfall0+random0*rise_time_max-ta0)/dta+0.5)+1
          end do
          
-         rake2 = ause*dpi
-         a = duse*sin(rake2)
-         b = duse*cos(rake2)
+         rake2 = rake1*dpi
+         slip_dip = slip1*sin(rake2)
+         slip_stk = slip1*cos(rake2)
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, omega, z, z1, green_subf, real1, imag1, coeffs_syn, ex)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
-            omega = -twopi*delta_freq*vuse
-            z1 = cmplx(cos(omega), sin(omega), double)
+            shift = -twopi*delta_freq*rupt_time1
+            z1 = cmplx(cos(shift), sin(shift), double)
             z = cmplx(1.d0, 0.d0, double)
             do j = 1, max_freq
                green_subf = &
-               &  (a*green_dip(j, channel, subfault)+b*green_stk(j, channel, subfault)) &
+               &  (slip_dip*green_dip(j, channel, subfault)+slip_stk*green_stk(j, channel, subfault)) &
                &  *source(j, channel, isl, isr)*z
                real1(j) = real(green_subf)+forward_real(j, channel)
                imag1(j) = aimag(green_subf)+forward_imag(j, channel)
                z = z*z1    ! we may need to increase numerical precision
             end do
             call wavelet_syn(real1, imag1, coeffs_syn)
-            call misfit_channel(channel, coeffs_syn, ex)     
-            misfit2 = misfit2 + ex    ! we may need to increase numerical precision
+            call misfit_channel(channel, coeffs_syn, misfit1)     
+            misfit2 = misfit2 + misfit1    ! we may need to increase numerical precision
          end do
 !$omp end do
 !$omp end parallel
-         moment0(event) = moment0(event)+duse*shear(subfault)
+         moment0(event) = moment0(event)+slip1*shear(subfault)
          moment = moment0(event)*area
          moment_reg(event) = (moment/moment_event(event))-1
          if(abs(moment_reg(event)) .ge. 0.10)then
@@ -1965,40 +1990,40 @@ contains
          moment_reg2 = moment_reg(event) + moment_reg2
 !         moment_reg = (moment/moment_input)
          amp = 1.0
-         if (static) call static_modify_subfault(duse, ause, subfault, gps_misfit)
-         if (insar) call insar_modify_subfault(duse, ause, subfault, insar_misfit)
-         call modify_slip_field(subfault, duse, ause)
+         if (static) call static_modify_subfault(slip1, rake1, subfault, gps_misfit)
+         if (insar) call insar_modify_subfault(slip1, rake1, subfault, insar_misfit)
+         call modify_slip_field(subfault, slip1, rake1)
          call slip_laplace(slip_reg)
-         rupt_time(subfault) = vuse
+         rupt_time(subfault) = rupt_time1
          call time_laplace(rupt_time, time_reg)
 
          value1 = misfit2+moment_reg2*coef_moment+amp*slip_reg*coef_slip
          value1 = value1+coef_time*time_reg
          value1 = value1+coef_gps*gps_misfit+coef_insar*insar_misfit
-         moment0(event) = moment0(event)-duse*shear(subfault)
+         moment0(event) = moment0(event)-slip1*shear(subfault)
          moment_reg2 = moment_reg2 - moment_reg(event)
          diff = value1-current_value
 !  
 !  Now, we update the kinematic model.
 ! 
          !call random_number(rand) 
-         rand = ran1()
+         random0 = ran1()
          aux = exp(-diff/t)
-         if (aux .gt. rand) then
+         if (aux .gt. random0) then
             current_value = value1
             insar_misfit0 = insar_misfit
-            slip(subfault) = duse
-            rake(subfault) = ause
-            rupt_time(subfault) = vuse
+            slip(subfault) = slip1
+            rake(subfault) = rake1
+            rupt_time(subfault) = rupt_time1
             t_rise(subfault) = (isl-1)*dta+ta0
             t_fall(subfault) = (isr-1)*dta+ta0
             n_accept = n_accept+1
          else
-            rupt_time(subfault) = t_save
-            t_rise(subfault) = l_save
-            t_fall(subfault) = r_save
-            slip(subfault) = d_save
-            rake(subfault) = a_save
+            rupt_time(subfault) = rupt_time0
+            t_rise(subfault) = trise0
+            t_fall(subfault) = tfall0
+            slip(subfault) = slip0
+            rake(subfault) = rake0
          end if
          min_value = min(min_value, value1)
          if (n_accept .gt. accept_max) exit
@@ -2007,12 +2032,17 @@ contains
 !  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 !  finish the perturbation of subevent (segment, subfault_seg)
 !
-      rake2 = rake(subfault)*dpi
-      a = sin(rake2)*slip(subfault)
-      b = cos(rake2)*slip(subfault)
-      isl = int((t_rise(subfault)-ta0)/dta+0.5)+1
-      isr = int((t_fall(subfault)-ta0)/dta+0.5)+1
-      kahan_y = slip(subfault)*shear(subfault)-kahan_c 
+      rupt_time0 = rupt_time(subfault)
+      slip0 = slip(subfault)
+      rake0 = rake(subfault)
+      trise0 = t_rise(subfault)
+      tfall0 = t_fall(subfault)
+      rake2 = rake0*dpi
+      slip_dip = sin(rake2)*slip0
+      slip_stk = cos(rake2)*slip0
+      isl = int((trise0-ta0)/dta+0.5)+1
+      isr = int((tfall0-ta0)/dta+0.5)+1
+      kahan_y = slip0*shear(subfault)-kahan_c 
       kahan_t = moment0(event)+kahan_y
       kahan_c = (kahan_t-moment0(event))-kahan_y
       moment0(event) = kahan_t
@@ -2024,16 +2054,14 @@ contains
          moment_reg(event) = (10*abs(moment_reg(event)))**4
       endif
       moment_reg2 = moment_reg(event) + moment_reg2
-      d_sub = slip(subfault)
-      a_sub = rake(subfault)
-      call modify_slip_field(subfault, d_sub, a_sub)
+      call modify_slip_field(subfault, slip0, rake0)
       do channel = 1, channels
          delta_freq = delta_freq0/dt_channel(channel)
-         omega = -twopi*delta_freq*rupt_time(subfault)
-         z1 = cmplx(cos(omega), sin(omega), double)   
+         shift = -twopi*delta_freq*rupt_time(subfault)
+         z1 = cmplx(cos(shift), sin(shift), double)   
          z = cmplx(1.d0, 0.d0, double)
          do i = 1, max_freq
-            green_subf = (a*green_dip(i, channel, subfault)+b*green_stk(i, channel, subfault)) &
+            green_subf = (slip_dip*green_dip(i, channel, subfault)+slip_stk*green_stk(i, channel, subfault)) &
             &   *source(i, channel, isl, isr)*z
             forward_real2(i, channel) = forward_real2(i, channel)+real(green_subf)
             forward_imag2(i, channel) = forward_imag2(i, channel)+aimag(green_subf)
@@ -2042,8 +2070,8 @@ contains
             z = z*z1
          end do
       end do
-      if (static) call static_add_subfault(d_sub, a_sub, subfault)
-      if (insar) call insar_add_subfault(d_sub, a_sub, subfault)
+      if (static) call static_add_subfault(slip0, rake0, subfault)
+      if (insar) call insar_add_subfault(slip0, rake0, subfault)
    end do
 
 !
@@ -2071,8 +2099,8 @@ contains
             do j = 1, ramp_length
                ramp_use = ramp_beg - 1.
                do while ((ramp_use .lt. ramp_beg) .or. (ramp_use .gt. ramp_end))
-                  call cauchy(t, c)
-                  ramp_use = ramp1(j)+c*ramp_max
+                  call cauchy(t, random0)
+                  ramp_use = ramp1(j)+random0*ramp_max
                end do
                ramp1(j) = ramp_use
             end do
@@ -2083,9 +2111,9 @@ contains
 !  Now, we update the ramp.
 ! 
             !call random_number(rand) 
-            rand = ran1()
+            random0 = ran1()
             aux = exp(-diff/t)
-            if (aux .gt. rand) then
+            if (aux .gt. random0) then
                current_value = current_value + coef_insar*(insar_misfit - insar_misfit0)
                insar_misfit0 = insar_misfit
                ramp(:) = ramp1(:)
