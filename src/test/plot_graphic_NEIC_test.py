@@ -1,36 +1,36 @@
-from glob import glob
+import json
 import os
 import pathlib
 import shutil
-import json
 import tempfile
 from test.testutils import (
     RESULTS_DIR,
     get_cgps_json,
     get_insar_json,
     get_segments_data,
-    get_tele_waves_json,
-    get_surf_waves_json,
     get_strong_motion_json,
+    get_surf_waves_json,
+    get_tele_waves_json,
     get_tensor_info,
     get_velmodel_data,
     update_manager_file_locations,
 )
-from wasp.get_outputs import get_insar, retrieve_gps
+
+import pytest
 
 from wasp.fault_plane import point_sources_param, shear_modulous
-from wasp.get_outputs import read_solution_static_format
+from wasp.get_outputs import get_insar, read_solution_static_format, retrieve_gps
 from wasp.plot_graphic_NEIC import (
-    _PlotSlipDist_Compare,
+    _plot_vel_model,
+    _PlotComparisonMap,
     _PlotCumulativeSlip,
-    plot_beachball,
     _PlotInsar,
     _PlotMultiSlipDist,
-    _PlotComparisonMap,
-    calculate_cumulative_moment_tensor,
     _PlotRiseTime,
-    _plot_vel_model,
     _PlotRuptTime,
+    _PlotSlipDist_Compare,
+    calculate_cumulative_moment_tensor,
+    plot_beachball,
     plot_ffm_sol,
     plot_misfit,
     shakemap_polygon,
@@ -258,6 +258,10 @@ def test___PlotCumulativeSlip():
         shutil.rmtree(tempdir)
 
 
+@pytest.mark.skipif(
+    os.getenv("CI_REGISTRY") is not None,
+    reason="Build runner does not have the resources to run",
+)
 def test__PlotInsar():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
