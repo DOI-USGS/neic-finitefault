@@ -59,7 +59,8 @@ contains
    random_int = random_list1(j)
    random_list1(j) = seed
    random = min(factor1*random_int, rnmx)
-!   if (random .lt. 0) write(*,*)random
+!   if (random .lt. 0) write(*,*)'ran1 LT 0: ', random
+!   if (random .gt. 1) write(*,*)'ran1 GT 1: ', random
    end function ran1
 
 
@@ -114,7 +115,8 @@ contains
    if (int1 .lt. 0) int1 = int1+big_constant2
    random_list2(index1) = int1
    random = int1*factor2
-!   if (random .lt. 0) write(*,*)random, index1, index2
+!   if (random .lt. 0) write(*,*)'ran3 LT 0: ', random
+!   if (random .gt. 1) write(*,*)'ran3 GT 1: ', random
    end function ran3
 
 

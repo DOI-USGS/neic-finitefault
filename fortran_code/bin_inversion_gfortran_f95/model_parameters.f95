@@ -12,7 +12,7 @@ module model_parameters
    real, allocatable :: point_sources(:, :, :)
    real :: shear(max_subfaults)
    real :: dxs, dys, v_ref, v_min, v_max, lower_bound, upper_bound
-   real :: ta0, dta
+   real :: rise_param1, rise_param2
    real :: time_min(max_subfaults), time_max(max_subfaults), rake_min
    real :: time_ref(max_subfaults)
    integer :: windows
@@ -45,7 +45,7 @@ contains
    open(12, file='fault&rise_time.txt', status='old')
    read(12,*) nxs0, nys0, float1
    read(12,*) segments, dxs, dys, nx_p, ny_p, v_min, v_max, lower_bound, upper_bound
-   read(12,*) ta0, dta, windows, v_ref, int1
+   read(12,*) rise_param1, rise_param2, windows, v_ref, int1
    subfault = 0
    cum_subfaults(:) = 0
    do segment = 1, segments
@@ -697,18 +697,18 @@ contains
    end subroutine get_events_segments
 
 
-   subroutine get_rise_time(ta00, dta0, windows0)
+   subroutine get_rise_time(rise_param10, rise_param20, windows0)
 !
 !  Args:
-!  ta00: first parameter of rise time function
-!  dta0: second parameter of rise time function
+!  rise_param10: first parameter of rise time function
+!  rise_param20: second parameter of rise time function
 !  windows: time windows for rise time function
 !  
    implicit none
-   real :: ta00, dta0
+   real :: rise_param10, rise_param20
    integer :: windows0 
-   ta00 = ta0
-   dta0 = dta
+   rise_param10 = rise_param1
+   rise_param20 = rise_param2
    windows0 = windows
    end subroutine get_rise_time
 

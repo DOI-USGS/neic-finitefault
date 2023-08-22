@@ -7,9 +7,9 @@ module wavelets
    complex :: wavelet1(wave_pts2, 12), wavelet2(wave_pts2, 12), c1, c2
    integer :: switch_index(4200, 15)
    real :: cos_fft(4200), sin_fft(4200)
-   real :: wavelet_r1(wave_pts2, 12), wavelet_r2(wave_pts2, 12)
-   real :: wavelet_i1(wave_pts2, 12), wavelet_i2(wave_pts2, 12)
-   real :: real_c1, imag_c1, real_c2, imag_c2
+!   real :: wavelet_r1(wave_pts2, 12), wavelet_r2(wave_pts2, 12)
+!   real :: wavelet_i1(wave_pts2, 12), wavelet_i2(wave_pts2, 12)
+!   real :: real_c1, imag_c1, real_c2, imag_c2
    integer :: jmin, jmax, lnpt, nlen
 
 
@@ -96,8 +96,8 @@ contains
    real, intent(out) :: coeffs(wave_pts2)
    real, intent(inout) :: real1(wave_pts2), imag1(wave_pts2)
    integer index1, n, kmax, half_length, length1, j1, j2, j, k
-   real :: real0(wave_pts2), imag0(wave_pts2)
-!   complex fre(wave_pts2)
+!   real :: real0(wave_pts2), imag0(wave_pts2)
+   complex fft_array(wave_pts2)
    complex cc
 
    half_length = nlen/2!2**(lnpt-1)
@@ -111,35 +111,34 @@ contains
    end do
    imag1(index1) = 0.0
    do j = 1, nlen
-      real0(j) = real1(j)/nlen
-      imag0(j) = imag1(j)/nlen
+      fft_array(j) = cmplx(real1(j), imag1(j))/nlen
+!      real0(j) = real1(j)/nlen
+!      imag0(j) = imag1(j)/nlen
 !      real1(j) = 0.0
 !      imag1(j) = 0.0
       coeffs(j) = 0.0
    end do
-!
-! c1 = wave(pi2, 2), c2 = wave(pi, 2).
-!
-!   u(1) = real(fre(2)*c1)
-!   u(2) = real(fre(2)*c2+fre(3)*c1)
-!   u(3) = real(-fre(2)*c2+fre(3)*c1)
-   coeffs(1) = real0(2)*real_c1 - imag0(2)*imag_c1
-   coeffs(2) = real0(2)*real_c2 - imag0(2)*imag_c2
-   coeffs(2) = coeffs(2) + real0(3)*real_c1 - imag0(3)*imag_c1
-   coeffs(3) = -real0(2)*real_c2 + imag0(2)*imag_c2
-   coeffs(3) = coeffs(3) + real0(3)*real_c1 - imag0(3)*imag_c1
+   
+!   coeffs(1) = real0(2)*real_c1 - imag0(2)*imag_c1
+!   coeffs(2) = real0(2)*real_c2 - imag0(2)*imag_c2
+!   coeffs(2) = coeffs(2) + real0(3)*real_c1 - imag0(3)*imag_c1
+!   coeffs(3) = -real0(2)*real_c2 + imag0(2)*imag_c2
+!   coeffs(3) = coeffs(3) + real0(3)*real_c1 - imag0(3)*imag_c1
+   coeffs(1) = real(fft_array(2)*c1)
+   coeffs(2) = real(fft_array(2)*c2+fft_array(3)*c1)
+   coeffs(3) = real(-fft_array(2)*c2+fft_array(3)*c1)
         
    kmax = 2
    do j=3, jmax
       kmax = 2*kmax  
       do k = 1, kmax
-         real1(k) = real0(k)*wavelet_r1(k,j) - imag0(k)*wavelet_i1(k,j) &
-         & + real0(k+kmax)*wavelet_r2(k,j) - imag0(k+kmax)*wavelet_i2(k,j)
-         imag1(k) = real0(k)*wavelet_i1(k,j) + imag0(k)*wavelet_r1(k,j) &
-         & + real0(k+kmax)*wavelet_i2(k,j) + imag0(k+kmax)*wavelet_r2(k,j)
-         !cc = fre(k)*wavelet1(k, j)+fre(k+kmax)*wavelet2(k, j)
-         !cr(k) = real(cc)
-         !cz(k) = aimag(cc)
+!         real1(k) = real0(k)*wavelet_r1(k,j) - imag0(k)*wavelet_i1(k,j) &
+!         & + real0(k+kmax)*wavelet_r2(k,j) - imag0(k+kmax)*wavelet_i2(k,j)
+!         imag1(k) = real0(k)*wavelet_i1(k,j) + imag0(k)*wavelet_r1(k,j) &
+!         & + real0(k+kmax)*wavelet_i2(k,j) + imag0(k+kmax)*wavelet_r2(k,j)
+         cc = fft_array(k)*wavelet1(k, j)+fft_array(k+kmax)*wavelet2(k, j)
+         real1(k) = real(cc)
+         imag1(k) = aimag(cc)
       end do
       n = j-1
       call cifft(real1, imag1, n)
@@ -301,10 +300,10 @@ contains
    integer j, i, kmax
    c1 = 2.*wave(twopi, 2)
    c2 = 2.*wave(pi, 2)
-   real_c1 = real(c1)
-   imag_c1 = aimag(c1)
-   real_c2 = real(c2)
-   imag_c2 = aimag(c2)
+!   real_c1 = real(c1)
+!   imag_c1 = aimag(c1)
+!   real_c2 = real(c2)
+!   imag_c2 = aimag(c2)
 !
 !       Create the coefficients of Mayer wavelet function
 !       so it should be called before any further application.
@@ -316,10 +315,10 @@ contains
          omega2 = omega1+twopi
          wavelet1(i, j) = 2.*wave(omega1, 2)
          wavelet2(i, j) = 2.*wave(omega2, 2)
-         wavelet_r1(i, j) = real(wavelet1(i, j))
-         wavelet_i1(i, j) = aimag(wavelet1(i, j))
-         wavelet_r2(i, j) = real(wavelet2(i, j))
-         wavelet_i2(i, j) = aimag(wavelet2(i, j))
+!         wavelet_r1(i, j) = real(wavelet1(i, j))
+!         wavelet_i1(i, j) = aimag(wavelet1(i, j))
+!         wavelet_r2(i, j) = real(wavelet2(i, j))
+!         wavelet_i2(i, j) = aimag(wavelet2(i, j))
       end do
    end do
    end subroutine meyer_yamada

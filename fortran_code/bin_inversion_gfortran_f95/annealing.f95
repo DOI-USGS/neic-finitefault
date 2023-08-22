@@ -28,11 +28,11 @@ module annealing
    integer, parameter :: double = kind(1.d0)
    integer, private :: threads
    integer, parameter, private :: max_move=50, accept_max=5
-   integer :: segments, msou, nxs_sub(max_seg), nys_sub(max_seg), subfaults
+   integer :: segments, windows, nxs_sub(max_seg), nys_sub(max_seg), subfaults
    real :: minimum(max_subfaults2), delta(max_subfaults2)
    integer :: n_values(max_subfaults2)
    real :: time_min(max_subfaults), time_max(max_subfaults)
-   real :: shear(max_subfaults), ta0, dta, dxs, dys
+   real :: shear(max_subfaults), rise_param1, rise_param2, dxs, dys
    integer :: max_freq, lnpt, channels
    real :: dt_channel(max_stations)
    logical :: segment_in_event(max_seg, 10), subfault_in_event(max_subfaults, 10)
@@ -63,7 +63,7 @@ contains
    real :: dip(max_seg), strike(max_seg), delay_seg(max_seg)
    integer :: cum_subfaults(max_seg), nx_p, ny_p
    real :: v_min, v_max, v_ref, time_ref(max_subfaults2)
-   call get_rise_time(ta0, dta, msou)
+   call get_rise_time(rise_param1, rise_param2, windows)
    call get_shear(shear)
    call get_segments(nxs_sub, nys_sub, dip, strike, delay_seg, segments, subfaults, cum_subfaults)
    call get_subfaults(dxs, dys, nx_p, ny_p, v_min, v_max, v_ref)
@@ -136,8 +136,8 @@ contains
             k = k + 1
             rake(subfault) = random(k)
             k = k + 2
-            t_rise(subfault) = (ta0+int(ran1()*msou)*dta)
-            t_fall(subfault) = (ta0+int(ran1()*msou)*dta)
+            t_rise(subfault) = (rise_param1+int(ran1()*windows)*rise_param2)
+            t_fall(subfault) = (rise_param1+int(ran1()*windows)*rise_param2)
             rupt_time(subfault) = ran1()* &
      &  (time_max(subfault)-time_min(subfault))+time_min(subfault)
          end do
@@ -207,8 +207,8 @@ contains
          rake2 = rake(subfault)*dpi
          slip_dip = sin(rake2)*slip(subfault)
          slip_stk = cos(rake2)*slip(subfault)
-         irise = int((t_rise(subfault)-ta0)/dta+0.5)+1
-         ifall = int((t_fall(subfault)-ta0)/dta+0.5)+1
+         irise = int((t_rise(subfault)-rise_param1)/rise_param2+0.5)+1
+         ifall = int((t_fall(subfault)-rise_param1)/rise_param2+0.5)+1
          shift = -twopi*delta_freq*rupt_time(subfault)
          z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
@@ -388,8 +388,8 @@ contains
          rake2 = rake(subfault)*dpi
          slip_dip = sin(rake2)*slip(subfault)
          slip_stk = cos(rake2)*slip(subfault)
-         irise = int((t_rise(subfault)-ta0)/dta+0.5)+1
-         ifall = int((t_fall(subfault)-ta0)/dta+0.5)+1
+         irise = int((t_rise(subfault)-rise_param1)/rise_param2+0.5)+1
+         ifall = int((t_fall(subfault)-rise_param1)/rise_param2+0.5)+1
          shift = -twopi*delta_freq*rupt_time(subfault)
          z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
@@ -573,8 +573,8 @@ contains
          rake2 = rake(subfault)*dpi
          slip_dip = sin(rake2)*slip(subfault)
          slip_stk = cos(rake2)*slip(subfault)
-         irise = int((t_rise(subfault)-ta0)/dta+0.5)+1
-         ifall = int((t_fall(subfault)-ta0)/dta+0.5)+1
+         irise = int((t_rise(subfault)-rise_param1)/rise_param2+0.5)+1
+         ifall = int((t_fall(subfault)-rise_param1)/rise_param2+0.5)+1
          shift = -twopi*delta_freq*rupt_time(subfault)
          z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
@@ -651,8 +651,8 @@ contains
       rake0 = rake(subfault)
       trise0 = t_rise(subfault)
       tfall0 = t_fall(subfault)
-      irise = int((trise0-ta0)/dta+0.5)+1
-      ifall = int((tfall0-ta0)/dta+0.5)+1
+      irise = int((trise0-rise_param1)/rise_param2+0.5)+1
+      ifall = int((tfall0-rise_param1)/rise_param2+0.5)+1
       rake2 = rake0*dpi
       slip_dip = sin(rake2)*slip0
       slip_stk = cos(rake2)*slip0
@@ -714,9 +714,9 @@ contains
 !
 !  rise time parameters extreme values
 !  
-      rise_time_beg = ta0
-      rise_time_end = ta0+(msou-1)*dta
-      rise_time_max = (msou-1)*dta
+      rise_time_beg = rise_param1
+      rise_time_end = rise_param1+(windows-1)*rise_param2
+      rise_time_max = (windows-1)*rise_param2
       do i = 1, max_move
 !
 !       Save values before the perturbation
@@ -758,14 +758,14 @@ contains
 !  Perturb rise time parameters
 !  
          irise = 0
-         do while (irise .lt. 1 .or. irise .gt. msou)
+         do while (irise .lt. 1 .or. irise .gt. windows)
             call cauchy(t, random0)                           
-            irise = int((trise0+random0*rise_time_max-ta0)/dta+0.5)+1
+            irise = int((trise0+random0*rise_time_max-rise_param1)/rise_param2+0.5)+1
          end do   
          ifall = 0
-         do while (ifall .lt. 1 .or. ifall .gt. msou)
+         do while (ifall .lt. 1 .or. ifall .gt. windows)
             call cauchy(t, random0)                           
-            ifall = int((tfall0+random0*rise_time_max-ta0)/dta+0.5)+1
+            ifall = int((tfall0+random0*rise_time_max-rise_param1)/rise_param2+0.5)+1
          end do
          
          rake2 = rake1*dpi
@@ -828,8 +828,8 @@ contains
             slip(subfault) = slip1
             rake(subfault) = rake1
             rupt_time(subfault) = rupt_time1
-            t_rise(subfault) = (irise-1)*dta+ta0
-            t_fall(subfault) = (ifall-1)*dta+ta0
+            t_rise(subfault) = (irise-1)*rise_param2+rise_param1
+            t_fall(subfault) = (ifall-1)*rise_param2+rise_param1
             n_accept = n_accept+1
          else
             rupt_time(subfault) = rupt_time0
@@ -853,8 +853,8 @@ contains
       rake2 = rake0*dpi
       slip_dip = sin(rake2)*slip0
       slip_stk = cos(rake2)*slip0
-      irise = int((trise0-ta0)/dta+0.5)+1
-      ifall = int((tfall0-ta0)/dta+0.5)+1
+      irise = int((trise0-rise_param1)/rise_param2+0.5)+1
+      ifall = int((tfall0-rise_param1)/rise_param2+0.5)+1
       kahan_y = slip0*shear(subfault)-kahan_c 
       kahan_t = moment0+kahan_y
       kahan_c = (kahan_t-moment0)-kahan_y
@@ -938,8 +938,8 @@ contains
          rake2 = rake(subfault)*dpi
          slip_dip = sin(rake2)*slip(subfault)
          slip_stk = cos(rake2)*slip(subfault)
-         irise = int((t_rise(subfault)-ta0)/dta+0.5)+1
-         ifall = int((t_fall(subfault)-ta0)/dta+0.5)+1
+         irise = int((t_rise(subfault)-rise_param1)/rise_param2+0.5)+1
+         ifall = int((t_fall(subfault)-rise_param1)/rise_param2+0.5)+1
          shift = -twopi*delta_freq*rupt_time(subfault)
          z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
@@ -1022,8 +1022,8 @@ contains
       rake0 = rake(subfault)
       trise0 = t_rise(subfault)
       tfall0 = t_fall(subfault)
-      irise = int((trise0-ta0)/dta+0.5)+1
-      ifall = int((tfall0-ta0)/dta+0.5)+1
+      irise = int((trise0-rise_param1)/rise_param2+0.5)+1
+      ifall = int((tfall0-rise_param1)/rise_param2+0.5)+1
       rake2 = rake0*dpi
       slip_dip = sin(rake2)*slip0
       slip_stk = cos(rake2)*slip0
@@ -1082,9 +1082,9 @@ contains
 !
 !  rise time parameters extreme values
 !  
-      rise_time_beg = ta0
-      rise_time_end = ta0+(msou-1)*dta
-      rise_time_max = (msou-1)*dta
+      rise_time_beg = rise_param1
+      rise_time_end = rise_param1+(windows-1)*rise_param2
+      rise_time_max = (windows-1)*rise_param2
       do i = 1, max_move
 !
 !       Save values before the perturbation
@@ -1126,14 +1126,14 @@ contains
 !  Perturb rise time parameters
 !  
          irise = 0
-         do while (irise .lt. 1 .or. irise .gt. msou)
+         do while (irise .lt. 1 .or. irise .gt. windows)
             call cauchy(t, random0)                           
-            irise = int((trise0+random0*rise_time_max-ta0)/dta+0.5)+1
+            irise = int((trise0+random0*rise_time_max-rise_param1)/rise_param2+0.5)+1
          end do   
          ifall = 0
-         do while (ifall .lt. 1 .or. ifall .gt. msou)
+         do while (ifall .lt. 1 .or. ifall .gt. windows)
             call cauchy(t, random0)                           
-            ifall = int((tfall0+random0*rise_time_max-ta0)/dta+0.5)+1
+            ifall = int((tfall0+random0*rise_time_max-rise_param1)/rise_param2+0.5)+1
          end do
          
          rake2 = rake1*dpi
@@ -1198,8 +1198,8 @@ contains
             slip(subfault) = slip1
             rake(subfault) = rake1
             rupt_time(subfault) = rupt_time1
-            t_rise(subfault) = (irise-1)*dta+ta0
-            t_fall(subfault) = (ifall-1)*dta+ta0
+            t_rise(subfault) = (irise-1)*rise_param2+rise_param1
+            t_fall(subfault) = (ifall-1)*rise_param2+rise_param1
             n_accept = n_accept+1
          else
             rupt_time(subfault) = rupt_time0
@@ -1223,8 +1223,8 @@ contains
       rake2 = rake0*dpi
       slip_dip = sin(rake2)*slip0
       slip_stk = cos(rake2)*slip0
-      irise = int((trise0-ta0)/dta+0.5)+1
-      ifall = int((tfall0-ta0)/dta+0.5)+1
+      irise = int((trise0-rise_param1)/rise_param2+0.5)+1
+      ifall = int((tfall0-rise_param1)/rise_param2+0.5)+1
       kahan_y = slip0*shear(subfault)-kahan_c 
       kahan_t = moment0+kahan_y
       kahan_c = (kahan_t-moment0)-kahan_y
@@ -1362,8 +1362,8 @@ contains
          rake2 = rake(subfault)*dpi
          slip_dip = sin(rake2)*slip(subfault)
          slip_stk = cos(rake2)*slip(subfault)
-         irise = int((t_rise(subfault)-ta0)/dta+0.5)+1
-         ifall = int((t_fall(subfault)-ta0)/dta+0.5)+1
+         irise = int((t_rise(subfault)-rise_param1)/rise_param2+0.5)+1
+         ifall = int((t_fall(subfault)-rise_param1)/rise_param2+0.5)+1
          shift = -twopi*delta_freq*rupt_time(subfault)
          z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
@@ -1456,8 +1456,8 @@ contains
       rake0 = rake(subfault)
       trise0 = t_rise(subfault)
       tfall0 = t_fall(subfault)
-      irise = int((trise0-ta0)/dta+0.5)+1
-      ifall = int((tfall0-ta0)/dta+0.5)+1
+      irise = int((trise0-rise_param1)/rise_param2+0.5)+1
+      ifall = int((tfall0-rise_param1)/rise_param2+0.5)+1
       rake2 = rake0*dpi
       slip_dip = sin(rake2)*slip0
       slip_stk = cos(rake2)*slip0
@@ -1520,9 +1520,9 @@ contains
 !
 !  rise time parameters extreme values
 !  
-      rise_time_beg = ta0
-      rise_time_end = ta0+(msou-1)*dta
-      rise_time_max = (msou-1)*dta
+      rise_time_beg = rise_param1
+      rise_time_end = rise_param1+(windows-1)*rise_param2
+      rise_time_max = (windows-1)*rise_param2
       do i = 1, max_move
 !
 !       Save values before the perturbation
@@ -1564,14 +1564,14 @@ contains
 !  Perturb rise time parameters
 !  
          irise = 0
-         do while (irise .lt. 1 .or. irise .gt. msou)
+         do while (irise .lt. 1 .or. irise .gt. windows)
             call cauchy(t, random0)                         
-            irise = int((trise0+random0*rise_time_max-ta0)/dta+0.5)+1
+            irise = int((trise0+random0*rise_time_max-rise_param1)/rise_param2+0.5)+1
          end do   
          ifall = 0
-         do while (ifall .lt. 1 .or. ifall .gt. msou)
+         do while (ifall .lt. 1 .or. ifall .gt. windows)
             call cauchy(t, random0)                         
-            ifall = int((tfall0+random0*rise_time_max-ta0)/dta+0.5)+1
+            ifall = int((tfall0+random0*rise_time_max-rise_param1)/rise_param2+0.5)+1
          end do
          
          rake2 = rake1*dpi
@@ -1636,8 +1636,8 @@ contains
             slip(subfault) = slip1
             rake(subfault) = rake1
             rupt_time(subfault) = rupt_time1
-            t_rise(subfault) = (irise-1)*dta+ta0
-            t_fall(subfault) = (ifall-1)*dta+ta0
+            t_rise(subfault) = (irise-1)*rise_param2+rise_param1
+            t_fall(subfault) = (ifall-1)*rise_param2+rise_param1
             n_accept = n_accept+1
          else
             rupt_time(subfault) = rupt_time0
@@ -1661,8 +1661,8 @@ contains
       rake2 = rake0*dpi
       slip_dip = sin(rake2)*slip0
       slip_stk = cos(rake2)*slip0
-      irise = int((trise0-ta0)/dta+0.5)+1
-      ifall = int((tfall0-ta0)/dta+0.5)+1
+      irise = int((trise0-rise_param1)/rise_param2+0.5)+1
+      ifall = int((tfall0-rise_param1)/rise_param2+0.5)+1
       kahan_y = slip0*shear(subfault)-kahan_c 
       kahan_t = moment0(event)+kahan_y
       kahan_c = (kahan_t-moment0(event))-kahan_y
@@ -1755,8 +1755,8 @@ contains
          rake2 = rake(subfault)*dpi
          slip_dip = sin(rake2)*slip(subfault)
          slip_stk = cos(rake2)*slip(subfault)
-         irise = int((t_rise(subfault)-ta0)/dta+0.5)+1
-         ifall = int((t_fall(subfault)-ta0)/dta+0.5)+1
+         irise = int((t_rise(subfault)-rise_param1)/rise_param2+0.5)+1
+         ifall = int((t_fall(subfault)-rise_param1)/rise_param2+0.5)+1
          shift = -twopi*delta_freq*rupt_time(subfault)
          z1 = cmplx(cos(shift), sin(shift), double)
          z = cmplx(1.d0, 0.d0, double)
@@ -1856,8 +1856,8 @@ contains
       rake0 = rake(subfault)
       trise0 = t_rise(subfault)
       tfall0 = t_fall(subfault)
-      irise = int((trise0-ta0)/dta+0.5)+1
-      ifall = int((tfall0-ta0)/dta+0.5)+1
+      irise = int((trise0-rise_param1)/rise_param2+0.5)+1
+      ifall = int((tfall0-rise_param1)/rise_param2+0.5)+1
       rake2 = rake0*dpi
       slip_dip = sin(rake2)*slip0
       slip_stk = cos(rake2)*slip0
@@ -1917,9 +1917,9 @@ contains
 !
 !  rise time parameters extreme values
 !  
-      rise_time_beg = ta0
-      rise_time_end = ta0+(msou-1)*dta
-      rise_time_max = (msou-1)*dta
+      rise_time_beg = rise_param1
+      rise_time_end = rise_param1+(windows-1)*rise_param2
+      rise_time_max = (windows-1)*rise_param2
       do i = 1, max_move
 !
 !       Save values before the perturbation
@@ -1961,14 +1961,14 @@ contains
 !  Perturb rise time parameters
 !  
          irise = 0
-         do while (irise .lt. 1 .or. irise .gt. msou)
+         do while (irise .lt. 1 .or. irise .gt. windows)
             call cauchy(t, random0)                         
-            irise = int((trise0+random0*rise_time_max-ta0)/dta+0.5)+1
+            irise = int((trise0+random0*rise_time_max-rise_param1)/rise_param2+0.5)+1
          end do   
          ifall = 0
-         do while (ifall .lt. 1 .or. ifall .gt. msou)
+         do while (ifall .lt. 1 .or. ifall .gt. windows)
             call cauchy(t, random0)                         
-            ifall = int((tfall0+random0*rise_time_max-ta0)/dta+0.5)+1
+            ifall = int((tfall0+random0*rise_time_max-rise_param1)/rise_param2+0.5)+1
          end do
          
          rake2 = rake1*dpi
@@ -2035,8 +2035,8 @@ contains
             slip(subfault) = slip1
             rake(subfault) = rake1
             rupt_time(subfault) = rupt_time1
-            t_rise(subfault) = (irise-1)*dta+ta0
-            t_fall(subfault) = (ifall-1)*dta+ta0
+            t_rise(subfault) = (irise-1)*rise_param2+rise_param1
+            t_fall(subfault) = (ifall-1)*rise_param2+rise_param1
             n_accept = n_accept+1
          else
             rupt_time(subfault) = rupt_time0
@@ -2060,8 +2060,8 @@ contains
       rake2 = rake0*dpi
       slip_dip = sin(rake2)*slip0
       slip_stk = cos(rake2)*slip0
-      irise = int((trise0-ta0)/dta+0.5)+1
-      ifall = int((tfall0-ta0)/dta+0.5)+1
+      irise = int((trise0-rise_param1)/rise_param2+0.5)+1
+      ifall = int((tfall0-rise_param1)/rise_param2+0.5)+1
       kahan_y = slip0*shear(subfault)-kahan_c 
       kahan_t = moment0(event)+kahan_y
       kahan_c = (kahan_t-moment0(event))-kahan_y

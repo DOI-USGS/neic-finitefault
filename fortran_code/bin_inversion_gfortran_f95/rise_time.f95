@@ -158,10 +158,10 @@ contains
    real :: dt
    real*8 :: df, t1, t2
    integer :: i, channel, isl, isr, jf
-   real :: ta0, dta
+   real :: rise_param1, rise_param2
    integer :: windows, lnpt, jmin, jmax, nlen, max_freq
    allocate(source(wave_pts2, max_stations, max_rise_time_range, max_rise_time_range))
-   call get_rise_time(ta0, dta, windows)
+   call get_rise_time(rise_param1, rise_param2, windows)
    call get_data_param(lnpt, jmin, jmax, nlen, max_freq)
 !       
 ! Here, we load into memory, the Fourier transform of rise time function 
@@ -174,8 +174,8 @@ contains
       if (abs(dt - 60.0) .gt. 1.e-4) then
          do isr = 1, windows
             do isl = 1, windows
-               t1 = ta0+(isl-1)*dta
-               t2 = ta0+(isr-1)*dta
+               t1 = rise_param1+(isl-1)*rise_param2
+               t2 = rise_param1+(isr-1)*rise_param2
                t1 = max(dt, t1)
                t2 = max(dt, t2)
                do i = 1, jf

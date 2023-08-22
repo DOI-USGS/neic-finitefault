@@ -10,7 +10,7 @@ module save_forward
    implicit none
    integer, parameter :: nnsta_tele = 80
    integer :: nxs_sub(max_seg), nys_sub(max_seg), windows, segments, subfaults
-   real :: dta, ta0, dt_channel(max_stations)
+   real :: rise_param2, rise_param1, dt_channel(max_stations)
    integer :: lnpt, max_freq, nlen
    character(len=15) :: sta_name(max_stations)
    character(len=3) :: component(max_stations)
@@ -24,7 +24,7 @@ contains
    implicit none
    real :: dip(max_seg), strike(max_seg), delay_seg(max_seg)
    integer :: cum_subfaults(max_seg)
-   call get_rise_time(ta0, dta, windows)
+   call get_rise_time(rise_param1, rise_param2, windows)
    call get_segments(nxs_sub, nys_sub, dip, strike, delay_seg, segments, subfaults, cum_subfaults)
    end subroutine saveforward_set_fault_parameters
 
@@ -143,8 +143,8 @@ contains
    do j = 1, windows
       do k = 1, windows
          source2(:, j, k) = cmplx(0.0, 0.0)
-         t1 = ta0+(j-1)*dta
-         t2 = ta0+(k-1)*dta
+         t1 = rise_param1+(j-1)*rise_param2
+         t2 = rise_param1+(k-1)*rise_param2
          if (t1 .lt. dt) t1 = dt
          if (t2 .lt. dt) t2 = dt
          do i = 1, 2*max_freq
@@ -228,8 +228,8 @@ contains
    df = 1.d0/(2**lnpt)/dt
    do j = 1, windows
       do k = 1, windows
-         t1 = ta0+(j-1)*dta
-         t2 = ta0+(k-1)*dta
+         t1 = rise_param1+(j-1)*rise_param2
+         t2 = rise_param1+(k-1)*rise_param2
          if (t1 .lt. dt) t1 = dt
          if (t2 .lt. dt) t2 = dt
          do i = 1, 2*max_freq
@@ -317,8 +317,8 @@ contains
    df = 1.d0/(2**lnpt)/4.d0
    do j = 1, windows
       do k = 1, windows
-         t1 = ta0+(j-1)*dta
-         t2 = ta0+(k-1)*dta
+         t1 = rise_param1+(j-1)*rise_param2
+         t2 = rise_param1+(k-1)*rise_param2
          if (t1 .lt. dt) t1 = dt
          if (t2 .lt. dt) t2 = dt
          do i = 1, 2*max_freq
@@ -405,8 +405,8 @@ contains
    df = 1.d0/(2**lnpt)/dt
    do j = 1, windows
       do k = 1, windows
-         t1 = ta0+(j-1)*dta
-         t2 = ta0+(k-1)*dta
+         t1 = rise_param1+(j-1)*rise_param2
+         t2 = rise_param1+(k-1)*rise_param2
          if (t1 .lt. dt) t1 = dt
          if (t2 .lt. dt) t2 = dt
          do i = 1, 2*max_freq
@@ -477,8 +477,8 @@ contains
       forward(i) = z0
    end do
    do subfault = 1, subfaults
-      j = int((trise(subfault)-ta0)/dta+0.5)+1
-      k = int((tfall(subfault)-ta0)/dta+0.5)+1
+      j = int((trise(subfault)-rise_param1)/rise_param2+0.5)+1
+      k = int((tfall(subfault)-rise_param1)/rise_param2+0.5)+1
       rake2 = rake(subfault)*dpi
       slip_dip = sin(rake2)*slip(subfault)
       slip_stk = cos(rake2)*slip(subfault)
