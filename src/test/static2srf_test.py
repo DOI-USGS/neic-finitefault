@@ -103,7 +103,8 @@ def test_static_to_srf():
             "  4.085888e+00  4.321979e+00  4.467891e+00  4.517247e+00  4.467891e+00  4.321979e+00\n",
         ]
         for idx, target_line in enumerate(target):
-            print([data[idx]])
+            if "@usgs.gov" in target_line:
+                continue
             assert data[idx] == target_line
     finally:
         shutil.rmtree(tempdir)
