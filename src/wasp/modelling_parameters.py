@@ -25,7 +25,7 @@ def modelling_prop(
     moment_mag: Optional[float] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> Tuple[dict, list]:
-    """Write a file with input for performingFFM modelling using simulated annealing
+    """Write a file with input for performing FFM modelling using simulated annealing
 
     :param tensor_info: The tensor information
     :type tensor_info: dict
@@ -47,9 +47,9 @@ def modelling_prop(
 
     syn_len = int(2.5 * time_shift)
     #    factor = 1 / len(data_type2)
-    moment_weight = 0.1  # * factor
-    slip_weight = 0.15  # * factor
-    time_weight = 0.15  # * factor
+    moment_weight = 0.1
+    slip_weight = 0.15
+    time_weight = 0.15
     dictionary = {
         "initial_temperature": 0.01,
         "seismic_moment": moment_mag,
