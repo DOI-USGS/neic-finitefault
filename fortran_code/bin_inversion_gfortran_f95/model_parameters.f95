@@ -3,12 +3,12 @@ module model_parameters
 
    use constants, only : max_seg, max_stk_psources, max_dip_psources, max_stk_subfaults, &
                &     max_dip_subfaults, max_subf, max_subfaults, max_subfaults2, max_psources
-   use modelling_inputs, only : t_latest
+   use modelling_inputs, only : get_weights_moment_end, get_many_events
    implicit none
    real :: slip0(max_subfaults), rake0(max_subfaults), rupt_time0(max_subfaults)
    real :: t_rise0(max_subfaults), t_fall0(max_subfaults)
    integer :: segments, nxs_sub(max_seg), nys_sub(max_seg), nx_p, ny_p, nxs0, nys0
-   real :: dip(max_seg), strike(max_seg), delay_seg(max_seg)
+   real :: dip(max_seg), strike(max_seg), delay_seg(max_seg), t_latest
    real, allocatable :: point_sources(:, :, :)
    real :: shear(max_subfaults)
    real :: dxs, dys, v_ref, v_min, v_max, lower_bound, upper_bound
@@ -18,7 +18,7 @@ module model_parameters
    integer :: windows
    real :: minimum(max_subfaults2), delta(max_subfaults2)
    integer :: n_values(max_subfaults2)
-   integer :: subfaults, cum_subfaults(max_seg)
+   integer :: subfaults, cum_subfaults(max_seg), events
    logical :: segment_in_event(max_seg, 10)
    logical :: subfault_in_event(max_subfaults, 10)
 !
@@ -29,6 +29,20 @@ module model_parameters
 
 
 contains
+
+   
+   subroutine modelparameters_set_procedure_param()
+   implicit none
+   real :: real0, real1, real2, real3, real4
+   call get_weights_moment_end(real0, real1, real2, real3, t_latest, real4)
+   end subroutine modelparameters_set_procedure_param
+
+   
+   subroutine modelparameters_set_events()
+   implicit none
+   real :: moment_event(10)
+   call get_many_events(events, moment_event)
+   end subroutine modelparameters_set_events
 
 
    subroutine get_faults_data()
@@ -140,7 +154,6 @@ contains
 
 
    subroutine events_segments()
-   use modelling_inputs, only : events
    implicit none
    integer :: event_segment(max_seg)
    integer :: integer1, integer2, i, k, segment, subfault0

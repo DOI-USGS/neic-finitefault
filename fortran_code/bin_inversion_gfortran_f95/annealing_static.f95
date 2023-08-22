@@ -4,7 +4,7 @@ module annealing_static
    use constants, only : pi, max_stations, dpi, twopi, max_subf, max_seg, wave_pts2, &
             &   max_subfaults2, wave_pts, max_subfaults
    use random_gen, only : ran1, cauchy
-   use modelling_inputs, only : smooth_moment, smooth_slip, moment_input, emin0
+   use modelling_inputs, only : get_weights_moment_end 
    use regularization, only : slip_laplace, define_slip_field, modify_slip_field
    use static_data, only : static_synthetic, static_remove_subfault, &
                        &   static_modify_subfault, static_add_subfault
@@ -17,6 +17,7 @@ module annealing_static
    real :: coef_moment, coef_slip, coef_gps, coef_insar
    real :: current_value, min_value, min_dt, area
    real :: insar_misfit0
+   real :: moment_input, smooth_moment, smooth_slip, smooth_time, emin0
    integer :: subfaults_segment(max_seg)
    integer, parameter :: double = kind(1.d0)
    integer, private :: threads
@@ -42,6 +43,13 @@ contains
    call get_subfaults(dxs, dys, nx_p, ny_p, v_min, v_max, v_ref)
    call get_space(time_min, time_max, time_ref, minimum, delta, n_values)
    end subroutine annealingstatic_set_fault_properties
+   
+
+   subroutine annealingstatic_set_procedure_param()
+   implicit none
+   real :: real0
+   call get_weights_moment_end(moment_input, smooth_moment, smooth_slip, smooth_time, real0, emin0)
+   end subroutine annealingstatic_set_procedure_param
 
 
    subroutine print_static_summary(slip, rake, static, insar, get_coeff, ramp)

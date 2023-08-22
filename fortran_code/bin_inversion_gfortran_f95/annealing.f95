@@ -10,8 +10,7 @@ module annealing
    use get_stations_data, only : get_properties, count_wavelets
    use random_gen, only : ran1, cauchy
    use misfit_eval, only : misfit_channel
-   use modelling_inputs, only : smooth_moment, smooth_slip, smooth_time, io_re, moment_input, emin0, &
-            &   t_latest
+   use modelling_inputs, only : get_annealing_param, get_weights_moment_end, get_many_events 
    use regularization, only : slip_laplace, time_laplace, define_slip_field, modify_slip_field
    use static_data, only : static_synthetic, static_remove_subfault, &
                        &   static_modify_subfault, static_add_subfault
@@ -28,13 +27,15 @@ module annealing
    integer, parameter :: double = kind(1.d0)
    integer, private :: threads
    integer, parameter, private :: max_move=50, accept_max=5
-   integer :: segments, windows, nxs_sub(max_seg), nys_sub(max_seg), subfaults
+   integer :: segments, windows, nxs_sub(max_seg), nys_sub(max_seg), subfaults, io_re
    real :: minimum(max_subfaults2), delta(max_subfaults2)
    integer :: n_values(max_subfaults2)
    real :: time_min(max_subfaults), time_max(max_subfaults)
    real :: shear(max_subfaults), rise_param1, rise_param2, dxs, dys
-   integer :: max_freq, lnpt, channels
+   integer :: max_freq, lnpt, channels, events
    real :: dt_channel(max_stations)
+   real :: moment_input, smooth_moment, smooth_slip, smooth_time, t_latest, emin0
+   real :: moment_event(10)
    logical :: segment_in_event(max_seg, 10), subfault_in_event(max_subfaults, 10)
    real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
    real, allocatable :: forward_real(:, :), forward_imag(:, :)
@@ -81,6 +82,22 @@ contains
    call get_properties(sta_name, component, dt_channel, channels)
    call get_data_param(lnpt, jmin, jmax, nlen, max_freq)
    end subroutine annealing_set_data_properties
+
+   
+   subroutine annealing_set_procedure_param()
+   implicit none
+   integer :: int0, int1
+   real :: real0, real1, real2, real3, real4
+   call get_annealing_param(int0, int1, real0, real1, real2, io_re, real3)
+   call get_weights_moment_end(moment_input, smooth_moment, smooth_slip, smooth_time, &
+                                &    real4, emin0)
+   end subroutine annealing_set_procedure_param
+
+   
+   subroutine annealing_set_events()
+   implicit none
+   call get_many_events(events, moment_event)
+   end subroutine annealing_set_events
 
 
    subroutine allocate_forward()
@@ -346,7 +363,6 @@ contains
 !  get_coeff: get regularization coefficients if and only if this is True
 !  ramp: Value of insar ramp, optional
 !
-   use modelling_inputs, only : events, moment_event
    implicit none
    real*8, optional :: ramp(:)
    real :: slip(:), rake(:), rupt_time(:)
@@ -1323,7 +1339,6 @@ contains
 !  t_fall: array with model falltime values for all subfaults
 !  t: Current temperature of the annealing method
 !
-   use modelling_inputs, only : events, moment_event
    implicit none
    real, intent(inout) :: slip(:), rake(:), rupt_time(:), t_fall(:), t_rise(:)
    real, intent(in) :: t
@@ -1713,7 +1728,6 @@ contains
 !  insar: True if insar data used in modelling, False otherwise
 !  ramp: Value of insar ramp, optional
 !
-   use modelling_inputs, only : events, moment_event
    implicit none
    real, intent(inout) :: slip(:), rake(:), rupt_time(:), t_fall(:), t_rise(:)
    real, intent(in) :: t

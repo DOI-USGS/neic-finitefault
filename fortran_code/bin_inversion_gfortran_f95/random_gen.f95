@@ -22,14 +22,14 @@ module random_gen
 contains
 
 
-   subroutine start_seed(idum)
+   subroutine start_seed(seed0)
 !
 !  Args:
-!  idum: seed value
+!  seed0: seed value
 !
    implicit none
-   integer, intent(in) :: idum
-   seed = idum
+   integer, intent(in) :: seed0
+   seed = seed0
    initialize = 0
    random_list1(:) = 0
    random_int = 0
