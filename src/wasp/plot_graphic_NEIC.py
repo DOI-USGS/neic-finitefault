@@ -98,7 +98,7 @@ def plot_ffm_sol(
     :type point_sources: np.ndarray
     :param shear: The shear moduli
     :type shear: list
-    :param solution: The solution read from Solucion.txt
+    :param solution: The kinematic model read from Solucion.txt
     :type solution: dict
     :param default_dirs: The location of default directories
     :type default_dirs: dict
@@ -298,7 +298,7 @@ def _PlotRuptTime(
     :type segments: dict
     :param point_sources: The point source locations
     :type point_sources: np.ndarray
-    :param solution: The solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param directory: The location where to write plots, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
@@ -351,7 +351,7 @@ def _PlotRiseTime(
     :type segments: dict
     :param point_sources: The point source locations
     :type point_sources: np.ndarray
-    :param solution: The solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param directory: The location where to write plots, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
@@ -418,7 +418,7 @@ def _PlotMultiSlipDist(
     :type segments: dict
     :param point_sources: The point source locations
     :type point_sources: np.ndarray
-    :param solution: The solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param autosize: Automatically size the figure, defaults to False
     :type autosize: bool, optional
@@ -562,7 +562,7 @@ def _PlotSlipDistribution(
     :type segments: dict
     :param point_sources: The point source locations
     :type point_sources: np.ndarray
-    :param solution: The solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param autosize: Automatically size the figure, defaults to False
     :type autosize: bool, optional
@@ -706,7 +706,7 @@ def _PlotSlipTimes(
     :type segments: dict
     :param point_sources: The point source locations
     :type point_sources: np.ndarray
-    :param solution: The solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param directory: The location where to write plots, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
@@ -969,7 +969,7 @@ def _PlotCumulativeSlip(
     :type segments: dict
     :param point_sources: The point source locations
     :type point_sources: np.ndarray
-    :param solution: The solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param tensor_info: The tensor information
     :type tensor_info: dict
@@ -1232,7 +1232,7 @@ def _PlotSlipDist_Compare(
     :type point_sources: np.ndarray
     :param input_model: The model
     :type input_model: dict
-    :param solution: The solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param max_val: Specify a max value, defaults to None
     :type max_val: Optional[float], optional
@@ -1337,7 +1337,7 @@ def _PlotMap(
     :type segments: List[dict]
     :param point_sources: The point source locations
     :type point_sources: np.ndarray
-    :param solution: The solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param default_dirs: The location of default directories
     :type default_dirs: dict
@@ -1985,7 +1985,7 @@ def _PlotInsar(
     :type segments: List[dict]
     :param point_sources: The point source locations
     :type point_sources: np.ndarray
-    :param solution: The solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param insar_points: List of insar data
     :type insar_points: List[dict]
@@ -2186,7 +2186,7 @@ def _PlotComparisonMap(
     :type point_sources: np.ndarray
     :param input_model: the model
     :type input_model: dict
-    :param solution: The solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param max_val: Specify a maximum value, defaults to None
     :type max_val: Optional[float], optional
@@ -2524,7 +2524,7 @@ def _PlotSnapshotSlip(
 
     :param segments: The segment properties
     :type segments: dict
-    :param solution: The solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param directory: Where to write the plots, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path,str], optional
@@ -2620,7 +2620,7 @@ def shakemap_polygon(
     :type segments: dict
     :param point_sources: The point source locations
     :type point_sources: np.ndarray
-    :param solution: The solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param tensor_info: The tensor information
     :type tensor_info: dict
@@ -2657,7 +2657,7 @@ def calculate_cumulative_moment_tensor(
 ):
     """Calculate the cumulative moment tensor
 
-    :param solution: The solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param directory: Whwere the segments file is located and where to write to,
                     defaults to pathlib.Path()
@@ -2966,7 +2966,6 @@ def __extent_plot(plane_info: dict) -> List[float]:
     :return: The extent
     :rtype: List[float]
     """
-
     (
         stk_subfaults,
         dip_subfaults,
