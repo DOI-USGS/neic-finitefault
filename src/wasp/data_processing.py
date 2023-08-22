@@ -9,6 +9,7 @@ import errno
 import glob
 import json
 import os
+import pathlib
 import time
 from multiprocessing import Pool  # , cpu_count
 from shutil import copy2
@@ -35,7 +36,9 @@ import wasp.wang_baseline_removal_v1 as wang1
 ###################################
 
 
-def select_process_tele_body(tele_files0, tensor_info, data_prop):
+def select_process_tele_body(
+    tele_files0, tensor_info, data_prop, directory=pathlib.Path()
+):
     """Module for automatic selection and processing of teleseismic body waves.
 
     :param tensor_info: dictionary with moment tensor information
@@ -54,22 +57,25 @@ def select_process_tele_body(tele_files0, tensor_info, data_prop):
     time1 = time.time()
     depth = tensor_info["depth"]
     timedelta = tensor_info["timedelta"]
-    tele_files1 = __pre_select_tele(tele_files0, tensor_info, timedelta)
+    tele_files1 = __pre_select_tele(
+        tele_files0,
+        tensor_info,
+        timedelta,
+    )
     if not tele_files1:
         return
-    if not os.path.isdir("logs"):
-        os.mkdir("logs")
-    if not os.path.isdir("P"):
-        os.mkdir("P")
-    if not os.path.isdir("SH"):
-        os.mkdir("SH")
+    if not os.path.isdir(directory / "logs"):
+        os.mkdir(directory / "logs")
+    if not os.path.isdir(directory / "P"):
+        os.mkdir(directory / "P")
+    if not os.path.isdir(directory / "SH"):
+        os.mkdir(directory / "SH")
     logger1 = ml.create_log(
-        "body_tele_processing", os.path.join("logs", "body_tele_processing.log")
+        "body_tele_processing",
+        os.path.join(directory / "logs", "body_tele_processing.log"),
     )
     logger1 = ml.add_console_handler(logger1)
     logger1.info("Start selection of teleseismic body data")
-
-    data_folder = os.path.abspath(os.getcwd())
 
     logger1.info("Get theoretical arrivals of P and S waves")
     model = TauPyModel(model="ak135f_no_mud")
@@ -78,28 +84,32 @@ def select_process_tele_body(tele_files0, tensor_info, data_prop):
         "time spent getting theoretic arrivals: {}".format(time.time() - time1)
     )
     logger1.info("Remove response for selected teleseismic traces")
-    response_files = glob.glob("SACPZ*") + glob.glob("SAC_PZs*")
+    response_files = glob.glob(directory + "/SACPZ*") + glob.glob(
+        directory + "/SAC_PZs*"
+    )
     __remove_response_body(
-        tele_files1, response_files, tensor_info, data_prop, logger=logger1
+        tele_files1,
+        response_files,
+        tensor_info,
+        data_prop,
+        logger=logger1,
+        directory=directory,
     )
     logger1.info("time until remove response: {}".format(time.time() - time1))
     logger1.info("Rotate horizontal components body waves")
     #
-    os.chdir(os.path.join(data_folder, "SH"))
-    horizontal_sacs = glob.glob("*sac")
-    __rotation(tensor_info, horizontal_sacs, logger=logger1)
+    sh_dir = directory / "SH"
+    horizontal_sacs = glob.glob(sh_dir + "/*sac")
+    __rotation(tensor_info, horizontal_sacs, logger=logger1, directory=sh_dir)
 
     logger1.info("Process body waves")
-    os.chdir(data_folder)
-    os.chdir(os.path.join(data_folder, "P"))
-    p_files = glob.glob("*_BHZ*sac")
-    process_body_waves(p_files, "P", data_prop, tensor_info)
-    os.chdir(os.path.join(data_folder, "SH"))
-    s_files = glob.glob("*_SH*sac")
-    process_body_waves(s_files, "SH", data_prop, tensor_info)
+    p_dir = directory / "P"
+    p_files = glob.glob(p_dir + "/*_BHZ*sac")
+    process_body_waves(p_files, "P", data_prop, tensor_info, directory=p_dir)
+    s_files = glob.glob(sh_dir + "/*_SH*sac")
+    process_body_waves(s_files, "SH", data_prop, tensor_info, directory=sh_dir)
 
     logger1.info("Body waves have been succesfully processed")
-    os.chdir(data_folder)
     logger1.info("time until create files: {}".format(time.time() - time1))
     logger1.info("total time spent: {}".format(time.time() - time1))
     ml.close_log(logger1)
@@ -157,7 +167,12 @@ def __picker(tensor_info, used_tele_sacs, depth, model):
 
 
 def __remove_response_body(
-    used_tele_sacs, response_files, tensor_info, data_prop, logger=None
+    used_tele_sacs,
+    response_files,
+    tensor_info,
+    data_prop,
+    logger=None,
+    directory=pathlib.Path(),
 ):
     """We remove instrumental response for data, and replace it for a common
     instrumental response
@@ -174,9 +189,9 @@ def __remove_response_body(
         "CONSTANT         3948",
     ]
     string = "".join(string)
-    with open("response_file.txt", "w") as resp_file:
+    with open(directory / "response_file.txt", "w") as resp_file:
         resp_file.write(string)
-    paz_dict2, is_paz = __read_paz("response_file.txt")
+    paz_dict2, is_paz = __read_paz(directory / "response_file.txt")
     filtro = data_prop["tele_filter"]
     depth = tensor_info["depth"]
     time_shift = tensor_info["time_shift"]
@@ -208,7 +223,7 @@ def __remove_response_body(
         full_signal = full_signal1(arrival, begin, end)
         name = stream[0].stats.station
         network = stream[0].stats.network
-        str_name = os.path.join(phase, new_name(network, name, channel))
+        str_name = os.path.join(directory, phase, new_name(network, name, channel))
         loc_code = stream[0].stats.location
         pz_files0 = [resp for resp in response_files if name in resp]
         pz_files0 = [resp for resp in pz_files0 if channel in resp]
@@ -251,7 +266,9 @@ def __remove_response_body(
     return
 
 
-def __rotation(tensor_info, used_sacs, rotate_RT=True, logger=None):
+def __rotation(
+    tensor_info, used_sacs, rotate_RT=True, logger=None, directory=pathlib.Path()
+):
     """We rotate horizontal body waves to match transverse and radial
     directions to the event.
     """
@@ -317,8 +334,8 @@ def __rotation(tensor_info, used_sacs, rotate_RT=True, logger=None):
             stream.rotate(method="NE->RT", back_azimuth=baz)
             stream_radial = stream.select(channel="*R")
             stream_transverse = stream.select(channel="*T")
-            stream_transverse.write(transverse, format="SAC", byteorder=0)
-            stream_radial.write(radial, format="SAC", byteorder=0)
+            stream_transverse.write(directory / transverse, format="SAC", byteorder=0)
+            stream_radial.write(directory / radial, format="SAC", byteorder=0)
         else:
             channel1 = stream[0].stats.channel
             channel2 = stream[1].stats.channel
@@ -326,12 +343,14 @@ def __rotation(tensor_info, used_sacs, rotate_RT=True, logger=None):
             east = string("acc", sta, channel2)
             stream_north = stream.select(channel="*N")
             stream_east = stream.select(channel="*E")
-            stream_east.write(east, format="SAC", byteorder=0)
-            stream_north.write(north, format="SAC", byteorder=0)
+            stream_east.write(directory / east, format="SAC", byteorder=0)
+            stream_north.write(directory / north, format="SAC", byteorder=0)
     return
 
 
-def process_body_waves(tele_files, phase, data_prop, tensor_info):
+def process_body_waves(
+    tele_files, phase, data_prop, tensor_info, directory=pathlib.Path()
+):
     r"""We high pass filter and downsample teleseismic data.
 
     :param phase: string indicating whether phase is P or SH
@@ -390,7 +409,7 @@ def process_body_waves(tele_files, phase, data_prop, tensor_info):
         if np.max(np.abs(tr.data)) > 5 * 10**5:
             continue
         stream[0] = tr
-        stream.write("final_{}".format(sac), format="SAC", byteorder=0)
+        stream.write(directory / "final_{}".format(sac), format="SAC", byteorder=0)
     return
 
 
@@ -399,7 +418,9 @@ def process_body_waves(tele_files, phase, data_prop, tensor_info):
 ##################################
 
 
-def select_process_surf_tele(tele_files0, tensor_info, data_prop):
+def select_process_surf_tele(
+    tele_files0, tensor_info, data_prop, directory=pathlib.Path()
+):
     """Module for selecting and processing surface wave data.
 
     :param tensor_info: dictionary with moment tensor information
@@ -437,41 +458,45 @@ def select_process_surf_tele(tele_files0, tensor_info, data_prop):
     tele_files1 = __pre_select_tele(tele_files0, tensor_info, timedelta)
     if not tele_files1:
         return
-    if not os.path.isdir("logs"):
-        os.mkdir("logs")
-    if not os.path.isdir("LONG"):
-        os.mkdir("LONG")
+    if not os.path.isdir(directory / "logs"):
+        os.mkdir(directory / "logs")
+    if not os.path.isdir(directory / "LONG"):
+        os.mkdir(directory / "LONG")
     logger1 = ml.create_log(
-        "surf_tele_processing", os.path.join("logs", "surf_tele_processing.log")
+        "surf_tele_processing",
+        os.path.join(directory, "logs", "surf_tele_processing.log"),
     )
     logger1 = ml.add_console_handler(logger1)
     logger1.info("Start processing of long period surface waves")
 
-    data_folder = os.path.abspath(os.getcwd())
-
-    os.chdir(data_folder)
     logger1.info("Get theoretical arrivals of P and S waves")
     model = TauPyModel(model="ak135f_no_mud")
     __picker(tensor_info, tele_files1, depth, model)
     logger1.info("Remove instrumental response for surface waves")
-    response_files = glob.glob("SACPZ*") + glob.glob("SAC_PZs*")
-    __remove_response_surf(tele_files1, response_files, data_prop, logger=logger1)
+    response_files = glob.glob(directory + "/SACPZ*") + glob.glob(
+        directory + "/SAC_PZs*"
+    )
+    __remove_response_surf(
+        tele_files1, response_files, data_prop, logger=logger1, directory=directory
+    )
     logger1.info("Rotate horizontal components for surface waves")
-    os.chdir(os.path.join(data_folder, "LONG"))
-    horizontal_sacs = glob.glob("*_BH[EN12]*sac")
-    __rotation(tensor_info, horizontal_sacs)
+    long_dir = directory / "LONG"
+    horizontal_sacs = glob.glob(long_dir + "/*_BH[EN12]*sac")
+    __rotation(tensor_info, horizontal_sacs, directory=long_dir)
     logger1.info("Get final surface waves")
-    os.chdir(os.path.join(data_folder, "LONG"))
-    surf_files = glob.glob("*_BHZ*.sac") + glob.glob("*_SH*.sac")
-    __create_long_period(surf_files, tensor_info)
+    surf_files = glob.glob(long_dir + "/*_BHZ*.sac") + glob.glob(
+        long_dir + "/*_SH*.sac"
+    )
+    __create_long_period(surf_files, tensor_info, directory=long_dir)
 
     logger1.info("Long period surface waves have been succesfully processed")
-    os.chdir(data_folder)
     ml.close_log(logger1)
     return
 
 
-def __remove_response_surf(used_tele_sacs, response_files, data_prop, logger=None):
+def __remove_response_surf(
+    used_tele_sacs, response_files, data_prop, logger=None, directory=pathlib.Path()
+):
     """We remove instrumental response for surface wave data."""
     new_name = lambda network, station, channel: os.path.join(
         "{}_{}_{}.sac".format(network, station, channel)
@@ -527,11 +552,11 @@ def __remove_response_surf(used_tele_sacs, response_files, data_prop, logger=Non
             pre_filt=freqs,
             taper=False,
         )
-        stream.write(str_name, format="SAC", byteorder=0)
+        stream.write(directory / str_name, format="SAC", byteorder=0)
     return
 
 
-def __create_long_period(surf_files, tensor_info):
+def __create_long_period(surf_files, tensor_info, directory=pathlib.Path()):
     """We downsample long period data."""
     for sac in surf_files:
         sacheader = SACTrace.read(sac)
@@ -547,7 +572,7 @@ def __create_long_period(surf_files, tensor_info):
         if np.max(np.abs(tr.data)) < 10**-3:
             continue
         st[0] = tr
-        st.write("final_{}".format(sac), format="SAC", byteorder=0)
+        st.write(directory / "final_{}".format(sac), format="SAC", byteorder=0)
     return
 
 
@@ -556,7 +581,7 @@ def __create_long_period(surf_files, tensor_info):
 ###################################
 
 
-def select_process_cgps(cgps_files, tensor_info, data_prop):
+def select_process_cgps(cgps_files, tensor_info, data_prop, directory=pathlib.Path()):
     """Routine for selecting and processing cgps data
 
     :param tensor_info: dictionary with moment tensor information
@@ -571,24 +596,25 @@ def select_process_cgps(cgps_files, tensor_info, data_prop):
         Currently, this code allows only to process files in sac format.
         Other data formats are not supported.
     """
-    if not os.path.isdir("logs"):
-        os.mkdir("logs")
+    if not os.path.isdir(directory / "logs"):
+        os.mkdir(directory / "logs")
     logger1 = ml.create_log(
-        "cgps_processing", os.path.join("logs", "cgps_processing.log")
+        directory, "cgps_processing", os.path.join("logs", "cgps_processing.log")
     )
     logger1 = ml.add_console_handler(logger1)
     logger1.info("Process cGPS data")
-    data_folder = os.path.abspath(os.getcwd())
     separator = "\n*************************************************\n"
     logger1.info("Select cGPS traces")
     __select_cgps_files(cgps_files, tensor_info)
     logger1.info("Process selected cGPS traces")
-    os.chdir(os.path.join(os.getcwd(), "cGPS"))
-    final_files = glob.glob("final*")
+    cgps_dir = directory / "cGPS"
+    final_files = glob.glob(cgps_dir + "/final*")
     for final_file in final_files:
         if os.path.isfile(final_file):
             os.remove(final_file)
-    cgps_files1 = glob.glob("*L[HXY]*.sac") + glob.glob("*L[HXY]*.SAC")
+    cgps_files1 = glob.glob(cgps_dir + "/*L[HXY]*.sac") + glob.glob(
+        cgps_dir + "/*L[HXY]*.SAC"
+    )
     __change_start(cgps_files1, tensor_info, cgps=True)
     new_process_cgps(tensor_info, cgps_files1, data_prop, logger=logger1)
     os.chdir(data_folder)
