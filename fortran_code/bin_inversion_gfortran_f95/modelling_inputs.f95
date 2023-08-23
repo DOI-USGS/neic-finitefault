@@ -5,7 +5,7 @@ module modelling_inputs
    integer :: seed0, io_data, n_iter
    real :: t0, cooling_rate, t_stop, emin0, smooth_moment, smooth_slip, smooth_time
    real :: t_mid, t_latest, moment_input
-   integer :: io_re, io_func, io, events
+   integer :: start_annealing, io_func, io, events
    real :: moment_event(10)
 
 
@@ -18,7 +18,7 @@ contains
    open(10, file='annealing.txt', status='old')
    read(10,*) n_iter, seed0, io_data, moment_input
    read(10,*) t0, cooling_rate, t_stop, emin0, smooth_moment, smooth_slip, smooth_time
-   read(10,*) io_re, t_mid, io_func, t_latest
+   read(10,*) start_annealing, t_mid, io_func, t_latest
    read(10,*) io
    close(10)
    end subroutine read_annealing_param
@@ -42,7 +42,7 @@ contains
    end subroutine moment_events
    
 
-   subroutine get_annealing_param(n_iter0, seed00, t00, cooling_rate0, t_stop0, io_re0, t_mid0)
+   subroutine get_annealing_param(n_iter0, seed00, t00, cooling_rate0, t_stop0, start_annealing0, t_mid0)
 !
 !  Args:
 !  n_iter0: iterations of annealing method
@@ -50,18 +50,18 @@ contains
 !  t00: initial temperature for annealing method
 !  cooling_rate0: cooling rate of annealing method
 !  t_stop0: temperature at which cooling of annealing method becomes slower
-!  io_re0: whether to perform simmulated annealing
+!  start_annealing0: whether to perform simmulated annealing
 !  t_mid0: another temperature value
 !  
    implicit none
-   integer :: n_iter0, seed00, io_re0
+   integer :: n_iter0, seed00, start_annealing0
    real :: t00, cooling_rate0, t_stop0, t_mid0
    n_iter0 = n_iter
    seed00 = seed0
    t00 = t0
    cooling_rate0 = cooling_rate
    t_stop0 = t_stop
-   io_re0 = io_re
+   start_annealing0 = start_annealing
    t_mid0 = t_mid
    end subroutine get_annealing_param
    

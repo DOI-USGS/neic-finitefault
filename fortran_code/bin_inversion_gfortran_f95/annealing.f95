@@ -27,7 +27,7 @@ module annealing
    integer, parameter :: double = kind(1.d0)
    integer, private :: threads
    integer, parameter, private :: max_move=50, accept_max=5
-   integer :: segments, windows, nxs_sub(max_seg), nys_sub(max_seg), subfaults, io_re
+   integer :: segments, windows, nxs_sub(max_seg), nys_sub(max_seg), subfaults, start_annealing
    real :: minimum(max_subfaults2), delta(max_subfaults2)
    integer :: n_values(max_subfaults2)
    real :: time_min(max_subfaults), time_max(max_subfaults)
@@ -88,7 +88,7 @@ contains
    implicit none
    integer :: int0, int1
    real :: real0, real1, real2, real3, real4
-   call get_annealing_param(int0, int1, real0, real1, real2, io_re, real3)
+   call get_annealing_param(int0, int1, real0, real1, real2, start_annealing, real3)
    call get_weights_moment_end(moment_input, smooth_moment, smooth_slip, smooth_time, &
                                 &    real4, emin0)
    end subroutine annealing_set_procedure_param
@@ -140,7 +140,7 @@ contains
    do k = 1, parameters
       random(k) = minimum(k)+int(ran1()*n_values(k)-1.0)*delta(k)
    end do
-   if (io_re .eq. 0) then
+   if (start_annealing .eq. 0) then
       k = 0
       subfault = 0
       do segment = 1, segments

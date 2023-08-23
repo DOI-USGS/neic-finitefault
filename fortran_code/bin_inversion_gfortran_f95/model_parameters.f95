@@ -298,38 +298,45 @@ contains
 !
    integer :: nx0, ny0
    parameter(nx0 = max_stk_subfaults*2, ny0 = max_dip_subfaults*2)
-   integer :: io_surf, nblock, parameters, k, segment, io_right, io_left, io_up, io_down 
+   integer :: surf_disp, nblock, parameters, k, segment
+   integer :: right_boundary, left_boundary, updip_boundary, downdip_boundary 
    real :: delt_x, delt_y, zmed_max, zmed_min, zleft_max, zleft_min
    real :: zright_max, zright_min, zup_max, zup_min, zdown_max, zdown_min
    real :: angle_max, angle_min, vel_max, vel_min
    real :: step1, step2
-   integer :: io_seg, nmed, nleft2, nright2, nup2, ndown2, nangle, npv, int1, int2
-   integer :: nx, ny, i, j, segment2, i_x, i_y
+   integer :: int0, steps0, steps1, steps2, steps3, steps4, steps5, steps6, int1, int2
+   integer :: nx, ny, i, j, segment2
    real :: surface(1000, 4), slip_boundary(nx0, ny0, 3), upper_bounds(5)
    real :: model_boundary(max_subfaults2, 4)
    open(17, file='model_space.txt', status='old')
-   read(17,*) io_surf
-   if (io_surf .eq. 1) then
+   read(17,*) surf_disp
+   if (surf_disp .eq. 1) then
       open(16, file='surface.constrain', status='old')
-      read(16,*) nblock, io_surf
+      read(16,*) nblock, surf_disp
       do i = 1, nblock
          read(16,*)(surface(i, k), k = 1, 4)
+!
+!  surface(i,1) is which segment is affected
+!  surface(i,1) is which updip subfault in strike direction is affected
+!  surface(i,2) is minimum allowed slip at said subfault
+!  surface(i,3) is maximum allowed slip at said subfault
+!
       end do
       close(16)
    end if
    parameters = 0
    k = 0
    do segment = 1, segments
-      read(17,*) io_seg
+      read(17,*) int0
       read(17,*) delt_x, delt_y
-      read(17,*) io_left, io_right, io_up, io_down
-      read(17,*) zmed_max, zmed_min, nmed
-      read(17,*) zleft_max, zleft_min, nleft2
-      read(17,*) zright_max, zright_min, nright2
-      read(17,*) zup_max, zup_min, nup2
-      read(17,*) zdown_max, zdown_min, ndown2
-      read(17,*) angle_max, angle_min, nangle
-      read(17,*) vel_max, vel_min, npv
+      read(17,*) left_boundary, right_boundary, updip_boundary, downdip_boundary
+      read(17,*) zmed_max, zmed_min, steps0
+      read(17,*) zleft_max, zleft_min, steps1
+      read(17,*) zright_max, zright_min, steps2
+      read(17,*) zup_max, zup_min, steps3
+      read(17,*) zdown_max, zdown_min, steps4
+      read(17,*) angle_max, angle_min, steps5
+      read(17,*) vel_max, vel_min, steps6
       read(17,*) int1, int2
       nx = nxs_sub(segment)
       ny = nys_sub(segment)
@@ -337,7 +344,7 @@ contains
 !
 !  check whether the contrains is frighting each other
 !
-      if (io_right .eq. 1 .or. io_left .eq. 1) then
+      if (right_boundary .eq. 1 .or. left_boundary .eq. 1) then
          step1 = (zmed_max-zleft_max)/(int((nx+1)/2))
          step2 = (zmed_max-zright_max)/(int((nx+1)/2))
          if (delt_x .lt. step1 .or. delt_x .lt. step2) then
@@ -345,7 +352,7 @@ contains
             stop
          end if
       end if
-      if (io_down .eq. 1 .or. io_up .eq. 1) then
+      if (downdip_boundary .eq. 1 .or. updip_boundary .eq. 1) then
          step1 = (zmed_max-zup_max)/(int((ny+1)/2))
          step2 = (zmed_max-zdown_max)/(int((ny+1)/2))
          if (delt_y .lt. step1 .or. delt_y .lt. step2) then
@@ -360,134 +367,134 @@ contains
          do j = 2, nys_sub(segment)-1
             slip_boundary(i, j, 1) = zmed_min
             slip_boundary(i, j, 2) = zmed_max
-            slip_boundary(i, j, 3) = nmed
+            slip_boundary(i, j, 3) = steps0
          end do
       end do
 !
 !     Second: Give the value range of left and right part
 !
       do j = 1, nys_sub(segment)
-         if (io_left .eq. 1) then
+         if (left_boundary .eq. 1) then
             slip_boundary(1, j, 1) = zleft_min
             slip_boundary(1, j, 2) = zleft_max
-            slip_boundary(1, j, 3) = nleft2
+            slip_boundary(1, j, 3) = steps1
          else
             slip_boundary(1, j, 1) = zmed_min
             slip_boundary(1, j, 2) = zmed_max
-            slip_boundary(1, j, 3) = nmed
+            slip_boundary(1, j, 3) = steps0
          end if
-         if (io_right .eq. 1) then
+         if (right_boundary .eq. 1) then
             slip_boundary(nx, j, 1) = zright_min
             slip_boundary(nx, j, 2) = zright_max
-            slip_boundary(nx, j, 3) = nright2
+            slip_boundary(nx, j, 3) = steps2
          else
             slip_boundary(nx, j, 1) = zmed_min
             slip_boundary(nx, j, 2) = zmed_max
-            slip_boundary(nx, j, 3) = nmed
+            slip_boundary(nx, j, 3) = steps0
          end if
       end do
 !
 !  Give the value range of up and down part
 !
       do i = 2, nxs_sub(segment)-1
-         if (io_up .eq. 1) then
+         if (updip_boundary .eq. 1) then
             slip_boundary(i, 1, 1) = zup_min
             slip_boundary(i, 1, 2) = zup_max
-            slip_boundary(i, 1, 3) = nup2
+            slip_boundary(i, 1, 3) = steps3
          else
             slip_boundary(i, 1, 1) = zmed_min
             slip_boundary(i, 1, 2) = zmed_max
-            slip_boundary(i, 1, 3) = nmed
+            slip_boundary(i, 1, 3) = steps0
          end if
-         if (io_down .eq. 1) then
+         if (downdip_boundary .eq. 1) then
             slip_boundary(i, ny, 1) = zdown_min
             slip_boundary(i, ny, 2) = zdown_max
-            slip_boundary(i, ny, 3) = ndown2
+            slip_boundary(i, ny, 3) = steps4
          else
             slip_boundary(i, ny, 1) = zmed_min
             slip_boundary(i, ny, 2) = zmed_max
-            slip_boundary(i, ny, 3) = nmed
+            slip_boundary(i, ny, 3) = steps0
          end if
       end do
 !
 !  upper left corner
 !
-      if ((io_up .eq. 1) .and. (io_left .eq. 1)) then
+      if ((updip_boundary .eq. 1) .and. (left_boundary .eq. 1)) then
          slip_boundary(1, 1, 1) = min(zup_min, zleft_min)
          slip_boundary(1, 1, 2) = min(zup_max, zleft_max)
-         slip_boundary(1, 1, 3) = min(nup2, nleft2)
-      elseif (io_up .eq. 1) then
+         slip_boundary(1, 1, 3) = min(steps3, steps1)
+      elseif (updip_boundary .eq. 1) then
          slip_boundary(1, 1, 1) = min(zup_min, zmed_min) 
          slip_boundary(1, 1, 2) = min(zup_max, zmed_max)
-         slip_boundary(1, 1, 3) = min(nup2, nmed)
-      elseif (io_left .eq. 1) then
+         slip_boundary(1, 1, 3) = min(steps3, steps0)
+      elseif (left_boundary .eq. 1) then
          slip_boundary(1, 1, 1) = min(zleft_min, zmed_min) 
          slip_boundary(1, 1, 2) = min(zleft_max, zmed_max)
-         slip_boundary(1, 1, 3) = min(nleft2, nmed)
+         slip_boundary(1, 1, 3) = min(steps1, steps0)
       else
          slip_boundary(1, 1, 1) = zmed_min
          slip_boundary(1, 1, 2) = zmed_max
-         slip_boundary(1, 1, 3) = nmed
+         slip_boundary(1, 1, 3) = steps0
       end if
 !
 !  upper right corner
 !
-      if ((io_up .eq. 1) .and. (io_right .eq. 1)) then
+      if ((updip_boundary .eq. 1) .and. (right_boundary .eq. 1)) then
          slip_boundary(nx, 1, 1) = min(zup_min, zright_min)
          slip_boundary(nx, 1, 2) = min(zup_max, zright_max)
-         slip_boundary(nx, 1, 3) = min(nup2, nright2)
-      elseif (io_up .eq. 1) then
+         slip_boundary(nx, 1, 3) = min(steps3, steps2)
+      elseif (updip_boundary .eq. 1) then
          slip_boundary(nx, 1, 1) = min(zup_min, zmed_min) 
          slip_boundary(nx, 1, 2) = min(zup_max, zmed_max)
-         slip_boundary(nx, 1, 3) = min(nup2, nmed)
-      elseif (io_right .eq. 1) then
+         slip_boundary(nx, 1, 3) = min(steps3, steps0)
+      elseif (right_boundary .eq. 1) then
          slip_boundary(nx, 1, 1) = min(zright_min, zmed_min) 
          slip_boundary(nx, 1, 2) = min(zright_max, zmed_max)
-         slip_boundary(nx, 1, 3) = min(nright2, nmed)
+         slip_boundary(nx, 1, 3) = min(steps2, steps0)
       else
          slip_boundary(nx, 1, 1) = zmed_min
          slip_boundary(nx, 1, 2) = zmed_max
-         slip_boundary(nx, 1, 3) = nmed
+         slip_boundary(nx, 1, 3) = steps0
       end if
 !
 !  lower left corner
 !
-      if ((io_down .eq. 1) .and. (io_left .eq. 1)) then
+      if ((downdip_boundary .eq. 1) .and. (left_boundary .eq. 1)) then
          slip_boundary(1, ny, 1) = min(zdown_min, zleft_min)
          slip_boundary(1, ny, 2) = min(zdown_max, zleft_max)
-         slip_boundary(1, ny, 3) = min(ndown2, nleft2)
-      elseif (io_down .eq. 1) then
+         slip_boundary(1, ny, 3) = min(steps4, steps1)
+      elseif (downdip_boundary .eq. 1) then
          slip_boundary(1, ny, 1) = min(zdown_min, zmed_min) 
          slip_boundary(1, ny, 2) = min(zdown_max, zmed_max)
-         slip_boundary(1, ny, 3) = min(ndown2, nmed)
-      elseif (io_left .eq. 1) then
+         slip_boundary(1, ny, 3) = min(steps4, steps0)
+      elseif (left_boundary .eq. 1) then
          slip_boundary(1, ny, 1) = min(zleft_min, zmed_min) 
          slip_boundary(1, ny, 2) = min(zleft_max, zmed_max)
-         slip_boundary(1, ny, 3) = min(nleft2, nmed)
+         slip_boundary(1, ny, 3) = min(steps1, steps0)
       else
          slip_boundary(1, ny, 1) = zmed_min
          slip_boundary(1, ny, 2) = zmed_max
-         slip_boundary(1, ny, 3) = nmed
+         slip_boundary(1, ny, 3) = steps0
       end if
 !
 !  lower right corner
 !
-      if ((io_down .eq. 1) .and. (io_right .eq. 1)) then
+      if ((downdip_boundary .eq. 1) .and. (right_boundary .eq. 1)) then
          slip_boundary(nx, ny, 1) = min(zdown_min, zright_min)
          slip_boundary(nx, ny, 2) = min(zdown_max, zright_max)
-         slip_boundary(nx, ny, 3) = min(ndown2, nright2)
-      elseif (io_down .eq. 1) then
+         slip_boundary(nx, ny, 3) = min(steps4, steps2)
+      elseif (downdip_boundary .eq. 1) then
          slip_boundary(nx, ny, 1) = min(zdown_min, zmed_min) 
          slip_boundary(nx, ny, 2) = min(zdown_max, zmed_max)
-         slip_boundary(nx, ny, 3) = min(ndown2, nmed)
-      elseif (io_right .eq. 1) then
+         slip_boundary(nx, ny, 3) = min(steps4, steps0)
+      elseif (right_boundary .eq. 1) then
          slip_boundary(nx, ny, 1) = min(zright_min, zmed_min) 
          slip_boundary(nx, ny, 2) = min(zright_max, zmed_max)
-         slip_boundary(nx, ny, 3) = min(nright2, nmed)
+         slip_boundary(nx, ny, 3) = min(steps2, steps0)
       else
          slip_boundary(nx, ny, 1) = zmed_min
          slip_boundary(nx, ny, 2) = zmed_max
-         slip_boundary(nx, ny, 3) = nmed
+         slip_boundary(nx, ny, 3) = steps0
       end if
 !
 !  Recheck the range of mediate part
@@ -505,14 +512,14 @@ contains
 !  
 !  check the surface constrain
 !  
-      if (io_surf .eq. 1) then
+      if (surf_disp .eq. 1) then
          do i = 1, nblock
             segment2 = int(surface(i, 1)+0.1)
             if (segment2 .eq. segment) then
-               i_y = 1
-               i_x = int(surface(i, 2)+0.1)
-               slip_boundary(i_x, i_y, 1) = surface(i, 3)
-               slip_boundary(i_x, i_y, 2) = surface(i, 4)
+               ny = 1
+               nx = int(surface(i, 2)+0.1)
+               slip_boundary(nx, ny, 1) = surface(i, 3)
+               slip_boundary(nx, ny, 2) = surface(i, 4)
             end if
          end do
       end if
@@ -529,11 +536,11 @@ contains
             k = k+1
             model_boundary(k, 1) = angle_min
             model_boundary(k, 2) = angle_max
-            model_boundary(k, 3) = nangle
+            model_boundary(k, 3) = steps5
             k = k+1
             model_boundary(k, 1) = vel_min
             model_boundary(k, 2) = vel_max
-            model_boundary(k, 3) = npv
+            model_boundary(k, 3) = steps6
             k = k+1
             model_boundary(k, 1) = 1
             model_boundary(k, 2) = windows

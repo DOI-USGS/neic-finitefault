@@ -23,64 +23,6 @@ contains
    end subroutine wavelets_set_data_properties
 
 
-   subroutine wavelet_obs(real1, imag1, coeffs)
-!
-!  Args:
-!  real1: real part of data vector
-!  imag1: imaginary part of data vector
-!  coeffs: input array, also outputs wavelet coefficients from data vector
-!
-   implicit none
-!       ******* Explaination ********
-!       In order to normalized the amplitude, we move the coeffficient
-!       sqrt(T/kmax)
-!                                       Jichen 1997, 1, 20
-!
-! we split between this routine and wavelet_syn routine to hopefully reduce
-! computation time
-!
-   real :: real1(wave_pts2), imag1(wave_pts2), coeffs(wave_pts2)
-   integer n, kmax, j, k, i
-   
-   complex fft_array(wave_pts2)
-   complex cc
-!
-!   do i = 1, nlen
-!      real1(i) = u(i)
-!      imag1(i) = 0.0
-!   end do
-   call cfft(real1, imag1, lnpt)
-   call realtr(real1, imag1, lnpt)
-   do j = 1, nlen
-      fft_array(j) = cmplx(real1(j), imag1(j))
-      real1(j) = 0.0
-      imag1(j) = 0.0
-      coeffs(j) = 0.0
-   end do
-!
-! c1 = wave(pi2, 2), c2 = wave(pi, 2).
-!
-   coeffs(1) = real(fft_array(2)*c1)
-   coeffs(2) = real(fft_array(2)*c2+fft_array(3)*c1)
-   coeffs(3) = real(-fft_array(2)*c2+fft_array(3)*c1)
-   
-   kmax = 2
-   do j=3, jmax
-      kmax = 2*kmax
-      do k = 1, kmax
-         cc = fft_array(k)*wavelet1(k, j)+fft_array(k+kmax)*wavelet2(k, j)
-         real1(k) = real(cc)
-         imag1(k) = aimag(cc)
-      end do
-      n = j-1
-      call cifft(real1, imag1, n)
-      do k = 1, kmax
-         coeffs(kmax+k-1) = real1(k)
-      end do
-   end do
-   end subroutine wavelet_obs
-
-
    pure subroutine wavelet_syn(real1, imag1, coeffs)
 !
 !  Args:

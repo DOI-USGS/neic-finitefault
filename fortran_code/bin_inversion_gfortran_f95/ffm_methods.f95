@@ -30,7 +30,7 @@ module ffm_methods
    real :: t_rise0(max_subfaults), t_fall0(max_subfaults)
    real :: t, t0, cooling_rate, t_stop, t_mid
    real*8 :: ramp(36)
-   integer :: i, n_iter, io_re
+   integer :: i, n_iter, start_annealing
    character(len=10) :: input
 
 
@@ -43,7 +43,7 @@ contains
 !
    implicit none
    integer :: seed0
-   call get_annealing_param(n_iter, seed0, t0, cooling_rate, t_stop, io_re, t_mid)
+   call get_annealing_param(n_iter, seed0, t0, cooling_rate, t_stop, start_annealing, t_mid)
    end subroutine ffmmethod_set_procedure_param
 
 
@@ -127,7 +127,7 @@ contains
    call get_gf(strong, cgps, body, surf, dart, many_events)
    call initial_model(slip, rake, rupt_time, t_rise, t_fall)
    t = t_mid
-   if (io_re .eq. 0) t = t0
+   if (start_annealing .eq. 0) t = t0
    if (many_events) then
       call annealing_set_events()
       call print_summary2(slip, rake, rupt_time, t_rise, t_fall, static, &
@@ -215,7 +215,7 @@ contains
    call get_gf(strong, cgps, body, surf, dart, many_events)
    call initial_model(slip, rake, rupt_time, t_rise, t_fall)
    t = t_mid
-   if (io_re .eq. 0) t = t0
+   if (start_annealing .eq. 0) t = t0
    if (static) call initial_gps(slip, rake, many_events)
    if (insar) call get_insar_gf()
    if (insar) call get_insar_data()
@@ -325,7 +325,7 @@ contains
    call staticdata_set_fault_parameters()
    call insardata_set_fault_parameters()
    t = t_mid
-   if (io_re .eq. 0) t = t0
+   if (start_annealing .eq. 0) t = t0
    if (static) call initial_gps(slip, rake, many_events)
    if (insar) call get_insar_gf()
    if (insar) call get_insar_data()
