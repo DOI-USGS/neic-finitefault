@@ -5,6 +5,7 @@ from typing import List, Optional
 
 from wasp.seismic_tensor import get_tensor
 
+BASE_DIR = pathlib.Path(__file__).parent.parent
 END_TO_END_DIR = pathlib.Path(__file__).parent / "data" / "end_to_end"
 RESULTS_DIR = pathlib.Path(__file__).parent / "data" / "end_to_end" / "results"
 

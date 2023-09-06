@@ -13,12 +13,7 @@ import time
 from multiprocessing import Pool  # , cpu_count
 from shutil import copy2
 
-import management as mng
-import modulo_logs as ml
 import numpy as np
-import remove_response as response
-import seismic_tensor as tensor
-import wang_baseline_removal_v1 as wang1
 from obspy import read
 from obspy.core.utcdatetime import UTCDateTime
 from obspy.geodetics import gps2dist_azimuth, kilometers2degrees, locations2degrees
@@ -28,6 +23,12 @@ from obspy.signal.invsim import simulate_seismometer
 from obspy.taup import TauPyModel
 from scipy.integrate import cumtrapz
 from scipy.signal import butter, filtfilt
+
+import wasp.management as mng
+import wasp.modulo_logs as ml
+import wasp.remove_response as response
+import wasp.seismic_tensor as tensor
+import wasp.wang_baseline_removal_v1 as wang1
 
 ###################################
 # teleseismic body waves
