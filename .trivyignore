@@ -1,20 +1,30 @@
 # https://avd.aquasec.com/nvd/cve-2023-3090/
+
 # linux-libc-dev is used for compilation in multi-stage container builds,
+
 # and should not appear in deployable containers
+
 CVE-2023-3389
 CVE-2023-3090
 CVE-2023-3390
 CVE-2023-3611
 CVE-2023-3776
+CVE-2023-4563
 
 # https://avd.aquasec.com/nvd/2022/cve-2022-42919/
+
 # running as non-root user, and not using non-default configuration
+
 CVE-2022-42919
 
 # https://avd.aquasec.com/nvd/2022/cve-2022-42966/
+
 # poetry only used for dependency management and does not allow arbitrary input
+
 CVE-2022-42966
 
 # https://avd.aquasec.com/nvd/2022/cve-2022-43945/
+
 # not using nfsd
+
 CVE-2022-43945
