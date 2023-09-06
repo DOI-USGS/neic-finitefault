@@ -153,7 +153,7 @@ def test_gf_retrieve_insar():
         shutil.rmtree(tempdir)
 
 
-@pytest.mark.skipif(
+@pytest.mark.if(
     os.getenv("CI_REGISTRY") is not None or os.getenv("RUN_ALL", False) == False,
     reason="Requires a 2+GB file to run",
 )

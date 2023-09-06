@@ -8,22 +8,24 @@ fault modelling
 import errno
 import glob
 import json
+import logging
 import os
 import pathlib
 import time
-from multiprocessing import Pool  # , cpu_count
-from shutil import copy2
+from functools import partial
+from multiprocessing import Pool
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
-from obspy import read
-from obspy.core.utcdatetime import UTCDateTime
-from obspy.geodetics import gps2dist_azimuth, kilometers2degrees, locations2degrees
-from obspy.io.sac import SACTrace
-from obspy.signal import rotate
-from obspy.signal.invsim import simulate_seismometer
-from obspy.taup import TauPyModel
-from scipy.integrate import cumtrapz
-from scipy.signal import butter, filtfilt
+from obspy import read  # type: ignore
+from obspy.core.utcdatetime import UTCDateTime  # type: ignore
+from obspy.geodetics import gps2dist_azimuth, locations2degrees  # type: ignore
+from obspy.io.sac import SACTrace  # type: ignore
+from obspy.signal import rotate  # type: ignore
+from obspy.signal.invsim import simulate_seismometer  # type: ignore
+from obspy.taup import TauPyModel  # type: ignore
+from scipy.integrate import cumtrapz  # type: ignore
+from scipy.signal import butter, filtfilt  # type: ignore
 
 import wasp.management as mng
 import wasp.modulo_logs as ml
@@ -37,16 +39,21 @@ import wasp.wang_baseline_removal_v1 as wang1
 
 
 def select_process_tele_body(
-    tele_files0, tensor_info, data_prop, directory=pathlib.Path()
+    tele_files0: List[str],
+    tensor_info: dict,
+    data_prop: dict,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Module for automatic selection and processing of teleseismic body waves.
+    """Select teleseismic body waves to process
 
-    :param tensor_info: dictionary with moment tensor information
-    :param data_prop: dictionary with waveform properties
-    :param tele_files0: files with body waves to be selected and processed
-    :type tensor_info: dict
-    :type data_prop: dict
+    :param tele_files0: List of teleseismic body wave file properties
     :type tele_files0: list
+    :param tensor_info: The moment tensor information
+    :type tensor_info: dict
+    :param data_prop: The sampling/filtering properties
+    :type data_prop: dict
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
 
     .. note::
 
@@ -54,14 +61,11 @@ def select_process_tele_body(
         instrumental response is in a SACPZ file. Other data formats are not
         supported.
     """
+    directory = pathlib.Path(directory)
     time1 = time.time()
     depth = tensor_info["depth"]
     timedelta = tensor_info["timedelta"]
-    tele_files1 = __pre_select_tele(
-        tele_files0,
-        tensor_info,
-        timedelta,
-    )
+    tele_files1 = __pre_select_tele(tele_files0, tensor_info)
     if not tele_files1:
         return
     if not os.path.isdir(directory / "logs"):
@@ -84,8 +88,8 @@ def select_process_tele_body(
         "time spent getting theoretic arrivals: {}".format(time.time() - time1)
     )
     logger1.info("Remove response for selected teleseismic traces")
-    response_files = glob.glob(directory + "/SACPZ*") + glob.glob(
-        directory + "/SAC_PZs*"
+    response_files = glob.glob(str(directory) + "/SACPZ*") + glob.glob(
+        str(directory) + "/SAC_PZs*"
     )
     __remove_response_body(
         tele_files1,
@@ -99,14 +103,14 @@ def select_process_tele_body(
     logger1.info("Rotate horizontal components body waves")
     #
     sh_dir = directory / "SH"
-    horizontal_sacs = glob.glob(sh_dir + "/*sac")
+    horizontal_sacs = glob.glob(str(sh_dir) + "/*sac")
     __rotation(tensor_info, horizontal_sacs, logger=logger1, directory=sh_dir)
 
     logger1.info("Process body waves")
     p_dir = directory / "P"
-    p_files = glob.glob(p_dir + "/*_BHZ*sac")
+    p_files = glob.glob(str(p_dir) + "/*_BHZ*sac")
     process_body_waves(p_files, "P", data_prop, tensor_info, directory=p_dir)
-    s_files = glob.glob(sh_dir + "/*_SH*sac")
+    s_files = glob.glob(str(sh_dir) + "/*_SH*sac")
     process_body_waves(s_files, "SH", data_prop, tensor_info, directory=sh_dir)
 
     logger1.info("Body waves have been succesfully processed")
@@ -116,15 +120,26 @@ def select_process_tele_body(
     return
 
 
-def __pre_select_tele(tele_files0, tensor_info, timedelta):
-    """Module which pre-selects teleseismic waveforms for processing"""
+def __pre_select_tele(
+    tele_files0: List[str],
+    tensor_info: dict,
+) -> List[str]:
+    """Module which pre-selects teleseismic waveforms for processing
+
+    :param tele_files0: List of teleseismic body wave file properties
+    :type tele_files0: list
+    :param tensor_info: The moment tensor information
+    :type tensor_info: dict
+    :return: List of selected waveform files
+    :rtype: List[str]
+    """
     date_origin = tensor_info["date_origin"]
     sacheaders = (SACTrace.read(sac) for sac in tele_files0)
     zipped = zip(tele_files0, sacheaders)
     fun1 = lambda header: header.stla and header.stlo
     zipped2 = ((sac, header) for sac, header in zipped if fun1(header))
 
-    used_tele_sacs = []
+    used_tele_sacs: List[str] = []
     for sac, sacheader in zipped2:
         if not __select_distance(
             tensor_info,
@@ -146,8 +161,18 @@ def __pre_select_tele(tele_files0, tensor_info, timedelta):
     return used_tele_sacs
 
 
-def __picker(tensor_info, used_tele_sacs, depth, model):
-    """Obspy taupy picker."""
+def __picker(tensor_info: dict, used_tele_sacs: List[str], depth: float, model: dict):
+    """Obspy taupy picker
+
+    :param tensor_info: The moment tensor information
+    :type tensor_info: dict
+    :param used_tele_sacs: The used teleseismic sac files
+    :type used_tele_sacs: List[dict]
+    :param depth: The depth of the event
+    :type depth: float
+    :param model: The kinematic model
+    :type model: dict
+    """
     event_lat = tensor_info["lat"]
     event_lon = tensor_info["lon"]
     for sac in used_tele_sacs:
@@ -167,17 +192,31 @@ def __picker(tensor_info, used_tele_sacs, depth, model):
 
 
 def __remove_response_body(
-    used_tele_sacs,
-    response_files,
-    tensor_info,
-    data_prop,
-    logger=None,
-    directory=pathlib.Path(),
+    used_tele_sacs: List[str],
+    response_files: List[str],
+    tensor_info: dict,
+    data_prop: dict,
+    logger: Optional[logging.Logger] = None,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """We remove instrumental response for data, and replace it for a common
+    """Remove instrumental response for data, and replace it for a common
     instrumental response
+
+    :param used_tele_sacs: The used teleseismic sac files
+    :type used_tele_sacs: List[str]
+    :param response_files: The response files corresponding to the selected teleseismic files
+    :type response_files: List[str]
+    :param tensor_info: The moment tensor information
+    :type tensor_info: dict
+    :param data_prop: The sampling/filtering properties
+    :type data_prop: dict
+    :param logger: An optional predefined logger, defaults to None
+    :type logger: logging.Logger, optional
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
     """
-    string = [
+    directory = pathlib.Path(directory)
+    string: Union[list, str] = [
         "ZEROS             2\n",
         "0.               0.\n",
         "0.               0.\n",
@@ -267,16 +306,32 @@ def __remove_response_body(
 
 
 def __rotation(
-    tensor_info, used_sacs, rotate_RT=True, logger=None, directory=pathlib.Path()
+    tensor_info: dict,
+    used_sacs: List[str],
+    rotate_RT: bool = True,
+    logger: Optional[logging.Logger] = None,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """We rotate horizontal body waves to match transverse and radial
-    directions to the event.
+    """Rotate horizontal body waves to match transverse and radial
+    directions to the event
+
+    :param tensor_info: The moment tensor information
+    :type tensor_info: dict
+    :param used_sacs: The selected sac files
+    :type used_sacs: List[str]
+    :param rotate_RT: Whether to rotate RT, defaults to True
+    :type rotate_RT: bool, optional
+    :param logger: A logger, defaults to None
+    :type logger: logging.Logger, optional
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
     """
+    directory = pathlib.Path(directory)
     event_lat = tensor_info["lat"]
     event_lon = tensor_info["lon"]
     string = lambda x, y, z: "{}_{}_{}.sac".format(x, y, z)
 
-    streams = [read(sac) for sac in used_sacs]
+    streams: Union[list, tuple] = [read(sac) for sac in used_sacs]
     streams = tuple(streams)
     stations = [st[0].stats.station for st in streams]
     stations = list(set(stations))
@@ -334,8 +389,10 @@ def __rotation(
             stream.rotate(method="NE->RT", back_azimuth=baz)
             stream_radial = stream.select(channel="*R")
             stream_transverse = stream.select(channel="*T")
-            stream_transverse.write(directory / transverse, format="SAC", byteorder=0)
-            stream_radial.write(directory / radial, format="SAC", byteorder=0)
+            stream_transverse.write(
+                str(directory / transverse), format="SAC", byteorder=0
+            )
+            stream_radial.write(str(directory / radial), format="SAC", byteorder=0)
         else:
             channel1 = stream[0].stats.channel
             channel2 = stream[1].stats.channel
@@ -343,25 +400,32 @@ def __rotation(
             east = string("acc", sta, channel2)
             stream_north = stream.select(channel="*N")
             stream_east = stream.select(channel="*E")
-            stream_east.write(directory / east, format="SAC", byteorder=0)
-            stream_north.write(directory / north, format="SAC", byteorder=0)
+            stream_east.write(str(directory / east), format="SAC", byteorder=0)
+            stream_north.write(str(directory / north), format="SAC", byteorder=0)
     return
 
 
 def process_body_waves(
-    tele_files, phase, data_prop, tensor_info, directory=pathlib.Path()
+    tele_files: List[str],
+    phase: str,
+    data_prop: dict,
+    tensor_info: dict,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    r"""We high pass filter and downsample teleseismic data.
+    """Perform a high pass filter and downsample teleseismic data
 
-    :param phase: string indicating whether phase is P or SH
-    :param tensor_info: dictionary with moment tensor information
-    :param data_prop: dictionary with waveform properties
-    :param tele_files: body wave files to be resampled and filtered
-    :type phase: string
-    :type tensor_info: dict
+    :param tele_files: The list of teleseismic files
+    :type tele_files: List[str]
+    :param phase: The phase
+    :type phase: str
+    :param data_prop: The sampling/filtering properties
     :type data_prop: dict
-    :type tele_files: list
+    :param tensor_info: The moment tensor information
+    :type tensor_info: dict
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
     """
+    directory = pathlib.Path(directory)
     dt = data_prop["sampling"]["dt_tele"]
     date_origin = tensor_info["date_origin"]
     filtro = data_prop["tele_filter"]
@@ -409,7 +473,11 @@ def process_body_waves(
         if np.max(np.abs(tr.data)) > 5 * 10**5:
             continue
         stream[0] = tr
-        stream.write(directory / "final_{}".format(sac), format="SAC", byteorder=0)
+        stream.write(
+            str(directory / "final_{}".format(os.path.basename(sac))),
+            format="SAC",
+            byteorder=0,
+        )
     return
 
 
@@ -419,14 +487,21 @@ def process_body_waves(
 
 
 def select_process_surf_tele(
-    tele_files0, tensor_info, data_prop, directory=pathlib.Path()
+    tele_files0: List[str],
+    tensor_info: dict,
+    data_prop: dict,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Module for selecting and processing surface wave data.
+    """Module for selecting and processing surface wave data
 
-    :param tensor_info: dictionary with moment tensor information
-    :param tele_files0: files with surface wave to be selected and processed
-    :type tensor_info: dict
+    :param tele_files0: List of teleseismic surface wave file properties
     :type tele_files0: list
+    :param tensor_info: The moment tensor information
+    :type tensor_info: dict
+    :param data_prop: The sampling/filtering properties
+    :type data_prop: dict
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
 
     .. rubric:: Example:
 
@@ -453,9 +528,10 @@ def select_process_surf_tele(
         instrumental response is in a SACPZ file. Other data formats are not
         supported.
     """
+    directory = pathlib.Path(directory)
     timedelta = tensor_info["timedelta"]
     depth = tensor_info["depth"]
-    tele_files1 = __pre_select_tele(tele_files0, tensor_info, timedelta)
+    tele_files1 = __pre_select_tele(tele_files0, tensor_info)
     if not tele_files1:
         return
     if not os.path.isdir(directory / "logs"):
@@ -473,19 +549,19 @@ def select_process_surf_tele(
     model = TauPyModel(model="ak135f_no_mud")
     __picker(tensor_info, tele_files1, depth, model)
     logger1.info("Remove instrumental response for surface waves")
-    response_files = glob.glob(directory + "/SACPZ*") + glob.glob(
-        directory + "/SAC_PZs*"
+    response_files = glob.glob(str(directory) + "/SACPZ*") + glob.glob(
+        str(directory) + "/SAC_PZs*"
     )
     __remove_response_surf(
         tele_files1, response_files, data_prop, logger=logger1, directory=directory
     )
     logger1.info("Rotate horizontal components for surface waves")
     long_dir = directory / "LONG"
-    horizontal_sacs = glob.glob(long_dir + "/*_BH[EN12]*sac")
+    horizontal_sacs = glob.glob(str(long_dir) + "/*_BH[EN12]*sac")
     __rotation(tensor_info, horizontal_sacs, directory=long_dir)
     logger1.info("Get final surface waves")
-    surf_files = glob.glob(long_dir + "/*_BHZ*.sac") + glob.glob(
-        long_dir + "/*_SH*.sac"
+    surf_files = glob.glob(str(long_dir) + "/*_BHZ*.sac") + glob.glob(
+        str(long_dir) + "/*_SH*.sac"
     )
     __create_long_period(surf_files, tensor_info, directory=long_dir)
 
@@ -495,9 +571,28 @@ def select_process_surf_tele(
 
 
 def __remove_response_surf(
-    used_tele_sacs, response_files, data_prop, logger=None, directory=pathlib.Path()
+    used_tele_sacs: List[str],
+    response_files: List[str],
+    data_prop: dict,
+    logger: Optional[logging.Logger] = None,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """We remove instrumental response for surface wave data."""
+    """Remove instrumental response for surface wave data
+
+    :param used_tele_sacs: The used teleseismic sac files
+    :type used_tele_sacs: List[str]
+    :param response_files: The response files corresponding to the selected teleseismic files
+    :type response_files: List[str]
+    :param tensor_info: The moment tensor information
+    :type tensor_info: dict
+    :param data_prop: The sampling/filtering properties
+    :type data_prop: dict
+    :param logger: An optional predefined logger, defaults to None
+    :type logger: logging.Logger, optional
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
+    """
+    directory = pathlib.Path(directory)
     new_name = lambda network, station, channel: os.path.join(
         "{}_{}_{}.sac".format(network, station, channel)
     )
@@ -552,12 +647,25 @@ def __remove_response_surf(
             pre_filt=freqs,
             taper=False,
         )
-        stream.write(directory / str_name, format="SAC", byteorder=0)
+        stream.write(str(directory / str_name), format="SAC", byteorder=0)
     return
 
 
-def __create_long_period(surf_files, tensor_info, directory=pathlib.Path()):
-    """We downsample long period data."""
+def __create_long_period(
+    surf_files: List[str],
+    tensor_info: dict,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+):
+    """Downsample long period data
+
+    :param surf_files: The selected sac files
+    :type surf_files: List[str]
+    :param tensor_info: The moment tensor information
+    :type tensor_info: dict
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
+    """
+    directory = pathlib.Path(directory)
     for sac in surf_files:
         sacheader = SACTrace.read(sac)
         sacheader.kcmpnm = "SH" if not sacheader.kcmpnm == "BHZ" else sacheader.kcmpnm
@@ -572,7 +680,11 @@ def __create_long_period(surf_files, tensor_info, directory=pathlib.Path()):
         if np.max(np.abs(tr.data)) < 10**-3:
             continue
         st[0] = tr
-        st.write(directory / "final_{}".format(sac), format="SAC", byteorder=0)
+        st.write(
+            str(directory / f"final_{os.path.basename(sac)}"),
+            format="SAC",
+            byteorder=0,
+        )
     return
 
 
@@ -581,59 +693,86 @@ def __create_long_period(surf_files, tensor_info, directory=pathlib.Path()):
 ###################################
 
 
-def select_process_cgps(cgps_files, tensor_info, data_prop, directory=pathlib.Path()):
-    """Routine for selecting and processing cgps data
+def select_process_cgps(
+    cgps_files: List[str],
+    tensor_info: dict,
+    data_prop: dict,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+):
+    """Module for selecting and processing cGPS data
 
-    :param tensor_info: dictionary with moment tensor information
-    :param data_prop: dictionary with waveform properties
-    :param cgps_files: files with cGPS data to be selected and processed
+    :param cgps_files: The list of available cGPS file's properties
+    :type cgps_files: List[str]
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
+    :param data_prop: The sampling/filtering properties
     :type data_prop: dict
-    :type cgps_files: list
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
 
     .. note::
 
-        Currently, this code allows only to process files in sac format.
-        Other data formats are not supported.
+    Currently, this code allows only to process files in sac format.
+    Other data formats are not supported.
     """
+    directory = pathlib.Path(directory)
     if not os.path.isdir(directory / "logs"):
         os.mkdir(directory / "logs")
+    if not os.path.isdir(directory / "cGPS"):
+        os.mkdir(directory / "cGPS")
     logger1 = ml.create_log(
-        directory, "cgps_processing", os.path.join("logs", "cgps_processing.log")
+        "cgps_processing", os.path.join(directory / "logs", "cgps_processing.log")
     )
     logger1 = ml.add_console_handler(logger1)
     logger1.info("Process cGPS data")
     separator = "\n*************************************************\n"
     logger1.info("Select cGPS traces")
-    __select_cgps_files(cgps_files, tensor_info)
+    __select_cgps_files(cgps_files, tensor_info, directory=directory)
     logger1.info("Process selected cGPS traces")
     cgps_dir = directory / "cGPS"
-    final_files = glob.glob(cgps_dir + "/final*")
+    final_files = glob.glob(str(cgps_dir) + "/final*")
     for final_file in final_files:
         if os.path.isfile(final_file):
             os.remove(final_file)
-    cgps_files1 = glob.glob(cgps_dir + "/*L[HXY]*.sac") + glob.glob(
-        cgps_dir + "/*L[HXY]*.SAC"
+    cgps_files1 = glob.glob(str(cgps_dir) + "/*L[HXY]*.sac") + glob.glob(
+        str(cgps_dir) + "/*L[HXY]*.SAC"
     )
     __change_start(cgps_files1, tensor_info, cgps=True)
-    new_process_cgps(tensor_info, cgps_files1, data_prop, logger=logger1)
-    os.chdir(data_folder)
+    new_process_cgps(
+        tensor_info, cgps_files1, data_prop, logger=logger1, directory=directory
+    )
     logger1.info("cGPS waves have been succesfully processed")
-    strong_files3 = glob.glob(os.path.join("cGPS", "final*"))
+    strong_files3 = glob.glob(os.path.join(cgps_dir, "final*"))
     select_strong_stations(tensor_info, strong_files3)
     ml.close_log(logger1)
     return
 
 
 def __select_distance(
-    tensor_info,
-    station_lat,
-    station_lon,
-    max_distance=180,
-    min_distance=0,
-    use_centroid=False,
-):
-    """ """
+    tensor_info: dict,
+    station_lat: float,
+    station_lon: float,
+    max_distance: float = 180,
+    min_distance: float = 0,
+    use_centroid: bool = False,
+) -> float:
+    """Select the distance
+
+    :param tensor_info: The moment tensor information
+    :type tensor_info: dict
+    :param station_lat: The station latitude
+    :type station_lat: float
+    :param station_lon: The station longitude
+    :type station_lon: float
+    :param max_distance: The maximum allowed distance, defaults to 180
+    :type max_distance: float, optional
+    :param min_distance: The minimum allowed distance, defaults to 0
+    :type min_distance: float, optional
+    :param use_centroid: Whether to use the centroid, defaults to False
+    :type use_centroid: bool, optional
+    :return: The distance
+    :rtype: float
+    """
     event_lat = tensor_info["lat"]
     event_lon = tensor_info["lon"]
     distance = locations2degrees(event_lat, event_lon, station_lat, station_lon)
@@ -647,16 +786,37 @@ def __select_distance(
     return min_distance <= distance < max_distance
 
 
-def __select_time(sac, tensor_info):
-    """ """
+def __select_time(sac: str, tensor_info: dict) -> UTCDateTime:
+    """Select the time
+
+    :param sac: The sac file
+    :type sac: str
+    :param tensor_info: The moment tensor information
+    :type tensor_info: dict
+    :return: The time
+    :rtype: UTCDatetime
+    """
     datetime = tensor_info["datetime"]
     origin_time = UTCDateTime(datetime)
     st = read(sac)
     return st[0].stats.starttime - origin_time < 20 * 60
 
 
-def __select_cgps_files(cgps_files, tensor_info):
-    """We select cgps data. We must make sure our cgps data is not too bad"""
+def __select_cgps_files(
+    cgps_files: List[str],
+    tensor_info: dict,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+):
+    """Select cgps data and make sure our cgps data is not of bad quality
+
+    :param cgps_files: The cgps files
+    :type cgps_files: List[str]
+    :param tensor_info: The moment tensor information
+    :type tensor_info: dict
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
+    """
+    directory = pathlib.Path(directory)
     event_lat = tensor_info["lat"]
     event_lon = tensor_info["lon"]
     depth = tensor_info["depth"]
@@ -705,7 +865,7 @@ def __select_cgps_files(cgps_files, tensor_info):
             station_lon = stream[0].stats.sac.stlo
             delta = stream[0].stats.delta
             distance = locations2degrees(event_lat, event_lon, station_lat, station_lon)
-            distance = 111.11 * distance
+            distance = 111.11 * distance  # type:ignore
             distance2 = np.sqrt(distance**2 + depth**2)
 
             index0 = distance2 / 5 / delta
@@ -728,12 +888,20 @@ def __select_cgps_files(cgps_files, tensor_info):
 
         station = stream[0].stats.station
         channel = stream[0].stats.channel
-        name = os.path.join("cGPS", "{}_{}.sac".format(station, channel))
+        name = os.path.join(directory, "cGPS", "{}_{}.sac".format(station, channel))
         stream.write(name, format="SAC", byteorder=0)
 
 
-def __change_start(stations_str, tensor_info, cgps=False):
-    """Routine for modifying start time of cGPS data"""
+def __change_start(stations_str: List[str], tensor_info: dict, cgps: bool = False):
+    """Routine for modifying start time of cGPS data
+
+    :param stations_str: The list of
+    :type stations_str: List[str]
+    :param tensor_info: The moment tensor information
+    :type tensor_info: dict
+    :param cgps: Whether this is cgps data, defaults to False
+    :type cgps: bool, optional
+    """
     event_lat = tensor_info["lat"]
     event_lon = tensor_info["lon"]
     depth = tensor_info["depth"]
@@ -759,18 +927,27 @@ def __change_start(stations_str, tensor_info, cgps=False):
         st.write(sac, format="SAC", byteorder=0)
 
 
-def new_process_cgps(tensor_info, stations_str, data_prop, logger=None):
-    """Routine for processing (filtering and filling header) selected cGPS data.
+def new_process_cgps(
+    tensor_info: dict,
+    stations_str: List[str],
+    data_prop: dict,
+    logger: Optional[logging.Logger] = None,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+):
+    """Routine for processing (filtering and filling header) selected cGPS data
 
-    :param tensor_info: dictionary with moment tensor information
-    :param stations_str: list with waveforms (in sac format) to use
-    :param data_prop: dictionary with waveform properties
-    :param logger: where to log results of processing data
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
-    :type stations_str: list
+    :param stations_str: The list of sac files
+    :type stations_str: List[str]
+    :param data_prop: The sampling/filtering properties
     :type data_prop: dict
-    :type logger: logging, optional
+    :param logger: A logger, defaults to None
+    :type logger: logging.Logger, optional
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
     """
+    directory = pathlib.Path(directory)
     start = tensor_info["date_origin"]
     filtro_cgps = data_prop["strong_filter"]
     if "cgps_filter" in data_prop:
@@ -800,7 +977,6 @@ def new_process_cgps(tensor_info, stations_str, data_prop, logger=None):
         start_time = UTCDateTime(sacheader.reftime) + begin
         sacheader.o = start - start_time
         sacheader.write(sac, byteorder="little")
-
     _filter_decimate(
         stations_str,
         filtro_cgps,
@@ -810,12 +986,23 @@ def new_process_cgps(tensor_info, stations_str, data_prop, logger=None):
         decimate=False,
         filter0="lowpass",
         logger=logger,
+        directory=directory,
     )
     return
 
 
-def __linear_fill(data, begin, end):
-    """ """
+def __linear_fill(data: np.ndarray, begin: int, end: int) -> np.ndarray:
+    """Linearly fill the data
+
+    :param data: The data to fill
+    :type data: np.ndarray
+    :param begin: The begin location
+    :type begin: int
+    :param end: The end location
+    :type end: int
+    :return: The updated data
+    :rtype: np.ndarray
+    """
     slope = (data[begin] - data[end]) / (begin - end) if begin >= 0 else 0
     intercept = data[begin] - slope * begin if begin >= 0 else data[end]
     for index in range(begin + 1, end):
@@ -842,16 +1029,38 @@ def __get_gaps(data):
 
 
 def _filter_decimate(
-    sac_files,
-    filtro,
-    dt,
-    corners=4,
-    passes=2,
-    decimate=True,
-    logger=None,
-    filter0="bandpass",
+    sac_files: List[str],
+    filtro: dict,
+    dt: float,
+    corners: int = 4,
+    passes: int = 2,
+    decimate: bool = True,
+    logger: Optional[logging.Logger] = None,
+    filter0: str = "bandpass",
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """ """
+    """Filter the data
+
+    :param sac_files: List of sac files
+    :type sac_files: List[str]
+    :param filtro: The filter properties
+    :type filtro: dict
+    :param dt: The dt of the data
+    :type dt: float
+    :param corners: The number of coners, defaults to 4
+    :type corners: int, optional
+    :param passes: The number of passes, defaults to 2
+    :type passes: int, optional
+    :param decimate: Whether to decimate the data, defaults to True
+    :type decimate: bool, optional
+    :param logger: A logger, defaults to None
+    :type logger: logging.Logger, optional
+    :param filter0: The type of filter, defaults to "bandpass"
+    :type filter0: str, optional
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
+    """
+    directory = pathlib.Path(directory)
     low_freq = filtro["low_freq"]
     high_freq = filtro["high_freq"]
     power = lambda m, n: max([d for d in range(10) if m % (n**d) == 0])
@@ -869,7 +1078,9 @@ def _filter_decimate(
             b, a = butter(corners, high_freq2, btype="lowpass")
         filt_data = filtfilt(b, a, st[0].data)
         st[0].data = 100 * filt_data
-        st.write("final_{}".format(sac), format="SAC", byteorder=0)
+        sac_file_name = sac.split("/")[-1]
+        final_file_name = f"final_{sac_file_name}"
+        st.write(sac.replace(sac_file_name, final_file_name), format="SAC", byteorder=0)
     return
 
 
@@ -878,79 +1089,104 @@ def _filter_decimate(
 #####################
 
 
-def select_process_strong(strong_files0, tensor_info, data_prop, remove_response=True):
+def select_process_strong(
+    strong_files0: List[str],
+    tensor_info: dict,
+    data_prop: dict,
+    remove_response: bool = True,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+):
     """Module for selecting and processing strong motion data
 
-    :param tensor_info: dictionary with moment tensor information
-    :param data_prop: dictionary with waveform properties
-    :param strong_files0: files with strong motions to be selected and processed
-    :param remove_response: whether to remove paz response in processing
+    :param strong_files0: The list of file's properties
+    :type strong_files0: List[str]
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
+    :param data_prop: The sampling/filtering properties
     :type data_prop: dict
-    :type strong_files0: list
-    :type remove_repsonse: bool, optional
+    :param remove_response: Whether to remove the response, defaults to True
+    :type remove_response: bool, optional
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
 
     .. note::
         Currently, this code allows only to process files in sac format, where the
         instrumental response is in a SACPZ file. Other data formats are not
         supported.
     """
-    data_folder = os.path.abspath(os.getcwd())
-    if not os.path.isdir("logs"):
-        os.mkdir("logs")
-    if not os.path.isdir("STR"):
-        os.mkdir("STR")
+    directory = pathlib.Path(directory)
+    if not os.path.isdir(directory / "logs"):
+        os.mkdir(directory / "logs")
+    if not os.path.isdir(directory / "STR"):
+        os.mkdir(directory / "STR")
     logger1 = ml.create_log(
-        "strong_motion_processing", os.path.join("logs", "strong_motion_processing.log")
+        "strong_motion_processing",
+        os.path.join(directory, "logs", "strong_motion_processing.log"),
     )
     logger1 = ml.add_console_handler(logger1)
     logger1.info("Process strong motion data")
 
-    move_str_files(strong_files0)
-    response_files = glob.glob("SACPZ*") + glob.glob("SAC_PZs*")
+    move_str_files(strong_files0, directory=directory)
+    response_files = glob.glob(str(directory) + "/SACPZ*") + glob.glob(
+        str(directory) + "/SAC_PZs*"
+    )
     response_files = [os.path.abspath(response) for response in response_files]
-    os.chdir(os.path.join(data_folder, "STR"))
-    final_files = glob.glob("final*")
+    str_dir = directory / "STR"
+    final_files = glob.glob(str(str_dir) + "/final*")
     for final_file in final_files:
         if os.path.isfile(final_file):
             os.remove(final_file)
-    strong_files1 = glob.glob("acc*")
+    strong_files1 = glob.glob(str(str_dir) + "/acc*")
     if remove_response:
         logger1.info("Remove response for selected strong motion traces")
-        __remove_response_str(strong_files1, response_files, logger=logger1)
+        __remove_response_str(
+            strong_files1, response_files, logger=logger1, directory=directory
+        )
 
     logger1.info("Select strong motion traces")
-    os.chdir(os.path.join(data_folder, "STR"))
-    horizontal_sacs = glob.glob("*HN1*sac") + glob.glob("*HN2*sac")
-    __rotation(tensor_info, horizontal_sacs, rotate_RT=False, logger=logger1)
+    horizontal_sacs = glob.glob(str(str_dir) + "/*HN1*sac") + glob.glob(
+        str(str_dir) + "/*HN2*sac"
+    )
+    __rotation(
+        tensor_info, horizontal_sacs, rotate_RT=False, logger=logger1, directory=str_dir
+    )
     for file in horizontal_sacs:
         if os.path.isfile(file):
             os.remove(file)
-    strong_files1 = glob.glob("acc*")
+    strong_files1 = glob.glob(str(str_dir) + "/acc*")
     strong_files2 = __select_str_files(strong_files1, tensor_info)
     logger1.info("Update duration of traces")
     __change_start(strong_files2, tensor_info)
     logger1.info("Process selected strong motion traces")
-    process_strong_motion(strong_files2, tensor_info, data_prop, logger=logger1)
-    os.chdir(data_folder)
-    strong_files3 = glob.glob(os.path.join("STR", "final*"))
+    process_strong_motion(strong_files2, data_prop, logger=logger1, directory=str_dir)
+    strong_files3 = glob.glob(os.path.join(directory, "STR", "final*"))
     select_strong_stations(tensor_info, strong_files3)
     logger1.info("Strong motion waves have been succesfully processed")
     ml.close_log(logger1)
     return
 
 
-def __convert_response_acc(resp_file):
+def __convert_response_acc(
+    resp_file: str, directory: Union[pathlib.Path, str] = pathlib.Path()
+) -> str:
     """Modify SACPZ response to ensure output is in units of acceleration after
-    response removal.
+    response removal
+
+    :param resp_file: The full path to the response file
+    :type resp_file: str
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
+    :return: The full path to the updated response file
+    :rtype: str
     """
+    directory = pathlib.Path(directory)
     with open(resp_file, "r") as infile:
         lines = [line for line in infile]
 
     indexes0 = [i for i, line in enumerate(lines) if "CONSTANT" in line.split()]
     index0 = 0
-    temp_resp_file = "temp.txt"
-    lines3 = []
+    temp_resp_file = directory / "temp.txt"
+    lines3: List[str] = []
     for index in indexes0:
         lines1 = lines[index0 : index + 1]
         index0 = index
@@ -961,33 +1197,36 @@ def __convert_response_acc(resp_file):
             for line in lines1:
                 outfile.write(line)
         paz_dict, is_paz = __read_paz(temp_resp_file)
-        zeros = paz_dict["zeros"]
-        zeros1 = [zero for zero in zeros if abs(zero - 0j) < 1e-10]
-        input_unit = [line for line in lines1 if "INPUT UNIT" in line]
-        if len(input_unit) > 0:
-            input_unit = input_unit[0]
-            input_unit = input_unit.split()[-1]
-            input_unit = input_unit.lower()
-            if input_unit in ["m"]:
-                nzeros = 2
-            elif input_unit in ["m/s"]:
-                nzeros = 1
-            elif input_unit in ["m/s**2", "m/s/s"]:
-                nzeros = 0
-            else:
-                nzeros = len(zeros1)
-            zeros1 = zeros1[:nzeros]
-        for zero in zeros1:
-            zeros.remove(zero)
-        paz_dict["zeros"] = zeros
-        nzeros1 = len(zeros)
-        lines2 = lines2 + ["ZEROS\t {}\n".format(nzeros1)]
-        for zero in zeros:
-            real = np.real(zero)
-            imag = np.imag(zero)
-            lines2 = lines2 + ["\t{:.4e}\t{:.4e}\n".format(real, imag)]
-        lines2 = lines2 + lines1[index3:]
-        lines3 = lines3 + lines2
+        if paz_dict is not None:
+            zeros = paz_dict["zeros"]
+            zeros1 = [zero for zero in zeros if abs(zero - 0j) < 1e-10]
+            input_unit: Union[list, str] = [
+                line for line in lines1 if "INPUT UNIT" in line
+            ]
+            if len(input_unit) > 0:
+                input_unit = input_unit[0]  # type:ignore
+                input_unit = str(input_unit).split()[-1]
+                input_unit = str(input_unit).lower()
+                if input_unit in ["m"]:
+                    nzeros = 2
+                elif input_unit in ["m/s"]:
+                    nzeros = 1
+                elif input_unit in ["m/s**2", "m/s/s"]:
+                    nzeros = 0
+                else:
+                    nzeros = len(zeros1)
+                zeros1 = zeros1[:nzeros]
+            for zero in zeros1:
+                zeros.remove(zero)
+            paz_dict["zeros"] = zeros
+            nzeros1 = len(zeros)
+            lines2 = lines2 + ["ZEROS\t {}\n".format(nzeros1)]
+            for zero in zeros:
+                real = np.real(zero)
+                imag = np.imag(zero)
+                lines2 = lines2 + ["\t{:.4e}\t{:.4e}\n".format(real, imag)]
+            lines2 = lines2 + lines1[index3:]
+            lines3 = lines3 + lines2
 
     with open(resp_file, "w") as outfile:
         for line in lines3:
@@ -995,16 +1234,24 @@ def __convert_response_acc(resp_file):
     return resp_file
 
 
-def __select_str_files(strong_files, tensor_info):
-    r"""We pre-select strong motion data"""
+def __select_str_files(strong_files: List[str], tensor_info: dict) -> List[str]:
+    """Pre-select strong motion data
+
+    :param strong_files: List of available strong motion files
+    :type strong_files: List[str]
+    :param tensor_info: The moment tensor information
+    :type tensor_info: dict
+    :raises RuntimeError: If no files are collected
+    :return: The updated list of strong motion files
+    :rtype: List[str]
+    """
     time_shift = tensor_info["time_shift"]
     centroid_lat = tensor_info["centroid_lat"]
     centroid_lon = tensor_info["centroid_lon"]
     depth = tensor_info["depth"]
-    strong_files2 = []
+    strong_files2: List[str] = []
     distance = 2 if time_shift < 50 else 4
     syn_len = 20 + 4 * time_shift + 7 * depth / 50
-
     for sac in strong_files:
         select_stat = True
         sacfile = SACTrace.read(sac)
@@ -1036,8 +1283,17 @@ def __select_str_files(strong_files, tensor_info):
     return strong_files2
 
 
-def move_str_files(stations_str):
-    """ """
+def move_str_files(
+    stations_str: List[str], directory: Union[pathlib.Path, str] = pathlib.Path()
+):
+    """Move strong motion files
+
+    :param stations_str: List of strong motion files
+    :type stations_str: List[str]
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
+    """
+    directory = pathlib.Path(directory)
     new_name = lambda network, station, channel: "acc_{}_{}_{}.sac".format(
         network, station, channel
     )
@@ -1048,12 +1304,18 @@ def move_str_files(stations_str):
         channel = st[0].stats.channel
         network = st[0].stats.network
         filename = os.path.join("STR", new_name(name, channel, network))
-        st.write(filename, format="SAC", byteorder=0)
+        st.write(str(directory / filename), format="SAC", byteorder=0)
     return
 
 
-def __read_paz(paz_file):
-    """ """
+def __read_paz(paz_file: Union[pathlib.Path, str]) -> Tuple[Optional[dict], bool]:
+    """The response paz file
+
+    :param paz_file: The full path to the paz file
+    :type paz_file: str
+    :return: The response dictionary, whether is paz
+    :rtype: Tuple[dict,bool]
+    """
     is_paz = True
     with open(paz_file, "r") as infile:
         lines = [line.split() for line in infile]
@@ -1065,13 +1327,16 @@ def __read_paz(paz_file):
     n_zeros = int(lines2[0][1])
     n_poles = int(lines2[n_zeros + 1][1])
     gain_line = n_zeros + n_poles + 2
+    gain: Union[float, int]
     if len(lines2) <= gain_line:
         gain = 1
     elif len(lines2[gain_line]) <= 1:
         gain = 1
     else:
         gain = float(lines2[gain_line][1])
-    zeros = [float(real) + 1j * float(imag) for real, imag in lines2[1 : n_zeros + 1]]
+    zeros = [
+        float(real) + 1j * float(imag) for real, imag in lines2[1 : n_zeros + 1]
+    ]  # type:ignore
     poles = [
         float(real) + 1j * float(imag) for real, imag in lines2[n_zeros + 2 : gain_line]
     ]
@@ -1079,8 +1344,24 @@ def __read_paz(paz_file):
     return paz_dict, is_paz
 
 
-def __remove_response_str(stations_str, response_files, logger=None):
-    """Remove instrumental response."""
+def __remove_response_str(
+    stations_str: List[str],
+    response_files: List[str],
+    logger: Optional[logging.Logger] = None,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+):
+    """Remove instrumental response
+
+    :param stations_str: The list of sac file paths
+    :type stations_str: List[str]
+    :param response_files: The list of response file paths
+    :type response_files: List[str]
+    :param logger: A logger, defaults to None
+    :type logger: logging.Logger, optional
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
+    """
+    directory = pathlib.Path(directory)
     for sac in stations_str:
         st = read(sac)
         name = st[0].stats.station
@@ -1106,25 +1387,31 @@ def __remove_response_str(stations_str, response_files, logger=None):
                     )
                 )
             continue
-        __convert_response_acc(pzfile2)
+        __convert_response_acc(pzfile2, directory=directory)
         paz_dict, is_paz = __read_paz(pzfile2)
         st[0].simulate(paz_remove=paz_dict)
         st.write(sac, format="SAC", byteorder=0)
     return
 
 
-def process_strong_motion(strong_files, tensor_info, data_prop, logger=None):
-    r"""We integrate strong motion to velocity and proceed to downsample it.
+def process_strong_motion(
+    strong_files: List[str],
+    data_prop: dict,
+    logger: Optional[logging.Logger] = None,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+):
+    """Integrate strong motion to velocity and proceed to downsample it
 
-    :param tensor_info: dictionary with moment tensor information
-    :param data_prop: dictionary with waveform properties
-    :param strong_files: strong motion to be resampled and integrated to velocity
-    :param logger: where to log results of strong motion resampling and integration
-    :type tensor_info: dict
+    :param strong_files: List of strong motion files
+    :type strong_files: List[str]
+    :param data_prop: The sampling/filtering properties
     :type data_prop: dict
-    :type strong_files: list
-    :type logger: logging, optional
+    :param logger: A logger, defaults to None
+    :type logger: logging.Logger, optional
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
     """
+    directory = pathlib.Path(directory)
     muestreo = data_prop["sampling"]
     dt_strong = muestreo["dt_strong"]
     filtro_strong = data_prop["strong_filter"]
@@ -1140,19 +1427,26 @@ def process_strong_motion(strong_files, tensor_info, data_prop, logger=None):
 
     print("Baseline removal procedure")
     with Pool(processes=6) as pool:
-        results = pool.map(__worker, [[str_file] for str_file in strong_files])
-    strong_files2 = glob.glob("vel*")
+        results = pool.map(
+            partial(__worker, directory=directory),
+            [[str_file] for str_file in strong_files],
+        )
+    strong_files2 = glob.glob(str(directory) + "/vel*")
 
-    _filter_decimate(strong_files2, filtro_strong, dt_strong)
+    _filter_decimate(strong_files2, filtro_strong, dt_strong, directory=directory)
     return
 
 
-def small_events(select_str_data):
+def small_events(
+    select_str_data: List[str], directory: Union[pathlib.Path, str] = pathlib.Path()
+):
     """A simple method for removing strong motion baselines. Based on Boore et
     al. [2002]_
 
-    :param select_st_data: list with waveforms (in sac format) to use
-    :type select_st_data: list
+    :param select_str_data: List of paths to strong motion files
+    :type select_str_data: List[str]
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
 
     This method consists on padding the record with zeros on the extremes and
     applying a low pass filter.
@@ -1161,6 +1455,7 @@ def small_events(select_str_data):
         Bulletin of the Seismological Society of America 2005,95(2):745-750.
         10.1785/0120040160
     """
+    directory = pathlib.Path(directory)
     order = 4
     for sac in select_str_data:
         stream = read(sac)
@@ -1182,12 +1477,23 @@ def small_events(select_str_data):
         #
         data = filtfilt(b, a, data)
         st_vel[0].data = data[t_pad:-t_pad]
-        st_vel.write("vel_{}".format(sac[4:]), format="SAC")
+        st_vel.write(
+            str(directory / "vel_{}".format(os.path.basename(sac)[4:])), format="SAC"
+        )
     return
 
 
-def __worker(select_str_data):
-    """Helper routine. Method for baseline removal based on Wang et al."""
+def __worker(
+    select_str_data: List[str], directory: Union[pathlib.Path, str] = pathlib.Path()
+):
+    """Helper routine. Method for baseline removal based on Wang et al.
+
+    :param select_str_data: List of paths to strong motion files
+    :type select_str_data: List[str]
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
+    """
+    directory = pathlib.Path(directory)
     for sac in select_str_data:
         stream = read(sac)
         if _delete_criteria(stream[0].data):
@@ -1195,12 +1501,20 @@ def __worker(select_str_data):
         st_vel = wang1.wang_process(sac)
         if not st_vel:
             continue
-        st_vel.write("vel_{}".format(sac[4:]), format="SAC")
+        st_vel.write(
+            str(directory / "vel_{}".format(os.path.basename(sac)[4:])), format="SAC"
+        )
     return
 
 
-def _delete_criteria(data):
-    """ """
+def _delete_criteria(data: np.ndarray) -> bool:
+    """Whether data meets delete criteria
+
+    :param data: The data
+    :type data: np.ndarray
+    :return: Whether data meets delete criteria
+    :rtype: bool
+    """
     data = data - np.mean(data)
     if np.max(np.abs(data)) < 10**-6:
         return True
@@ -1212,11 +1526,15 @@ def _delete_criteria(data):
 ##########################
 
 
-def select_strong_stations(tensor_info, files):
-    """We select strong motion data to use in finite fault modelling
+def select_strong_stations(tensor_info: dict, files: List[str]) -> List[str]:
+    """Select strong motion data to use in finite fault modelling
 
-    :param files: list of waveform files (in sac format) to select
-    :type files: list
+    :param tensor_info: the moment tensor information
+    :type tensor_info: dict
+    :param files: The list of paths to files
+    :type files: List[str]
+    :return: The updated list of strong motion files
+    :rtype: List[str]
     """
     if len(files) < 150:
         return files
@@ -1225,18 +1543,20 @@ def select_strong_stations(tensor_info, files):
     sacheaders = tuple([SACTrace.read(sac) for sac in files])
     streams = tuple([read(sac) for sac in files])
     names = [header.kstnm for header in sacheaders]
-    azimuth0 = []
+    azimuth0: list = []
     for header in sacheaders:
         station_lat = header.stla
         station_lon = header.stlo
-        dist, az, baz = mng._distazbaz(station_lat, station_lon, lat, lon)
+        dist, az, baz = mng._distazbaz(
+            station_lat, station_lon, lat, lon
+        )  # type:ignore
         azimuth0 = azimuth0 + [az]
-    azimuth0 = np.array(azimuth0)  # [header.az for header in sacheaders])
+    azimuth0 = np.array(azimuth0)  # type:ignore
     az0 = np.amin(azimuth0)
     az1 = np.amax(azimuth0)
     jump = int((az1 - az0) / 60) + 1
     names = list(set(names))
-    select_stations = []
+    select_stations: list = []
 
     # Limiting the number of data. Choose at most one station (3 channels)
     # for every degree in azimuth. Preferably use data with higher PGV
@@ -1273,7 +1593,7 @@ def select_strong_stations(tensor_info, files):
 if __name__ == "__main__":
     import argparse
 
-    import manage_parser as mp
+    import wasp.manage_parser as mp
 
     parser = argparse.ArgumentParser()
     parser.add_argument(

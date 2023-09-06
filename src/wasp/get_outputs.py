@@ -49,6 +49,8 @@ def read_solution_static_format(
     moment: List[float] = []
 
     data_dir = pathlib.Path(data_dir)
+    print(f"I am here: {str(pathlib.Path().resolve())}")
+    print(f"Getting file from {data_dir / 'Solucion.txt'}")
     if not os.path.isfile(data_dir / "Solucion.txt"):
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), "Solucion.txt")
     with open(data_dir / "Solucion.txt", "r") as input_file:

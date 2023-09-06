@@ -12,13 +12,19 @@ import numpy as np
 from netCDF4 import Dataset  # type:ignore
 
 
-def select_velmodel(tensor_info: dict, default_dirs: dict) -> dict:
+def select_velmodel(
+    tensor_info: dict,
+    default_dirs: dict,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+) -> dict:
     """Select a velocity model given the hypocenter location
 
     :param tensor_info: The moment tensor information
     :type tensor_info: dict
     :param default_dirs: The paths to default directories
     :type default_dirs: dict
+    :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
     :return: The velocity model
     :rtype: dict
 
@@ -59,9 +65,10 @@ def select_velmodel(tensor_info: dict, default_dirs: dict) -> dict:
         ``default_dirs()`` of the module ``management.py``.
 
     """
+    directory = pathlib.Path(directory)
     crust_model = __litho_crust_velmodel(tensor_info, default_dirs)
     velmodel = __crust_mantle_model(crust_model, tensor_info["depth"])
-    velmodel2json(velmodel)
+    velmodel2json(velmodel, directory=directory)
     return velmodel
 
 

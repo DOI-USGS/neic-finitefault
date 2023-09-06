@@ -867,7 +867,7 @@ def __failsafe(filtro: dict, header: SACTrace, cgps: bool = False):
 def filling_data_dicts(
     tensor_info: dict,
     data_types: List[
-        Literal["cgps", "gps", "insar", "strong_motion", "surf_tele", "tele_body"]
+        str
     ],
     data_prop: dict,
     data_folder: Union[pathlib.Path, str],
@@ -883,7 +883,7 @@ def filling_data_dicts(
     :param tensor_info: The tensor information (from tensor_info.json)
     :type tensor_info: dict
     :param data_types: List of data types to populate property files for
-    :type data_type: List[ Literal[&quot;cgps&quot;, &quot;gps&quot;, &quot;insar&quot;, &quot;strong_motion&quot;, &quot;surf_tele&quot;, &quot;tele_body&quot;] ]
+    :type data_type: List[str]
     :param data_prop: The data properties (from sampling_filter.json)
     :type data_prop: dict
     :param data_folder: The path to the folder where the data exists and property

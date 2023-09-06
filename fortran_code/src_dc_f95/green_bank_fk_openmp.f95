@@ -20,14 +20,15 @@ program green_bank_fk_openmp
    integer iz, k, ll, n_com, nd_max, npt, ntc, nx, nz
    logical :: disp
 
-   character(len=100) gf_file, vel_model, gf_bank, input
+   character(len=100) gf_file, vel_model, gf_bank, input, directory
 !
    call getarg(1, input)
+   call getarg(2, directory)
    disp = (input.eq.'cgps')
 
    gf_file = 'Green_strong.txt'
    if (disp) gf_file = 'Green_cgps.txt'
-   call get_gf_data(gf_file, vel_model, gf_bank)
+   call get_gf_data(trim(directory)//gf_file, vel_model, gf_bank)
    npt=2**lnpt
 !
    if(abs(dist_min-int(dist_min/d_step+0.001)*d_step).gt.1.0e-4)then
@@ -61,8 +62,8 @@ program green_bank_fk_openmp
    nz=int((dep_max-dep_min)/dep_step)+1
 
 !   write(*,*)'total =',nx,nz
-!	open(100,file='stored_bessel')
-!	open(101,file='computed_bessel')
+!	open(100,file=trim(directory)//'stored_bessel')
+!	open(101,file=trim(directory)//'computed_bessel')
    if(nx.gt.ndis) then
       write(*,*)"please reduce the number of Green function"
       stop
@@ -70,7 +71,7 @@ program green_bank_fk_openmp
    open(11,file=gf_bank,status='unknown',access='direct',recl=block_gg)
 
    write(0, *)'Get velocity model...'
-   call read_vel_model(vel_model)
+   call read_vel_model(trim(directory)//vel_model)
 
    do k=1,nx
       dist(k)=dist_min+(k-1)*d_step

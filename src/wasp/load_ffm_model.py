@@ -16,10 +16,8 @@ from wasp import get_outputs
 
 def load_ffm_model(
     segments_data: dict,
-    point_sources: np.ndarray,
-    option: Literal[
-        "Checkerboard", "Patches", "Solucion.txt", "fault&rise_time.txt", "point_source"
-    ] = "Solucion.txt",
+    point_sources: list,
+    option: str = "Solucion.txt",
     max_slip: float = 1000,
     len_stk: int = 4,
     len_dip: int = 4,
@@ -30,7 +28,7 @@ def load_ffm_model(
     :param segments_data: The segment properties
     :type segments_data: dict
     :param point_sources: The point sources
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param option: The path to the solution file, defaults to Solucion.txt
     :type option: str, optional
     :param max_slip: The maximum slip, defaults to 1000

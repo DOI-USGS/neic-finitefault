@@ -1,0 +1,31 @@
+* **********************************
+* NETWORK   (KNETWK): C1
+* STATION    (KSTNM): VA03
+* LOCATION   (KHOLE): 
+* CHANNEL   (KCMPNM): HNE
+* CREATED           : 2022-05-02T15:57:35
+* START             : 2013-11-28T00:00:00
+* END               : 
+* DESCRIPTION       : San Esteban
+* LATITUDE          : -32.763700
+* LONGITUDE         : -70.550800
+* ELEVATION         : 1053.0
+* DEPTH             : 0.0
+* DIP               : 90.0
+* AZIMUTH           : 90.0
+* SAMPLE RATE       : 100.0
+* INPUT UNIT        : COUNT
+* OUTPUT UNIT       : V
+* INSTTYPE          : CMG-5T, DC_100 s,  0.255 V/m/s**2, 4g clip level,
+* INSTGAIN          : 1.020410e+00 (COUNT)
+* COMMENT           : 
+* SENSITIVITY       : 4.279910e+05 (COUNT)
+* A0                : 3.021840e+12
+* **********************************
+ZEROS	 0
+POLES	4
+	-4.008000e+02	+5.679000e+02	
+	-4.008000e+02	-5.679000e+02	
+	-4.749000e+03	+0.000000e+00	
+	-1.317000e+03	+0.000000e+00	
+CONSTANT	1.293320e+18

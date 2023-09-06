@@ -1,0 +1,31 @@
+* **********************************
+* NETWORK   (KNETWK): C
+* STATION    (KSTNM): GO04
+* LOCATION   (KHOLE): 
+* CHANNEL   (KCMPNM): HNZ
+* CREATED           : 2022-05-02T15:57:09
+* START             : 2011-07-15T00:00:00
+* END               : 
+* DESCRIPTION       : Tololo Observatory, Vicuna, Chile
+* LATITUDE          : -30.172700
+* LONGITUDE         : -70.799300
+* ELEVATION         : 2076.0
+* DEPTH             : 0.0
+* DIP               : 0.0
+* AZIMUTH           : 0.0
+* SAMPLE RATE       : 100.0
+* INPUT UNIT        : M
+* OUTPUT UNIT       : COUNTS
+* INSTTYPE          : Episensor 200 Hz 10 Volt per g/Quanterra 330 Linea
+* INSTGAIN          : 1.020180e+00 (M/S**2)
+* COMMENT           : 
+* SENSITIVITY       : 4.278940e+05 (M/S**2)
+* A0                : 2.459560e+13
+* **********************************
+ZEROS	 0
+POLES	4
+	-9.810000e+02	+1.009000e+03	
+	-9.810000e+02	-1.009000e+03	
+	-3.290000e+03	+1.263000e+03	
+	-3.290000e+03	-1.263000e+03	
+CONSTANT	1.052431e+19
