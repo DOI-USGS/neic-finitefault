@@ -6,7 +6,6 @@ import pathlib
 import shutil
 import subprocess
 import tempfile
-from shutil import copy2
 
 import numpy as np
 import pytest
@@ -92,7 +91,7 @@ def _end_to_end(
     directory = pathlib.Path(directory)
     if "gps" in data_type:
         if os.path.isfile(os.path.join(directory, "data", "gps_data")):
-            copy2(os.path.join(directory, "data", "gps_data"), directory)
+            shutil.copy2(os.path.join(directory, "data", "gps_data"), directory)
     if "insar" in data_type:
         insar_files = glob.glob(os.path.join(directory, "data", "insar_a*txt"))
         insar_files = insar_files + glob.glob(
@@ -100,7 +99,7 @@ def _end_to_end(
         )
         for file in insar_files:
             if os.path.isfile(file):
-                copy2(file, directory)
+                shutil.copy2(file, directory)
     data_dir = directory / "data"
     data_prop = properties_json(tensor_info, dt_cgps=dt_cgps, data_directory=directory)
     processing(
@@ -189,7 +188,7 @@ def _end_to_end(
     for folder in folders:
         for file in files:  # type:ignore
             if os.path.isfile(file):
-                copy2(file, folder)
+                shutil.copy2(file, folder)
     info_np1, info_np2 = planes_from_tensor(tensor_info)
     plane1_folder = directory / "NP1"
     _automatic2(
@@ -215,7 +214,7 @@ def test_automatic_usgs():
         set_directory_structure(TENSOR, directory=tempdir)
         for file in os.listdir(tempdir / "data"):
             if os.path.isfile(os.path.join(tempdir / "data", file)):
-                shutil.copy2(
+                shutil.shutil.copy2(
                     os.path.join(tempdir / "data", file),
                     tempdir / "20150916225432" / "ffm.0" / "data",
                 )
@@ -344,7 +343,7 @@ def test_automatic_cgps():
         set_directory_structure(TENSOR, directory=tempdir)
         for file in os.listdir(tempdir / "data"):
             if os.path.isfile(os.path.join(tempdir / "data", file)):
-                shutil.copy2(
+                shutil.shutil.copy2(
                     os.path.join(tempdir / "data", file),
                     tempdir / "20150916225432" / "ffm.0" / "data",
                 )
@@ -401,7 +400,7 @@ def test_automatic_gps():
         set_directory_structure(TENSOR, directory=tempdir)
         for file in os.listdir(tempdir / "data"):
             if os.path.isfile(os.path.join(tempdir / "data", file)):
-                shutil.copy2(
+                shutil.shutil.copy2(
                     os.path.join(tempdir / "data", file),
                     tempdir / "20150916225432" / "ffm.0" / "data",
                 )
@@ -453,7 +452,7 @@ def test_automatic_insar():
         set_directory_structure(TENSOR, directory=tempdir)
         for file in os.listdir(tempdir / "data"):
             if os.path.isfile(os.path.join(tempdir / "data", file)):
-                shutil.copy2(
+                shutil.shutil.copy2(
                     os.path.join(tempdir / "data", file),
                     tempdir / "20150916225432" / "ffm.0" / "data",
                 )
@@ -503,7 +502,7 @@ def test_automatic_strong_motion():
         set_directory_structure(TENSOR, directory=tempdir)
         for file in os.listdir(tempdir / "data"):
             if os.path.isfile(os.path.join(tempdir / "data", file)):
-                shutil.copy2(
+                shutil.shutil.copy2(
                     os.path.join(tempdir / "data", file),
                     tempdir / "20150916225432" / "ffm.0" / "data",
                 )
@@ -562,7 +561,7 @@ def test_automatic_tele():
         set_directory_structure(TENSOR, directory=tempdir)
         for file in os.listdir(tempdir / "data"):
             if os.path.isfile(os.path.join(tempdir / "data", file)):
-                shutil.copy2(
+                shutil.shutil.copy2(
                     os.path.join(tempdir / "data", file),
                     tempdir / "20150916225432" / "ffm.0" / "data",
                 )
