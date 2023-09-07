@@ -4,7 +4,6 @@ import pathlib
 import shutil
 import tempfile
 from copy import deepcopy
-from test.testutils import BASE_DIR, get_segments_data, get_tensor_info
 from unittest import mock
 
 from wasp.multiple_solutions import (
@@ -14,6 +13,8 @@ from wasp.multiple_solutions import (
     get_summary_all_models,
     multiple_solutions,
 )
+
+from .testutils import HOME, get_segments_data, get_tensor_info
 
 SEGMENTS = get_segments_data()["segments"]
 TENSOR = get_tensor_info()
@@ -185,5 +186,5 @@ def test_multiple_solutions():
             test=True,
         )
     finally:
-        os.chdir(BASE_DIR)
+        os.chdir(HOME)
         shutil.rmtree(tempdir)
