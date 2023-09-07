@@ -88,7 +88,7 @@ def _wang_baselines(
         return trace, trace, trace, None
     delta = trace.stats.delta
     #
-    # we define some relevant times
+    # Define some relevant times
     #
     time_p = _first_arrival(trace)
     time_end, time_pga = _time_end_pga(trace)
@@ -98,7 +98,7 @@ def _wang_baselines(
     trace.data = trace.data - preevent_baseline
     trace.data = trace.data[: time_p + 4 * (time_end - time_p)]
     #
-    # we integrate to velocity and displacement and remove quadratic trend at the
+    # Integrate to velocity and displacement and remove quadratic trend at the
     # end of the signal.
     #
     new_trace = trace.copy()
@@ -118,7 +118,7 @@ def _wang_baselines(
     if aic4 < aic3:
         a0, a1, a2, a3 = [b0, b1, b2, b3]
     #
-    # we search for a baseline correction such that corrected displacement best
+    # Search for a baseline correction such that corrected displacement best
     # resembles a heaviside function.
     #
     disp_data = disp_trace.data
@@ -354,8 +354,8 @@ def _time_d0_pgd(
     trace: Trace, time_p: int, time_pga: int, time_end: int
 ) -> Tuple[int, int]:
     """Find the last zero crossing of displacement prior to the estimated trace
-        end, for uncorrected displacement. Then Find the last local optimum of
-        displacement prior to this instant.
+    end, for uncorrected displacement. Then Find the last local optimum of
+    displacement prior to this instant.
 
     :param trace: The strong motion trace
     :type trace: Trace
@@ -381,7 +381,7 @@ def _time_d0_pgd(
         )
     else:
         #
-        # In case we can't find these values, we search them in some value previous to
+        # In case values can't be found, search them in some value previous to
         # the PGA time
         #
         vel_trace = np.gradient(trace, trace.stats.delta)
