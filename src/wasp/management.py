@@ -328,11 +328,11 @@ def correct_response_file(
             outfile.write("{}\n".format(line2))
 
 
-def use_waveforms(data_type: str) -> bool:
+def use_waveforms(data_type: List[str]) -> bool:
     """Determine whether waveforms should be used based on the data type
 
     :param data_type: The data type
-    :type data_type: str
+    :type data_type: List[str]
     :return: Whether waveforms should be used
     :rtype: bool
     """

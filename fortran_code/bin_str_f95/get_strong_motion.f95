@@ -14,7 +14,7 @@ program get_strong_motion
    use bpfilter, only : bandpassfilter
    use rad_pattern, only : rad_coef
    implicit none
-   character(len=100) :: vel_model, gf_file, gf_bank, filter_file, wave_file, stat_file
+   character(len=100) :: vel_model, gf_file, vel_file, gf_bank, filter_file, wave_file, stat_file
    character(len=70) :: string1, input
    character(len=200) :: directory,filterfile,risetimefile,pointsourcefile
    character(len=200) :: channelsfile,waveformsfile,responsefile
@@ -110,10 +110,11 @@ program get_strong_motion
 !	Load vel. model into memory
 ! 
    gf_file = trim(directory)//'Green_strong.txt'
+   vel_file = trim(directory)//'vel_model.txt'
    if (disp) gf_file = trim(directory)//'Green_cgps.txt'
    call get_gf_data(gf_file, vel_model, gf_bank)
    write(*,*)'Get velocity model...'
-   call read_vel_model(trim(directory)//'vel_model.txt')
+   call read_vel_model(vel_file)
    dep_min = 1.e+10
    dep_max = 0.0
    do i_seg=1,n_seg

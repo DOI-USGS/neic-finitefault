@@ -24,6 +24,7 @@ def create_finite_fault(
     data_type: List[str],
     water_level: float = 0,
     rupture_vel: Optional[float] = None,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> dict:
     """Create the fault plane and rise time function for the given plane and tensor
 
@@ -37,6 +38,8 @@ def create_finite_fault(
     :type water_level: float, optional
     :param rupture_vel: The rupture velocity, defaults to None
     :type rupture_vel: Optional[float], optional
+    :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
     :return: The segments data
     :rtype: dict
 
@@ -55,6 +58,7 @@ def create_finite_fault(
     >>> data_type = ['strong_motion']
     >>> create_finite_fault(tensor_info, np_plane_info, data_type)
     """
+    directory = pathlib.Path(directory)
     print("Create fault segments from input parameters")
     time_shift = tensor_info["time_shift"]
     strike = np_plane_info["strike"]
@@ -77,8 +81,17 @@ def create_finite_fault(
 
     plane_info2.update(subfaults)
     plane_info2.update(hyp_location)
-    __write_event_mult_in(tensor_info, plane_info, subfaults, hyp_location, rise_time)
-    segments_data = __save_plane_data(plane_info, subfaults, hyp_location, rise_time)
+    __write_event_mult_in(
+        tensor_info,
+        plane_info,
+        subfaults,
+        hyp_location,
+        rise_time,
+        output_directory=directory,
+    )
+    segments_data = __save_plane_data(
+        plane_info, subfaults, hyp_location, rise_time, output_directory=directory
+    )
     return segments_data
 
 
@@ -259,11 +272,11 @@ def __lat_lon(
     return lat_ref, lon_ref
 
 
-def shear_modulous(point_sources: np.ndarray, velmodel: Optional[dict] = None) -> list:
+def shear_modulous(point_sources: list, velmodel: Optional[dict] = None) -> list:
     """Calculate the shear modulus for each subfault
 
     :param point_sources: Point source array for fault segments
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param velmodel: The velocity model properties, defaults to None
     :type velmodel: Optional[dict], optional
     :return: The calculated shear moduli

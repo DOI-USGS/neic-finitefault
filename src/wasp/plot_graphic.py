@@ -38,7 +38,7 @@ from wasp.waveform_plots import plot_waveform_fits
 def plot_ffm_sol(
     tensor_info: dict,
     segments_data: dict,
-    point_sources: np.ndarray,
+    point_sources: list,
     shear: list,
     solution: dict,
     vel_model: dict,
@@ -54,7 +54,7 @@ def plot_ffm_sol(
     :param segments: The segment properties
     :type segments: dict
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param shear: The shear moduli
     :type shear: list
     :param solution: The kinematic model read from Solucion.txt
@@ -548,7 +548,7 @@ def _PlotSlipDistribution(
 
 def _PlotSlipDist_Compare(
     segments: dict,
-    point_sources: np.ndarray,
+    point_sources: list,
     input_model: dict,
     solution: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
@@ -559,7 +559,7 @@ def _PlotSlipDist_Compare(
     :param segments: The segment properties
     :type segments: dict
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param input_model: The model
     :type input_model: dict
     :param solution: The kinematic solution read from Solucion.txt
@@ -641,7 +641,7 @@ def _PlotSlipDist_Compare(
 def _PlotMap(
     tensor_info: dict,
     segments: List[dict],
-    point_sources: np.ndarray,
+    point_sources: list,
     solution: dict,
     default_dirs: dict,
     files_str: Optional[dict] = None,
@@ -657,7 +657,7 @@ def _PlotMap(
     :param segments: The segment properties
     :type segments: List[dict]
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param default_dirs: The location of default directories
@@ -913,7 +913,7 @@ def _PlotMap(
 def _PlotInsar(
     tensor_info: dict,
     segments: List[dict],
-    point_sources: np.ndarray,
+    point_sources: list,
     default_dirs: dict,
     insar_points: List[dict],
     los: str = "ascending",
@@ -926,7 +926,7 @@ def _PlotInsar(
     :param segments: The segment properties
     :type segments: List[dict]
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param default_dirs: The location of default directories
     :type default_dirs: dict
     :param insar_points: List of insar data
@@ -1056,7 +1056,7 @@ def _PlotInsar(
 def _PlotComparisonMap(
     tensor_info: dict,
     segments: List[dict],
-    point_sources: np.ndarray,
+    point_sources: list,
     input_model: dict,
     solution: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
@@ -1068,7 +1068,7 @@ def _PlotComparisonMap(
     :param segments: The segment properties
     :type segments: List[dict]
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param input_model: the model
     :type input_model: dict
     :param solution: The kinematic solution read from Solucion.txt

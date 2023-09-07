@@ -62,7 +62,7 @@ def write_velmodel(
 def forward_model(
     tensor_info: dict,
     segments_data: dict,
-    model: np.ndarray,
+    model: dict,
     vel0: float,
     vel1: float,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
@@ -420,8 +420,8 @@ def input_chen_tele_body(
 def input_chen_tele_surf(
     tensor_info: dict,
     data_prop: dict,
+    config_path: Optional[Union[str, pathlib.Path]] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
-    config_directory: Optional[Union[pathlib.Path, str]] = None,
 ):
     """Write text files, which are inputs for Chen's scripts, with information
        about the teleseismic surface wave data
@@ -430,6 +430,8 @@ def input_chen_tele_surf(
     :type tensor_info: dict
     :param data_prop: The sampling/filtering properties (from sampling_filter.json)
     :type data_prop: dict
+    :param config_path: The path to the config file, defaults to None
+    :type config_path: Optional[Union[str, pathlib.Path]], optional
     :param directory: The directory to read/write to, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     :param config_directory: The directory where the config file is located, defaults to pathlib.Path()
@@ -438,8 +440,8 @@ def input_chen_tele_surf(
     directory = pathlib.Path(directory)
     if not os.path.isfile(directory / "surf_waves.json"):
         return
-    if config_directory is not None:
-        dirs = mng.default_dirs(config_directory)
+    if config_path is not None:
+        dirs = mng.default_dirs(config_path=config_path)
     else:
         dirs = mng.default_dirs()
     gf_bank = dirs["long_gf_bank"]
@@ -619,7 +621,7 @@ def input_chen_near_field(
     with open(filename3, "w") as file1, open(filename4, "w") as file2:
         write_files_wavelet_observed(file1, file2, dt_strong, data_prop, traces_info)
 
-    write_wavelet_freqs(dt_strong, "Wavelets_strong_motion")
+    write_wavelet_freqs(dt_strong, directory / "Wavelets_strong_motion")
     return "strong_motion"
 
 
@@ -1057,9 +1059,7 @@ def write_wavelet_freqs(dt: float, name: Union[pathlib.Path, str]):
 
 def from_synthetic_to_obs(
     files: List[dict],
-    data_type: Literal[
-        "dart", "cgps", "gps", "strong_motion", "surf_tele", "tele_body"
-    ],
+    data_type: str,
     data_prop: dict,
     add_error: bool = False,
     directory: Union[pathlib.Path, str] = pathlib.Path(),

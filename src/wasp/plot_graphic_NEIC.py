@@ -71,7 +71,7 @@ slipcpt = ListedColormap(slip_cpt)
 def plot_ffm_sol(
     tensor_info: dict,
     segments_data: dict,
-    point_sources: np.ndarray,
+    point_sources: list,
     shear: list,
     solution: dict,
     default_dirs: dict,
@@ -95,7 +95,7 @@ def plot_ffm_sol(
     :param segments: The segment properties
     :type segments: dict
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param shear: The shear moduli
     :type shear: list
     :param solution: The kinematic model read from Solucion.txt

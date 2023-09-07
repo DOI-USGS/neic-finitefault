@@ -7,12 +7,15 @@ Chen-Ji.
 import errno
 import glob
 import json
+import logging
 import os
+import pathlib
 import subprocess
 import time
 import warnings
 from multiprocessing import Process
 from shutil import copy2, move
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -23,200 +26,254 @@ import wasp.green_functions as gf
 import wasp.management as mng
 import wasp.modelling_parameters as mp
 import wasp.modulo_logs as ml
-import wasp.plane_management as pl_mng
 import wasp.plot_graphic as plot
 import wasp.seismic_tensor as tensor
 import wasp.traces_properties as tp
 import wasp.velocity_models as mv
 from wasp import get_outputs, input_files
-from wasp.data_acquisition import acquisition
 from wasp.load_ffm_model import load_ffm_model
 from wasp.static2fsp import static_to_fsp
 
 
 def automatic_usgs(
-    tensor_info, data_type, default_dirs, velmodel=None, dt_cgps=1.0, st_response=True
+    tensor_info: dict,
+    data_type: List[str],
+    default_dirs: dict,
+    velmodel: Optional[dict] = None,
+    dt_cgps: Optional[float] = 1.0,
+    st_response: bool = True,
+    config_path: Optional[Union[str, pathlib.Path]] = None,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Routine for automatic FFM modelling
+    """Routine for automatically running the FFM modelling
 
-    :param tensor_info: dictionary with moment tensor properties
-    :param data_type: list with data types to be used in modelling
-    :param default_dirs: dictionary with default directories to be used
-    :param velmodel: dictionary with velocity model
-    :param dt_cgps: sampling interval for cgps data
-    :param st_response: whether to remove paz response of strong motion
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
-    :type data_type: list
+    :param data_type: The data types available
+    :type data_type: List[str]
+    :param default_dirs: The location of default directories
     :type default_dirs: dict
-    :type velmodel: dict, optional
-    :type dt_cgps: float, optional
+    :param velmodel: The velocity model, defaults to None
+    :type velmodel: Optional[dict], optional
+    :param dt_cgps: The time delta for cgps data, defaults to 1.0
+    :type dt_cgps: Optional[float], optional
+    :param st_response: Whether to remove paz response of strong motion, defaults to True
     :type st_response: bool, optional
+    :param config_path: The path to the config file, defaults to None
+    :type config_path: Optional[Union[str, pathlib.Path]], optional
+    :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
     """
-    logger = ml.create_log("automatic_ffm", os.path.join("logs", "automatic_ffm.log"))
+    directory = pathlib.Path(directory)
+    logger = ml.create_log(
+        "automatic_ffm", os.path.join(directory, "logs", "automatic_ffm.log")
+    )
     logger = ml.add_console_handler(logger)
     logger.info("Starting fff program")
-    sol_folder = os.getcwd()
-    sol_folder = os.path.abspath(sol_folder)
     time0 = time.time()
     if "gps" in data_type:
-        if os.path.isfile(os.path.join("data", "gps_data")):
-            copy2(os.path.join("data", "gps_data"), sol_folder)
+        if os.path.isfile(os.path.join(directory, "data", "gps_data")):
+            copy2(os.path.join(directory, "data", "gps_data"), directory)
     if "insar" in data_type:
-        insar_files = glob.glob(os.path.join("data", "insar_a*txt"))
-        insar_files = insar_files + glob.glob(os.path.join("data", "insar_d*txt"))
+        insar_files = glob.glob(os.path.join(directory, "data", "insar_a*txt"))
+        insar_files = insar_files + glob.glob(
+            os.path.join(directory, "data", "insar_d*txt")
+        )
         for file in insar_files:
             if os.path.isfile(file):
-                copy2(file, sol_folder)
-    data_prop = tp.properties_json(tensor_info, dt_cgps=dt_cgps)
-    os.chdir(os.path.join(sol_folder, "data"))
+                copy2(file, directory)
+    data_dir = directory / "data"
+    data_prop = tp.properties_json(
+        tensor_info, dt_cgps=dt_cgps, data_directory=directory
+    )
     time2 = time.time()
     logger.info("Process data")
-    processing(tensor_info, data_type, data_prop, st_response=st_response)
+    processing(
+        tensor_info, data_type, data_prop, st_response=st_response, directory=data_dir
+    )
     time2 = time.time() - time2
     logger.info("Time spent processing traces: {}".format(time2))
-    os.chdir(sol_folder)
-    data_folder = os.path.join(sol_folder, "data")
-    insar_asc = glob.glob("insar_asc*txt")
-    insar_asc = None if len(insar_asc) == 0 else insar_asc
-    insar_desc = glob.glob("insar_desc*txt")
-    insar_desc = None if len(insar_desc) == 0 else insar_desc
+    data_folder = os.path.join(directory, "data")
+    insar_asc = glob.glob(str(directory) + "/insar_asc*txt")
+    insar_asc = None if len(insar_asc) == 0 else insar_asc  # type:ignore
+    insar_desc = glob.glob(str(directory) + "/insar_desc*txt")
+    insar_desc = None if len(insar_desc) == 0 else insar_desc  # type:ignore
     dm.filling_data_dicts(
         tensor_info,
         data_type,
         data_prop,
         data_folder,
-        insar_asc=insar_asc,
-        insar_desc=insar_desc,
+        insar_asc=insar_asc,  # type:ignore
+        insar_desc=insar_desc,  # type:ignore
+        working_directory=directory,
     )
-    writing_inputs0(tensor_info, data_type)
+    writing_inputs0(
+        tensor_info, data_type, config_path=config_path, directory=directory
+    )
     logger.info("Compute GF bank")
     if not velmodel:
         velmodel = mv.select_velmodel(tensor_info, default_dirs)
-    input_files.write_velmodel(velmodel)
-    gf_bank_str = os.path.join(sol_folder, "GF_strong")
-    gf_bank_cgps = os.path.join(sol_folder, "GF_cgps")
+    input_files.write_velmodel(velmodel, directory=directory)
+    gf_bank_str = os.path.join(directory, "GF_strong")
+    gf_bank_cgps = os.path.join(directory, "GF_cgps")
     get_gf_bank = default_dirs["strong_motion_gf_bank2"]
     if "cgps" in data_type:
         logger.info("Compute cGPS GF bank")
-        green_dict = gf.fk_green_fun1(data_prop, tensor_info, gf_bank_cgps, cgps=True)
-        input_files.write_green_file(green_dict, cgps=True)
-        with open(os.path.join("logs", "GF_cgps_log"), "w") as out_gf_cgps:
-            p1 = subprocess.Popen([get_gf_bank, "cgps"], stdout=out_gf_cgps)
+        green_dict = gf.fk_green_fun1(
+            data_prop, tensor_info, gf_bank_cgps, cgps=True, directory=directory
+        )
+        input_files.write_green_file(green_dict, cgps=True, directory=directory)
+        with open(os.path.join(directory, "logs", "GF_cgps_log"), "w") as out_gf_cgps:
+            p1 = subprocess.Popen(
+                [get_gf_bank, "cgps", f"{(directory)}/"], stdout=out_gf_cgps
+            )
         p1.wait()
     if "strong_motion" in data_type:
         logger.info("Compute strong motion GF bank")
-        green_dict = gf.fk_green_fun1(data_prop, tensor_info, gf_bank_str)
-        input_files.write_green_file(green_dict)
-        with open(os.path.join("logs", "GF_strong_log"), "w") as out_gf_strong:
+        green_dict = gf.fk_green_fun1(
+            data_prop, tensor_info, gf_bank_str, directory=directory
+        )
+        input_files.write_green_file(green_dict, directory=directory)
+        with open(
+            os.path.join(directory, "logs", "GF_strong_log"), "w"
+        ) as out_gf_strong:
             p2 = subprocess.Popen(
-                [
-                    get_gf_bank,
-                ],
+                [get_gf_bank, "strong", f"{(directory)}/"],
                 stdout=out_gf_strong,
             )
         p2.wait()
-
     files = [
-        "Green_strong.txt",
-        "Green_cgps.txt",
-        "modelling_stats.json",
-        "gps_data",
-        "strong_motion_gf.json",
-        "cgps_gf.json",
-        "sampling_filter.json",
+        directory / "Green_strong.txt",
+        directory / "Green_cgps.txt",
+        directory / "modelling_stats.json",
+        directory / "gps_data",
+        directory / "strong_motion_gf.json",
+        directory / "cgps_gf.json",
+        directory / "sampling_filter.json",
     ]
-    files2 = glob.glob("channels_*txt")
-    files3 = glob.glob("wavelets_*txt")
-    files4 = glob.glob("waveforms_*txt")
-    files5 = glob.glob("*waves.json")
-    files6 = glob.glob("static*")
-    files7 = glob.glob("filtro*") + glob.glob("surf_filter*")
-    files8 = ["instrumental_response.txt", "body_wave_weight.txt"]
-    files9 = glob.glob("insar*")
-    files = (
-        files + files2 + files3 + files4 + files5 + files6 + files7 + files8 + files9
+    files2 = glob.glob(str(directory) + "/channels_*txt")
+    files3 = glob.glob(str(directory) + "/wavelets_*txt")
+    files4 = glob.glob(str(directory) + "/waveforms_*txt")
+    files5 = glob.glob(str(directory) + "/*waves.json")
+    files6 = glob.glob(str(directory) + "/static*")
+    files7 = glob.glob(str(directory) + "/filtro*") + glob.glob(
+        str(directory) + "/surf_filter*"
     )
-    folders = ["NP1", "NP2"]
+    files8 = [
+        directory / "instrumental_response.txt",
+        directory / "body_wave_weight.txt",
+    ]
+    files9 = glob.glob(str(directory) + "/insar*")
+    files = (
+        files
+        + files2
+        + files3
+        + files4
+        + files5
+        + files6
+        + files7
+        + files8
+        + files9  # type:ignore
+    )
+    folders = [directory / "NP1", directory / "NP2"]
     for folder in folders:
-        for file in files:
+        for file in files:  # type:ignore
             if os.path.isfile(file):
                 copy2(file, folder)
     info_np1, info_np2 = tensor.planes_from_tensor(tensor_info)
-    keywords = {"velmodel": velmodel}
-    os.chdir(os.path.join(sol_folder, "NP1"))
-    p1 = Process(
+    plane1_folder = directory / "NP1"
+    keywords = {"velmodel": velmodel, "directory": plane1_folder}
+    p1 = Process(  # type:ignore
         target=_automatic2,
-        args=(tensor_info, info_np1, data_type, data_prop, default_dirs, logger),
+        args=(
+            tensor_info,
+            info_np1,
+            data_type,
+            data_prop,
+            default_dirs,
+            logger,
+        ),
         kwargs=keywords,
     )
-    p1.start()
-    os.chdir(os.path.join(sol_folder, "NP2"))
-    p2 = Process(
+    p1.start()  # type:ignore
+    plane2_folder = directory / "NP2"
+    keywords["directory"] = plane2_folder
+    p2 = Process(  # type:ignore
         target=_automatic2,
-        args=(tensor_info, info_np2, data_type, data_prop, default_dirs, logger),
+        args=(
+            tensor_info,
+            info_np2,
+            data_type,
+            data_prop,
+            default_dirs,
+            logger,
+        ),
         kwargs=keywords,
     )
-    p2.start()
-    [p.join() for p in [p1, p2]]
+    p2.start()  # type:ignore
+    [p.join() for p in [p1, p2]]  # type:ignore
     logger.info("Time spent: {}".format(time.time() - time0))
     ml.close_log(logger)
     return
 
 
 def _automatic2(
-    tensor_info,
-    plane_data,
-    data_type,
-    data_prop,
-    default_dirs,
-    logger,
-    velmodel=None,
-    check_surf=True,
+    tensor_info: dict,
+    plane_data: dict,
+    data_type: List[str],
+    data_prop: dict,
+    default_dirs: dict,
+    logger: logging.Logger,
+    velmodel: Optional[dict] = None,
+    directory: pathlib.Path = pathlib.Path(),
 ):
     """Routine for automatic FFM modelling for each nodal plane
 
-    :param tensor_info: dictionary with moment tensor properties
-    :param plane_data: dictionary with fault plane mechanism
-    :param data_type: list with data types to be used in modelling
-    :param default_dirs: dictionary with default directories to be used
-    :param data_prop: dictionary with properties for different waveform types
-    :param logger: logging object
-    :param velmodel: dictionary with velocity model
-    :param check_surf: check whether surface waves can be used
-    :type default_dirs: dict
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
+    :param plane_data: The properties of the plane
     :type plane_data: dict
-    :type data_type: list
+    :param data_type: The data types available
+    :type data_type: List[str]
+    :param data_prop: The data properties
     :type data_prop: dict
-    :type logger: Logger
-    :type velmodel: dict, optional
-    :type check_surf: bool, optional
+    :param default_dirs: The location of default directories
+    :type default_dirs: dict
+    :param logger: The logger used to log information
+    :type logger: logging.Logger
+    :param velmodel: The velocity model, defaults to None
+    :type velmodel: Optional[dict], optional
+    :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
     """
     #
     # Create JSON files
     #
     logger.info("Create input files for Fortran scripts")
     logger.info("Create automatic JSON")
-    tensor.write_tensor(tensor_info)
+    tensor.write_tensor(tensor_info, directory=directory)
     if velmodel:
-        mv.velmodel2json(velmodel)
+        mv.velmodel2json(velmodel, directory=directory)
     if not velmodel:
         velmodel = mv.select_velmodel(tensor_info, default_dirs)
     np_plane_info = plane_data["plane_info"]
-    data_folder = os.path.join("..", "data")
-    insar_asc = glob.glob("insar_asc*txt")
-    insar_asc = None if len(insar_asc) == 0 else insar_asc
-    insar_desc = glob.glob("insar_desc*txt")
-    insar_desc = None if len(insar_desc) == 0 else insar_desc
+    data_folder = os.path.join(directory.parent.parent, "data")
+    insar_asc = glob.glob(str(directory) + "/insar_asc*txt")
+    insar_asc = None if len(insar_asc) == 0 else insar_asc  # type:ignore
+    insar_desc = glob.glob(str(directory) + "/insar_desc*txt")
+    insar_desc = None if len(insar_desc) == 0 else insar_desc  # type:ignore
     dm.filling_data_dicts(
         tensor_info,
         data_type,
         data_prop,
         data_folder,
-        insar_asc=insar_asc,
-        insar_desc=insar_desc,
+        insar_asc=insar_asc,  # type:ignore
+        insar_desc=insar_desc,  # type:ignore
+        working_directory=directory,
     )
-    segments_data = pf.create_finite_fault(tensor_info, np_plane_info, data_type)
+    segments_data = pf.create_finite_fault(
+        tensor_info, np_plane_info, data_type, directory=directory
+    )
     segments = segments_data["segments"]
     rise_time = segments_data["rise_time"]
     connections = None
@@ -226,7 +283,9 @@ def _automatic2(
         segments, tensor_info, rise_time, connections=connections
     )
     data_type = _check_surf_GF(point_sources, data_type, logger=logger)
-    mp.modelling_prop(tensor_info, segments_data, data_type=data_type)
+    mp.modelling_prop(
+        tensor_info, segments_data, data_type=data_type, directory=directory
+    )
     #
     # write text files from JSONs
     #
@@ -235,36 +294,56 @@ def _automatic2(
     lambda_max = 1.25
     min_vel, max_vel = [lambda_min * rupt_vel, lambda_max * rupt_vel]
     logger.info("Write input files")
-    writing_inputs(tensor_info, data_type, segments_data, min_vel, max_vel)
+    writing_inputs(
+        tensor_info, data_type, segments_data, min_vel, max_vel, directory=directory
+    )
     #
     # Modelling and plotting results
     #
-    inversion(tensor_info, data_type, default_dirs, logger)
-    logger.info("Plot data in folder {}".format(os.getcwd()))
-    execute_plot(tensor_info, data_type, segments_data, default_dirs, velmodel=velmodel)
-    base = os.path.basename(os.getcwd())
-    dirname = os.path.abspath(os.getcwd())
+    inversion(data_type, default_dirs, logger, directory=directory)
+    logger.info("Plot data in folder {}".format(directory))
+    execute_plot(
+        tensor_info,
+        data_type,
+        segments_data,
+        default_dirs,
+        velmodel=velmodel,
+        directory=directory,
+    )
     #
     # write solution in FSP format
     #
-    solution = get_outputs.read_solution_static_format(segments)
-    static_to_fsp(tensor_info, segments_data, data_type, velmodel, solution)
-    for file in glob.glob("*png"):
-        if os.path.isfile(os.path.join(dirname, base, file)):
-            copy2(os.path.join(dirname, base, file), os.path.join(dirname, "plots"))
+    logging.info
+    solution = get_outputs.read_solution_static_format(segments, data_dir=directory)
+    static_to_fsp(
+        tensor_info, segments_data, data_type, velmodel, solution, directory=directory
+    )
+    for file in glob.glob(str(directory) + "/*png"):
+        if os.path.isfile(os.path.join(directory, file)):
+            copy2(os.path.join(directory, file), os.path.join(directory, "plots"))
 
 
-def _check_surf_GF(point_sources, used_data, logger=None):
-    """ """
+def _check_surf_GF(
+    point_sources: list, used_data: List[str], logger: Optional[logging.Logger] = None
+) -> List[str]:
+    """Check the maximum depth is greater than 125km and whether the surface wave data can be used
+
+    :param point_sources: The location of point sources
+    :type point_sources: list
+    :param data_type: The data types available
+    :type used_data: List[str]
+    :param logger: The logger used to log information, defaults to None
+    :type logger: logging.Logger, optional
+    :return: The updated data types list
+    :rtype: List[str]
+    """
     new_used_data = used_data.copy()
     depths = [ps[:, :, :, :, 2] for ps in point_sources]
     depths = [np.max(depths1) for depths1 in depths]
     max_depth = np.max(depths)
     is_surf = "surf_tele" in used_data
     if max_depth > 125 and is_surf:
-        warnings.warn(
-            "Maximum depth larger than 125 km. " "Surface waves won't be used"
-        )
+        warnings.warn("Maximum depth larger than 125 km. Surface waves won't be used")
         new_used_data.remove("surf_tele")
         if logger:
             logger.info("Maximum depth larger than 125 km.")
@@ -272,48 +351,57 @@ def _check_surf_GF(point_sources, used_data, logger=None):
 
 
 def modelling_new_data(
-    tensor_info, data_type, default_dirs, data_folder, segments_data, st_response=True
+    tensor_info: dict,
+    data_type: List[str],
+    default_dirs: dict,
+    data_folder: Union[pathlib.Path, str],
+    segments_data: dict,
+    st_response: bool = True,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Routine for manual finite fault modelling with new data types.
+    """Routine for manual finite fault modelling with new data types
 
-    :param tensor_info: dictionary with moment tensor properties
-    :param data_type: list with data types to be used in modelling
-    :param default_dirs: dictionary with default directories to be used
-    :param data_folder: location of data used for modelling
-    :param segments_data: properties of fault segments and rise time
-    :param st_response: whether to remove paz response of strong motion
-    :type default_dirs: dict
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
-    :type data_type: list
-    :type data_folder: string
+    :param data_type: The data types available
+    :type data_type: List[str]
+    :param default_dirs: The location of default directories
+    :type default_dirs: dict
+    :param data_folder: The location of the data used in modelling
+    :type data_folder: Union[pathlib.Path, str]
+    :param segments_data: The segments properties
     :type segments_data: dict
+    :param st_response: Whether to remove paz response of strong motion, defaults to True
     :type st_response: bool, optional
+    :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
     """
-    sol_folder = os.getcwd()
-    sol_folder = os.path.abspath(sol_folder)
+    directory = pathlib.Path(directory)
     if os.path.isfile(os.path.join(data_folder, "gps_data")):
-        copy2(os.path.join(data_folder, "gps_data"), sol_folder)
+        copy2(os.path.join(data_folder, "gps_data"), directory)
     insar_asc = glob.glob(os.path.join(data_folder, "insar_a*txt"))
     insar_desc = glob.glob(os.path.join(data_folder, "insar_d*txt"))
     insar_files = insar_asc + insar_desc
     for file in insar_files:
         if os.path.isfile(file):
-            copy2(file, sol_folder)
-    data_prop = json.load(open("sampling_filter.json"))
-    os.chdir(os.path.join(data_folder))
+            copy2(file, directory)
+    with open(directory / "sampling_filter.json") as sf:
+        data_prop = json.load(sf)
     time2 = time.time()
-    processing(tensor_info, data_type, data_prop, st_response=st_response)
-    os.chdir(sol_folder)
+    processing(
+        tensor_info, data_type, data_prop, st_response=st_response, directory=directory
+    )
     dm.filling_data_dicts(
         tensor_info,
         data_type,
         data_prop,
         data_folder,
-        insar_asc=insar_asc,
-        insar_desc=insar_desc,
+        insar_asc=insar_asc,  # type:ignore
+        insar_desc=insar_desc,  # type:ignore
+        working_directory=directory,
     )
-    gf_bank_str = os.path.join(sol_folder, "GF_strong")
-    gf_bank_cgps = os.path.join(sol_folder, "GF_cgps")
+    gf_bank_str = os.path.join(directory, "GF_strong")
+    gf_bank_cgps = os.path.join(directory, "GF_cgps")
     get_gf_bank = default_dirs["strong_motion_gf_bank2"]
     segments = segments_data["segments"]
     rise_time = segments_data["rise_time"]
@@ -328,105 +416,135 @@ def modelling_new_data(
     max_depth = np.max(max_depths)
     if "cgps" in data_type:
         green_dict = gf.fk_green_fun1(
-            data_prop, tensor_info, gf_bank_cgps, max_depth=max_depth, cgps=True
+            data_prop,
+            tensor_info,
+            gf_bank_cgps,
+            max_depth=max_depth,
+            cgps=True,
+            directory=directory,
         )
-        input_files.write_green_file(green_dict, cgps=True)
-        with open(os.path.join("logs", "GF_cgps_log"), "w") as out_gf_cgps:
-            p1 = subprocess.Popen([get_gf_bank, "cgps"], stdout=out_gf_cgps)
+        input_files.write_green_file(green_dict, cgps=True, directory=directory)
+        with open(os.path.join(directory / "logs", "GF_cgps_log"), "w") as out_gf_cgps:
+            p1 = subprocess.Popen(
+                [get_gf_bank, "cgps", f"{(directory)}/"], stdout=out_gf_cgps
+            )
         p1.wait()
     if "strong_motion" in data_type:
         green_dict = gf.fk_green_fun1(
-            data_prop, tensor_info, gf_bank_str, max_depth=max_depth
+            data_prop,
+            tensor_info,
+            gf_bank_str,
+            max_depth=max_depth,
+            directory=directory,
         )
-        input_files.write_green_file(green_dict)
-        with open(os.path.join("logs", "GF_strong_log"), "w") as out_gf_strong:
+        input_files.write_green_file(green_dict, directory=directory)
+        with open(
+            os.path.join(directory / "logs", "GF_strong_log"), "w"
+        ) as out_gf_strong:
             p2 = subprocess.Popen(
-                [
-                    get_gf_bank,
-                ],
+                [get_gf_bank, "strong", f"{(directory)}/"],
                 stdout=out_gf_strong,
             )
         p2.wait()
-    data_type2 = []
-    if os.path.isfile("tele_waves.json"):
+    data_type2: list = []
+    if os.path.isfile(directory / "tele_waves.json"):
         data_type2 = data_type2 + ["tele_body"]
-    if os.path.isfile("surf_waves.json"):
+    if os.path.isfile(directory / "surf_waves.json"):
         data_type2 = data_type2 + ["surf_tele"]
-    if os.path.isfile("strong_motion_waves.json"):
+    if os.path.isfile(directory / "strong_motion_waves.json"):
         data_type2 = data_type2 + ["strong_motion"]
-    if os.path.isfile("cgps_waves.json"):
+    if os.path.isfile(directory / "cgps_waves.json"):
         data_type2 = data_type2 + ["cgps"]
-    if os.path.isfile("static_data.json"):
+    if os.path.isfile(directory / "static_data.json"):
         data_type2 = data_type2 + ["gps"]
-    if os.path.isfile("insar_data.json"):
+    if os.path.isfile(directory / "insar_data.json"):
         data_type2 = data_type2 + ["insar"]
-    if os.path.isfile("dart_waves.json"):
+    if os.path.isfile(directory / "dart_waves.json"):
         data_type2 = data_type2 + ["dart"]
-    manual_modelling(tensor_info, data_type2, default_dirs, segments_data)
+    manual_modelling(
+        tensor_info, data_type2, default_dirs, segments_data, directory=directory
+    )
     return
 
 
-def manual_modelling(tensor_info, data_type, default_dirs, segments_data):
-    """Routine for manual finite fault modelling.
+def manual_modelling(
+    tensor_info: dict,
+    data_type: List[str],
+    default_dirs: dict,
+    segments_data: dict,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+):
+    """Routine for manual finite fault modelling
 
-    :param tensor_info: dictionary with moment tensor properties
-    :param data_type: list with data types to be used in modelling
-    :param default_dirs: dictionary with default directories to be used
-    :param segments_data: properties of fault segments and rise time
-    :type default_dirs: dict
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
-    :type data_type: list
+    :param data_type: The data types available
+    :type data_type: List[str]
+    :param default_dirs: The location of default directories
+    :type default_dirs: dict
+    :param segments_data: The segments properties
     :type segments_data: dict
+    :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
     """
-    if not os.path.isdir("logs"):
-        os.mkdir("logs")
-    if not os.path.isdir("plots"):
-        os.mkdir("plots")
-    # segments_data = json.load(open('segments_data.json'))
-    min_vel, max_vel = __ask_velrange()
-    logger = ml.create_log("manual_ffm", os.path.join("logs", "manual_ffm.log"))
+    directory = pathlib.Path(directory)
+    if not os.path.isdir(directory / "logs"):
+        os.mkdir(directory / "logs")
+    if not os.path.isdir(directory / "plots"):
+        os.mkdir(directory / "plots")
+    min_vel, max_vel = __ask_velrange(directory=directory)
+    logger = ml.create_log(
+        "manual_ffm", os.path.join(directory, "logs", "manual_ffm.log")
+    )
     logger.info("Write input files")
-    tensor.write_tensor(tensor_info)
-    writing_inputs(tensor_info, data_type, segments_data, min_vel, max_vel)
-    writing_inputs0(tensor_info, data_type)
-    inversion(tensor_info, data_type, default_dirs, logger)
-    logger.info("Plot data in folder {}".format(os.getcwd()))
-    execute_plot(tensor_info, data_type, segments_data, default_dirs)
+    tensor.write_tensor(tensor_info, directory=directory)
+    writing_inputs(
+        tensor_info, data_type, segments_data, min_vel, max_vel, directory=directory
+    )
+    writing_inputs0(tensor_info, data_type, directory=directory)
+    inversion(data_type, default_dirs, logger, directory=directory)
+    logger.info("Plot data in folder {}".format(directory))
+    execute_plot(
+        tensor_info, data_type, segments_data, default_dirs, directory=directory
+    )
     ml.close_log(logger)
 
 
 def forward_modelling(
-    tensor_info,
-    data_type,
-    default_dirs,
-    segments_data,
-    option="Solucion.txt",
-    max_slip=200,
+    tensor_info: dict,
+    data_type: List[str],
+    default_dirs: dict,
+    segments_data: dict,
+    option: str = "Solucion.txt",
+    max_slip: Union[float, int] = 200,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Routine for forward modelling.
+    """Routine for forward modelling
 
-    :param tensor_info: dictionary with moment tensor properties
-    :param data_type: set with data types to be used in modelling
-    :param option: string with location of input file with kinematic model to
-     use
-    :param max_slip: maximum slip in case of checkerboard test
-    :param default_dirs: dictionary with default directories to be used
-    :param segments_data: properties of fault segments and rise time
-    :type default_dirs: dict
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
-    :type data_type: set, optional
-    :type option: string, optional
-    :type max_slip: float, optional
+    :param data_type: The data types available
+    :type data_type: List[str]
+    :param default_dirs: The location of default directories
+    :type default_dirs: dict
+    :param segments_data: The segments properties
     :type segments_data: dict
+    :param option: Name of the file with the kinematic model, defaults to "Solucion.txt"
+    :type option: str, optional
+    :param max_slip: Maximum slip in case of checkerboard test, defaults to 200
+    :type max_slip: Union[float, int], optional
+    :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
+    :raises FileNotFoundError: If the velocity model file is not found
     """
-    tensor.write_tensor(tensor_info)
-    if not os.path.isdir("logs"):
-        os.mkdir("logs")
-    if not os.path.isdir("plots"):
-        os.mkdir("plots")
+    directory = pathlib.Path(directory)
+    tensor.write_tensor(tensor_info, directory=directory)
+    if not os.path.isdir(directory / "logs"):
+        os.mkdir(directory / "logs")
+    if not os.path.isdir(directory / "plots"):
+        os.mkdir(directory / "plots")
     len_stk = 5 if not option == "point_source" else 8
     len_dip = 5 if not option == "point_source" else 1
-    # segments_data = json.load(open('segments_data.json'))
     segments = segments_data["segments"]
     rise_time = segments_data["rise_time"]
     connections = None
@@ -445,17 +563,20 @@ def forward_modelling(
         max_slip=max_slip,
         len_stk=len_stk,
         len_dip=len_dip,
+        directory=directory,
     )
-    if not os.path.isfile("velmodel_data.json"):
+    if not os.path.isfile(directory / "velmodel_data.json"):
         raise FileNotFoundError(
             errno.ENOENT, os.strerror(errno.ENOENT), "velmodel_data.json"
         )
-    velmodel = json.load(open("velmodel_data.json"))
-    min_vel, max_vel = __ask_velrange()
+    with open(directory / "velmodel_data.json") as vm:
+        velmodel = json.load(vm)
+    min_vel, max_vel = __ask_velrange(directory=directory)
 
-    logger = ml.create_log("forward_model", os.path.join("logs", "forward_model.log"))
+    logger = ml.create_log(
+        "forward_model", os.path.join(directory, "logs", "forward_model.log")
+    )
     logger.info("Write input files")
-    # segments, rise_time, point_sources = pl_mng.__read_planes_info()
     shear = pf.shear_modulous(point_sources, velmodel=velmodel)
     dx = segments[0]["delta_strike"]
     dy = segments[0]["delta_dip"]
@@ -472,59 +593,69 @@ def forward_modelling(
         max_vel,
         moment_mag=moment,
         forward_model=model,
+        directory=directory,
     )
-    inversion(tensor_info, data_type, default_dirs, logger, forward=True)
-    logger.info("Plot data in folder {}".format(os.getcwd()))
-    execute_plot(tensor_info, data_type, segments_data, default_dirs, velmodel=velmodel)
+    inversion(data_type, default_dirs, logger, forward=True, directory=directory)
+    logger.info("Plot data in folder {}".format(directory))
+    execute_plot(
+        tensor_info,
+        data_type,
+        segments_data,
+        default_dirs,
+        velmodel=velmodel,
+        directory=directory,
+    )
     ml.close_log(logger)
 
 
 def checkerboard(
-    tensor_info,
-    data_type,
-    default_dirs,
-    segments_data,
-    max_slip=200,
-    add_error=False,
-    option="Checkerboard",
-    option2="FFM modelling",
+    tensor_info: dict,
+    data_type: List[str],
+    default_dirs: dict,
+    segments_data: dict,
+    max_slip: Union[float, int] = 200,
+    add_error: bool = False,
+    option: str = "Checkerboard",
+    option2: str = "FFM modelling",
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Routine for running checkerboard tests.
+    """Routine for running checkerboard tests
 
-    :param tensor_info: dictionary with moment tensor properties
-    :param data_type: set with data types to be used in modelling
-    :param option: string with location of input file with kinematic model to
-     use
-    :param max_slip: maximum slip in case of checkerboard test
-    :param add_error: whether we add noise to synthetic waveforms
-    :param option2: whether we invert the checkerboard model or not
-    :param default_dirs: dictionary with default directories to be used
-    :param segments_data: properties of fault segments and rise time
-    :type default_dirs: dict
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
-    :type data_type: set
-    :type option: string, optional
-    :type max_slip: float, optional
-    :type add_error: bool, optional
-    :type option2: string, optional
+    :param data_type: The data types available
+    :type data_type: List[str]
+    :param default_dirs: The location of default directories
+    :type default_dirs: dict
+    :param segments_data: The segments properties
     :type segments_data: dict
+    :param max_slip: Maximum slip in case of checkerboard test, defaults to 200
+    :type max_slip: Union[float, int], optional
+    :param add_error: Whether to add noise to synthetic waveforms, defaults to False
+    :type add_error: bool, optional
+    :param option: Name of the file with the kinematic model, defaults to "Checkerboard"
+    :type option: str, optional
+    :param option2: Whether to invert the checkerboard model or not, defaults to "FFM modelling"
+    :type option2: str, optional
+    :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
     """
+    directory = pathlib.Path(directory)
     if max_slip > 0:
-        folder_name = "checkerboard_resolution"
+        folder_name = directory / "checkerboard_resolution"
     else:
-        folder_name = "checkerboard_noise"
+        folder_name = directory / "checkerboard_noise"
     if not option == "Checkerboard":
-        folder_name = option
+        folder_name = directory / option
     if not os.path.isdir(folder_name):
         os.mkdir(folder_name)
-    if not os.path.isdir("logs"):
-        os.mkdir("logs")
-    if not os.path.isdir("plots"):
-        os.mkdir("plots")
+    if not os.path.isdir(directory / "logs"):
+        os.mkdir(directory / "logs")
+    if not os.path.isdir(directory / "plots"):
+        os.mkdir(directory / "plots")
     for file in os.listdir():
         if os.path.isfile(file):
             copy2(file, folder_name)
-    os.chdir(folder_name)
     segments = segments_data["segments"]
     rise_time = segments_data["rise_time"]
     connections = None
@@ -540,8 +671,10 @@ def checkerboard(
         segments_data,
         option=option,
         max_slip=max_slip,
+        directory=folder_name,
     )
-    data_prop = json.load(open("sampling_filter.json"))
+    with open(folder_name / "sampling_filter.json") as sf:
+        data_prop = json.load(sf)
     for data_type0 in data_type:
         if data_type0 == "tele_body":
             json_dict = "tele_waves.json"
@@ -555,207 +688,296 @@ def checkerboard(
             json_dict = "static_data.json"
         if data_type0 == "dart":
             json_dict = "dart_waves.json"
-        files = json.load(open(json_dict))
+        with open(folder_name / json_dict) as jd:
+            files = json.load(jd)
         input_files.from_synthetic_to_obs(
-            files, data_type0, tensor_info, data_prop, add_error=add_error
+            files,
+            data_type0,
+            data_prop,
+            add_error=add_error,
         )
     logger = ml.create_log(
-        "checkerboard_ffm", os.path.join("logs", "checkerboard_ffm.log")
+        "checkerboard_ffm", os.path.join(folder_name, "logs", "checkerboard_ffm.log")
     )
     if option2 == "FFM modelling":
-        inversion(tensor_info, data_type, default_dirs, logger)
+        inversion(data_type, default_dirs, logger, directory=folder_name)
         execute_plot(
-            tensor_info, data_type, segments_data, default_dirs, plot_input=True
+            tensor_info,
+            data_type,
+            segments_data,
+            default_dirs,
+            plot_input=True,
+            directory=folder_name,
         )
     ml.close_log(logger)
 
 
-def set_directory_structure(tensor_info):
+def set_directory_structure(
+    tensor_info: dict, directory: Union[pathlib.Path, str] = pathlib.Path()
+):
     """Create directory structure
 
-    :param tensor_info: dictionary with moment tensor properties
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
+    :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
     """
-    sol_folder = mng.start_time_id(tensor_info)
+    directory = pathlib.Path(directory)
+    sol_folder = directory / mng.start_time_id(tensor_info)
     if not os.path.isdir(sol_folder):
         os.mkdir(sol_folder)
-    sol_folder = os.path.abspath(sol_folder)
     version = len(glob.glob(os.path.join(sol_folder, "ffm*")))
     sol_folder2 = os.path.join(sol_folder, "ffm.{}".format(version))
     os.mkdir(sol_folder2)
-    os.mkdir(os.path.join(sol_folder2, "data"))
-    os.mkdir(os.path.join(sol_folder2, "data", "cGPS"))
-    os.mkdir(os.path.join(sol_folder2, "data", "STR"))
-    os.mkdir(os.path.join(sol_folder2, "data", "P"))
-    os.mkdir(os.path.join(sol_folder2, "data", "SH"))
-    os.mkdir(os.path.join(sol_folder2, "data", "LONG"))
-    os.mkdir(os.path.join(sol_folder2, "data", "final"))
-    os.mkdir(os.path.join(sol_folder2, "data", "final_r"))
-    os.mkdir(os.path.join(sol_folder2, "NP1"))
-    os.mkdir(os.path.join(sol_folder2, "NP1", "logs"))
-    os.mkdir(os.path.join(sol_folder2, "NP1", "plots"))
-    os.mkdir(os.path.join(sol_folder2, "NP2"))
-    os.mkdir(os.path.join(sol_folder2, "NP2", "logs"))
-    os.mkdir(os.path.join(sol_folder2, "NP2", "plots"))
-    os.mkdir(os.path.join(sol_folder2, "logs"))
-    os.mkdir(os.path.join(sol_folder2, "plots"))
-    os.mkdir(os.path.join(sol_folder2, "plots", "NP1"))
-    os.mkdir(os.path.join(sol_folder2, "plots", "NP2"))
-    os.chdir(sol_folder2)
+    folders = [
+        "data",
+        os.path.join("data", "cGPS"),
+        os.path.join("data", "STR"),
+        os.path.join("data", "P"),
+        os.path.join("data", "SH"),
+        os.path.join("data", "LONG"),
+        os.path.join("data", "final"),
+        os.path.join("data", "final_r"),
+        "NP1",
+        os.path.join("NP1", "logs"),
+        os.path.join("NP1", "plots"),
+        "NP2",
+        os.path.join("NP2", "logs"),
+        os.path.join("NP2", "plots"),
+        "logs",
+        "plots",
+        os.path.join("plots", "NP1"),
+        os.path.join("plots", "NP2"),
+    ]
+    for folder in folders:
+        new_folder = os.path.join(sol_folder2, folder)
+        if os.path.exists(new_folder):
+            continue
+        os.mkdir(new_folder)
     return
 
 
-def processing(tensor_info, data_type, data_prop, st_response=True):
-    """Run all waveform data processing.
+def processing(
+    tensor_info: dict,
+    data_type: List[str],
+    data_prop: dict,
+    st_response: bool = True,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+):
+    """Run all waveform data processing
 
-    :param tensor_info: dictionary with moment tensor properties
-    :param data_type: set with data types to be used in modelling
-    :param data_prop: dictionary with properties for different waveform types
-    :param st_response: whether to remove paz response of strong motion
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
-    :type data_type: set
+    :param data_type: The data types available
+    :type data_type: List[str]
+    :param data_prop: The data properties
     :type data_prop: dict
+    :param st_response: Whether to remove paz response of strong motion, defaults to True
     :type st_response: bool, optional
+    :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
     """
+    directory = pathlib.Path(directory)
     tele_files = (
-        glob.glob("*.BH*SAC")
-        + glob.glob("*.BH*sac")
-        + glob.glob("*_BH*sac")
-        + glob.glob("*_BH*sac")
+        glob.glob(str(directory) + "/*.BH*SAC")
+        + glob.glob(str(directory) + "/*.BH*sac")
+        + glob.glob(str(directory) + "/*_BH*sac")
+        + glob.glob(str(directory) + "/*_BH*sac")
     )
     strong_files = (
-        glob.glob("*.HN*SAC")
-        + glob.glob("*.HL*SAC")
-        + glob.glob("*.HN*sac")
-        + glob.glob("*.HL*sac")
-        + glob.glob("*.AH?.*")
-        + glob.glob("*_HN*sac")
-        + glob.glob("*_HL*sac")
-        + glob.glob("*HG*sac")
+        glob.glob(str(directory) + "/*.HN*SAC")
+        + glob.glob(str(directory) + "/*.HL*SAC")
+        + glob.glob(str(directory) + "/*.HN*sac")
+        + glob.glob(str(directory) + "/*.HL*sac")
+        + glob.glob(str(directory) + "/*.AH?.*")
+        + glob.glob(str(directory) + "/*_HN*sac")
+        + glob.glob(str(directory) + "/*_HL*sac")
+        + glob.glob(str(directory) + "/*HG*sac")
     )
-    cgps_files = glob.glob("*L[HXY]*sac") + glob.glob("*L[HXY]*SAC")
+    cgps_files = glob.glob(str(directory) + "/*L[HXY]*sac") + glob.glob(
+        str(directory) + "/*L[HXY]*SAC"
+    )
     if "tele_body" in data_type:
-        proc.select_process_tele_body(tele_files, tensor_info, data_prop)
+        proc.select_process_tele_body(
+            tele_files, tensor_info, data_prop, directory=directory
+        )
     if "surf_tele" in data_type:
-        proc.select_process_surf_tele(tele_files, tensor_info, data_prop)
+        proc.select_process_surf_tele(
+            tele_files, tensor_info, data_prop, directory=directory
+        )
     if "strong_motion" in data_type:
         proc.select_process_strong(
-            strong_files, tensor_info, data_prop, remove_response=st_response
+            strong_files,
+            tensor_info,
+            data_prop,
+            remove_response=st_response,
+            directory=directory,
         )
     if "cgps" in data_type:
-        proc.select_process_cgps(cgps_files, tensor_info, data_prop)
+        proc.select_process_cgps(
+            cgps_files, tensor_info, data_prop, directory=directory
+        )
 
 
-def writing_inputs0(tensor_info, data_type):
-    """ """
-    if not os.path.isfile("sampling_filter.json"):
+def writing_inputs0(
+    tensor_info: dict,
+    data_type: List[str],
+    config_path: Optional[Union[str, pathlib.Path]] = None,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+):
+    """Write the input files
+
+    :param tensor_info: The moment tensor information
+    :type tensor_info: dict
+    :param data_type: The data types available
+    :type data_type: List[str]
+    :param config_path: The path to the config file, defaults to None
+    :type config_path: Optional[Union[str, pathlib.Path]], optional
+    :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
+    :raises FileNotFoundError: If sampling_filter.json cannot be found
+    """
+    directory = pathlib.Path(directory)
+    if not os.path.isfile(directory / "sampling_filter.json"):
         raise FileNotFoundError(
             errno.ENOENT, os.strerror(errno.ENOENT), "sampling_filter.json"
         )
-    data_prop = json.load(open("sampling_filter.json"))
+    with open(directory / "sampling_filter.json") as dp:
+        data_prop = json.load(dp)
     if "tele_body" in data_type:
-        input_files.input_chen_tele_body(tensor_info, data_prop)
+        input_files.input_chen_tele_body(tensor_info, data_prop, directory=directory)
     if "surf_tele" in data_type:
-        input_files.input_chen_tele_surf(tensor_info, data_prop)
+        input_files.input_chen_tele_surf(
+            tensor_info, data_prop, config_path=config_path, directory=directory
+        )
     if "strong_motion" in data_type:
-        input_files.input_chen_near_field(tensor_info, data_prop, "strong_motion")
+        input_files.input_chen_near_field(
+            tensor_info, data_prop, "strong_motion", directory=directory
+        )
     if "cgps" in data_type:
-        input_files.input_chen_near_field(tensor_info, data_prop, "cgps")
+        input_files.input_chen_near_field(
+            tensor_info, data_prop, "cgps", directory=directory
+        )
     if "gps" in data_type:
-        input_files.input_chen_static(tensor_info)
+        input_files.input_chen_static(directory=directory)
     if "insar" in data_type:
-        input_files.input_chen_insar()
+        input_files.input_chen_insar(directory=directory)
     if "dart" in data_type:
-        input_files.input_chen_dart(tensor_info, data_prop)
+        input_files.input_chen_dart(tensor_info, data_prop, directory=directory)
 
 
 def writing_inputs(
-    tensor_info,
-    data_type,
-    segments_data,
-    min_vel,
-    max_vel,
-    moment_mag=None,
-    forward_model=None,
+    tensor_info: dict,
+    data_type: List[str],
+    segments_data: dict,
+    min_vel: float,
+    max_vel: float,
+    moment_mag: Optional[float] = None,
+    forward_model: Optional[dict] = None,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Write all required text files from the information found in the JSONs.
+    """Write all required text files from the information found in the JSONs
 
-    :param tensor_info: dictionary with moment tensor properties
-    :param data_type: set with data types to be used in modelling
-    :param segments_data: properties of fault segments and rise time
-    :param min_vel: minimum rupture velocity
-    :param max_vel: maximum rupture velocity
-    :param moment_mag: input seismic moment
-    :param forward_model: input kinematic model
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
-    :type data_type: set
-    :type min_vel: float
-    :type max_vel: float
+    :param data_type: The data types available
+    :type data_type: List[str]
+    :param segments_data: The segments properties
     :type segments_data: dict
-    :type moment_mag: float, optional
-    :type forward_model: dict, optional
+    :param min_vel: The minimum rupture velocity
+    :type min_vel: float
+    :param max_vel: The maximum rupture velocity
+    :type max_vel: float
+    :param moment_mag: The input seismic moment, defaults to None
+    :type moment_mag: Optional[float], optional
+    :param forward_model: The input kinematic model, defaults to None
+    :type forward_model: Optional[np.ndarray], optional
+    :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
+    :raises FileNotFoundError: Whether a property json file cannot be found
     """
-    if not os.path.isfile("velmodel_data.json"):
+    directory = pathlib.Path(directory)
+    if not os.path.isfile(directory / "velmodel_data.json"):
         raise FileNotFoundError(
             errno.ENOENT, os.strerror(errno.ENOENT), "velmodel_data.json"
         )
-    velmodel = json.load(open("velmodel_data.json"))
-    input_files.write_velmodel(velmodel)
-    input_files.plane_for_chen(tensor_info, segments_data, min_vel, max_vel, velmodel)
+    with open(directory / "velmodel_data.json") as vm:
+        velmodel = json.load(vm)
+    input_files.write_velmodel(velmodel, directory=directory)
+    input_files.plane_for_chen(
+        tensor_info, segments_data, min_vel, max_vel, velmodel, directory=directory
+    )
     if forward_model:
         input_files.forward_model(
-            tensor_info, segments_data, forward_model, min_vel, max_vel
+            tensor_info,
+            segments_data,
+            forward_model,
+            min_vel,
+            max_vel,
+            directory=directory,
         )
-    if not os.path.isfile("annealing_prop.json"):
+    if not os.path.isfile(directory / "annealing_prop.json"):
         raise FileNotFoundError(
             errno.ENOENT, os.strerror(errno.ENOENT), "annealing_prop.json"
         )
-    dictionary = json.load(open("annealing_prop.json"))
+    with open(directory / "annealing_prop.json") as ap:
+        dictionary = json.load(ap)
     if moment_mag:
         dictionary["seismic_moment"] = moment_mag
-    input_files.inputs_simmulated_annealing(dictionary, data_type)
+    input_files.inputs_simmulated_annealing(dictionary, directory=directory)
     if "cgps" in data_type:
-        if not os.path.isfile("cgps_gf.json"):
+        if not os.path.isfile(directory / "cgps_gf.json"):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), "cgps_gf.json"
             )
-        green_dict = json.load(open("cgps_gf.json"))
-        input_files.write_green_file(green_dict, cgps=True)
+        with open(directory / "cgps_gf.json") as cg:
+            green_dict = json.load(cg)
+        input_files.write_green_file(green_dict, cgps=True, directory=directory)
     if "strong_motion" in data_type:
-        if not os.path.isfile("strong_motion_gf.json"):
+        if not os.path.isfile(directory / "strong_motion_gf.json"):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), "strong_motion_gf.json"
             )
-        green_dict = json.load(open("strong_motion_gf.json"))
-        input_files.write_green_file(green_dict)
-    if not os.path.isfile("model_space.json"):
+        with open(directory / "strong_motion_gf.json") as sm:
+            green_dict = json.load(sm)
+        input_files.write_green_file(green_dict, directory=directory)
+    if not os.path.isfile(directory / "model_space.json"):
         raise FileNotFoundError(
             errno.ENOENT, os.strerror(errno.ENOENT), "model_space.json"
         )
-    segments2 = json.load(open("model_space.json"))
-    input_files.model_space(segments2)
+    with open(directory / "model_space.json") as ms:
+        segments2 = json.load(ms)
+    input_files.model_space(segments2, directory=directory)
     return
 
 
-def inversion(tensor_info, data_type, default_dirs, logger, forward=False):
-    """We get the binaries with gf for each station, run the ffm code, and
-    proceed to plot the results.
+def inversion(
+    data_type: List[str],
+    default_dirs: dict,
+    logger: logging.Logger,
+    forward: bool = False,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+) -> dict:
+    """Get the binaries with gf for each station, run the ffm code, and
+    proceed to plot the results
 
-    :param tensor_info: dictionary with moment tensor properties
-    :param data_type: set with data types to be used in modelling
-    :param logger: name of logfile to write
-    :param forward: whether we solve the inverse problem or the forward problem
-    :param default_dirs: dictionary with default directories to be used
+    :param data_type: The data types available
+    :type data_type: List[str]
+    :param default_dirs: The location of default directories
     :type default_dirs: dict
-    :type tensor_info: dict
-    :type data_type: set
-    :type logger: Logger
+    :param logger: The logger to log to
+    :type logger: logging.Logger
+    :param forward: Whether to forward model, defaults to False
     :type forward: bool, optional
+    :param directory:  Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
+    :return: The run's statistics
+    :rtype: dict
     """
-    # print('Retrieve GF for modelling')
+    directory = pathlib.Path(directory)
     logger.info("Green_functions")
     time1 = time.time()
-    gf.gf_retrieve(data_type, default_dirs)
+    gf.gf_retrieve(data_type, default_dirs, directory=directory)
     time1 = time.time() - time1
     run_stats = dict()
     run_stats["gf_time"] = time1
@@ -770,53 +992,63 @@ def inversion(tensor_info, data_type, default_dirs, logger, forward=False):
     args = args + ["dart"] if "dart" in data_type else args
     args = args + ["insar"] if "insar" in data_type else args
     if not forward:
-        # print('Perform kinematic modelling')
         logger.info("Inversion at folder {}".format(os.getcwd()))
         finite_fault = default_dirs["finite_fault"]
     else:
         logger.info("Forward at folder {}".format(os.getcwd()))
         finite_fault = default_dirs["forward"]
+    working_dir = str(pathlib.Path().resolve())
+    os.chdir(directory)
     p1 = subprocess.Popen([finite_fault, *args], stderr=subprocess.PIPE)
+    os.chdir(working_dir)
     #
     # need to wait until FFM modelling is finished.
     #
     outs, errs = p1.communicate(timeout=40 * 60)
     if errs:
         logger.error(errs.decode("utf-8"))
-    # p1.wait()
+        raise Exception(errs)
     time3 = time.time() - time3
     logger.info("Elapsed time of finite fault modelling: {}".format(time3))
     run_stats["ffm_time"] = time3
-    delete_binaries()
+    delete_binaries(directory=directory)
     return run_stats
 
 
 def execute_plot(
-    tensor_info, data_type, segments_data, default_dirs, velmodel=None, plot_input=False
+    tensor_info: dict,
+    data_type: List[str],
+    segments_data: dict,
+    default_dirs: dict,
+    velmodel: Optional[dict] = None,
+    plot_input: bool = False,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """We plot modelling results
+    """Plot modelling results
 
-    :param tensor_info: dictionary with moment tensor properties
-    :param data_type: set with data types to be used in modelling
-    :param plot_input: choose whether to plot initial kinematic model as well
-    :param default_dirs: dictionary with default directories to be used
-    :param velmodel: dictionary with velocity model
-    :param segments_data: properties of fault segments and rise time
-    :type velmodel: dict, optional
-    :type default_dirs: dict
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
-    :type data_type: set
-    :type segments:data: dict
+    :param data_type: The data types available
+    :type data_type: List[str]
+    :param segments_data: The segments properties
+    :type segments_data: dict
+    :param default_dirs: The location of default directories
+    :type default_dirs: dict
+    :param velmodel: The velocity model, defaults to None
+    :type velmodel: Optional[dict], optional
+    :param plot_input: Whether to plot initial kinematic model as well, defaults to False
     :type plot_input: bool, optional
+    :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
     """
-
+    directory = pathlib.Path(directory)
     print("Plot results")
     segments = segments_data["segments"]
     rise_time = segments_data["rise_time"]
     connections = None
     if "connections" in segments_data:
         connections = segments_data["connections"]
-    solution = get_outputs.read_solution_static_format(segments)
+    solution = get_outputs.read_solution_static_format(segments, data_dir=directory)
     if not velmodel:
         velmodel = mv.select_velmodel(tensor_info, default_dirs)
     point_sources = pf.point_sources_param(
@@ -833,14 +1065,17 @@ def execute_plot(
         velmodel,
         default_dirs,
         use_waveforms=use_waveforms,
+        directory=directory,
     )
-    plot.plot_misfit(data_type)
-    # plot.plot_beachballs(tensor_info, data_type)
+    plot.plot_misfit(data_type, directory=directory)
     traces_info, stations_gps = [None, None]
     if "strong_motion" in data_type:
-        traces_info = json.load(open("strong_motion_waves.json"))
+        with open(directory / "strong_motion_waves.json") as smw:
+            traces_info = json.load(smw)
     if "gps" in data_type:
-        names, lats, lons, observed, synthetic, error = get_outputs.retrieve_gps()
+        names, lats, lons, observed, synthetic, error = get_outputs.retrieve_gps(
+            directory=directory
+        )
         stations_gps = zip(names, lats, lons, observed, synthetic, error)
     if "strong_motion" in data_type or "gps" in data_type:
         plot._PlotMap(
@@ -851,9 +1086,10 @@ def execute_plot(
             default_dirs,
             files_str=traces_info,
             stations_gps=stations_gps,
+            directory=directory,
         )
     if "insar" in data_type:
-        insar_data = get_outputs.get_insar()
+        insar_data = get_outputs.get_insar(data_dir=directory)
         if "ascending" in insar_data:
             asc_properties = insar_data["ascending"]
             for i, asc_property in enumerate(asc_properties):
@@ -865,6 +1101,7 @@ def execute_plot(
                     default_dirs,
                     insar_points,
                     los="ascending{}".format(i),
+                    directory=directory,
                 )
         if "descending" in insar_data:
             desc_properties = insar_data["descending"]
@@ -877,25 +1114,41 @@ def execute_plot(
                     default_dirs,
                     insar_points,
                     los="descending{}".format(i),
+                    directory=directory,
                 )
     if plot_input:
         input_model = load_ffm_model(
-            segments_data, point_sources, option="fault&rise_time.txt"
+            segments_data,
+            point_sources,
+            option="fault&rise_time.txt",
+            directory=directory,
         )
-        plot._PlotSlipDist_Compare(segments, point_sources, input_model, solution)
+        plot._PlotSlipDist_Compare(
+            segments, point_sources, input_model, solution, directory=directory
+        )
         plot._PlotComparisonMap(
-            tensor_info, segments, point_sources, input_model, solution
+            tensor_info,
+            segments,
+            point_sources,
+            input_model,
+            solution,
+            directory=directory,
         )
-    plot_files = glob.glob(os.path.join("plots", "*png"))
+    plot_files = glob.glob(os.path.join(directory, "plots", "*png"))
     for plot_file in plot_files:
         os.remove(plot_file)
-    plot_files = glob.glob("*png")
+    plot_files = glob.glob(str(directory) + "/*png")
     for plot_file in plot_files:
         move(plot_file, "plots")
 
 
-def delete_binaries():
-    """to remove the files with Green function data."""
+def delete_binaries(directory: Union[pathlib.Path, str] = pathlib.Path()):
+    """Remove the files with Green function data
+
+    :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
+    """
+    directory = pathlib.Path(directory)
     deletables = glob.glob("*.GRE") + glob.glob("*.TDE") + glob.glob("*[1-2-3]")
     deletables = deletables + glob.glob("*.H[LN][E-N-Z]")
     deletables = deletables + glob.glob("*.L[HXY][E-N-Z]")
@@ -904,8 +1157,18 @@ def delete_binaries():
             os.remove(file)
 
 
-def __ask_velrange():
-    with open("fault&rise_time.txt", "r") as infile:
+def __ask_velrange(
+    directory: Union[pathlib.Path, str] = pathlib.Path()
+) -> Tuple[float, float]:
+    """Get the velocity range from fault&rise_time.txt
+
+    :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path,str], optional
+    :return: The minimum and maximum velocity
+    :rtype: Tuple[float,float]
+    """
+    directory = pathlib.Path(directory)
+    with open(directory / "fault&rise_time.txt", "r") as infile:
         lines = [line.split() for line in infile]
 
     min_vel = float(lines[1][5])
@@ -970,13 +1233,14 @@ if __name__ == "__main__":
         if not args.gcmt_tensor and not args.qcmt_tensor:
             raise RuntimeError("You must select direction of input GCMT file")
         if args.gcmt_tensor:
-            tensor_info = tensor.get_tensor(cmt_file=args.gcmt_tensor)
+            tensor_info = tensor.get_tensor(
+                cmt_file=args.gcmt_tensor, directory=pathlib.Path()
+            )
         if args.qcmt_tensor:
-            tensor_info = tensor.get_tensor(quake_file=args.qcmt_tensor)
-        # if not args.gcmt_tensor:
-        #     raise RuntimeError('You must select direction of input GCMT file')
-        # tensor_info = tensor.get_tensor(cmt_file=args.gcmt_tensor)
-        set_directory_structure(tensor_info)
+            tensor_info = tensor.get_tensor(
+                quake_file=args.qcmt_tensor, directory=pathlib.Path()
+            )
+        set_directory_structure(tensor_info, directory=pathlib.Path())
         if args.data:
             for file in os.listdir(args.data):
                 if os.path.isfile(os.path.join(args.data, file)):
@@ -989,13 +1253,14 @@ if __name__ == "__main__":
             velmodel=velmodel,
             dt_cgps=None,
             st_response=args.st_response,
+            directory=pathlib.Path(),
         )
     if args.option == "add_data":
         if args.gcmt_tensor:
             cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file)
+            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
         else:
-            tensor_info = tensor.get_tensor()
+            tensor_info = tensor.get_tensor(directory=pathlib.Path())
         if len(data_type) == 0:
             raise RuntimeError("You must input at least one data type")
         data_folder = args.data if args.data else None
@@ -1006,35 +1271,47 @@ if __name__ == "__main__":
             data_folder,
             segments_data,
             st_response=args.st_response,
+            directory=pathlib.Path(),
         )
     if args.option == "manual":
         if args.gcmt_tensor:
             cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file)
+            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
         else:
-            tensor_info = tensor.get_tensor()
+            tensor_info = tensor.get_tensor(directory=pathlib.Path())
         if len(data_type) == 0:
             raise RuntimeError("You must input at least one data type")
         data_folder = args.data if args.data else None
-        manual_modelling(tensor_info, data_type, default_dirs, segments_data)
+        manual_modelling(
+            tensor_info,
+            data_type,
+            default_dirs,
+            segments_data,
+            directory=pathlib.Path(),
+        )
     if args.option == "forward":
         if args.gcmt_tensor:
             cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file)
+            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
         else:
-            tensor_info = tensor.get_tensor()
+            tensor_info = tensor.get_tensor(directory=pathlib.Path())
         if len(data_type) == 0:
             raise RuntimeError("You must input at least one data type")
         data_folder = args.data if args.data else None
         forward_modelling(
-            tensor_info, data_type, default_dirs, segments_data, option="Solucion.txt"
+            tensor_info,
+            data_type,
+            default_dirs,
+            segments_data,
+            option="Solucion.txt",
+            directory=pathlib.Path(),
         )
     if args.option == "forward_patch":
         if args.gcmt_tensor:
             cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file)
+            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
         else:
-            tensor_info = tensor.get_tensor()
+            tensor_info = tensor.get_tensor(directory=pathlib.Path())
         if len(data_type) == 0:
             raise RuntimeError("You must input at least one data type")
         data_folder = args.data if args.data else None
@@ -1046,25 +1323,31 @@ if __name__ == "__main__":
             max_slip=400,
             option="Patches",
             option2="forward",
+            directory=pathlib.Path(),
         )
     if args.option == "checker_mod":
         if args.gcmt_tensor:
             cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file)
+            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
         else:
-            tensor_info = tensor.get_tensor()
+            tensor_info = tensor.get_tensor(directory=pathlib.Path())
         if len(data_type) == 0:
             raise RuntimeError("You must input at least one data type")
         data_folder = args.data if args.data else None
         checkerboard(
-            tensor_info, data_type, default_dirs, segments_data, add_error=True
+            tensor_info,
+            data_type,
+            default_dirs,
+            segments_data,
+            add_error=True,
+            directory=pathlib.Path(),
         )
     if args.option == "checker_noise":
         if args.gcmt_tensor:
             cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file)
+            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
         else:
-            tensor_info = tensor.get_tensor()
+            tensor_info = tensor.get_tensor(directory=pathlib.Path())
         if len(data_type) == 0:
             raise RuntimeError("You must input at least one data type")
         data_folder = args.data if args.data else None
@@ -1075,13 +1358,14 @@ if __name__ == "__main__":
             segments_data,
             max_slip=0,
             add_error=True,
+            directory=pathlib.Path(),
         )
     if args.option == "point_source":
         if args.gcmt_tensor:
             cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file)
+            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
         else:
-            tensor_info = tensor.get_tensor()
+            tensor_info = tensor.get_tensor(directory=pathlib.Path())
         if len(data_type) == 0:
             raise RuntimeError("You must input at least one data type")
         data_folder = args.data if args.data else None
@@ -1092,13 +1376,14 @@ if __name__ == "__main__":
             segments_data,
             max_slip=500,
             option="Patches",
+            directory=pathlib.Path(),
         )
     if args.option == "point_source_err":
         if args.gcmt_tensor:
             cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file)
+            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
         else:
-            tensor_info = tensor.get_tensor()
+            tensor_info = tensor.get_tensor(directory=pathlib.Path())
         if len(data_type) == 0:
             raise RuntimeError("You must input at least one data type")
         data_folder = args.data if args.data else None
@@ -1110,4 +1395,5 @@ if __name__ == "__main__":
             max_slip=300,
             option="Patches",
             add_error=True,
+            directory=pathlib.Path(),
         )
