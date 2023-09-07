@@ -39,6 +39,16 @@ TENSOR = get_tensor_info()
 VELMODEL = get_velmodel_data()
 
 
+def _handle_lowin():
+    with open(HOME / "fortran_code" / "gfs_nm" / "long" / "low.in", "r") as f:
+        file_data = f.read()
+    with open(HOME / "fortran_code" / "gfs_nm" / "long" / "low.in", "a") as f:
+        if "fd_bank" not in file_data:
+            f.write(
+                f"\n{str((HOME  / 'fortran_code' / 'gfs_nm'/ 'long'/'fd_bank').resolve())}"
+            )
+
+
 def _compare(f1, ftarget, tempdir):
     with open(f1) as td:
         target = json.load(td)
@@ -209,12 +219,13 @@ def _end_to_end(
 )
 def test_automatic_usgs():
     tempdir = pathlib.Path(tempfile.mkdtemp())
+    _handle_lowin()
     try:
         shutil.copytree(END_TO_END_DIR / "data", tempdir / "data")
         set_directory_structure(TENSOR, directory=tempdir)
         for file in os.listdir(tempdir / "data"):
             if os.path.isfile(os.path.join(tempdir / "data", file)):
-                shutil.shutil.copy2(
+                shutil.copy2(
                     os.path.join(tempdir / "data", file),
                     tempdir / "20150916225432" / "ffm.0" / "data",
                 )
@@ -338,12 +349,13 @@ def test_automatic_usgs():
 )
 def test_automatic_cgps():
     tempdir = pathlib.Path(tempfile.mkdtemp())
+    _handle_lowin()
     try:
         shutil.copytree(END_TO_END_DIR / "data", tempdir / "data")
         set_directory_structure(TENSOR, directory=tempdir)
         for file in os.listdir(tempdir / "data"):
             if os.path.isfile(os.path.join(tempdir / "data", file)):
-                shutil.shutil.copy2(
+                shutil.copy2(
                     os.path.join(tempdir / "data", file),
                     tempdir / "20150916225432" / "ffm.0" / "data",
                 )
@@ -390,17 +402,18 @@ def test_automatic_cgps():
             target_stream = read(str(target_file))
             np.testing.assert_array_equal(stream[0].data, target_stream[0].data)
     finally:
-        shutil.rmtree(tempdir / "20150916225432" / "ffm.0" / "NP1")
+        shutil.rmtree(tempdir)
 
 
 def test_automatic_gps():
     tempdir = pathlib.Path(tempfile.mkdtemp())
+    _handle_lowin()
     try:
         shutil.copytree(END_TO_END_DIR / "data", tempdir / "data")
         set_directory_structure(TENSOR, directory=tempdir)
         for file in os.listdir(tempdir / "data"):
             if os.path.isfile(os.path.join(tempdir / "data", file)):
-                shutil.shutil.copy2(
+                shutil.copy2(
                     os.path.join(tempdir / "data", file),
                     tempdir / "20150916225432" / "ffm.0" / "data",
                 )
@@ -438,7 +451,7 @@ def test_automatic_gps():
             target_solucion = f.read()
         assert solucion == target_solucion
     finally:
-        shutil.rmtree(tempdir / "20150916225432" / "ffm.0" / "NP1")
+        shutil.rmtree(tempdir)
 
 
 @pytest.mark.skipif(
@@ -447,12 +460,13 @@ def test_automatic_gps():
 )
 def test_automatic_insar():
     tempdir = pathlib.Path(tempfile.mkdtemp())
+    _handle_lowin()
     try:
         shutil.copytree(END_TO_END_DIR / "data", tempdir / "data")
         set_directory_structure(TENSOR, directory=tempdir)
         for file in os.listdir(tempdir / "data"):
             if os.path.isfile(os.path.join(tempdir / "data", file)):
-                shutil.shutil.copy2(
+                shutil.copy2(
                     os.path.join(tempdir / "data", file),
                     tempdir / "20150916225432" / "ffm.0" / "data",
                 )
@@ -488,7 +502,7 @@ def test_automatic_insar():
             target_solucion = f.read()
         assert solucion == target_solucion
     finally:
-        shutil.rmtree(tempdir / "20150916225432" / "ffm.0" / "NP1")
+        shutil.rmtree(tempdir)
 
 
 @pytest.mark.skipif(
@@ -497,12 +511,13 @@ def test_automatic_insar():
 )
 def test_automatic_strong_motion():
     tempdir = pathlib.Path(tempfile.mkdtemp())
+    _handle_lowin()
     try:
         shutil.copytree(END_TO_END_DIR / "data", tempdir / "data")
         set_directory_structure(TENSOR, directory=tempdir)
         for file in os.listdir(tempdir / "data"):
             if os.path.isfile(os.path.join(tempdir / "data", file)):
-                shutil.shutil.copy2(
+                shutil.copy2(
                     os.path.join(tempdir / "data", file),
                     tempdir / "20150916225432" / "ffm.0" / "data",
                 )
@@ -551,17 +566,18 @@ def test_automatic_strong_motion():
             target_stream = read(str(target_file))
             np.testing.assert_array_equal(stream[0].data, target_stream[0].data)
     finally:
-        shutil.rmtree(tempdir / "20150916225432" / "ffm.0" / "NP1")
+        shutil.rmtree(tempdir)
 
 
 def test_automatic_tele():
     tempdir = pathlib.Path(tempfile.mkdtemp())
+    _handle_lowin()
     try:
         shutil.copytree(END_TO_END_DIR / "data", tempdir / "data")
         set_directory_structure(TENSOR, directory=tempdir)
         for file in os.listdir(tempdir / "data"):
             if os.path.isfile(os.path.join(tempdir / "data", file)):
-                shutil.shutil.copy2(
+                shutil.copy2(
                     os.path.join(tempdir / "data", file),
                     tempdir / "20150916225432" / "ffm.0" / "data",
                 )
@@ -615,4 +631,4 @@ def test_automatic_tele():
                     continue
                 np.testing.assert_array_equal(stream[0].data, target_stream[0].data)
     finally:
-        shutil.rmtree(tempdir / "20150916225432" / "ffm.0" / "NP1")
+        shutil.rmtree(tempdir)

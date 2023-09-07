@@ -45,7 +45,6 @@ SEGMENTS = get_segments_data()
 def test_forward_model():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-
         ## Don't have an example of this all the way through
         ## TODO: add baseline data
         segments = get_segments_data()
@@ -231,7 +230,7 @@ def test_input_chen_surf_body():
             shutil.copyfile(o["file"], n["file"])
 
         input_chen_tele_surf(
-            CMT, SAMPLE_FILTER, tempdir, config_directory=tempdir / "config.ini"
+            CMT, SAMPLE_FILTER, directory=tempdir, config_path=tempdir / "config.ini"
         )
         for f in [
             "surf_filter.txt",
