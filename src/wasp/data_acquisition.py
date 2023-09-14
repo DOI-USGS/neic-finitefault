@@ -406,32 +406,3 @@ def __get_channel_information_manual(
         "evdp": depth,
     }
     return sac_dict
-
-
-if __name__ == "__main__":
-    import argparse
-
-    from obspy.core.utcdatetime import UTCDateTime
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser.add_argument(
-        "-gcmt", "--gcmt_tensor", help="location of GCMT moment tensor file"
-    )
-    args = parser.parse_args()
-    os.chdir(args.folder)
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-    event_time = tensor_info["datetime"]
-    event_time = UTCDateTime(event_time)
-    lat_ep = tensor_info["lat"]
-    lon_ep = tensor_info["lon"]
-    depth = tensor_info["depth"]
-    time0 = time.time()
-    acquisition(event_time, lat_ep, lon_ep, depth, ["strong", "tele"])
-    print("time spent downloading metadata: ", time.time() - time0)
