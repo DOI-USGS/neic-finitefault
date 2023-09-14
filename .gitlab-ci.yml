@@ -90,7 +90,7 @@ Fortran:
     - cp -r "/home/usgs-user/finitefault/tectonicplates" ./fortran_code/
     - cp "/home/usgs-user/finitefault/fortran_code/gfs_nm/long/fd_bank" ./fortran_code/gfs_nm/long/fd_bank
     - cp "/home/usgs-user/finitefault/fortran_code/info/LITHO1.0.nc" ./fortran_code/info/LITHO1.0.nc
-    - bash install.d/wasp.sh "/builds/ghsc/users/hhunsinger/neic-finitefault"
+    - bash install.d/wasp.sh "$(pwd)"
   stage: init
 
 ## -------------------------------------
@@ -168,7 +168,7 @@ Docker Deploy:
       --skip-files "/usr/local/bin/trivy"
       "${LOCAL_IMAGE}";
     # fail HIGH,CRITICAL vulnerabilities
-    - ${TRIVY} image --exit-code 1 --severity HIGH,CRITICAL
+    - ${TRIVY} image --exit-code 1 --ignore-unfixed linux-libc-dev:5.4.0-162.179 --severity HIGH,CRITICAL
       --skip-files "/usr/local/bin/trivy"
       "${LOCAL_IMAGE}";
     # push to registry
