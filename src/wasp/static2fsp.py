@@ -199,10 +199,11 @@ def static_to_fsp(
     dart_r = 0
     if "dart" in used_data:
         dart_data = pd.read_json(directory / "dart_data.json")
-        dart_data = pd.read_json("dart_data.json")
         quantity_dart = len(dart_data)
+        dart_r = min(dart_data["distance"])
+        dart_az = np.sort(dart_data["azimuth"].values.tolist())
+        dart_az = np.append(dart_az, dart_az[0] + 360)
         dart_phimx = max(np.diff(dart_az))
-
     n_layers = len(vel_model["dens"])
     p_vel = [float(v) for v in vel_model["p_vel"]]
     s_vel = [float(v) for v in vel_model["s_vel"]]

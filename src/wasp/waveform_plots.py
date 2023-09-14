@@ -118,7 +118,7 @@ def plot_waveform_fits(
     components: List[str],
     type_str: str,
     start_margin: int = 10,
-    event: Optional[str] = None,
+    event: Optional[int] = None,
     plot_directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """Plot fit of observed to synthetic data for selected channels.

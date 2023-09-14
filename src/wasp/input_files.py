@@ -1171,7 +1171,14 @@ def from_synthetic_to_obs(
                     file, dt, outfile, waveform, dart=dart
                 )  # type:ignore
     else:
-        names, lats, lons, observed, synthetic, error = get_outputs.retrieve_gps()
+        (
+            names,
+            lats,
+            lons,
+            observed,
+            synthetic,
+            error,
+        ) = get_outputs.retrieve_gps()  # type:ignore
         with open(directory / "static_data.txt", "r") as infile:
             orig_lines = [line.split() for line in infile]
         with open(directory / "static_data.txt", "w") as outfile:
@@ -1459,7 +1466,7 @@ if __name__ == "__main__":
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), "static_data.json"
             )
-        input_chen_static(tensor_info)
+        input_chen_static()
     if args.insar:
         if not os.path.isfile("insar_data.json"):
             raise FileNotFoundError(

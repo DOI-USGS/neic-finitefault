@@ -10,13 +10,13 @@ from pyproj import Geod
 geod = Geod(ellps="WGS84")
 
 
-def equivalent_slip_length(slip_array: np.ndarray, subfault_len: int) -> int:
+def equivalent_slip_length(slip_array: np.ndarray, subfault_len: float) -> int:
     """Get the length of the equivalent slip
 
     :param slip_array: The array of slip
     :type slip_array: np.ndarray
     :param subfault_len: The length of subfaults
-    :type subfault_len: int
+    :type subfault_len: float
     :return: The length of equivalent slip
     :rtype: int
     """
@@ -51,14 +51,14 @@ def equivalent_slip_length(slip_array: np.ndarray, subfault_len: int) -> int:
 
 
 def locate_equivalent_slip(
-    slip_array: np.ndarray, subfault_len: int, eq_len: int
+    slip_array: np.ndarray, subfault_len: float, eq_len: int
 ) -> float:
     """Locate the left edge of the equivalent slip
 
     :param slip_array: The array of slip
     :type slip_array: np.ndarray
     :param subfault_len: The length of subfaults
-    :type subfault_len: int
+    :type subfault_len: float
     :param eq_len: The length of the equivalent slip
     :type eq_len: int
     :return: the location of the equivalent slip

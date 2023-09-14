@@ -130,9 +130,9 @@ def set_map_cartopy(
 
 def plot_map(
     ax: GeoAxes,
-    latitudes: np.ndarray,
-    longitudes: np.ndarray,
-    values: np.ndarray,
+    latitudes: list,
+    longitudes: list,
+    values: list,
     min_val: Optional[float] = None,
     max_val: Optional[float] = None,
     transform: Optional[Projection] = None,
@@ -143,11 +143,11 @@ def plot_map(
     :param ax: The axes of the plot object
     :type ax: GeoAxes
     :param latitudes: Array of latitudes
-    :type latitudes: np.ndarray
+    :type latitudes: list
     :param longitudes: Array of longitudes
-    :type longitudes: np.ndarray
+    :type longitudes: list
     :param values: Array of values
-    :type values: np.ndarray
+    :type values: list
     :param min_val: Minimum value of the colorbar, defaults to None
     :type min_val: Optional[float], optional
     :param max_val: Maximum value of the colorbar, defaults to None

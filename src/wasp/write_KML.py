@@ -54,8 +54,8 @@ slipcpt = ListedColormap(slip_cpt)
 
 
 def _write_KML(
-    segments: dict,
-    point_sources: np.ndarray,
+    segments: List[dict],
+    point_sources: list,
     evID: str,
     margins: list,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
@@ -63,9 +63,9 @@ def _write_KML(
     """Write the kml file
 
     :param segments: The segment properties
-    :type segments: dict
+    :type segments: List[dict]
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param evID: _description_
     :type evID: str
     :param margins: The extent of the map
@@ -251,8 +251,8 @@ def _write_KML(
 
 def _PlotMap_KML(
     tensor_info: dict,
-    segments: dict,
-    point_sources: np.ndarray,
+    segments: List[dict],
+    point_sources: list,
     solution: dict,
     default_dirs: dict,
     stations_str: Optional[dict] = None,
@@ -270,9 +270,9 @@ def _PlotMap_KML(
     :param tensor_info: The tensor information
     :type tensor_info: dict
     :param segments: The segment properties
-    :type segments: dict
+    :type segments: List[dict]
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param solution: The solution read from Solucion.txt
     :type solution: dict
     :param default_dirs: The location of default directories
@@ -758,7 +758,6 @@ def set_KML_map_cartopy(
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-ev",

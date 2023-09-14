@@ -112,7 +112,7 @@ def automatic_usgs(
     )
     logger.info("Compute GF bank")
     if not velmodel:
-        velmodel = mv.select_velmodel(tensor_info, default_dirs)
+        velmodel = mv.select_velmodel(tensor_info, default_dirs, directory=directory)
     input_files.write_velmodel(velmodel, directory=directory)
     gf_bank_str = os.path.join(directory, "GF_strong")
     gf_bank_cgps = os.path.join(directory, "GF_cgps")
@@ -255,7 +255,7 @@ def _automatic2(
     if velmodel:
         mv.velmodel2json(velmodel, directory=directory)
     if not velmodel:
-        velmodel = mv.select_velmodel(tensor_info, default_dirs)
+        velmodel = mv.select_velmodel(tensor_info, default_dirs, directory=directory)
     np_plane_info = plane_data["plane_info"]
     data_folder = os.path.join(directory.parent.parent, "data")
     insar_asc = glob.glob(str(directory) + "/insar_asc*txt")
@@ -992,10 +992,10 @@ def inversion(
     args = args + ["dart"] if "dart" in data_type else args
     args = args + ["insar"] if "insar" in data_type else args
     if not forward:
-        logger.info("Inversion at folder {}".format(os.getcwd()))
+        logger.info("Inversion at folder {}".format(directory))
         finite_fault = default_dirs["finite_fault"]
     else:
-        logger.info("Forward at folder {}".format(os.getcwd()))
+        logger.info("Forward at folder {}".format(directory))
         finite_fault = default_dirs["forward"]
     working_dir = str(pathlib.Path().resolve())
     os.chdir(directory)
@@ -1050,7 +1050,7 @@ def execute_plot(
         connections = segments_data["connections"]
     solution = get_outputs.read_solution_static_format(segments, data_dir=directory)
     if not velmodel:
-        velmodel = mv.select_velmodel(tensor_info, default_dirs)
+        velmodel = mv.select_velmodel(tensor_info, default_dirs, directory=directory)
     point_sources = pf.point_sources_param(
         segments, tensor_info, rise_time, connections=connections
     )
@@ -1139,7 +1139,7 @@ def execute_plot(
         os.remove(plot_file)
     plot_files = glob.glob(str(directory) + "/*png")
     for plot_file in plot_files:
-        move(plot_file, "plots")
+        move(plot_file, directory / "plots")
 
 
 def delete_binaries(directory: Union[pathlib.Path, str] = pathlib.Path()):
