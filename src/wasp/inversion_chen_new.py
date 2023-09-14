@@ -326,8 +326,7 @@ def _automatic2(
 def _check_surf_GF(
     point_sources: list, used_data: List[str], logger: Optional[logging.Logger] = None
 ) -> List[str]:
-    """Check the maximum depth is greater than 125km and whether the surface wave data can be used
-
+    """Check maximum fault depth to determine whether the surface wave data can be used (No surface wave GFs below 125km)
     :param point_sources: The location of point sources
     :type point_sources: list
     :param data_type: The data types available
@@ -343,7 +342,7 @@ def _check_surf_GF(
     max_depth = np.max(depths)
     is_surf = "surf_tele" in used_data
     if max_depth > 125 and is_surf:
-        warnings.warn("Maximum depth larger than 125 km. Surface waves won't be used")
+        warnings.warn("Fault plane extends below 125 km depth limit for surface wave Green's functions. Surface waves won't be used.")
         new_used_data.remove("surf_tele")
         if logger:
             logger.info("Maximum depth larger than 125 km.")
