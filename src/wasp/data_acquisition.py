@@ -30,7 +30,7 @@ def acquisition(
     lat_ep: float,
     lon_ep: float,
     depth: float,
-    data_to_use: List[Literal["strong", "tele"]],
+    data_to_use: List[str],
     minutes_before: int = 3,
     minutes_after: int = 67,
     strong_before: int = 1,
