@@ -3,14 +3,14 @@ program run_modelling
 
    use constants, only : max_seg, max_subfaults, max_subf
    use model_parameters, only : get_faults_data, get_model_space, get_special_boundaries, &
-         & subfault_positions, events_segments, deallocate_ps
-   use modelling_inputs, only : get_annealing_param, moment_events, n_iter, io_re, cooling_rate, &
-         & t_stop, t_mid, t0, idum
+         & subfault_positions, modelparameters_set_procedure_param, &
+         & modelparameters_set_events, events_segments, deallocate_ps
+   use modelling_inputs, only : read_annealing_param, moment_events, get_annealing_param
    use save_forward, only : write_forward
    use random_gen, only : start_seed
    use annealing, only : n_threads
    use ffm_methods, only: check_waveforms, check_static, waveform_ffm, &
-                     &  mixed_ffm, static_ffm
+                     &  mixed_ffm, static_ffm, ffmmethod_set_procedure_param
    use regularization, only : regularization_set_fault_parameters 
    implicit none
    integer :: i
@@ -21,6 +21,8 @@ program run_modelling
    logical :: static, strong, cgps, dart, body, surf, auto
    logical :: insar, ramp_gf_file
    logical :: use_waveforms, use_static, many_events
+   integer :: int0, seed0, int1
+   real :: real0, real1, real2, real3
    character(len=10) :: input
 
    write(*,'(/A/)')"CHEN-JI'S WAVELET KINEMATIC MODELLING METHOD"
@@ -49,15 +51,19 @@ program run_modelling
    call check_waveforms(strong, cgps, body, surf, dart, use_waveforms)
    call check_static(static, insar, use_static)
    call n_threads(auto)
-   call get_annealing_param()
+   call read_annealing_param()
    if (many_events) call moment_events()
-   call start_seed(idum)
+   if (many_events) call modelparameters_set_events()
+   call get_annealing_param(int0, seed0, real0, real1, real2, int1, real3)
+   call start_seed(seed0)
+   call modelparameters_set_procedure_param()
    call get_faults_data()
    call get_model_space()
    call get_special_boundaries()
    call subfault_positions()
    if (many_events) call events_segments()
    call regularization_set_fault_parameters()
+   call ffmmethod_set_procedure_param()
    if ((use_waveforms) .and. (use_static .eqv. .False.)) then
       call waveform_ffm(strong, cgps, body, surf, dart, &
        & slip, rake, rupt_time, t_rise, t_fall, many_events)

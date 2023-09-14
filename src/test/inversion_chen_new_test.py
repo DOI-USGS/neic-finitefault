@@ -405,6 +405,10 @@ def test_automatic_cgps():
         shutil.rmtree(tempdir)
 
 
+@pytest.mark.skipif(
+    os.getenv("CI_REGISTRY") is not None,
+    reason="Pipeline does not have the required memory",
+)
 def test_automatic_gps():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     _handle_lowin()
@@ -569,6 +573,10 @@ def test_automatic_strong_motion():
         shutil.rmtree(tempdir)
 
 
+@pytest.mark.skipif(
+    os.getenv("CI_REGISTRY") is not None,
+    reason="Pipeline does not have the required memory",
+)
 def test_automatic_tele():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     _handle_lowin()

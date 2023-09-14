@@ -3,7 +3,7 @@ program run_forward
 
    use model_parameters, only : get_faults_data, slip0, rake0, rupt_time0, &
        &  t_rise0, t_fall0, write_model, deallocate_ps
-   use modelling_inputs, only : get_annealing_param
+   use modelling_inputs, only : read_annealing_param
    use get_stations_data, only : get_data
    use retrieve_gf, only : get_gf, deallocate_gf, retrievegf_set_data_properties, &
                     &   retrievegf_set_fault_parameters
@@ -41,7 +41,7 @@ program run_forward
       if (input .eq.'dart') dart = .True.
       if (input .eq.'many') many_events = .True.
    end do
-   call get_annealing_param()
+   call read_annealing_param()
    call get_faults_data()
    call retrievegf_set_fault_parameters()
    call saveforward_set_fault_parameters()

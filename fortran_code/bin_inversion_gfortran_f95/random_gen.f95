@@ -1,32 +1,38 @@
 module random_gen
+!
+! TODO: there is an error in ran3. This routine can, sometimes, output negative numbers!
+! TODO: one case where this happens, is when the input seed value for ran3 is 1731825384
+! TODO: why not replace ran1, ran3 with gfortran's random_number? 
+!
 
 
    implicit none
-   integer, parameter, private :: ia=16807, im=2147483647, iq=127773, ir=2836, ntab=32, ndiv=1+int((im-1)/ntab)
-   real, parameter, private :: am=1./im, eps=1.2e-7, rnmx=1.0-eps
-   integer :: iv(ntab), iy
-!   data iv/ntab*0/, iy/0/
-   integer, parameter, private :: mbig=1000000000, midum=161803398, mz=0
-   real, parameter, private :: fac=1.e-9
-   integer :: iff, inext, inextp, ma(55)
-!   data iff/0/
+   integer, parameter, private :: constant1=16807, big_constant1=2147483647, constant3=127773
+   integer, parameter, private :: constant4=2836, size1=32, ndiv=1+int((big_constant1-1)/size1)
+   real, parameter, private :: factor1=1./big_constant1, eps=1.2e-7, rnmx=1.0-eps
+   integer :: random_list1(size1), random_int
+!   data random_list1/size1*0/, random_int/0/
+   integer, parameter, private :: big_constant2=1000000000, mseed=161803398
+   real, parameter, private :: factor2=1.e-9
+   integer :: initialize, index1, index2, random_list2(55)
+!   data initconstant1lize1/0/
    integer :: seed
 
 
 contains
 
 
-   subroutine start_seed(idum)
+   subroutine start_seed(seed0)
 !
 !  Args:
-!  idum: seed value
+!  seed0: seed value
 !
    implicit none
-   integer, intent(in) :: idum
-   seed = idum
-   iff = 0
-   iv(:) = 0
-   iy = 0
+   integer, intent(in) :: seed0
+   seed = seed0
+   initialize = 0
+   random_list1(:) = 0
+   random_int = 0
    end subroutine start_seed
 
    
@@ -34,23 +40,27 @@ contains
    implicit none
    integer :: j, k
    real :: random
-   if (seed .le. 0 .or. iy .eq. 0) then
+   if (seed .le. 0 .or. random_int .eq. 0) then
       seed = max(-seed, 1)
-      do j = ntab+8, 1, -1
-         k = seed/iq
-         seed = ia*(seed-k*iq)-ir*k
-         if (seed .lt. 0) seed = seed+im
-         if (j .le. ntab) iv(j) = seed
+      do j = size1+8, 1, -1
+         k = seed/constant3
+         seed = constant1*(seed-k*constant3)-constant4*k
+         seed = modulo(seed, big_constant1)
+!         if (seed .lt. 0) seed = seed+big_constant1
+         if (j .le. size1) random_list1(j) = seed
       end do
-      iy = iv(1)
+      random_int = random_list1(1)
    end if
-   k = seed/iq
-   seed = ia*(seed-k*iq)-ir*k
-   if (seed .lt. 0) seed = seed+im
-   j = 1+iy/ndiv
-   iy = iv(j)
-   iv(j) = seed
-   random = min(am*iy, rnmx)
+   k = seed/constant3
+   seed = constant1*(seed-k*constant3)-constant4*k
+   seed = modulo(seed, big_constant1)
+!   if (seed .lt. 0) seed = seed+big_constant1
+   j = 1+random_int/ndiv
+   random_int = random_list1(j)
+   random_list1(j) = seed
+   random = min(factor1*random_int, rnmx)
+!   if (random .lt. 0) write(*,*)'ran1 LT 0: ', random
+!   if (random .gt. 1) write(*,*)'ran1 GT 1: ', random
    end function ran1
 
 
@@ -59,58 +69,74 @@ contains
 !*****  routine to generate a uniformly distributed random *****
 !*****  number on the interval [0, 1].                      *****
 !
+!*****************************************************************************
+!   This yiels an erroneous negative value when the input seed is 1731825384! 
+!*****************************************************************************
+!
    implicit none
-   integer :: i, ii, k, mj, mk
+   integer :: i, j, k, int1, int2
    real :: random
-   if (seed .lt. 0 .or. iff .eq. 0) then
-      iff = 1
-      mj = midum-iabs(seed)
-      mj = mod(mj, mbig)
-      ma(55) = mj
-      mk = 1
+   if (seed .lt. 0 .or. initialize .eq. 0) then
+      initialize = 1
+      int1 = mseed-abs(seed)
+      int1 = mod(int1, big_constant2)
+!      write(*,*)seed, int1
+      random_list2(55) = int1
+      int2 = 1
       do i = 1, 54
-         ii = mod(21*i, 55)
-         ma(ii) = mk
-         mk = mj-mk
-         if (mk .lt. mz) mk = mk+mbig
-         mj = ma(ii)
+         j = mod(21*i, 55)
+         random_list2(j) = int2
+         int2 = int1-int2
+!         int2 = modulo(int2, big_constant2)
+         if (int2 .lt. 0) int2 = int2+big_constant2
+         int1 = random_list2(j)
       end do
       do k = 1, 4
          do i = 1, 55
-            ma(i) = ma(i)-ma(1+mod(i+30, 55))
-            if (ma(i) .lt. mz) ma(i) = ma(i)+mbig
+            random_list2(i) = random_list2(i)-random_list2(1+mod(i+30, 55))
+!            random_list2(i) = modulo(random_list2(i), big_constant2) 
+            if (random_list2(i) .lt. 0) random_list2(i) = random_list2(i)+big_constant2
          end do
       end do
-      inext = 0
-      inextp = 31
+!      write(*,*)seed
+!      write(*,*)random_list2
+      index1 = 0
+      index2 = 31
       seed = 1
    end if
-   inext = inext+1
-   if (inext .eq. 56) inext = 1
-   inextp = inextp+1
-   if (inextp .eq. 56) inextp = 1
-   mj = ma(inext)-ma(inextp)
-   if (mj .lt. mz) mj = mj+mbig
-   ma(inext) = mj
-   random = mj*fac
+   index1 = modulo(index1, 55)
+   index1 = index1+1
+!   if (index1 .eq. 56) index1 = 1
+   index2 = modulo(index2, 55)
+   index2 = index2+1
+!   if (index2 .eq. 56) index2 = 1
+   int1 = random_list2(index1)-random_list2(index2)
+!   int1 = modulo(int1, big_constant2)
+   if (int1 .lt. 0) int1 = int1+big_constant2
+   random_list2(index1) = int1
+   random = int1*factor2
+!   if (random .lt. 0) write(*,*)'ran3 LT 0: ', random
+!   if (random .gt. 1) write(*,*)'ran3 GT 1: ', random
    end function ran3
 
 
-   subroutine cauchy(t, x)
+   subroutine cauchy(temp, random)
 !
 !  Args:
-!  i: temṕerture of annealing method
-!  x: output
+!  temp: temperature of annealing method
+!  random: output
 !
    implicit none
-   real, intent(in) :: t
-   real, intent(out) :: x
-   real :: u, sgn, uu
-   u = ran3()
-   sgn = 1.
-   if ((u-0.5) .lt. 0.) sgn = -1.
-   uu = abs(2.*u-1.)
-   x = sgn*t*((1.+1./t)**uu-1.)
+   real, intent(in) :: temp
+   real, intent(out) :: random
+   real :: value1, sign1, value2
+   !call random_number(value1)
+   value1 = ran3()
+   !sign1 = 1.
+   !if (value1 .lt. 0.5) sign1 = -1.
+   sign1 = sign(1., value1 - 0.5)
+   value2 = abs(2.*value1-1.)
+   random = sign1*temp*((1.+1./temp)**value2-1.)
    end subroutine cauchy
 
 

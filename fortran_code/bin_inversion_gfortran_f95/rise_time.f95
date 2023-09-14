@@ -13,85 +13,84 @@ module rise_time
 contains
 
 
-   subroutine realtr(xr, xi, n)
+   subroutine realtr(real1, imag1, n)
 !
 !  Args:
-!  xr: real part of data vector
-!  xi: imaginary part of data vector
+!  real1: real part of data vector
+!  imag1: imaginary part of data vector
 !  n: length of data vector
 !
    implicit none
-   real :: xr(*), xi(*)
+   real :: real1(*), imag1(*)
    integer :: n
-   integer :: i, i1, i2, lb, lh
-   lh = 2**(n-1)
-   lb = lh-1
-   lh = lh+1
-   do i = 1, lb
-      i1 = lh+i
-      i2 = lh-i
-      xr(i1) = xr(i2)
-      xi(i1) = -xi(i2)
+   integer :: i, i1, i2, half_length, length1, length2
+   half_length = 2**(n-1)
+   length1 = half_length-1
+   length2 = half_length+1
+   do i = 1, length1
+      i1 = length2+i
+      i2 = length2-i
+      real1(i1) = real1(i2)
+      imag1(i1) = -imag1(i2)
    end do
-   xi(lh) = 0.0
+   imag1(length2) = 0.0
    end subroutine realtr
 !
 
-   subroutine fft(xr, xi, n, sn)
+   subroutine fft(real1, imag1, n, sn)
 !
 !  Args:
-!  xr: real part of data vector
-!  xi: imaginary part of data vector
+!  real1: real part of data vector
+!  imag1: imaginary part of data vector
 !  n: length of data vector
 !  sn: 1 or -1, whether to compute FFT or IFFT
 !
    implicit none
-   real :: xr(*), xi(*), sn
+   real :: real1(*), imag1(*), sn
    integer :: m(25), n
-   real :: flx, holdi, holdr, qi, qr, v, wki, wkr
-   integer :: i, ib, ist, j, j1, jh, k, l, lb, lbh, lx, nb 
-   lx = 2**n
-   flx = lx
+   real :: norm, imag3, real3, v, imag2, real2
+   integer :: i, start, j, j1, k, l, length2, length3, length1, chunks
+   length1 = 2**n
+   norm = length1
    do i = 1, n
       m(i) = 2**(n-i)
    end do
    do l = 1, n
-      nb = 2**(l-1)
-      lb = lx/nb
-      lbh = lb/2
+      chunks = 2**(l-1)
+      length2 = length1/chunks
+      length3 = length2/2
       k = 0
-      do ib = 1, nb
-         v = sn*twopi*k/flx
-         wkr = cos(v)
-         wki = sin(v)
-         ist = lb*(ib-1)
-         do i = 1, lbh
-            j = ist+i
-            jh = j+lbh
-            qr = xr(jh)*wkr-xi(jh)*wki
-            qi = xr(jh)*wki+xi(jh)*wkr
-            xr(jh) = xr(j)-qr
-            xi(jh) = xi(j)-qi
-            xr(j) = xr(j)+qr
-            xi(j) = xi(j)+qi
+      do i = 1, chunks
+         v = sn*twopi*k/norm
+         real2 = cos(v)
+         imag2 = sin(v)
+         start = length2*(i-1)
+         do j = start + 1, start + length3
+            j1 = j+length3
+            real3 = real1(j1)*real2-imag1(j1)*imag2
+            imag3 = real1(j1)*imag2+imag1(j1)*real2
+            real1(j1) = real1(j)-real3
+            imag1(j1) = imag1(j)-imag3
+            real1(j) = real1(j)+real3
+            imag1(j) = imag1(j)+imag3
          end do
-         do i = 2, n
-            if (k.LT.m(i)) exit
-            k = k-m(i)
+         do j = 2, n
+            if (k.LT.m(j)) exit
+            k = k-m(j)
          end do
-         k = k+m(i)
+         k = k+m(j)
       end do
    end do
    k = 0
-   do j = 1, lx
+   do j = 1, length1
       if (k .lt. j) goto 7
-      holdr = xr(j)
-      holdi = xi(j)
+      real2 = real1(j)
+      imag2 = imag1(j)
       j1 = k+1
-      xr(j) = xr(j1)
-      xi(j) = xi(j1)
-      xr(j1) = holdr
-      xi(j1) = holdi
+      real1(j) = real1(j1)
+      imag1(j) = imag1(j1)
+      real1(j1) = real2
+      imag1(j1) = imag2
  7    do i = 1, n
          if (k .lt. m(i)) exit
          k = k-m(i)
@@ -99,9 +98,9 @@ contains
       k = k+m(i)
    end do
    if (sn .ge. 0.) then
-      do i = 1, lx
-         xr(i) = xr(i)/flx
-         xi(i) = xi(i)/flx
+      do i = 1, length1
+         real1(i) = real1(i)/norm
+         imag1(i) = imag1(i)/norm
       end do
    end if
    end subroutine fft
@@ -158,37 +157,37 @@ contains
    implicit none
    real :: dt
    real*8 :: df, t1, t2
-   integer :: i, ir, isl, isr, jf
-   real :: ta0, dta
-   integer :: msou, lnpt, jmin, jmax, nlen, max_freq
+   integer :: i, channel, isl, isr, jf
+   real :: rise_param1, rise_param2
+   integer :: windows, lnpt, jmin, jmax, nlen, max_freq
    allocate(source(wave_pts2, max_stations, max_rise_time_range, max_rise_time_range))
-   call get_rise_time(ta0, dta, msou)
+   call get_rise_time(rise_param1, rise_param2, windows)
    call get_data_param(lnpt, jmin, jmax, nlen, max_freq)
 !       
 ! Here, we load into memory, the Fourier transform of rise time function 
 !
    jf = 2**(lnpt-1)+1
-   do ir = 1, max_stations
-      dt = dt_channel(ir)
+   do channel = 1, max_stations
+      dt = dt_channel(channel)
       if (dt .lt. 1.e-4) cycle
       df = 1.d0/(2**lnpt)/dt
       if (abs(dt - 60.0) .gt. 1.e-4) then
-         do isr = 1, msou
-            do isl = 1, msou
-               t1 = ta0+(isl-1)*dta
-               t2 = ta0+(isr-1)*dta
+         do isr = 1, windows
+            do isl = 1, windows
+               t1 = rise_param1+(isl-1)*rise_param2
+               t2 = rise_param1+(isr-1)*rise_param2
                t1 = max(dt, t1)
                t2 = max(dt, t2)
                do i = 1, jf
-                  call fourier_asym_cosine((i-1)*df, t1, t2, source(i, ir, isl, isr))
+                  call fourier_asym_cosine((i-1)*df, t1, t2, source(i, channel, isl, isr))
                end do
             end do
          end do
       else
-         do isr = 1, msou
-            do isl = 1, msou
+         do isr = 1, windows
+            do isl = 1, windows
                do i = 1, jf
-                  source(i, ir, isl, isr) = cmplx(1.0, 0.0)
+                  source(i, channel, isl, isr) = cmplx(1.0, 0.0)
                end do
             end do
          end do

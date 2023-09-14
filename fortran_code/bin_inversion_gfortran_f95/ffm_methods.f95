@@ -3,7 +3,7 @@ module ffm_methods
 
    use constants, only : max_seg, max_subfaults, max_subf
    use model_parameters, only : write_model, deallocate_ps
-   use modelling_inputs, only : n_iter, io_re, cooling_rate, t_stop, t_mid, t0
+   use modelling_inputs, only : get_annealing_param
    use get_stations_data, only : get_data
    use retrieve_gf, only : get_gf, deallocate_gf, retrievegf_set_data_properties, &
                     &   retrievegf_set_fault_parameters
@@ -20,19 +20,31 @@ module ffm_methods
                     &   annealing_iter3, annealing_iter4, n_threads, &
                     &   annealing_iter5, annealing_iter6, &
                     &   annealing_set_data_properties, annealing_set_fault_parameters, &
+                    &   annealing_set_procedure_param, annealing_set_events, &
                     &   allocate_forward, deallocate_forward
    use annealing_static, only : print_static_summary, annealing_iter, &
-                    &   annealingstatic_set_fault_properties
+                    &   annealingstatic_set_fault_properties, &
+                    &   annealingstatic_set_procedure_param
    implicit none
    real :: rupt_time0(max_subfaults)
    real :: t_rise0(max_subfaults), t_fall0(max_subfaults)
-   real :: t
+   real :: t, t0, cooling_rate, t_stop, t_mid
    real*8 :: ramp(36)
-   integer :: i
+   integer :: i, n_iter, start_annealing
    character(len=10) :: input
 
 
 contains
+   
+
+   subroutine ffmmethod_set_procedure_param()
+!
+!  Args:
+!
+   implicit none
+   integer :: seed0
+   call get_annealing_param(n_iter, seed0, t0, cooling_rate, t_stop, start_annealing, t_mid)
+   end subroutine ffmmethod_set_procedure_param
 
 
    subroutine check_waveforms(strong, cgps, body, surf, dart, use_waveforms)
@@ -97,6 +109,7 @@ contains
    get_coeff = .True.
    static = .False.
    insar = .False.
+   call annealing_set_procedure_param()
    call retrievegf_set_fault_parameters()
    call annealing_set_fault_parameters()
    call saveforward_set_fault_parameters()
@@ -114,8 +127,9 @@ contains
    call get_gf(strong, cgps, body, surf, dart, many_events)
    call initial_model(slip, rake, rupt_time, t_rise, t_fall)
    t = t_mid
-   if (io_re .eq. 0) t = t0
+   if (start_annealing .eq. 0) t = t0
    if (many_events) then
+      call annealing_set_events()
       call print_summary2(slip, rake, rupt_time, t_rise, t_fall, static, &
         &  insar, get_coeff)
    else
@@ -180,6 +194,7 @@ contains
    use_waveforms = .True.
    ramp_gf_file = .False.
    get_coeff = .True.
+   call annealing_set_procedure_param()
    call retrievegf_set_fault_parameters()
    call annealing_set_fault_parameters()
    call annealingstatic_set_fault_properties()
@@ -200,7 +215,7 @@ contains
    call get_gf(strong, cgps, body, surf, dart, many_events)
    call initial_model(slip, rake, rupt_time, t_rise, t_fall)
    t = t_mid
-   if (io_re .eq. 0) t = t0
+   if (start_annealing .eq. 0) t = t0
    if (static) call initial_gps(slip, rake, many_events)
    if (insar) call get_insar_gf()
    if (insar) call get_insar_data()
@@ -208,6 +223,7 @@ contains
    if (ramp_gf_file .eqv. .False.) then
       if (insar) call initial_insar(slip, rake)
       if (many_events) then
+         call annealing_set_events()
          call print_summary2(slip, rake, rupt_time, t_rise, t_fall, static, &
           &  insar, get_coeff)
       else
@@ -302,13 +318,14 @@ contains
    use_waveforms = .False.
    get_coeff = .True.
    ramp_gf_file = .False.
+   call annealingstatic_set_procedure_param()
    call annealing_set_fault_parameters()
    call annealingstatic_set_fault_properties()
    call initial_model(slip, rake, rupt_time0, t_rise0, t_fall0)
    call staticdata_set_fault_parameters()
    call insardata_set_fault_parameters()
    t = t_mid
-   if (io_re .eq. 0) t = t0
+   if (start_annealing .eq. 0) t = t0
    if (static) call initial_gps(slip, rake, many_events)
    if (insar) call get_insar_gf()
    if (insar) call get_insar_data()

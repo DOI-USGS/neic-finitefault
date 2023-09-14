@@ -4,7 +4,7 @@ module annealing_static
    use constants, only : pi, max_stations, dpi, twopi, max_subf, max_seg, wave_pts2, &
             &   max_subfaults2, wave_pts, max_subfaults
    use random_gen, only : ran1, cauchy
-   use modelling_inputs, only : smooth_moment, smooth_slip, io_re, moment_input, emin0
+   use modelling_inputs, only : get_weights_moment_end 
    use regularization, only : slip_laplace, define_slip_field, modify_slip_field
    use static_data, only : static_synthetic, static_remove_subfault, &
                        &   static_modify_subfault, static_add_subfault
@@ -17,12 +17,13 @@ module annealing_static
    real :: coef_moment, coef_slip, coef_gps, coef_insar
    real :: current_value, min_value, min_dt, area
    real :: insar_misfit0
+   real :: moment_input, smooth_moment, smooth_slip, smooth_time, emin0
    integer :: subfaults_segment(max_seg)
    integer, parameter :: double = kind(1.d0)
    integer, private :: threads
    integer, parameter, private :: max_move=50, accept_max=5
-   real :: beg(max_subfaults2), dp(max_subfaults2)
-   integer :: np(max_subfaults2), segments, subfaults
+   real :: minimum(max_subfaults2), delta(max_subfaults2)
+   integer :: n_values(max_subfaults2), segments, subfaults
    real :: shear(max_subfaults), dxs, dys
    integer :: nxs_sub(max_seg), nys_sub(max_seg) 
 
@@ -40,8 +41,15 @@ contains
    call get_shear(shear)
    call get_segments(nxs_sub, nys_sub, dip, strike, delay_seg, segments, subfaults, cum_subfaults)
    call get_subfaults(dxs, dys, nx_p, ny_p, v_min, v_max, v_ref)
-   call get_space(time_min, time_max, time_ref, beg, dp, np)
+   call get_space(time_min, time_max, time_ref, minimum, delta, n_values)
    end subroutine annealingstatic_set_fault_properties
+   
+
+   subroutine annealingstatic_set_procedure_param()
+   implicit none
+   real :: real0
+   call get_weights_moment_end(moment_input, smooth_moment, smooth_slip, smooth_time, real0, emin0)
+   end subroutine annealingstatic_set_procedure_param
 
 
    subroutine print_static_summary(slip, rake, static, insar, get_coeff, ramp)
@@ -57,9 +65,8 @@ contains
    implicit none
    real*8, optional :: ramp(:)
    real :: slip(:), rake(:)
-   real amp, moment, moment_reg, dt, value1, er0, slip_reg, gps_misfit, insar_misfit, &
-      & a, b
-   real :: rake2, delta_freq, delta_freq0, moment0, kahan_y, kahan_t, kahan_c
+   real amp, moment, moment_reg, dt, value1, er0, slip_reg, gps_misfit, insar_misfit
+   real :: delta_freq, delta_freq0, moment0, kahan_y, kahan_t, kahan_c
    integer :: i, segment, channel, isl, isr, ixs, iys, jf, k, subfault, subfault_seg 
    real*8 :: misfit2
    logical :: static, get_coeff, insar
@@ -176,18 +183,18 @@ contains
 !
    implicit none
    integer isl, isr, n_subfault(max_subfaults), n_accept, &
-   & nbb, i, k, npb, nn, nran, subfault_seg, segment, channel, subfault, iys, &
+   & subfault0, i, k, values0, subfault1, index0, subfault_seg, segment, channel, subfault, iys, &
    & ixs, n_total, j
    real*8, optional :: ramp(:)
-   real slip(:), rake(:), t, duse, ause, &
-   & de, rand, c, aux, dpb, amp, moment_reg, value1, gps_misfit, insar_misfit, &
-   & moment, d_sub, a_sub, slip_reg, a, b, kahan_y, kahan_c, kahan_t, &
-   & time_reg, d_save, a_save, x, moment0, &
+   real slip(:), rake(:), t, slip1, rake1, &
+   & diff, random0, aux, delta0, amp, moment_reg, value1, gps_misfit, insar_misfit, &
+   & moment, slip0, rake0, slip_reg, kahan_y, kahan_c, kahan_t, &
+   & time_reg, moment0, &
    & slip_beg, slip_max, slip_end, angle_beg, angle_end, angle_max
    real ramp_beg, ramp_end, ramp_max, ramp_use
    real*8 :: ramp0(36), ramp1(36)
    real*8 :: omega, misfit2, ex
-   real :: delta_freq, delta_freq0, rake2!, ex
+   real :: delta_freq, delta_freq0!, ex
    logical :: static, insar
 !
    value1 = 0.0
@@ -233,15 +240,16 @@ contains
    end do
 
    do k = 1, subfaults-1
-      nran = k
-      do while (nran .eq. k .or. nran .gt. subfaults)
-         x = ran1()
-         nran = int(x*(subfaults-k)+k+1)
+      index0 = k
+      do while (index0 .eq. k .or. index0 .gt. subfaults)
+         !call random_number(x)
+         random0 = ran1()
+         index0 = int(random0*(subfaults-k)+k+1)
       end do
-      nbb = n_subfault(nran)
-      nn = n_subfault(k)
-      n_subfault(k) = nbb
-      n_subfault(nran) = nn
+      subfault0 = n_subfault(index0)
+      subfault1 = n_subfault(k)
+      n_subfault(k) = subfault0
+      n_subfault(index0) = subfault1
    end do
 
    do k = 1, subfaults
@@ -259,67 +267,61 @@ contains
       do i = 1, segment-1
          subfault_seg = subfault_seg-subfaults_segment(i)
       end do
-      d_sub = slip(subfault)
-      a_sub = rake(subfault)
-      rake2 = a_sub*dpi
-      a = sin(rake2)*d_sub
-      b = cos(rake2)*d_sub
+      slip0 = slip(subfault)
+      rake0 = rake(subfault)
 !
 !  make up unchange graph
 !
-      if (static) call static_remove_subfault(d_sub, a_sub, subfault)
-      if (insar) call insar_remove_subfault(d_sub, a_sub, subfault)
+      if (static) call static_remove_subfault(slip0, rake0, subfault)
+      if (insar) call insar_remove_subfault(slip0, rake0, subfault)
       kahan_y = -slip(subfault)*shear(subfault)-kahan_c 
       kahan_t = moment0+kahan_y
       kahan_c = (kahan_t-moment0)-kahan_y
       moment0 = kahan_t
 !  
       n_accept = 0
-      npb = np(4*(subfault-1)+1)
-      if (npb .lt. 2) exit
+      values0 = n_values(4*(subfault-1)+1)
+      if (values0 .lt. 2) exit
 !
 !  slip extreme values
 !
-      npb = np(4*(subfault-1)+1)
-      dpb = dp(4*(subfault-1)+1)
-      slip_beg = beg(4*(subfault-1)+1)
-      slip_max = (npb-1)*dpb
+      values0 = n_values(4*(subfault-1)+1)
+      delta0 = delta(4*(subfault-1)+1)
+      slip_beg = minimum(4*(subfault-1)+1)
+      slip_max = (values0-1)*delta0
       slip_end = slip_beg+slip_max
 !
 !  rake extreme values
 !  
-      npb = np(4*(subfault-1)+2)
-      dpb = dp(4*(subfault-1)+2)
-      angle_beg = beg(4*(subfault-1)+2)
-      angle_max = (npb-1)*dpb
+      values0 = n_values(4*(subfault-1)+2)
+      delta0 = delta(4*(subfault-1)+2)
+      angle_beg = minimum(4*(subfault-1)+2)
+      angle_max = (values0-1)*delta0
       angle_end = angle_beg+angle_max
       do i = 1, max_move
 !
 !       Save values before the perturbation
 !
-         d_save = slip(subfault)
-         a_save = rake(subfault)
+         slip0 = slip(subfault)
+         rake0 = rake(subfault)
 !
 !  Perturb the slip
 !
-         duse = slip_beg - 1.
-         do while ((duse .le. slip_beg) .or. (duse .ge. slip_end))
-            call cauchy(t, c)                           
-            duse = d_save+c*slip_max
+         slip1 = slip_beg - 1.
+         do while ((slip1 .le. slip_beg) .or. (slip1 .ge. slip_end))
+            call cauchy(t, random0)                           
+            slip1 = slip0+random0*slip_max
          end do
 !
 !  Perturb the rake
 !
-         ause = angle_beg - 1.
-         do while ((ause .lt. angle_beg) .or. (ause .gt. angle_end))
-            call cauchy(t, c)                          
-            ause = a_save+c*angle_max
+         rake1 = angle_beg - 1.
+         do while ((rake1 .lt. angle_beg) .or. (rake1 .gt. angle_end))
+            call cauchy(t, random0)                          
+            rake1 = rake0+random0*angle_max
          end do
          
-         rake2 = ause*dpi
-         a = duse*sin(rake2)
-         b = duse*cos(rake2)
-         moment0 = moment0+duse*shear(subfault)
+         moment0 = moment0+slip1*shear(subfault)
          moment = moment0*area
          moment_reg = (moment/moment_input) - 1
          if(abs(moment_reg) .ge. 0.10)then
@@ -329,9 +331,9 @@ contains
          endif
 !         moment_reg = (moment/moment_input)
          amp = 1.0
-         if (static) call static_modify_subfault(duse, ause, subfault, gps_misfit)
-         if (insar) call insar_modify_subfault(duse, ause, subfault, insar_misfit)
-         call modify_slip_field(subfault, duse, ause)
+         if (static) call static_modify_subfault(slip1, rake1, subfault, gps_misfit)
+         if (insar) call insar_modify_subfault(slip1, rake1, subfault, insar_misfit)
+         call modify_slip_field(subfault, slip1, rake1)
          call slip_laplace(slip_reg)
 
          misfit2 = 0.d0
@@ -340,22 +342,23 @@ contains
 !         misfit2 = insar_misfit + gps_misfit
          value1 = misfit2 + moment_reg*coef_moment+amp*slip_reg*coef_slip
 !         value1 = value1+coef_gps*gps_misfit+coef_insar*insar_misfit
-         moment0 = moment0-duse*shear(subfault)
-         de = value1-current_value
+         moment0 = moment0-slip1*shear(subfault)
+         diff = value1-current_value
 !  
 !  Now, we update the kinematic model.
-!  
-         rand = ran1()
-         aux = exp(-de/t)
-         if (aux .gt. rand) then
+! 
+         !call random_number(rand) 
+         random0 = ran1()
+         aux = exp(-diff/t)
+         if (aux .gt. random0) then
             current_value = value1
             insar_misfit0 = insar_misfit
-            slip(subfault) = duse
-            rake(subfault) = ause
+            slip(subfault) = slip1
+            rake(subfault) = rake1
             n_accept = n_accept+1
          else
-            slip(subfault) = d_save
-            rake(subfault) = a_save
+            slip(subfault) = slip0
+            rake(subfault) = rake0
          end if
          min_value = min(min_value, value1)
          if (n_accept .gt. accept_max) exit
@@ -364,18 +367,15 @@ contains
 !  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 !  finish the perturbation of subevent (segment, subfault_seg)
 !
-      rake2 = rake(subfault)*dpi
-      a = sin(rake2)*slip(subfault)
-      b = cos(rake2)*slip(subfault)
       kahan_y = slip(subfault)*shear(subfault)-kahan_c 
       kahan_t = moment0+kahan_y
       kahan_c = (kahan_t-moment0)-kahan_y
       moment0 = kahan_t
-      d_sub = slip(subfault)
-      a_sub = rake(subfault)
-      call modify_slip_field(subfault, d_sub, a_sub)
-      if (static) call static_add_subfault(d_sub, a_sub, subfault)
-      if (insar) call insar_add_subfault(d_sub, a_sub, subfault)
+      slip0 = slip(subfault)
+      rake0 = rake(subfault)
+      call modify_slip_field(subfault, slip0, rake0)
+      if (static) call static_add_subfault(slip0, rake0, subfault)
+      if (insar) call insar_add_subfault(slip0, rake0, subfault)
    end do
 
 !
@@ -403,20 +403,21 @@ contains
             do j = 1, ramp_length
                ramp_use = ramp_beg - 1.
                do while ((ramp_use .lt. ramp_beg) .or. (ramp_use .gt. ramp_end))
-                  call cauchy(t, c)
-                  ramp_use = ramp1(j)+c*ramp_max
+                  call cauchy(t, random0)
+                  ramp_use = ramp1(j)+random0*ramp_max
                end do
                ramp1(j) = ramp_use
             end do
             
             call insar_modify_ramp(ramp1, insar_misfit)
-            de = insar_misfit-insar_misfit0
+            diff = insar_misfit-insar_misfit0
 !  
 !  Now, we update the ramp.
-!  
-            rand = ran1()
-            aux = exp(-de/t)
-            if (aux .gt. rand) then
+! 
+            !call random_number(rand) 
+            random0 = ran1()
+            aux = exp(-diff/t)
+            if (aux .gt. random0) then
                current_value = current_value + (insar_misfit - insar_misfit0)
                insar_misfit0 = insar_misfit
                ramp(:) = ramp1(:)
