@@ -6,7 +6,8 @@ build-backend = "poetry.core.masonry.api"
 authors = [
     "Koch, Pablo <pkoch@csn.uchile.cl>", 
     "Goldberg, Dara <dgoldberg@usgs.gov>",
-    "Hunsinger, Heather <hhunsinger@usgs.gov>"
+    "Hunsinger, Heather <hhunsinger@usgs.gov>",
+    "Haynie, Kirstie <khaynie@usgs.gov>"
 ]
 description = "Wavelet based inversion for slip on a fault, used to generate Finite Fault products"
 keywords = ["usgs", "neic", "earthquake", "slip", "finitefault"]
