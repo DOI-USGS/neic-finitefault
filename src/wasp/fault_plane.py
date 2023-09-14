@@ -384,7 +384,7 @@ def __default_vel_of_eq(tensor_info: dict) -> float:
 
     :param tensor_info: Dictionary with plane tensor information
     :type tensor_info: dict
-    :return: _description_
+    :return: Rupture velocity
     :rtype: float
     """
     #
@@ -741,7 +741,7 @@ def __epicenter_location(hyp_stk: float, hyp_dip: float) -> Dict[str, float]:
     :type hyp_stk: float
     :param hyp_dip: Hypocenter dip
     :type hyp_dip: float
-    :return: _description_
+    :return: Epicenter location
     :rtype: Dict[str, float]
     """
     values = {

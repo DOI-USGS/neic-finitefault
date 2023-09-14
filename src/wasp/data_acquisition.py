@@ -63,7 +63,7 @@ def acquisition(
     :type tele_before: int, optional
     :param tele_after: Minutes post-event included in station query, defaults to 120
     :type tele_after: int, optional
-    :param waveform_directory: _description_, defaults to "."
+    :param waveform_directory: The waveform directory, defaults to "."
     :type waveform_directory: Union[pathlib.Path, str], optional
     """
     t1 = event_time - minutes_before * 60

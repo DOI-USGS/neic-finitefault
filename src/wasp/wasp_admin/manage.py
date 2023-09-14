@@ -11,35 +11,16 @@ from wasp.data_management import filling_data_dicts
 from wasp.modify_jsons import modify_channels
 from wasp.modify_sacs import correct_waveforms, plot_channels
 from wasp.seismic_tensor import get_tensor
-from wasp.wasp_admin.datautils import validate_data_types
-from wasp.wasp_admin.fileutils import validate_files
 
-app = typer.Typer(help="WASP data management")
+from .datautils import (
+    DEFAULT_MANAGEMENT_FILES,
+    AcquireDataTypes,
+    ManagedDataTypes,
+    ModifiableDataTypes,
+)
+from .fileutils import validate_files
 
-
-DEFAULT_ACQUIRE_DATA = ["strong", "tele"]
-DEFAULT_MANAGEMENT_DATA = [
-    "cgps",
-    "gps",
-    "insar",
-    "strong_motion",
-    "surf_tele",
-    "tele_body",
-]
-DEFAULT_MODIFY_DATA = [
-    "cgps",
-    "gps",
-    "strong_motion",
-    "surf_tele",
-    "tele_body",
-]
-DEFAULT_MANAGEMENT_FILES = {
-    "cgps": "cgps_waves.json",
-    "gps": "gps_waves.json",
-    "strong_motion": "strong_motion_waves.json",
-    "surf_tele": "surf_waves.json",
-    "tele_body": "tele_waves.json",
-}
+app = typer.Typer(help="Manage WASP data, faults, and property files")
 
 
 def _get_correction(correction_string: str) -> Tuple[str, List[str], float]:
@@ -58,7 +39,7 @@ def acquire(
     gcmt_tensor_file: str = typer.Argument(
         ..., help="Path to the GCMT moment tensor file"
     ),
-    data_types: List[str] = typer.Option(
+    data_types: List[AcquireDataTypes] = typer.Option(
         [],
         "-d",
         "--data-type",
@@ -74,18 +55,20 @@ def acquire(
     depth = tensor_info["depth"]
 
     # set default data type
+    chosen_data_types: List[str]
     if data_types == []:
-        data_types = DEFAULT_ACQUIRE_DATA
-    validate_data_types(data_types, DEFAULT_ACQUIRE_DATA)
+        chosen_data_types = [d.value for d in AcquireDataTypes]
+    else:
+        chosen_data_types = [d.value for d in data_types]
 
-    # aquire the data
+    # acquire the data
     time0 = time.time()
     acquisition(
         event_time,
         lat_ep,
         lon_ep,
         depth,
-        data_types,
+        chosen_data_types,
         waveform_directory=directory,
     )
     typer.echo(f"Time spent downloading metadata: {time.time() - time0}")
@@ -97,7 +80,7 @@ def fill_dicts(
     gcmt_tensor_file: pathlib.Path = typer.Argument(
         ..., help="Path to the GCMT moment tensor file"
     ),
-    data_types: List[str] = typer.Option(
+    data_types: List[ManagedDataTypes] = typer.Option(
         [],
         "-d",
         "--data-type",
@@ -122,13 +105,15 @@ def fill_dicts(
     event_time = UTCDateTime(event_time)
 
     # set default data type
+    chosen_data_types: List[str]
     if data_types == []:
-        data_types = DEFAULT_MANAGEMENT_DATA
-    validate_data_types(data_types, DEFAULT_MANAGEMENT_DATA)
+        chosen_data_types = [d.value for d in ManagedDataTypes]
+    else:
+        chosen_data_types = [d.value for d in data_types]
     if (
         insar_ascending is not None or insar_descending is not None
     ) and "insar" not in data_types:
-        data_types += ["insar"]
+        chosen_data_types += ["insar"]
 
     # validate files
     files_to_validate = []
@@ -149,7 +134,7 @@ def fill_dicts(
     # fill data dictionaries
     filling_data_dicts(
         tensor_info,
-        data_types,
+        chosen_data_types,
         data_prop,
         directory,
         insar_asc=[insar_ascending],
@@ -167,7 +152,7 @@ def modify_dicts(
         ...,
         help="The type of modification to apply to the selected channels (delete or downweight)",
     ),
-    data_type: str = typer.Argument(
+    data_type: ModifiableDataTypes = typer.Argument(
         ...,
         help="Type of data being modified",
     ),
@@ -184,9 +169,6 @@ def modify_dicts(
         help=f'Station and channels to modify in format "STATION:CHANNEL1,CHANNEL2"',
     ),
 ):
-    # validate data type
-    validate_data_types([data_type], DEFAULT_MODIFY_DATA)
-
     # validate files
     management_file = directory / DEFAULT_MANAGEMENT_FILES[data_type]
     validate_files([management_file])
@@ -227,7 +209,7 @@ def modify_dicts(
 @app.command(help="Modify data in sac files")
 def modify_sacs(
     directory: pathlib.Path = typer.Argument(..., help="Path to the data directory"),
-    data_type: str = typer.Argument(
+    data_type: ModifiableDataTypes = typer.Argument(
         ...,
         help="Type of data being modified",
     ),
@@ -262,9 +244,6 @@ def modify_sacs(
         help=f"Path to where plots should be written, default is the data directory",
     ),
 ):
-    # validate data type
-    validate_data_types([data_type], DEFAULT_MODIFY_DATA)
-
     # validate files
     management_file = directory / DEFAULT_MANAGEMENT_FILES[data_type]
     validate_files([management_file])

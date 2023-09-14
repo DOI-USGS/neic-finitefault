@@ -442,7 +442,7 @@ def build_source_time_function(
     :type t_ris: np.ndarray
     :param t_fal: The fall time
     :type t_fal: np.ndarray
-    :param dt: _description_
+    :param dt: The dt
     :type dt: float
     :param total_time: The total time
     :type total_time: int

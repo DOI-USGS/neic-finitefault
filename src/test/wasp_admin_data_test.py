@@ -60,36 +60,6 @@ def test_acquire(p1):
         shutil.rmtree(tempdir)
 
 
-def test_acquire_bad_input():
-    from wasp.wasp_admin.manage import app
-
-    tempdir = pathlib.Path(tempfile.mkdtemp())
-    try:
-        shutil.copyfile(
-            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT",
-            tempdir / "20003k7a_cmt_CMT",
-        )
-        result = runner.invoke(
-            app,
-            [
-                "acquire",
-                str(tempdir),
-                str(tempdir / "20003k7a_cmt_CMT"),
-                "-d",
-                "bad_input",
-            ],
-        )
-        assert result.exit_code == 1
-        assert (
-            str(result.exception)
-            == "'bad_input' is not in the allowed data type list: ['strong', 'tele']."
-        )
-    finally:
-        print("Cleaning up test directory.")
-
-        shutil.rmtree(tempdir)
-
-
 def test_fill_dicts():
     from wasp.wasp_admin.manage import app
 
@@ -110,41 +80,11 @@ def test_fill_dicts():
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
                 "-d",
-                "tele_body",
+                "tele",
             ],
         )
         print(result.stdout)
         assert result.exit_code == 0
-    finally:
-        print("Cleaning up test directory.")
-        shutil.rmtree(tempdir)
-
-
-def test_fill_dicts_bad_input():
-    from wasp.wasp_admin.manage import app
-
-    tempdir = pathlib.Path(tempfile.mkdtemp())
-    try:
-        shutil.copyfile(
-            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT",
-            tempdir / "20003k7a_cmt_CMT",
-        )
-        result = runner.invoke(
-            app,
-            [
-                "fill-dicts",
-                str(tempdir),
-                str(tempdir / "20003k7a_cmt_CMT"),
-                "-d",
-                "bad_input",
-            ],
-        )
-        assert result.exit_code == 1
-        assert isinstance(result.exception, ValueError)
-        assert (
-            str(result.exception)
-            == "'bad_input' is not in the allowed data type list: ['cgps', 'gps', 'insar', 'strong_motion', 'surf_tele', 'tele_body']."
-        )
     finally:
         print("Cleaning up test directory.")
         shutil.rmtree(tempdir)
@@ -166,7 +106,7 @@ def test_fill_dicts_missing_file():
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
                 "-d",
-                "tele_body",
+                "tele",
             ],
         )
         assert result.exit_code == 1
@@ -193,7 +133,7 @@ def test_modify_dicts():
                 "modify-dicts",
                 str(tempdir),
                 "downweight",
-                "tele_body",
+                "tele",
                 "-sc",
                 "ABCD:SH",
                 "-sc",
@@ -235,7 +175,7 @@ def test_modify_dicts():
                 "modify-dicts",
                 str(tempdir),
                 "delete",
-                "tele_body",
+                "tele",
                 "-sc",
                 "ABCD:SH",
                 "-sc",
@@ -259,26 +199,6 @@ def test_modify_dicts():
         shutil.rmtree(tempdir)
 
 
-def test_modify_dicts_bad_input():
-    from wasp.wasp_admin.manage import app
-
-    result = runner.invoke(
-        app,
-        [
-            "modify-dicts",
-            ".",
-            "downweight",
-            "bad_input",
-        ],
-    )
-    assert result.exit_code == 1
-    assert isinstance(result.exception, ValueError)
-    assert (
-        str(result.exception)
-        == "'bad_input' is not in the allowed data type list: ['cgps', 'gps', 'strong_motion', 'surf_tele', 'tele_body']."
-    )
-
-
 def test_modify_dicts_missing_file():
     from wasp.wasp_admin.manage import app
 
@@ -288,7 +208,7 @@ def test_modify_dicts_missing_file():
             "modify-dicts",
             ".",
             "downweight",
-            "tele_body",
+            "tele",
             "-sc",
             "ABCD:SH",
             "-sc",
@@ -321,7 +241,7 @@ def test_modify_sacs():
             [
                 "modify-sacs",
                 str(tempdir),
-                "tele_body",
+                "tele",
                 "-b",
                 "RCBR:BHZ=-10",
                 "-t",
@@ -344,31 +264,12 @@ def test_modify_sacs():
         shutil.rmtree(tempdir)
 
 
-def test_modify_sacs_bad_input():
-    from wasp.wasp_admin.manage import app
-
-    result = runner.invoke(
-        app,
-        [
-            "modify-sacs",
-            ".",
-            "bad_input",
-        ],
-    )
-    assert result.exit_code == 1
-    assert isinstance(result.exception, ValueError)
-    assert (
-        str(result.exception)
-        == "'bad_input' is not in the allowed data type list: ['cgps', 'gps', 'strong_motion', 'surf_tele', 'tele_body']."
-    )
-
-
 def test_modify_sacs_missing_file():
     from wasp.wasp_admin.manage import app
 
     result = runner.invoke(
         app,
-        ["modify-sacs", ".", "tele_body", "-b", "ABCD:SH=10", "-p"],
+        ["modify-sacs", ".", "tele", "-b", "ABCD:SH=10", "-p"],
     )
     print(result.stdout, result.exception)
     assert result.exit_code == 1

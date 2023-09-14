@@ -4,7 +4,7 @@ import pathlib
 import shutil
 import tempfile
 
-from wasp.shift_match import _print_arrival, shift_match2, shift_match_regional
+from wasp.shift_match import print_arrival, shift_match2, shift_match_regional
 
 from .testutils import (
     RESULTS_DIR,
@@ -49,7 +49,7 @@ def test_shift_match2():
         os.mkdir(tempdir / "data" / "SH")
         os.mkdir(tempdir / "data" / "P")
         os.mkdir(tempdir / "data" / "LONG")
-        for a, b, c, d, in zip(
+        for (a, b, c, d,) in zip(
             get_surf_waves_json(),
             new_surf_waves,
             get_tele_waves_json(),
@@ -100,7 +100,7 @@ def test_shift_match_regional():
         os.mkdir(tempdir / "data")
         os.mkdir(tempdir / "data" / "STR")
         os.mkdir(tempdir / "data" / "cGPS")
-        for a, b, c, d, in zip(
+        for (a, b, c, d,) in zip(
             get_strong_motion_json(),
             new_strong,
             get_cgps_json(),
@@ -124,7 +124,6 @@ def test_shift_match_regional():
 def test__print_arrival():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-
         new_tele_waves = update_manager_file_locations(
             get_tele_waves_json(),
             tempdir / "data",
@@ -146,12 +145,12 @@ def test__print_arrival():
                 json.dump(d, w)
         print(new_tele_waves)
         os.mkdir(tempdir / "data")
-        for a, b, in zip(
+        for (a, b,) in zip(
             get_tele_waves_json(),
             new_tele_waves,
         ):
             shutil.copyfile(a["file"], b["file"])
-        _print_arrival(get_tensor_info(), directory=tempdir)
+        print_arrival(get_tensor_info(), directory=tempdir)
         for d in new_tele_waves:
             assert (tempdir / "tele_arrival" / f"{d['name']}_pick.png").exists
     finally:

@@ -170,7 +170,7 @@ def plot_misfit(
 ):
     """Plot misfit of observed and synthetic data
 
-    :param used_data_type: _description_
+    :param used_data_type: The data types used
     :type used_data_type: List[str]
     :param event: The event, defaults to None
     :type event: Optional[int], optional

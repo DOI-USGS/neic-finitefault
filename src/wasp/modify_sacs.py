@@ -189,7 +189,7 @@ def correct_waveforms(
                             }
                             defaults to {}
     :type station_dict: Dict[str, List[Dict[str, Union[float, int, str]]]], optional
-    :raises ValueError: _description_
+    :raises ValueError: If input is false and a station_dict is not provided
     """
     if input:
         _modify_by_input(json_file=json_file)

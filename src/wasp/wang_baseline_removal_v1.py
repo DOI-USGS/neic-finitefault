@@ -78,7 +78,7 @@ def _wang_baselines(
 
     :param file: File with strong motion data in sac format
     :type file: Union[pathlib.Path, str]
-    :return: _description_
+    :return: The trace, velocity trace, displacement trace, and constants
     :rtype: Tuple[Trace, Trace, Trace, Optional[list]]
     """
     st = read(file)
@@ -655,28 +655,3 @@ def _optional_plots(
     plt.savefig(directory / "plots" / f"{station}_{channel}_plot5")
     plt.close(fig5)
     return
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser.add_argument(
-        "-p",
-        "--plot_results",
-        action="store_true",
-        help="plot results for baseline removal procedure",
-    )
-    args = parser.parse_args()
-    os.chdir(args.folder)
-    if not os.path.isdir("plots"):
-        os.mkdir("plots")
-    if not os.path.isdir("../int_STR"):
-        os.mkdir("../int_STR")
-    time0 = time.time()
-    files = glob.glob("acc*")
-    results: list = []
-    for file in files:
-        wang_process(file, plot=True)
-    print("Time spent: ", time.time() - time0)
