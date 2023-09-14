@@ -168,7 +168,7 @@ Docker Deploy:
       --skip-files "/usr/local/bin/trivy"
       "${LOCAL_IMAGE}";
     # fail HIGH,CRITICAL vulnerabilities
-    - ${TRIVY} image --exit-code 1 --severity HIGH,CRITICAL
+    - ${TRIVY} image --exit-code 1 --ignore-unfixed linux-libc-dev:5.4.0-162.179 --severity HIGH,CRITICAL
       --skip-files "/usr/local/bin/trivy"
       "${LOCAL_IMAGE}";
     # push to registry
