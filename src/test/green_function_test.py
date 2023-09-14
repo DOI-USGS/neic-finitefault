@@ -10,9 +10,7 @@ from wasp.green_functions import fk_green_fun1, gf_retrieve
 
 from .testutils import (
     RESULTS_DIR,
-    get_cgps_json,
     get_sampling_filter,
-    get_strong_motion_json,
     get_tele_waves_json,
     get_tensor_info,
 )

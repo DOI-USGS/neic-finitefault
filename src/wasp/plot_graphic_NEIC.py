@@ -288,7 +288,7 @@ def _plot_vel_model(
 
 def _PlotRuptTime(
     segments: dict,
-    point_sources: np.ndarray,
+    point_sources: list,
     solution: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
@@ -297,7 +297,7 @@ def _PlotRuptTime(
     :param segments: The segment properties
     :type segments: dict
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param directory: The location where to write plots, defaults to pathlib.Path()
@@ -341,7 +341,7 @@ def _PlotRuptTime(
 
 def _PlotRiseTime(
     segments: dict,
-    point_sources: np.ndarray,
+    point_sources: list,
     solution: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
@@ -350,7 +350,7 @@ def _PlotRiseTime(
     :param segments: The segment properties
     :type segments: dict
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param directory: The location where to write plots, defaults to pathlib.Path()
@@ -406,7 +406,7 @@ def _PlotRiseTime(
 
 def _PlotMultiSlipDist(
     segments: dict,
-    point_sources: np.ndarray,
+    point_sources: list,
     solution: dict,
     autosize: bool = False,
     max_val: Optional[float] = None,
@@ -417,7 +417,7 @@ def _PlotMultiSlipDist(
     :param segments: The segment properties
     :type segments: dict
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param autosize: Automatically size the figure, defaults to False
@@ -550,7 +550,7 @@ def _PlotMultiSlipDist(
 
 def _PlotSlipDistribution(
     segments: dict,
-    point_sources: np.ndarray,
+    point_sources: list,
     solution: dict,
     autosize: bool = False,
     max_val: Optional[float] = None,
@@ -561,7 +561,7 @@ def _PlotSlipDistribution(
     :param segments: The segment properties
     :type segments: dict
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param autosize: Automatically size the figure, defaults to False
@@ -696,7 +696,7 @@ def _PlotSlipDistribution(
 
 def _PlotSlipTimes(
     segments: dict,
-    point_sources: np.ndarray,
+    point_sources: list,
     solution: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
@@ -705,7 +705,7 @@ def _PlotSlipTimes(
     :param segments: The segment properties
     :type segments: dict
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param directory: The location where to write plots, defaults to pathlib.Path()
@@ -957,7 +957,7 @@ def _PlotSlipTimes(
 
 def _PlotCumulativeSlip(
     segments: dict,
-    point_sources: np.ndarray,
+    point_sources: list,
     solution: dict,
     tensor_info: dict,
     evID: Optional[str] = None,
@@ -968,7 +968,7 @@ def _PlotCumulativeSlip(
     :param segments: The segment properties
     :type segments: dict
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param tensor_info: The tensor information
@@ -1048,10 +1048,12 @@ def _PlotCumulativeSlip(
         ### Calculate equivalent slip length in along-strike and along-dip directions ###
         eq_len_AS = shakemap.equivalent_slip_length(along_strike / 100, delta_strike)
         left_edge_AS = shakemap.locate_equivalent_slip(
-            along_strike / 100, delta_strike, eq_len_AS
+            along_strike / 100, delta_strike, eq_len_AS  # type:ignore
         )
         left_edge_AS = left_edge_AS + x[0]
-        eq_len_AD = shakemap.equivalent_slip_length(along_dip / 100, delta_dip)
+        eq_len_AD = shakemap.equivalent_slip_length(
+            along_dip / 100, delta_dip  # type:ignore
+        )
         left_edge_AD = shakemap.locate_equivalent_slip(
             along_dip / 100, delta_dip, eq_len_AD
         )
@@ -1218,7 +1220,7 @@ def _PlotCumulativeSlip(
 
 def _PlotSlipDist_Compare(
     segments: dict,
-    point_sources: np.ndarray,
+    point_sources: list,
     input_model: dict,
     solution: dict,
     max_val: Optional[float] = None,
@@ -1229,7 +1231,7 @@ def _PlotSlipDist_Compare(
     :param segments: The segment properties
     :type segments: dict
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param input_model: The model
     :type input_model: dict
     :param solution: The kinematic solution read from Solucion.txt
@@ -1316,7 +1318,7 @@ def _PlotSlipDist_Compare(
 def _PlotMap(
     tensor_info: dict,
     segments: List[dict],
-    point_sources: np.ndarray,
+    point_sources: list,
     solution: dict,
     default_dirs: dict,
     files_str: Optional[dict] = None,
@@ -1336,7 +1338,7 @@ def _PlotMap(
     :param segments: The segment properties
     :type segments: List[dict]
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param default_dirs: The location of default directories
@@ -1970,7 +1972,7 @@ def _PlotMap(
 def _PlotInsar(
     tensor_info: dict,
     segments: List[dict],
-    point_sources: np.ndarray,
+    point_sources: list,
     solution: dict,
     insar_points: List[dict],
     scene: str,
@@ -1984,7 +1986,7 @@ def _PlotInsar(
     :param segments: The segment properties
     :type segments: List[dict]
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param insar_points: List of insar data
@@ -2170,7 +2172,7 @@ def _PlotInsar(
 def _PlotComparisonMap(
     tensor_info: dict,
     segments: List[dict],
-    point_sources: np.ndarray,
+    point_sources: list,
     input_model: dict,
     solution: dict,
     max_val: Optional[float] = None,
@@ -2183,7 +2185,7 @@ def _PlotComparisonMap(
     :param segments: The segment properties
     :type segments: List[dict]
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param input_model: the model
     :type input_model: dict
     :param solution: The kinematic solution read from Solucion.txt
@@ -2273,14 +2275,14 @@ def _PlotComparisonMap(
 
 
 def __redefine_lat_lon(
-    segments: List[dict], point_sources: np.ndarray
+    segments: List[dict], point_sources: list
 ) -> Tuple[list, list, list]:
     """Redefine the lat/lon
 
     :param segments: The segments
     :type segments: List[dict]
     :param point_sources: The point sources
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :return: segments latitudes, segments longitudes, and segments depths
     :rtype: Tuple[list, list, list]
     """
@@ -2320,7 +2322,7 @@ def __redefine_lat_lon(
 def _plot_moment_rate_function(
     segments_data: dict,
     shear: list,
-    point_sources: np.ndarray,
+    point_sources: list,
     mr_time: Optional[int] = None,
     separate_planes: bool = False,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
@@ -2332,7 +2334,7 @@ def _plot_moment_rate_function(
     :param shear: The shear moduli
     :type shear: list
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param mr_time: The moment rate time, defaults to None
     :type mr_time: Optional[int], optional
     :param separate_planes: Whether there are separate planes, defaults to False
@@ -2608,7 +2610,7 @@ def _PlotSnapshotSlip(
 
 def shakemap_polygon(
     segments: dict,
-    point_sources: np.ndarray,
+    point_sources: list,
     solution: dict,
     tensor_info: dict,
     evID: str,
@@ -2619,7 +2621,7 @@ def shakemap_polygon(
     :param segments: The segment properties
     :type segments: dict
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param tensor_info: The tensor information

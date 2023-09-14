@@ -27,8 +27,8 @@ from wasp.plot_graphic_NEIC import __redefine_lat_lon
 
 def _PlotMap(
     tensor_info: dict,
-    segments: dict,
-    point_sources: np.ndarray,
+    segments: List[dict],
+    point_sources: list,
     solution: dict,
     default_dirs: dict,
     files_str: Optional[dict] = None,
@@ -45,9 +45,9 @@ def _PlotMap(
     :param tensor_info: The tensor information
     :type tensor_info: dict
     :param segments: The segment properties
-    :type segments: dict
+    :type segments: List[dict]
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param solution: The solution read from Solucion.txt
     :type solution: dict
     :param default_dirs: The location of default directories

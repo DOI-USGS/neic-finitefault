@@ -866,9 +866,7 @@ def __failsafe(filtro: dict, header: SACTrace, cgps: bool = False):
 
 def filling_data_dicts(
     tensor_info: dict,
-    data_types: List[
-        str
-    ],
+    data_types: List[str],
     data_prop: dict,
     data_folder: Union[pathlib.Path, str],
     insar_asc: Optional[List[Union[pathlib.Path, str]]] = None,

@@ -50,7 +50,9 @@ def read_solution_static_format(
 
     data_dir = pathlib.Path(data_dir)
     if not os.path.isfile(data_dir / "Solucion.txt"):
-        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), "Solucion.txt")
+        raise FileNotFoundError(
+            errno.ENOENT, os.strerror(errno.ENOENT), str(data_dir / "Solucion.txt")
+        )
     with open(data_dir / "Solucion.txt", "r") as input_file:
         jk = [line.split() for line in input_file]
 

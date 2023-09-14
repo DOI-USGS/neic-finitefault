@@ -165,7 +165,7 @@ def plot_beachballs(
 
 def plot_misfit(
     used_data_type: List[str],
-    event: Optional[str] = None,
+    event: Optional[int] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """Plot misfit of observed and synthetic data
@@ -173,7 +173,7 @@ def plot_misfit(
     :param used_data_type: _description_
     :type used_data_type: List[str]
     :param event: The event, defaults to None
-    :type event: Optional[str], optional
+    :type event: Optional[int], optional
     :param directory: Where to write the plot, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     :raises FileNotFoundError: If one of the input json files cannot be found
@@ -317,7 +317,7 @@ def plot_misfit(
 
 def _plot_vel_model(
     velmodel: dict,
-    point_sources: np.ndarray,
+    point_sources: list,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """Plot the seismic velocity model as a function of depth
@@ -325,7 +325,7 @@ def _plot_vel_model(
     :param velmodel: The velocity model
     :type velmodel: dict
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param directory: Where to read/write file(s), defaults to pathlib.Path()
     :type directory: Union[pathlib.Path,str], optional
     """
@@ -368,7 +368,7 @@ def _plot_vel_model(
 
 def _PlotRuptTime(
     segments: dict,
-    point_sources: np.ndarray,
+    point_sources: list,
     solution: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
@@ -377,7 +377,7 @@ def _PlotRuptTime(
     :param segments: The segment properties
     :type segments: dict
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param directory: The location where to write plots, defaults to pathlib.Path()
@@ -422,7 +422,7 @@ def _PlotRuptTime(
 
 def _PlotRiseTime(
     segments: dict,
-    point_sources: np.ndarray,
+    point_sources: list,
     solution: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
@@ -431,7 +431,7 @@ def _PlotRiseTime(
     :param segments: The segment properties
     :type segments: dict
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param directory: The location where to write plots, defaults to pathlib.Path()
@@ -486,7 +486,7 @@ def _PlotRiseTime(
 
 def _PlotSlipDistribution(
     segments: dict,
-    point_sources: np.ndarray,
+    point_sources: list,
     solution: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
@@ -495,7 +495,7 @@ def _PlotSlipDistribution(
     :param segments: The segment properties
     :type segments: dict
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param solution: The kinematic solution read from Solucion.txt
     :type solution: dict
     :param directory: The location where to write plots, defaults to pathlib.Path()
@@ -1148,15 +1148,13 @@ def _PlotComparisonMap(
     return
 
 
-def __redefine_lat_lon(
-    segments: List[dict], point_sources: np.ndarray
-) -> Tuple[list, list]:
+def __redefine_lat_lon(segments: List[dict], point_sources: list) -> Tuple[list, list]:
     """Redefine the lat/lon
 
     :param segments: The segments
     :type segments: List[dict]
     :param point_sources: The point sources
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :return: segments latitudes, segments longitudes
     :rtype: Tuple[list, list]
     """
@@ -1188,7 +1186,7 @@ def __redefine_lat_lon(
 def _plot_moment_rate_function(
     segments_data: dict,
     shear: list,
-    point_sources: np.ndarray,
+    point_sources: list,
     event: Optional[str] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
@@ -1199,7 +1197,7 @@ def _plot_moment_rate_function(
     :param shear: The shear moduli
     :type shear: list
     :param point_sources: The point source locations
-    :type point_sources: np.ndarray
+    :type point_sources: list
     :param directory: Where to write plots, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path,str], optional
     """
@@ -1308,7 +1306,7 @@ def _plot_moment_rate_function(
             mr[i] = mr[i] + moment_rate[i] * (delta_strike * 1000) * (delta_dip * 1000)
 
     time = np.arange(nmax) * dt  # type:ignore
-    with open("STF.txt", "w") as outf:
+    with open(directory / "STF.txt", "w") as outf:
         outf.write("dt: {}\n".format(dt))
         outf.write("Time[s]     Moment_Rate [Nm]\n")
         for t, val in zip(time, mr):  # type:ignore
@@ -1807,10 +1805,10 @@ if __name__ == "__main__":
 
     if args.beachballs:
         plot_beachballs(segments, used_data)
-    plot_misfit(used_data)  # , forward=True)
+    plot_misfit(used_data)
     if args.many_events:
-        plot_misfit(used_data, event=str(1))
-        plot_misfit(used_data, event=str(2))
+        plot_misfit(used_data, event=1)
+        plot_misfit(used_data, event=2)
     plot_files = glob.glob(os.path.join("plots", "*png"))
     for plot_file in plot_files:
         os.remove(plot_file)
