@@ -380,7 +380,7 @@ def shear_modulous(point_sources: list, velmodel: Optional[dict] = None) -> list
 def __default_vel_of_eq(tensor_info: dict) -> float:
     """Get a default rupture velocity
        Rupture velocity is roughly 0.7*shear wave velocity, Vs. Vs increases with depth.
-       Rupture velocity can be modified manually in segments_data.json
+       Rupture velocity can be modified manually in segments_data.json.
 
     :param tensor_info: Dictionary with plane tensor information
     :type tensor_info: dict
@@ -388,7 +388,7 @@ def __default_vel_of_eq(tensor_info: dict) -> float:
     :rtype: float
     """
     #
-    #  Default velocity for shallow crustal events is 2.5 km/sec.
+    #  Default rupture velocity for shallow crustal events is 2.5 km/sec.
     #
     time_shift = tensor_info["time_shift"]
     moment_mag = tensor_info["moment_mag"]
@@ -400,7 +400,7 @@ def __default_vel_of_eq(tensor_info: dict) -> float:
     if depth > 100:
         default_vel = 3.0
     #
-    # Default velocity for deep earthquakes (>300 km) is 3.6 km/sec.
+    # Default rupture velocity for deep earthquakes (>300 km) is 3.6 km/sec.
     #
     if depth > 300:
         default_vel = 3.6
