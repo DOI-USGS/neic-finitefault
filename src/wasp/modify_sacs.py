@@ -215,11 +215,11 @@ def plot_channels(
 
     plot_folder: Union[pathlib.Path, str] = (
         "review_tele"
-        if json_file == "tele_waves.json"
+        if os.path.basename(json_file) == "tele_waves.json"
         else "review_strong"
-        if json_file == "strong_motion_waves.json"
+        if os.path.basename(json_file) == "strong_motion_waves.json"
         else "review_surf"
-        if json_file == "surf_waves.json"
+        if os.path.basename(json_file) == "surf_waves.json"
         else "review_manual"
     )
     plot_folder = pathlib.Path(plot_directory) / plot_folder

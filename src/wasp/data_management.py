@@ -1214,4 +1214,3 @@ def __is_number(value: Union[str, float]) -> bool:
         return True
     except ValueError:
         return False
-
