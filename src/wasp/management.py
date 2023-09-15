@@ -300,17 +300,17 @@ def correct_response_file(
     :type pzfile: Union[str, pathlib.Path]
     """
     date_origin = tensor_info["date_origin"]
-    
+
     with open(pzfile, "r") as infile:
         lines = [line.split() for line in infile]
     start_times = [line[-1] for line in lines if "START" in line]
     end_times = [line[-1] for line in lines if "END" in line]
-    
+
     network_lines = [index for index, line in enumerate(lines) if "NETWORK" in line]
     constant_lines = [index for index, line in enumerate(lines) if "CONSTANT" in line]
 
     for i in range(len(end_times)):
-        if end_times[i] == ':':
+        if end_times[i] == ":":
             end_times[i] = dt.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
     start_times2 = [UTCDateTime(time) for time in start_times]
@@ -318,11 +318,11 @@ def correct_response_file(
 
     index = 1
     for i in range(len(start_times2)):
-        if start_times2[i] <= date_origin <=end_times2[i]:
+        if start_times2[i] <= date_origin <= end_times2[i]:
             index = max(0, index - 1)
             index1 = network_lines[index] - 1
             index2 = constant_lines[index] + 1
-        index+=1
+        index += 1
 
     with open(pzfile, "w") as outfile:
         for line in lines[index1:index2]:
