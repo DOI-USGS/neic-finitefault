@@ -379,6 +379,8 @@ def shear_modulous(point_sources: list, velmodel: Optional[dict] = None) -> list
 
 def __default_vel_of_eq(tensor_info: dict) -> float:
     """Get a default rupture velocity
+       Rupture velocity is roughly 0.7*shear wave velocity, Vs. Vs increases with depth.
+       Rupture velocity can be modified manually in segments_data.json.
 
     :param tensor_info: Dictionary with plane tensor information
     :type tensor_info: dict
@@ -386,27 +388,26 @@ def __default_vel_of_eq(tensor_info: dict) -> float:
     :rtype: float
     """
     #
-    #  2.5 km/sec is a nice guess for subduction events.
+    #  Default rupture velocity for shallow crustal events is 2.5 km/sec.
     #
     time_shift = tensor_info["time_shift"]
     moment_mag = tensor_info["moment_mag"]
     depth = tensor_info["depth"]
     default_vel = 2.5
     #
-    # for intermediate depth earthquakes (100-300 km), we guess 3.0 km/sec.
+    # Default rupture velocity for intermediate depth earthquakes (100-300 km) is 3.0 km/sec.
     #
     if depth > 100:
         default_vel = 3.0
     #
-    # for deep earthquakes, we guess 3.6 km/sec. As they take place in
-    # locations where body wave velocities are higher.
+    # Default rupture velocity for deep earthquakes (>300 km) is 3.6 km/sec.
     #
     if depth > 300:
         default_vel = 3.6
     #
-    # we loosely follow duputel (2013). He stablishes that a criteria for
-    # saying whether an earthquake is slow, is if the centroid time delay
-    # is much larger than a first estimate of the half-duration, based on magnitude
+    # Default rupture velocity for "slow" earthquakes follows Duputel et al. (2013),
+    # Earth and Planetary Science Letters, in which earthquake is classified as slow if the
+    # centroid time delay is much larger than a magnitude-based estimate of the half-duration
     #
     if time_shift / (1.2 * 10**-8 * moment_mag ** (1 / 3)) > 3:
         default_vel = 1.5

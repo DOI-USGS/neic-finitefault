@@ -342,7 +342,9 @@ def _check_surf_GF(
     max_depth = np.max(depths)
     is_surf = "surf_tele" in used_data
     if max_depth > 125 and is_surf:
-        warnings.warn("Fault plane extends below 125 km depth limit for surface wave Green's functions. Surface waves won't be used.")
+        warnings.warn(
+            "Fault plane extends below 125 km depth limit for surface wave Green's functions. Surface waves won't be used."
+        )
         new_used_data.remove("surf_tele")
         if logger:
             logger.info("Maximum depth larger than 125 km.")
