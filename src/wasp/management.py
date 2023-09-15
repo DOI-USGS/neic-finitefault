@@ -9,6 +9,7 @@ import pathlib
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
+import datetime as dt
 from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 from obspy.taup import TauPyModel  # type: ignore
 from obspy.taup.tau import Arrivals  # type: ignore
@@ -290,7 +291,8 @@ def correct_response_file(
     tensor_info: Dict[str, Union[float, str, UTCDateTime]],
     pzfile: Union[str, pathlib.Path],
 ):
-    """Routine for selecting instrumental response only in period of earthquake
+    """Routine for selecting instrumental response only in period of earthquake if multiple date ranges are present in PZ file
+
 
     :param tensor_info: Dictionary with moment tensor information
     :type tensor_info: Dict[str, Union[float, str, UTCDateTime]]
@@ -298,29 +300,29 @@ def correct_response_file(
     :type pzfile: Union[str, pathlib.Path]
     """
     date_origin = tensor_info["date_origin"]
+    
     with open(pzfile, "r") as infile:
         lines = [line.split() for line in infile]
-    print("LINES\n", lines)
     start_times = [line[-1] for line in lines if "START" in line]
     end_times = [line[-1] for line in lines if "END" in line]
-    end_times[0] = "2030-12-31T23:59:59"
-    print(start_times)
-    print(end_times)
-    print("\n\n\n\n")
+    
     network_lines = [index for index, line in enumerate(lines) if "NETWORK" in line]
     constant_lines = [index for index, line in enumerate(lines) if "CONSTANT" in line]
+
+    for i in range(len(end_times)):
+        if end_times[i] == ':':
+            end_times[i] = dt.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
     start_times2 = [UTCDateTime(time) for time in start_times]
     end_times2 = [UTCDateTime(time) for time in end_times]
 
-    zipped1 = zip(start_times2, end_times2)
-
-    index = next(
-        i for i, (start, end) in enumerate(zipped1) if start <= date_origin <= end
-    )
-    index = max(0, index - 1)
-    index1 = network_lines[index] - 1
-    index2 = constant_lines[index] + 1
+    index = 1
+    for i in range(len(start_times2)):
+        if start_times2[i] <= date_origin <=end_times2[i]:
+            index = max(0, index - 1)
+            index1 = network_lines[index] - 1
+            index2 = constant_lines[index] + 1
+        index+=1
 
     with open(pzfile, "w") as outfile:
         for line in lines[index1:index2]:
