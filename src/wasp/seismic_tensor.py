@@ -304,7 +304,7 @@ def __strike_dip_rake_from_ln(
     slip_vector: np.ndarray, fault_normal: np.ndarray
 ) -> Tuple[float, float, float]:
     """Calculate strike, dip, and rake from the slip vector and fault plane's
-       normal vector (Following Udias Fig 16.19)
+       normal vector (Following Udias (1999) Principles of Seismology, Fig 16.19)
 
     :param slip_vector: The slip vectory
     :type slip_vector: np.ndarray
