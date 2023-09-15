@@ -433,14 +433,12 @@ def __fault_plane_properties(
     """
     #
     # Fault dimensions
-    #
-    #  The fault plane is constrained by following 3 conditions
-    #
-    #  1.  width is less than length
-    #  2.  0.5*width<(depth-water_depth)/sind
-    #  3.  If it is strike-slip event (I define as dip>60 abs(sin(rake))<0.7)
-    #      in the crust (dep_hy<30), the
-    #      maximum depth is fixed to 33 km (don't ask me why).
+    #  The fault plane is constrained by following conditions (revised from Goldberg et al., 2022 SRL):
+    #  1. Length = 2.75*Vr*Tc  where Vr is rupture velocity and Tc is the centroid time
+    #  2. Width < 2z/sin(d)  where z is hypocentral depth and d is fault dip
+    #  3. Width < Length
+    #  4. Width < 300 km
+    #  5. Fault plane is divided into ~225 subfaults of equal size
     #
     dip = plane_info["dip"]
     default_vel = plane_info["rupture_vel"]
@@ -451,14 +449,7 @@ def __fault_plane_properties(
     max_length = default_vel * eq_time
     max_width = min(300.0, max_length, 2 * dist_hypo_surface)
     max_width = max(max_width, 30)
-    #
-    # now we find the number of grids in strike and dip direction,
-    # as well as their size
-    #  2 sec P wave has a wave length of 40 km. So default grid size of subfault is
-    #  a quarter of wavelength
-    #
     size0 = np.sqrt(max_width * max_length / 225.0)
-    #    min_size = 10 if time_shift > 10 else 5
     delta_strike = max(size0, 1.0)
     delta_dip = max(size0, 1.0)
     stk_subfaults = int(min(int(max_length / delta_strike), 45))
