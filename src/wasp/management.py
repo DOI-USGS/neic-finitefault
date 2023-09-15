@@ -3,13 +3,11 @@
 moving to a different folder.
 """
 
-
 import os
 import pathlib
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
-import datetime as dt
 from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 from obspy.taup import TauPyModel  # type: ignore
 from obspy.taup.tau import Arrivals  # type: ignore
@@ -311,7 +309,7 @@ def correct_response_file(
 
     for i in range(len(end_times)):
         if end_times[i] == ":":
-            end_times[i] = dt.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+            end_times[i] = UTCDateTime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
     start_times2 = [UTCDateTime(time) for time in start_times]
     end_times2 = [UTCDateTime(time) for time in end_times]
