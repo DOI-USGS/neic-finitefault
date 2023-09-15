@@ -433,8 +433,8 @@ def __fault_plane_properties(
     """
     #
     # Fault dimensions
-    #  The fault plane is constrained by following conditions (revised from Goldberg et al., 2022 SRL):
-    #  1. Length = 2.75*Vr*Tc  where Vr is rupture velocity and Tc is the centroid time
+    #  The fault plane is constrained by following conditions (from Goldberg et al., 2022 SRL):
+    #  1. Length = 3.3*Vr*Tc  where Vr is rupture velocity and Tc is the centroid time
     #  2. Width < 2z/sin(d)  where z is hypocentral depth and d is fault dip
     #  3. Width < Length
     #  4. Width < 300 km
