@@ -145,7 +145,7 @@ def read_solution_fsp_format(
     :type file_name: Union[str, pathlib.Path], optional
     :param custom: If the data has a custom start point, defaults to False
     :type custom: bool, optional
-    :raises FileNotFoundError: _description_
+    :raises FileNotFoundError: If the the solution file cannot be found
     :return: The parsed tensor info, solution, and subfault data
     :rtype: Tuple[dict, dict, dict]
     """

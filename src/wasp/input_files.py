@@ -538,7 +538,7 @@ def input_chen_near_field(
     :type tensor_info: dict
     :param data_prop: The sampling/filtering properties (from sampling_filter.json)
     :type data_prop: dict
-    :param data_type: _description_
+    :param data_type: The data type
     :type data_type: Literal[&quot;cgps&quot;, &quot;strong_motion&quot;]
     :param directory: The directory to read/write to, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional

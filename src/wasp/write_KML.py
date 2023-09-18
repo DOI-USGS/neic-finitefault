@@ -66,7 +66,7 @@ def _write_KML(
     :type segments: List[dict]
     :param point_sources: The point source locations
     :type point_sources: list
-    :param evID: _description_
+    :param evID: The event id/name
     :type evID: str
     :param margins: The extent of the map
     :type margins: list
@@ -693,7 +693,7 @@ def set_KML_map_cartopy(
     :type aftershocks: bool, optional
     :param transform: Coordinate transform to use, defaults to None
     :type transform: Optional[Projection], optional
-    :param directory: _description_, defaults to "."
+    :param directory: The directory to read/write from, defaults to "."
     :type directory: Union[pathlib.Path, str], optional
     :return: The updated axes
     :rtype: GeoAxes

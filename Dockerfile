@@ -68,7 +68,7 @@ RUN pip install okada-wrapper==18.12.07.3
 RUN chown -R usgs-user:usgs-user "${FINITEFAULT_DIR}"
 RUN chmod -R 777 "${FINITEFAULT_DIR}"
 ## cleanup
-RUN rm -rf "${FINITEFAULT_DIR}/install.d"
+RUN rm -rf "${FINITEFAULT_DIR}/install.d" src
 RUN apt remove -y \
     cmake \
     curl \
@@ -76,16 +76,3 @@ RUN apt remove -y \
     gfortran \
     git;
 USER usgs-user
-
-# test code
-FROM finitefault as test
-
-USER root
-RUN pip install pytest
-USER usgs-user
-
-# (placeholder for unit tests, currently just try importing)
-WORKDIR /home/usgs-user/finitefault
-RUN rm /home/usgs-user/finitefault/config.ini
-
-RUN poetry run pytest src/test

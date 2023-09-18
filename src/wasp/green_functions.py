@@ -128,19 +128,19 @@ def fk_green_fun1(
 ) -> dict:
     """Write data for computing/retrieving strong motion Green's functions
 
-    :param data_prop: _description_
+    :param data_prop: The sampling filtering properties
     :type data_prop: dict
-    :param tensor_info: _description_
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
-    :param location: _description_
+    :param location: The file location
     :type location: Union[pathlib.Path, str]
-    :param cgps: _description_, defaults to False
+    :param cgps: Whether cgps data is included, defaults to False
     :type cgps: bool, optional
-    :param max_depth: _description_, defaults to None
+    :param max_depth: The max depth, defaults to None
     :type max_depth: Optional[Union[float,int]], optional
-    :param directory: _description_, defaults to pathlib.Path()
+    :param directory: The directory to read/write at, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
-    :return: _description_
+    :return: the green dictionary
     :rtype: dict
     """
     directory = pathlib.Path(directory)

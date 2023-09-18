@@ -185,7 +185,7 @@ def get_summary_all_models(subfolders: list) -> pd.DataFrame:
 def get_summary(directory: Union[pathlib.Path, str] = pathlib.Path()) -> dict:
     """Get summary from FFM model
 
-    :param directory: _description_, defaults to pathlib.Path()
+    :param directory: The directory to read files from, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     :return: The summary dictionary
     :rtype: dict
