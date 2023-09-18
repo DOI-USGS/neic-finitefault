@@ -309,7 +309,7 @@ def worker3(
     """
     try:
         response_data = "SAC_PZs_{}_{}_{}_{}".format(netwk, statn, channel, loc_code)
-        if len(loc_code) is 0:
+        if len(loc_code) == 0:
             response_data = "SAC_PZs_{}_{}_{}___".format(netwk, statn, channel)
         iris_client.sacpz(
             netwk,
@@ -360,7 +360,7 @@ def worker4(
     try:
         response = canal.response
         response_data = "SAC_PZs_{}_{}_{}_{}".format(netwk, statn, channel, loc_code)
-        if len(loc_code) is 0:
+        if len(loc_code) == 0:
             response_data = "SAC_PZs_{}_{}_{}___".format(netwk, statn, channel)
         sacpz = response.get_sacpz()
         with open(waveform_directory / response_data, "w") as file:

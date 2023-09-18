@@ -79,7 +79,7 @@ def test_fill_dicts():
                 "fill-dicts",
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
-                "-d",
+                "-t",
                 "tele",
             ],
         )
@@ -105,7 +105,7 @@ def test_fill_dicts_missing_file():
                 "fill-dicts",
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
-                "-d",
+                "-t",
                 "tele",
             ],
         )

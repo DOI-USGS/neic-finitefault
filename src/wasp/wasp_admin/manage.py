@@ -41,7 +41,7 @@ def acquire(
     ),
     data_types: List[AcquireDataTypes] = typer.Option(
         [],
-        "-d",
+        "-t",
         "--data-type",
         help="Type to add to the data_types list, default is [strong, tele]",
     ),
@@ -82,7 +82,7 @@ def fill_dicts(
     ),
     data_types: List[ManagedDataTypes] = typer.Option(
         [],
-        "-d",
+        "-t",
         "--data-type",
         help=f"Type to add to the data_types list, default is []",
     ),

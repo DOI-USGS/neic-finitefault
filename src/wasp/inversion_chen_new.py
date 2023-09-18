@@ -715,13 +715,15 @@ def checkerboard(
 
 def set_directory_structure(
     tensor_info: dict, directory: Union[pathlib.Path, str] = pathlib.Path()
-):
+) -> pathlib.Path:
     """Create directory structure
 
     :param tensor_info: The moment tensor information
     :type tensor_info: dict
     :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
+    :return: The solution folder
+    :rtype: pathlib.Path
     """
     directory = pathlib.Path(directory)
     sol_folder = directory / mng.start_time_id(tensor_info)
@@ -755,7 +757,7 @@ def set_directory_structure(
         if os.path.exists(new_folder):
             continue
         os.mkdir(new_folder)
-    return
+    return pathlib.Path(sol_folder2)
 
 
 def processing(
@@ -1175,226 +1177,3 @@ def __ask_velrange(
     min_vel = float(lines[1][5])
     max_vel = float(lines[1][6])
     return min_vel, max_vel
-
-
-if __name__ == "__main__":
-    import argparse
-
-    import wasp.manage_parser as mpar
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser = mpar.parser_add_tensor(parser)
-    parser = mpar.parser_ffm_data(parser)
-    parser.add_argument(
-        "-o",
-        "--option",
-        choices=[
-            "auto",
-            "manual",
-            "forward",
-            "point_source",
-            "checker_mod",
-            "checker_noise",
-            "point_source_err",
-            "forward_patch",
-            "add_data",
-        ],
-        required=True,
-        help="which method to run",
-    )
-    parser.add_argument("-d", "--data", help="direction of folder with seismic data")
-    parser.add_argument("-v", "--velmodel", help="direction of velocity model file")
-    parser.add_argument(
-        "-rst",
-        "--st_response",
-        action="store_false",
-        help="whether to remove response of strong_motion or not",
-    )
-    args = parser.parse_args()
-    if args.gcmt_tensor:
-        args.gcmt_tensor = os.path.abspath(args.gcmt_tensor)
-    if args.qcmt_tensor:
-        args.qcmt_tensor = os.path.abspath(args.qcmt_tensor)
-    if args.data:
-        args.data = os.path.abspath(args.data)
-    velmodel = args.velmodel if args.velmodel else None
-    if velmodel:
-        velmodel = mv.model2dict(velmodel)
-    os.chdir(args.folder)
-    data_type = mpar.get_used_data(args)
-    data_type = data_type + ["insar"] if args.insar else data_type
-
-    default_dirs = mng.default_dirs()
-    if args.option not in ["auto"]:
-        segments_data = json.load(open("segments_data.json"))
-    if args.option == "auto":
-        if not args.gcmt_tensor and not args.qcmt_tensor:
-            raise RuntimeError("You must select direction of input GCMT file")
-        if args.gcmt_tensor:
-            tensor_info = tensor.get_tensor(
-                cmt_file=args.gcmt_tensor, directory=pathlib.Path()
-            )
-        if args.qcmt_tensor:
-            tensor_info = tensor.get_tensor(
-                quake_file=args.qcmt_tensor, directory=pathlib.Path()
-            )
-        set_directory_structure(tensor_info, directory=pathlib.Path())
-        if args.data:
-            for file in os.listdir(args.data):
-                if os.path.isfile(os.path.join(args.data, file)):
-                    copy2(os.path.join(args.data, file), "data")
-        data_type = data_type if len(data_type) >= 1 else ["tele_body"]
-        automatic_usgs(
-            tensor_info,
-            data_type,
-            default_dirs,
-            velmodel=velmodel,
-            dt_cgps=None,
-            st_response=args.st_response,
-            directory=pathlib.Path(),
-        )
-    if args.option == "add_data":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        modelling_new_data(
-            tensor_info,
-            data_type,
-            default_dirs,
-            data_folder,
-            segments_data,
-            st_response=args.st_response,
-            directory=pathlib.Path(),
-        )
-    if args.option == "manual":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        manual_modelling(
-            tensor_info,
-            data_type,
-            default_dirs,
-            segments_data,
-            directory=pathlib.Path(),
-        )
-    if args.option == "forward":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        forward_modelling(
-            tensor_info,
-            data_type,
-            default_dirs,
-            segments_data,
-            option="Solucion.txt",
-            directory=pathlib.Path(),
-        )
-    if args.option == "forward_patch":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        checkerboard(
-            tensor_info,
-            data_type,
-            default_dirs,
-            segments_data,
-            max_slip=400,
-            option="Patches",
-            option2="forward",
-            directory=pathlib.Path(),
-        )
-    if args.option == "checker_mod":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        checkerboard(
-            tensor_info,
-            data_type,
-            default_dirs,
-            segments_data,
-            add_error=True,
-            directory=pathlib.Path(),
-        )
-    if args.option == "checker_noise":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        checkerboard(
-            tensor_info,
-            data_type,
-            default_dirs,
-            segments_data,
-            max_slip=0,
-            add_error=True,
-            directory=pathlib.Path(),
-        )
-    if args.option == "point_source":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        checkerboard(
-            tensor_info,
-            data_type,
-            default_dirs,
-            segments_data,
-            max_slip=500,
-            option="Patches",
-            directory=pathlib.Path(),
-        )
-    if args.option == "point_source_err":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        checkerboard(
-            tensor_info,
-            data_type,
-            default_dirs,
-            segments_data,
-            max_slip=300,
-            option="Patches",
-            add_error=True,
-            directory=pathlib.Path(),
-        )
