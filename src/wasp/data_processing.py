@@ -1049,7 +1049,7 @@ def _filter_decimate(
     :type corners: int, optional
     :param passes: The number of passes, defaults to 2
     :type passes: int, optional
-    :param decimate: Whether to decimate the data, defaults to True
+    :param decimate: Decimate the data to sampling defined in traces_properties.py, defaults to True
     :type decimate: bool, optional
     :param logger: A logger, defaults to None
     :type logger: logging.Logger, optional
