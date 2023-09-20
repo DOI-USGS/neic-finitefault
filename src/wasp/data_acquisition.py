@@ -105,7 +105,7 @@ def acquisition(
         except:
             pass
     inventory_tele = Inventory([], None)
-    if "tele" in data_to_use:
+    if "body" in data_to_use:
         networks = "II,G,IU,GE"
         max_dist = 90
         inventory_tele = client_iris.get_stations(
@@ -175,7 +175,7 @@ def acquisition(
                         sac_dict,
                         t1,
                         t2,
-                        "strong_motion",
+                        "strong",
                         waveform_directory,
                     ]
                 )

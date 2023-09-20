@@ -80,7 +80,7 @@ def test_fill_dicts():
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
-                "tele",
+                "body",
             ],
         )
         print(result.stdout)
@@ -106,7 +106,7 @@ def test_fill_dicts_missing_file():
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
-                "tele",
+                "body",
             ],
         )
         assert result.exit_code == 1
@@ -133,7 +133,7 @@ def test_modify_dicts():
                 "modify-dicts",
                 str(tempdir),
                 "downweight",
-                "tele",
+                "body",
                 "-sc",
                 "ABCD:SH",
                 "-sc",
@@ -175,7 +175,7 @@ def test_modify_dicts():
                 "modify-dicts",
                 str(tempdir),
                 "delete",
-                "tele",
+                "body",
                 "-sc",
                 "ABCD:SH",
                 "-sc",
@@ -208,7 +208,7 @@ def test_modify_dicts_missing_file():
             "modify-dicts",
             ".",
             "downweight",
-            "tele",
+            "body",
             "-sc",
             "ABCD:SH",
             "-sc",
@@ -241,7 +241,7 @@ def test_modify_sacs():
             [
                 "modify-sacs",
                 str(tempdir),
-                "tele",
+                "body",
                 "-b",
                 "RCBR:BHZ=-10",
                 "-t",
@@ -269,7 +269,7 @@ def test_modify_sacs_missing_file():
 
     result = runner.invoke(
         app,
-        ["modify-sacs", ".", "tele", "-b", "ABCD:SH=10", "-p"],
+        ["modify-sacs", ".", "body", "-b", "ABCD:SH=10", "-p"],
     )
     print(result.stdout, result.exception)
     assert result.exit_code == 1

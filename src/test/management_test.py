@@ -122,8 +122,8 @@ def test_theoretical_arrivals():
 
 
 def test_use_waveforms():
-    assert use_waveforms("strong_motion") == True
+    assert use_waveforms("strong") == True
     assert use_waveforms("cgps") == True
-    assert use_waveforms("tele_body") == True
-    assert use_waveforms("surf_tele") == True
+    assert use_waveforms("body") == True
+    assert use_waveforms("surf") == True
     assert use_waveforms("other") == False

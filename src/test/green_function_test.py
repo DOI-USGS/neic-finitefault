@@ -78,7 +78,7 @@ def test_gf_retrieve_tele():
             pass
         fdir = pathlib.Path(__file__).parent.parent.parent / "fortran_code"
         gf_retrieve(
-            ["tele_body"],
+            ["body"],
             {
                 "tele_gf": fdir / "bin_inversion_gfortran_f95" / "green_tele",
                 "strong_motion_gf": fdir / "bin_str_f95" / "get_strong_motion",

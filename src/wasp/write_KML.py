@@ -249,7 +249,7 @@ def _write_KML(
     return
 
 
-def _PlotMap_KML(
+def PlotMap_KML(
     tensor_info: dict,
     segments: List[dict],
     point_sources: list,
@@ -864,7 +864,7 @@ if __name__ == "__main__":
     else:
         limits = [None, None, None, None]
 
-    _PlotMap_KML(
+    PlotMap_KML(
         tensor_info,
         segments,
         point_sources,

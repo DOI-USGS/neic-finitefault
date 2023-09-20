@@ -46,7 +46,7 @@ def test_run(p1):
                 "-c",
                 str(tempdir / "config.ini"),
                 "-t",
-                "tele",
+                "body",
             ],
         )
         assert result.exit_code == 1
@@ -69,7 +69,7 @@ def test_run(p1):
                 "-c",
                 str(tempdir / "config.ini"),
                 "-t",
-                "tele",
+                "body",
                 "-g",
                 str(tempdir / "20003k7a_cmt_CMT"),
             ],
@@ -91,7 +91,7 @@ def test_run(p1):
                 "-c",
                 str(tempdir / "config.ini"),
                 "-t",
-                "tele",
+                "body",
                 "-g",
                 str(tempdir / "20003k7a_cmt_CMT"),
             ],

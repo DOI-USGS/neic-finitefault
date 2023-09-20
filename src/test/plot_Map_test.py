@@ -6,7 +6,7 @@ import tempfile
 
 from wasp.fault_plane import point_sources_param
 from wasp.get_outputs import read_solution_static_format
-from wasp.plot_Map import _PlotMap
+from wasp.plot_Map import PlotMap
 
 from .testutils import (
     RESULTS_DIR,
@@ -18,7 +18,7 @@ from .testutils import (
 )
 
 
-def test_PlotMap():
+def testPlotMap():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
         shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
@@ -54,7 +54,7 @@ def test_PlotMap():
             segments["segments"],
             tempdir,
         )
-        _PlotMap(
+        PlotMap(
             tensor,
             segments["segments"],
             point_sources,

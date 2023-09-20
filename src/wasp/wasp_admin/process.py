@@ -30,9 +30,9 @@ DATA_TYPES = [
     "cgps",
     "gps",
     "insar",
-    "strong_motion",
-    "surf_tele",
-    "tele_body",
+    "strong",
+    "surf",
+    "body",
 ]
 
 
@@ -73,17 +73,17 @@ def process_all(
         data_prop = json.load(sf)
 
     dir_str = str(directory.resolve())
-    if data_type == "tele_body":
+    if data_type == "body":
         tele_files = glob(dir_str + "/*BH*SAC") + glob(dir_str + "/*BH*sac")
         select_process_tele_body(
             tele_files, tensor_info, data_prop, directory=directory
         )
-    if data_type == "surf_tele":
+    if data_type == "surf":
         tele_files = glob(dir_str + "/*BH*SAC") + glob(dir_str + "/*BH*sac")
         select_process_surf_tele(
             tele_files, tensor_info, data_prop, directory=directory
         )
-    if data_type == "strong_motion":
+    if data_type == "strong":
         strong_files = (
             glob(dir_str + "/**.HN*SAC")
             + glob(dir_str + "/**.HL*SAC")
@@ -168,12 +168,12 @@ def shift_match(
 
     if option == "match":
         if multiple_events is None:
-            if data_type in ["tele", "surf"]:
+            if data_type in ["body", "surf"]:
                 files = shift_match2(data_type, plot=plot, directory=directory)
             else:
                 files = shift_match_regional(data_type, plot=plot, directory=directory)
         else:
-            if data_type in ["tele", "surf"]:
+            if data_type in ["body", "surf"]:
                 files = []
                 for i in range(multiple_events + 1):
                     shift_files = shift_match2(

@@ -42,7 +42,7 @@ def gf_retrieve(
     ch.setFormatter(formatter)
     ch.setLevel(logging.ERROR)
 
-    if "tele_body" in used_data_type:
+    if "body" in used_data_type:
         print("Computing teleseismic GFs")
         logger1 = ml.create_log("body_wave_GF", directory / "logs" / "green_tele_log")
         logger1.addHandler(ch)
@@ -54,7 +54,7 @@ def gf_retrieve(
         processes = processes + [p1]
         loggers = loggers + [logger1]
         data_types = data_types + ["body waves"]
-    if "strong_motion" in used_data_type:
+    if "strong" in used_data_type:
         print("Computing strong motion GFs")
         logger2 = ml.create_log(
             "get_strong_motion_GF", directory / "logs" / "green_str_log"
@@ -207,7 +207,7 @@ if __name__ == "__main__":
     used_data = mp.get_used_data(args)
     default_dirs = mng.default_dirs()
     # fk_green_fun0 removed since it isn't used anywhere
-    # if "strong_motion" in used_data and not os.path.isfile("strong_motion_gf.json"):
+    # if "strong" in used_data and not os.path.isfile("strong_motion_gf.json"):
     #     green_dict = fk_green_fun0(args.dt, tensor_info, default_dirs)
     # #        write_green_file(green_dict)
     # if "cgps" in used_data and not os.path.isfile("cgps_gf.json"):

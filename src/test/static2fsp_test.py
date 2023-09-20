@@ -16,7 +16,6 @@ from .testutils import (
 def test_static_to_fsp():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-
         shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "strong_motion_waves.json",
@@ -53,7 +52,7 @@ def test_static_to_fsp():
         static_to_fsp(
             get_tensor_info(),
             segments,
-            ["cgps", "gps", "insar", "strong_motion", "surf_tele", "tele_body"],
+            ["cgps", "gps", "insar", "strong", "surf", "body"],
             get_velmodel_data(),
             solution,
             tempdir,

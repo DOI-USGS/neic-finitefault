@@ -337,13 +337,13 @@ def use_waveforms(data_type: List[str]) -> bool:
     :rtype: bool
     """
     use_waveforms = False
-    if "strong_motion" in data_type:
+    if "strong" in data_type:
         use_waveforms = True
     if "cgps" in data_type:
         use_waveforms = True
-    if "tele_body" in data_type:
+    if "body" in data_type:
         use_waveforms = True
-    if "surf_tele" in data_type:
+    if "surf" in data_type:
         use_waveforms = True
     return use_waveforms
 

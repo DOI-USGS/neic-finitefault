@@ -6,30 +6,30 @@ DEFAULT_MANAGEMENT_FILES = {
     "gps": "gps_waves.json",
     "strong": "strong_motion_waves.json",
     "surf": "surf_waves.json",
-    "tele": "tele_waves.json",
+    "body": "tele_waves.json",
 }
 
 
 class AcquireDataTypes(str, Enum):
     strong = "strong"
-    tele = "tele"
+    body = "body"
 
 
 class ManagedDataTypes(str, Enum):
     cgps = "cgps"
     gps = "gps"
     insar = "insar"
-    strong_motion = "strong"
-    surf_tele = "surf"
-    tele_body = "tele"
+    strong = "strong"
+    surf = "surf"
+    body = "body"
 
 
 class ModifiableDataTypes(str, Enum):
     cgps = "cgps"
     gps = "gps"
     strong_motion = "strong"
-    surf_tele = "surf"
-    tele_body = "tele"
+    surf = "surf"
+    body = "body"
 
 
 ProcessDataTypes = ManagedDataTypes
@@ -39,4 +39,4 @@ class ShiftMatchDataTypes(str, Enum):
     cgps = "cgps"
     strong = "strong"
     surf = "surf"
-    tele = "tele"
+    body = "body"

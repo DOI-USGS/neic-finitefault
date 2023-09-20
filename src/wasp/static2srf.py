@@ -96,7 +96,7 @@ def static_to_srf(
     quantity_strong = 0
     strong_phimx = 0
     strong_r = 0
-    if "strong_motion" in used_data:
+    if "strong" in used_data:
         strong_data = pd.read_json(directory / "strong_motion_waves.json")
         quantity_strong = int(
             len(strong_data) / 3
@@ -128,7 +128,7 @@ def static_to_srf(
     quantity_tele = 0
     tele_phimx = 0
     tele_r = 0
-    if "tele_body" in used_data:
+    if "body" in used_data:
         tele_data = pd.read_json(directory / "tele_waves.json")
         quantity_tele = len(tele_data)
         tele_r = min(tele_data["distance"])
@@ -138,7 +138,7 @@ def static_to_srf(
     quantity_surf = 0
     surf_phimx = 0
     surf_r = 0
-    if "surf_tele" in used_data:
+    if "surf" in used_data:
         surf_data = pd.read_json(directory / "surf_waves.json")
         quantity_surf = len(surf_data)
         surf_r = min(surf_data["distance"])

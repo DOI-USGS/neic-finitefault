@@ -47,7 +47,7 @@ def test_process_tele():
             [
                 "process-all",
                 str(tempdir),
-                "tele",
+                "body",
                 "-g",
                 str(tempdir / "20003k7a_cmt_CMT"),
             ],
@@ -99,7 +99,7 @@ def test_process_missing_file():
         [
             "process-all",
             ".",
-            "tele",
+            "body",
             "-g",
             str(END_TO_END_DIR / "info" / "20003k7a_cmt_CMT"),
         ],
@@ -175,7 +175,7 @@ def test_shift_match():
             [
                 "shift-match",
                 str(tempdir),
-                "tele",
+                "body",
                 str(tempdir / "20003k7a_cmt_CMT"),
             ],
         )
@@ -184,7 +184,7 @@ def test_shift_match():
             [
                 "shift-match",
                 str(tempdir),
-                "tele",
+                "body",
                 str(tempdir / "20003k7a_cmt_CMT"),
                 "-o",
                 "manual",

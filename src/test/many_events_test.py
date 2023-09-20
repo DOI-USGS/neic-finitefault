@@ -122,7 +122,7 @@ def test_get_waveforms_events():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
         for datatype, txt_file, dict_file in zip(
-            ["cgps", "strong_motion", "tele_body", "surf_tele", "gps"],
+            ["cgps", "strong", "body", "surf", "gps"],
             [
                 "cgps_events.txt",
                 "strong_motion_events.txt",

@@ -168,11 +168,11 @@ if __name__ == "__main__":
         tensor_info = tensor.get_tensor()
     data_type: list = []
     if args.tele:
-        data_type = data_type + ["tele_body"]
+        data_type = data_type + ["body"]
     if args.surface:
-        data_type = data_type + ["surf_tele"]
+        data_type = data_type + ["surf"]
     if args.strong:
-        data_type = data_type + ["strong_motion"]
+        data_type = data_type + ["strong"]
     if args.cgps:
         data_type = data_type + ["cgps"]
     modelling_prop(tensor_info, data_type=data_type)  # type:ignore

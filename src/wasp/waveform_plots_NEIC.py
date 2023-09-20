@@ -62,7 +62,7 @@ def plot_waveforms(
             ax.set_ylim([-(max(abs(min_val), max_val)), max(abs(min_val), max_val)])
             min_val, max_val = ax.get_ylim()
             ax.vlines(0, min_val, max_val, "k", lw=1)
-            if type_str == "tele_body":
+            if type_str == "body":
                 ax.text(
                     np.max(time),
                     0.6 * max_val,
@@ -72,7 +72,7 @@ def plot_waveforms(
                 )
                 ax.hlines(0, -20, np.max(time), "k", lw=1)
                 ax.set_xlim([-20, np.max(time)])
-            elif type_str == "surf_tele":
+            elif type_str == "surf":
                 ax.text(
                     np.max(time),
                     0.6 * max_val,
@@ -82,7 +82,7 @@ def plot_waveforms(
                 )
                 ax.hlines(0, -350, np.max(time), "k", lw=1)
                 ax.set_xlim([-350, np.max(time)])
-            elif type_str == "cgps" or type_str == "strong_motion":
+            elif type_str == "cgps" or type_str == "strong":
                 min_wval = np.min(waveform)
                 max_wval = np.max(waveform)
                 if max_wval > abs(min_wval):
@@ -104,7 +104,7 @@ def plot_waveforms(
                 ax.hlines(0, -15, np.max(time), "k", lw=1)
                 ax.set_xlim([-15, np.max(time)])
             min_time, max_time = ax.get_xlim()
-            if type_str == "tele_body" and comp == "BHZ":
+            if type_str == "body" and comp == "BHZ":
                 ax.text(
                     1.1 * min_time,
                     0.2 * max(abs(min_val), max_val),
@@ -112,7 +112,7 @@ def plot_waveforms(
                     ha="right",
                     va="bottom",
                 )
-            if type_str == "tele_body" and comp == "SH":
+            if type_str == "body" and comp == "SH":
                 ax.text(
                     1.1 * min_time,
                     0.2 * max(abs(min_val), max_val),
@@ -120,7 +120,7 @@ def plot_waveforms(
                     ha="right",
                     va="bottom",
                 )
-            if type_str == "surf_tele" and comp == "BHZ":
+            if type_str == "surf" and comp == "BHZ":
                 ax.text(
                     1.2 * min_time,
                     0.2 * max(abs(min_val), max_val),
@@ -128,7 +128,7 @@ def plot_waveforms(
                     ha="right",
                     va="bottom",
                 )
-            if type_str == "surf_tele" and comp == "SH":
+            if type_str == "surf" and comp == "SH":
                 ax.text(
                     1.2 * min_time,
                     0.2 * max(abs(min_val), max_val),
@@ -140,7 +140,7 @@ def plot_waveforms(
             max_val = np.maximum(abs(min(waveform)), max(waveform))
             tmin, tmax = ax.get_xlim()
             ymin, ymax = ax.get_ylim()
-            if type_str == "tele_body":
+            if type_str == "body":
                 ax.text(
                     tmax,
                     0.6 * ymin,
@@ -149,7 +149,7 @@ def plot_waveforms(
                     va="center",
                     color="red",
                 )
-            elif type_str == "surf_tele":
+            elif type_str == "surf":
                 ax.text(
                     tmax,
                     0.6 * ymin,
@@ -158,7 +158,7 @@ def plot_waveforms(
                     va="center",
                     color="red",
                 )
-            elif type_str == "cgps" or type_str == "strong_motion":
+            elif type_str == "cgps" or type_str == "strong":
                 ax.text(
                     tmax,
                     0.6 * ymin,
@@ -167,14 +167,14 @@ def plot_waveforms(
                     va="center",
                     color="red",
                 )
-        if type_str == "tele_body":
+        if type_str == "body":
             ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=5, min_n_ticks=5))
             ax.yaxis.set_major_locator(ticker.NullLocator())
             ax.xaxis.set_minor_locator(ticker.MultipleLocator(5))
-        elif type_str == "surf_tele":
+        elif type_str == "surf":
             ax.xaxis.set_major_locator(ticker.MultipleLocator(500))
             ax.yaxis.set_major_locator(ticker.NullLocator())
-        elif type_str == "cgps" or type_str == "strong_motion":
+        elif type_str == "cgps" or type_str == "strong":
             ax.xaxis.set_major_locator(ticker.MultipleLocator(40))
             ax.yaxis.get_major_locator().set_params(integer=True)
         if nPlot > len(weights) - 3:
@@ -212,7 +212,7 @@ def add_metadata(
     :rtype: plt.Axes
     """
     if type_str is not None:
-        if type_str == "cgps" or type_str == "strong_motion":
+        if type_str == "cgps" or type_str == "strong":
             if distances is not None:
                 for ax, dist in zip(axes, distances):
                     ax.text(
@@ -308,10 +308,10 @@ def plot_waveform_fits(
     :type plot_directory: Union[pathlib.Path, str], optional
     """
     plot_directory = pathlib.Path(plot_directory)
-    if type_str == "tele_body" or type_str == "surf_tele":
+    if type_str == "body" or type_str == "surf":
         files = [file for file in files if file["component"] in components]
         print("Creating Waveform Fit Plot: " + str(type_str) + " " + str(components[0]))
-    if type_str == "cgps" or type_str == "strong_motion":
+    if type_str == "cgps" or type_str == "strong":
         files = [file for file in files]
         print("Creating Waveform Fit Plot: " + str(type_str))
     files = sorted(files, key=lambda k: (k["azimuth"], k["component"]))
@@ -344,7 +344,7 @@ def plot_waveform_fits(
     for ax in axes2[len(files) :]:
         ax.axis("off")
 
-    if type_str == "tele_body" or type_str == "surf_tele":
+    if type_str == "body" or type_str == "surf":
         axes2 = plot_waveforms(
             axes2,
             obs_times,
@@ -365,7 +365,7 @@ def plot_waveform_fits(
             color="red",
             custom="syn",
         )
-    if type_str == "cgps" or type_str == "strong_motion":
+    if type_str == "cgps" or type_str == "strong":
         axes2 = plot_waveforms(
             axes2,
             obs_times,
@@ -397,13 +397,13 @@ def plot_waveform_fits(
     }
     axes2 = add_metadata(axes2, **dict)
 
-    if type_str == "tele_body":
+    if type_str == "body":
         if "BHZ" in components:
             plot_name = "P_body_waves"
         if "SH" in components:
             plot_name = "SH_body_waves"
 
-    if type_str == "surf_tele":
+    if type_str == "surf":
         if "BHZ" in components:
             plot_name = "Rayleigh_surf_waves"
         if "SH" in components:
@@ -412,7 +412,7 @@ def plot_waveform_fits(
     if type_str == "cgps":
         plot_name = "cGPS_waves"
 
-    if type_str == "strong_motion":
+    if type_str == "strong":
         plot_name = "strong_motion_waves"
 
     plt.savefig(plot_directory / (plot_name + ".png"), dpi=300)  # bbox_inches='tight')
