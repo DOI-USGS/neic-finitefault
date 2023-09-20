@@ -466,4 +466,3 @@ def plot_spectra(
         plt.title("{} {}".format(name, comp))
         plt.savefig(plot_directory / "spectra_{}_{}".format(name, comp))
         plt.close()
-
