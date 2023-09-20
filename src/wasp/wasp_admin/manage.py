@@ -1,13 +1,14 @@
 import json
 import pathlib
 import time
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
 import typer
 from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 
 from wasp.data_acquisition import acquisition
 from wasp.data_management import filling_data_dicts
+from wasp.fault_plane import create_finite_fault, event_mult_in_to_json
 from wasp.get_outputs import read_solution_static_format
 from wasp.management import default_dirs
 from wasp.modify_jsons import modify_channels
@@ -77,6 +78,63 @@ def acquire(
         waveform_directory=directory,
     )
     typer.echo(f"Time spent downloading metadata: {time.time() - time0}")
+
+
+@app.command(help="Create the finite fault from the tensor and plane information")
+def create_ff(
+    directory: pathlib.Path = typer.Argument(..., help="Path to read/write from"),
+    gcmt_tensor_file: pathlib.Path = typer.Argument(
+        ..., help="Path to the GCMT moment tensor file"
+    ),
+    nodal_plane: Tuple[float, float, float] = typer.Argument(
+        ..., help="The nodal plane (strike, dip, rake)"
+    ),
+    data_types: List[ManagedDataTypes] = typer.Option(
+        [],
+        "-t",
+        "--data-type",
+        help="Type to add to the data_types list, default is []",
+    ),
+    rupture_velocity: float = typer.Option(
+        None,
+        "-v",
+        "--rupture-velocity",
+        help="The rupture velocity to use in the finite fault creation",
+    ),
+    water_level: float = typer.Option(
+        0,
+        "-w",
+        "--water-level",
+        help="The water level to use in the finite fault creation",
+    ),
+):
+    # set default data type
+    chosen_data_types: List[str]
+    chosen_data_types = [d.value for d in data_types]
+
+    # get tensor information
+    tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
+
+    event_mult_in_to_json(directory=directory)
+    create_finite_fault(
+        tensor_info=tensor_info,
+        np_plane_info={
+            "strike": nodal_plane[0],
+            "dip": nodal_plane[1],
+            "rake": nodal_plane[2],
+        },
+        data_type=chosen_data_types,
+        water_level=water_level,
+        rupture_vel=rupture_velocity,
+        directory=directory,
+    )
+
+
+@app.command(help="Convert Event_mult.in to json")
+def eventmult_to_json(
+    directory: pathlib.Path = typer.Argument(..., help="Path to read/write from"),
+):
+    event_mult_in_to_json(directory=directory)
 
 
 @app.command(help="Populate data dictionaries used for managing data")

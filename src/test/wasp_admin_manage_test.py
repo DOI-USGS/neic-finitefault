@@ -62,6 +62,111 @@ def test_acquire(p1):
         shutil.rmtree(tempdir)
 
 
+def test_create_ff():
+    from wasp.wasp_admin.manage import app
+
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        shutil.copyfile(
+            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT",
+            tempdir / "20003k7a_cmt_CMT",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "Event_mult.in",
+            tempdir / "Event_mult.in",
+        )
+        result = runner.invoke(
+            app,
+            [
+                "create-ff",
+                str(tempdir),
+                str(tempdir / "20003k7a_cmt_CMT"),
+                "6.613912311529926",
+                "19.280827965117993",
+                "109.27817171619564",
+                "-t",
+                "body",
+            ],
+        )
+        assert result.exit_code == 0
+        with open(tempdir / "segments_data.json") as d:
+            data = json.load(d)
+        with open(RESULTS_DIR / "NP1" / "segments_data.json") as t:
+            target = json.load(t)
+        assert data == target
+    finally:
+        print("Cleaning up test directory.")
+        shutil.rmtree(tempdir)
+
+
+def test_create_ff():
+    from wasp.wasp_admin.manage import app
+
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        shutil.copyfile(
+            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT",
+            tempdir / "20003k7a_cmt_CMT",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "Event_mult.in",
+            tempdir / "Event_mult.in",
+        )
+        result = runner.invoke(
+            app,
+            [
+                "create-ff",
+                str(tempdir),
+                str(tempdir / "20003k7a_cmt_CMT"),
+                "6.613912311529926",
+                "19.280827965117993",
+                "109.27817171619564",
+                "-t",
+                "body",
+            ],
+        )
+        assert result.exit_code == 0
+        with open(tempdir / "segments_data.json") as d:
+            data = json.load(d)
+        with open(RESULTS_DIR / "NP1" / "segments_data.json") as t:
+            target = json.load(t)
+        assert data == target
+    finally:
+        print("Cleaning up test directory.")
+        shutil.rmtree(tempdir)
+
+
+def test_eventmult_to_json():
+    from wasp.wasp_admin.manage import app
+
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        shutil.copyfile(
+            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT",
+            tempdir / "20003k7a_cmt_CMT",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "Event_mult.in",
+            tempdir / "Event_mult.in",
+        )
+        result = runner.invoke(
+            app,
+            [
+                "eventmult-to-json",
+                str(tempdir),
+            ],
+        )
+        assert result.exit_code == 0
+        with open(tempdir / "segments_data.json") as d:
+            data = json.load(d)
+        with open(RESULTS_DIR / "NP1" / "segments_data.json") as t:
+            target = json.load(t)
+        assert data == target
+    finally:
+        print("Cleaning up test directory.")
+        shutil.rmtree(tempdir)
+
+
 def test_fill_dicts():
     from wasp.wasp_admin.manage import app
 

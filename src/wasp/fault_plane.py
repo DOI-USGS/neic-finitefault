@@ -845,15 +845,15 @@ def __write_event_mult_in(
         infile.write("{} {} 1 {}\n".format(hyp_stk, hyp_dip, depth))
 
 
-def event_mult_in_to_json(output_directory: Union[pathlib.Path, str] = pathlib.Path()):
+def event_mult_in_to_json(directory: Union[pathlib.Path, str] = pathlib.Path()):
     """Parse fault properties in event_mult_in file to json file
 
-    :param output_directory: The directory where modelling outputs exist,
+    :param directory: The directory where modelling outputs exist,
                             defaults to pathlib.Path()
-    :type output_directory: Union[pathlib.Path, str], optional
+    :type directory: Union[pathlib.Path, str], optional
     """
-    output_directory = pathlib.Path(output_directory)
-    with open(output_directory / "Event_mult.in", "r") as infile:
+    directory = pathlib.Path(directory)
+    with open(directory / "Event_mult.in", "r") as infile:
         lines = [line.split() for line in infile]
     t1 = float(lines[4][0])
     t2 = float(lines[4][1])
@@ -905,7 +905,7 @@ def event_mult_in_to_json(output_directory: Union[pathlib.Path, str] = pathlib.P
             index0 = index0 + 6
         segments = segments + [dict1]
     dict3 = {"rise_time": rise_time, "segments": segments}
-    with open(output_directory / "segments_data.json", "w") as f:
+    with open(directory / "segments_data.json", "w") as f:
         json.dump(
             dict3,
             f,
@@ -936,72 +936,3 @@ def is_fault_correct(
     length = (hyp_dip - 0.2) * delta_dip
     height = np.sin(dip * np.pi / 180) * length
     return depth > height
-
-
-if __name__ == "__main__":
-    import argparse
-
-    import wasp.manage_parser as mp  # type:ignore
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser = mp.parser_add_tensor(parser)
-    parser.add_argument(
-        "-v", "--rupt_vel", default=2.5, type=float, help="Rupture velocity to use"
-    )
-    parser.add_argument(
-        "-np",
-        "--nodal_plane",
-        nargs=3,
-        default=[0, 17, 90],
-        type=float,
-        help="Mechanism (strike, dip, rake) of nodal plane",
-    )
-    parser.add_argument(
-        "-t",
-        "--tele",
-        action="store_true",
-        help="automatic parametrization for teleseismic data",
-    )
-    parser.add_argument(
-        "-st",
-        "--strong",
-        action="store_true",
-        help="automatic parametrization for strong motion data",
-    )
-    parser.add_argument(
-        "-e2j",
-        "--event_to_json",
-        action="store_true",
-        help="Translate Event_mult.in file to JSON file",
-    )
-    args = parser.parse_args()
-
-    os.chdir(args.folder)
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-
-    if args.event_to_json:
-        if not os.path.isfile("Event_mult.in"):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "Event_mult.in"
-            )
-        event_mult_in_to_json()
-    else:
-        data_type: List[str] = []
-        data_type = data_type + ["body"] if args.tele else data_type
-        data_type = data_type + ["strong"] if args.strong else data_type
-        strike, dip, rake = args.nodal_plane
-        np_plane_info = {"strike": strike, "dip": dip, "rake": rake}
-        create_finite_fault(
-            tensor_info,
-            np_plane_info,
-            data_type,
-            water_level=0,
-            rupture_vel=args.rupt_vel,
-        )
