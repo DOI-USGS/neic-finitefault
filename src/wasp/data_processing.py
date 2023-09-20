@@ -805,7 +805,8 @@ def __select_cgps_files(
     tensor_info: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Select cgps data and make sure our cgps data is not of bad quality
+    """Select cgps data and do some basic quality control
+       (synthetic length, missing data check, station distance within bounds)
 
     :param cgps_files: The cgps files
     :type cgps_files: List[str]
