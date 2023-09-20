@@ -5,7 +5,9 @@ import shutil
 import tempfile
 from glob import glob
 from test.testutils import (
+    DATA_DIR,
     END_TO_END_DIR,
+    HOME,
     RESULTS_DIR,
     get_cgps_json,
     get_strong_motion_json,
@@ -24,6 +26,10 @@ def test_plot_neic():
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
+        with open(DATA_DIR / "config.ini") as f:
+            config = f.read().replace("/home/user/neic-finitefault", str(HOME))
+        with open(tempdir / "config.ini", "w") as wf:
+            wf.write(config)
         shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
         cgps_waves = get_cgps_json()
         new_cgps_waves = update_manager_file_locations(
@@ -117,6 +123,8 @@ def test_plot_neic():
                 "-t",
                 "body",
                 "-ffms",
+                "-c",
+                str(tempdir / "config.ini"),
             ],
         )
         assert result.exit_code == 0
