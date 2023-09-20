@@ -8,11 +8,13 @@ from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 
 from wasp.data_acquisition import acquisition
 from wasp.data_management import filling_data_dicts
+from wasp.get_outputs import read_solution_static_format
 from wasp.management import default_dirs
 from wasp.modify_jsons import modify_channels
 from wasp.modify_sacs import correct_waveforms, plot_channels
 from wasp.read_config import CONFIG_PATH
 from wasp.seismic_tensor import get_tensor
+from wasp.static2fsp import static_to_fsp as convert_static_to_fsp
 from wasp.velocity_models import model2dict, select_velmodel, velmodel2json
 
 from .datautils import (
@@ -283,6 +285,75 @@ def modify_sacs(
             management_file,
             plot_directory=plot_directory or directory,
         )
+
+
+@app.command(help="Convert static solution to FSP format")
+def static_to_fsp(
+    directory: pathlib.Path = typer.Argument(
+        ..., help="Path to the directory to read/write from"
+    ),
+    gcmt_tensor_file: pathlib.Path = typer.Argument(
+        ..., help="Path to the GCMT moment tensor file"
+    ),
+    data_types: List[ManagedDataTypes] = typer.Option(
+        [],
+        "-t",
+        "--data-type",
+        help="Type to add to the data_types list, default is []",
+    ),
+    segments_file: pathlib.Path = typer.Option(
+        None,
+        "-s",
+        "--segments",
+        help="Path to the segments file (otherwise assumes in specified directory)",
+    ),
+    velocity_model_file: pathlib.Path = typer.Option(
+        None,
+        "-v",
+        "--velocity-model",
+        help="Path to the velocity model file (otherwise assumes in specified directory)",
+    ),
+):
+    # set default data type
+    chosen_data_types: List[str]
+    chosen_data_types = [d.value for d in data_types]
+    for d in data_types:
+        if d not in ["insar", "gps"]:
+            validate_files([directory / DEFAULT_MANAGEMENT_FILES[d]])
+
+    # get tensor information
+    tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
+
+    # get velocity model
+    if velocity_model_file:
+        with open(velocity_model_file) as v:
+            vel_model = json.load(v)
+    else:
+        with open(directory / "velmodel_data.json") as v:
+            vel_model = json.load(v)
+
+    # get velocity model
+    if segments_file:
+        with open(segments_file) as s:
+            segments_data = json.load(s)
+    else:
+        with open(directory / "segments_data.json") as s:
+            segments_data = json.load(s)
+
+    # get the solution
+    solution = read_solution_static_format(
+        segments=segments_data["segments"], data_dir=directory
+    )
+
+    # convert static to srf
+    convert_static_to_fsp(
+        tensor_info=tensor_info,
+        segments_data=segments_data,
+        used_data=chosen_data_types,
+        vel_model=vel_model,
+        solution=solution,
+        directory=directory,
+    )
 
 
 @app.command(help="Write a velocity model")

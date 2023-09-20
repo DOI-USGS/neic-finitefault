@@ -279,6 +279,121 @@ def test_modify_sacs_missing_file():
     assert "does not exist!" in str(result.exception)
 
 
+def test_static_fsp():
+    from wasp.wasp_admin.manage import app
+
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "strong_motion_waves.json",
+            tempdir / "strong_motion_waves.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "cgps_waves.json",
+            tempdir / "cgps_waves.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "static_data.json",
+            tempdir / "static_data.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "tele_waves.json",
+            tempdir / "tele_waves.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "surf_waves.json",
+            tempdir / "surf_waves.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "insar_data.json",
+            tempdir / "insar_data.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "insar_data.txt",
+            tempdir / "insar_data.txt",
+        )
+        shutil.copyfile(
+            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "velmodel_data.json", tempdir / "velmodel_data.json"
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "segments_data.json", tempdir / "segments_data.json"
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "strong_motion_waves.json",
+            tempdir / "strong_motion_waves.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "tele_waves.json",
+            tempdir / "tele_waves.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "surf_waves.json",
+            tempdir / "surf_waves.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "cgps_waves.json",
+            tempdir / "cgps_waves.json",
+        )
+
+        result = runner.invoke(
+            app,
+            [
+                "static-to-fsp",
+                str(tempdir),
+                str(tempdir / "20003k7a_cmt_CMT"),
+                "-t",
+                "cgps",
+                "-t",
+                "gps",
+                "-t",
+                "insar",
+                "-t",
+                "strong",
+                "-t",
+                "surf",
+                "-t",
+                "body",
+            ],
+        )
+        result = runner.invoke(
+            app,
+            [
+                "static-to-fsp",
+                str(tempdir),
+                str(tempdir / "20003k7a_cmt_CMT"),
+                "-t",
+                "cgps",
+                "-t",
+                "gps",
+                "-t",
+                "insar",
+                "-t",
+                "strong",
+                "-t",
+                "surf",
+                "-t",
+                "body",
+                "-s",
+                str(tempdir / "segments_data.json"),
+                "-v",
+                str(tempdir / "velmodel_data.json"),
+            ],
+        )
+        assert result.exit_code == 0
+        with open(tempdir / "fsp_sol_file.txt") as f:
+            data = f.readlines()[41:]
+        with open(RESULTS_DIR / "NP1" / "fsp_sol_file.txt") as f:
+            target = f.readlines()[41:]
+        for l, t in zip(data, target):
+            assert l == t
+    finally:
+        shutil.rmtree(tempdir)
+
+
 def test_velmodel_from_tensor():
     from wasp.wasp_admin.manage import app
 
