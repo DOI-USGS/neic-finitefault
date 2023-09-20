@@ -183,7 +183,7 @@ def fk_green_fun1(
 if __name__ == "__main__":
     import argparse
 
-    import wasp.manage_parser as mp
+    import wasp.manage_parser as mp  # type:ignore
     import wasp.management as mng
     import wasp.seismic_tensor as tensor
 

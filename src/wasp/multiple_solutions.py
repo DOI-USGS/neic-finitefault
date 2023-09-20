@@ -208,7 +208,7 @@ def get_summary(directory: Union[pathlib.Path, str] = pathlib.Path()) -> dict:
 if __name__ == "__main__":
     import argparse
 
-    import wasp.manage_parser as mp
+    import wasp.manage_parser as mp  # type:ignore
 
     parser = argparse.ArgumentParser()
     parser.add_argument(

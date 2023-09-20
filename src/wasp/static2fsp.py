@@ -488,7 +488,7 @@ if __name__ == "__main__":
     import argparse
     import errno
 
-    import wasp.manage_parser as mp
+    import wasp.manage_parser as mp  # type:ignore
     from wasp import get_outputs
 
     parser = argparse.ArgumentParser()
