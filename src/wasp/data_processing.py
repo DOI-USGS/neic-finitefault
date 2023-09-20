@@ -990,7 +990,7 @@ def new_process_cgps(
 
 
 def __linear_fill(data: np.ndarray, begin: int, end: int) -> np.ndarray:
-    """Linearly fill the data
+    """Linear interpolation for data gaps
 
     :param data: The data to fill
     :type data: np.ndarray
