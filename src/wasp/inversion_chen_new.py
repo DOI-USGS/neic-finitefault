@@ -326,7 +326,7 @@ def _automatic2(
 def _check_surf_GF(
     point_sources: list, used_data: List[str], logger: Optional[logging.Logger] = None
 ) -> List[str]:
-    """Check maximum fault depth to determine whether the surface wave data can be used (No surface wave GFs below 125km)
+    """Check maximum fault depth to determine whether the surface wave data can be used (No surface wave GFs calculated below 125km)
     :param point_sources: The location of point sources
     :type point_sources: list
     :param data_type: The data types available
