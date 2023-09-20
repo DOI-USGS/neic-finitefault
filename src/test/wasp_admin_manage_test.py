@@ -10,7 +10,9 @@ from obspy import read
 from typer.testing import CliRunner
 
 from .testutils import (
+    DATA_DIR,
     END_TO_END_DIR,
+    HOME,
     RESULTS_DIR,
     get_tele_waves_json,
     update_manager_file_locations,
@@ -275,3 +277,84 @@ def test_modify_sacs_missing_file():
     assert result.exit_code == 1
     assert isinstance(result.exception, FileNotFoundError)
     assert "does not exist!" in str(result.exception)
+
+
+def test_velmodel_from_tensor():
+    from wasp.wasp_admin.manage import app
+
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        shutil.copyfile(
+            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT",
+            tempdir / "20003k7a_cmt_CMT",
+        )
+        with open(DATA_DIR / "config.ini") as f:
+            config = f.read().replace("/home/user/neic-finitefault", str(HOME))
+        with open(tempdir / "config.ini", "w") as wf:
+            wf.write(config)
+
+        result = runner.invoke(
+            app,
+            [
+                "velmodel-from-tensor",
+                str(tempdir / "20003k7a_cmt_CMT"),
+                str(tempdir / "velmodel"),
+                "-c",
+                str(tempdir / "config.ini"),
+            ],
+        )
+        assert result.exit_code == 0
+        with open(tempdir / "velmodel") as v:
+            data = v.read()
+        assert data == (
+            "6\n"
+            "3.35 1.44 2.0447 0.074 1200.0 600.0\n"
+            "6.23 3.61 2.7074199 12.076 1200.0 600.0\n"
+            "6.75 3.87 2.83123 12.945 1200.0 600.0\n"
+            "7.65 4.36 2.96935 15.8029995 1200.0 600.0\n"
+            "8.08 4.473 3.3754 196.0 1200.0 500.0\n"
+            "8.594 4.657 3.4465 36.0 360.0 140.0\n"
+        )
+    finally:
+        print("Cleaning up test directory.")
+        shutil.rmtree(tempdir)
+
+
+def test_velmodel_to_json():
+    from wasp.wasp_admin.manage import app
+
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        with open(tempdir / "velmodel", "w") as v:
+            v.write(
+                "6\n"
+                "3.35 1.44 2.0447 0.074 1200.0 600.0\n"
+                "6.23 3.61 2.7074199 12.076 1200.0 600.0\n"
+                "6.75 3.87 2.83123 12.945 1200.0 600.0\n"
+                "7.65 4.36 2.96935 15.8029995 1200.0 600.0\n"
+                "8.08 4.473 3.3754 196.0 1200.0 500.0\n"
+                "8.594 4.657 3.4465 36.0 360.0 140.0\n"
+            )
+
+        result = runner.invoke(
+            app,
+            ["velmodel-to-json", str(tempdir), str(tempdir / "velmodel")],
+        )
+
+        assert result.exit_code == 0
+        with open(tempdir / "velmodel_data.json") as v:
+            data = json.load(v)
+
+        target = {
+            "dens": ["2.0447", "2.7074199", "2.83123", "2.96935", "3.3754", "3.4465"],
+            "p_vel": ["3.35", "6.23", "6.75", "7.65", "8.08", "8.594"],
+            "qa": ["1200", "1200", "1200", "1200", "1200", "360"],
+            "qb": ["600", "600", "600", "600", "500", "140"],
+            "s_vel": ["1.44", "3.61", "3.87", "4.36", "4.473", "4.657"],
+            "thick": ["0.074", "12.076", "12.945", "15.8029995", "196.0", "36.0"],
+        }
+        for t in target:
+            assert data[t] == target[t]
+    finally:
+        print("Cleaning up test directory.")
+        shutil.rmtree(tempdir)

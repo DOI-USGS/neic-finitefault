@@ -548,38 +548,3 @@ def __process_line(line: str) -> List[Union[float, int]]:
         except:
             pass
     return line_split
-
-
-if __name__ == "__main__":
-    velmodel = model2dict("vel_model")
-    velmodel2json(velmodel)
-    import argparse
-
-    import wasp.management as mng
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-o", "--output", help="name of output file")
-    parser.add_argument("--lat", help="latitude of hypocenter location")
-    parser.add_argument("--lon", help="longitude of hypocenter location")
-    parser.add_argument("--depth", help="depth of hypocenter location")
-    args = parser.parse_args()
-    default_dirs = mng.default_dirs()
-    tensor_info = {
-        "lat": float(args.lat),
-        "lon": float(args.lon),
-        "depth": float(args.depth),
-    }
-    velmodel = select_velmodel(tensor_info, default_dirs)
-    with open(args.output, "w") as outf:
-        nlen = len(velmodel["p_vel"])
-        outf.write("{}\n".format(nlen))
-        zipped = zip(
-            velmodel["p_vel"],
-            velmodel["s_vel"],
-            velmodel["thick"],
-            velmodel["dens"],
-            velmodel["qa"],
-            velmodel["qb"],
-        )
-        for p, s, thick, dens, qa, qb in zipped:
-            outf.write("{} {} {} {} {} {}\n".format(p, s, dens, thick, qa, qb))

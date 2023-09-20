@@ -8,9 +8,12 @@ from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 
 from wasp.data_acquisition import acquisition
 from wasp.data_management import filling_data_dicts
+from wasp.management import default_dirs
 from wasp.modify_jsons import modify_channels
 from wasp.modify_sacs import correct_waveforms, plot_channels
+from wasp.read_config import CONFIG_PATH
 from wasp.seismic_tensor import get_tensor
+from wasp.velocity_models import model2dict, select_velmodel, velmodel2json
 
 from .datautils import (
     DEFAULT_MANAGEMENT_FILES,
@@ -280,3 +283,53 @@ def modify_sacs(
             management_file,
             plot_directory=plot_directory or directory,
         )
+
+
+@app.command(help="Write a velocity model")
+def velmodel_from_tensor(
+    gcmt_tensor_file: str = typer.Argument(
+        ..., help="Path to the GCMT moment tensor file"
+    ),
+    vel_model_file: pathlib.Path = typer.Argument(
+        ..., help="Path to the output velocity model file"
+    ),
+    config_file: pathlib.Path = typer.Option(
+        CONFIG_PATH, "-c", "--config-file", help="Path to config file"
+    ),
+):
+    # get tensor information
+    tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
+
+    # get default directories
+    default_directories = default_dirs(config_path=config_file)
+
+    # get velocity model
+    velmodel = select_velmodel(
+        tensor_info=tensor_info,
+        default_dirs=default_directories,
+        directory=vel_model_file.parent,
+    )
+    with open(vel_model_file, "w") as outf:
+        nlen = len(velmodel["p_vel"])
+        outf.write("{}\n".format(nlen))
+        zipped = zip(
+            velmodel["p_vel"],
+            velmodel["s_vel"],
+            velmodel["thick"],
+            velmodel["dens"],
+            velmodel["qa"],
+            velmodel["qb"],
+        )
+        for p, s, thick, dens, qa, qb in zipped:
+            outf.write("{} {} {} {} {} {}\n".format(p, s, dens, thick, qa, qb))
+
+
+@app.command(help="Convert the velocity model to json")
+def velmodel_to_json(
+    directory: pathlib.Path = typer.Argument(..., help="Path to the data directory"),
+    vel_model_file: pathlib.Path = typer.Argument(
+        ..., help="Path to the velocity model file"
+    ),
+):
+    velmodel = model2dict(vel_model_file)
+    velmodel2json(velmodel, directory=directory)
