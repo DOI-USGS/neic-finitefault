@@ -18,6 +18,7 @@ from wasp.modify_sacs import correct_waveforms, plot_channels
 from wasp.read_config import CONFIG_PATH
 from wasp.seismic_tensor import get_tensor, modify_tensor, write_tensor
 from wasp.static2fsp import static_to_fsp as convert_static_to_fsp
+from wasp.traces_properties import properties_json
 from wasp.velocity_models import model2dict, select_velmodel, velmodel2json
 
 from .datautils import (
@@ -345,6 +346,24 @@ def modify_sacs(
             management_file,
             plot_directory=plot_directory or directory,
         )
+
+
+@app.command(help="Write trace properties (sampling_filter.json)")
+def sampling_filtering(
+    directory: pathlib.Path = typer.Argument(..., help="Path to the data directory"),
+    gcmt_tensor_file: str = typer.Argument(
+        ..., help="Path to the GCMT moment tensor file"
+    ),
+    cgps_dt: float = typer.Option(
+        None,
+        "-cdt",
+        "--cgps-dt",
+        help="CGPS dt to be used in in USGS routines",
+    ),
+):
+    # get tensor information
+    tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
+    properties_json(tensor_info, dt_cgps=cgps_dt, data_directory=directory)
 
 
 @app.command(help="Convert static solution to FSP format")
