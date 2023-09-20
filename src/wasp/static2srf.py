@@ -490,34 +490,3 @@ def build_source_time_function(
         return  # type:ignore
 
     return t, Mdot
-
-
-if __name__ == "__main__":
-    import argparse
-    import errno
-
-    import wasp.manage_parser as mp  # type:ignore
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser = mp.parser_add_tensor(parser)
-    parser = mp.parser_ffm_data(parser)
-    args = parser.parse_args()
-    os.chdir(args.folder)
-    used_data = mp.get_used_data(args)
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-    segments_data = json.load(open("segments_data.json"))
-    segments = segments_data["segments"]
-    if not os.path.isfile("velmodel_data.json"):
-        raise FileNotFoundError(
-            errno.ENOENT, os.strerror(errno.ENOENT), "velmodel_data.json"
-        )
-    vel_model = json.load(open("velmodel_data.json"))
-    solution = get_outputs.read_solution_static_format(segments)
-    static_to_srf(tensor_info, segments_data, used_data, vel_model, solution)

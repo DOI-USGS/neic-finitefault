@@ -3,7 +3,6 @@ from typing import List
 
 DEFAULT_MANAGEMENT_FILES = {
     "cgps": "cgps_waves.json",
-    "gps": "gps_waves.json",
     "strong": "strong_motion_waves.json",
     "surf": "surf_waves.json",
     "body": "tele_waves.json",
