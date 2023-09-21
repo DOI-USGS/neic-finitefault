@@ -1,8 +1,10 @@
+import datetime
 import json
 import pathlib
 import time
 from typing import List, Tuple
 
+import numpy as np
 import typer
 from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 
@@ -14,7 +16,7 @@ from wasp.management import default_dirs
 from wasp.modify_jsons import modify_channels
 from wasp.modify_sacs import correct_waveforms, plot_channels
 from wasp.read_config import CONFIG_PATH
-from wasp.seismic_tensor import get_tensor
+from wasp.seismic_tensor import get_tensor, modify_tensor, write_tensor
 from wasp.static2fsp import static_to_fsp as convert_static_to_fsp
 from wasp.velocity_models import model2dict, select_velmodel, velmodel2json
 
@@ -412,6 +414,31 @@ def static_to_fsp(
         solution=solution,
         directory=directory,
     )
+
+
+@app.command(help="Write the tensor file from a GCMT moment tensor")
+def tensor_from_gcmt(
+    gcmt_tensor_file: str = typer.Argument(
+        ..., help="Path to the GCMT moment tensor file"
+    ),
+    directory: pathlib.Path = typer.Option(
+        pathlib.Path(),
+        "-d",
+        "--directory",
+        help="Directory where to write the tensor file. Default is working directory",
+    ),
+):
+    # get tensor information
+    tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
+
+    tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
+    tensor_info = modify_tensor(tensor_info)
+    date_origin: UTCDateTime = tensor_info["date_origin"]
+    delta = datetime.datetime.utcnow() - date_origin.datetime
+    tensor_info["timedelta"] = delta.seconds
+    moment_mag = tensor_info["moment_mag"]
+    moment_mag = 2 * np.log10(moment_mag) / 3 - 10.7
+    write_tensor(tensor_info, directory=directory)
 
 
 @app.command(help="Write a velocity model")
