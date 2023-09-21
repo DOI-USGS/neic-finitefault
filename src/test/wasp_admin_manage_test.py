@@ -394,6 +394,36 @@ def test_static_fsp():
         shutil.rmtree(tempdir)
 
 
+def test_tensor_from_gcmt():
+    from wasp.wasp_admin.manage import app
+
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        shutil.copyfile(
+            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
+        )
+
+        result = runner.invoke(
+            app,
+            [
+                "tensor-from-gcmt",
+                str(tempdir / "20003k7a_cmt_CMT"),
+                "-d",
+                str(tempdir),
+            ],
+        )
+        assert result.exit_code == 0
+        with open(tempdir / "tensor_info.json") as f:
+            data = json.load(f)
+        with open(RESULTS_DIR / "NP1" / "tensor_info.json") as f:
+            target = json.load(f)
+        del target["timedelta"]
+        del data["timedelta"]
+        assert data == target
+    finally:
+        shutil.rmtree(tempdir)
+
+
 def test_velmodel_from_tensor():
     from wasp.wasp_admin.manage import app
 
