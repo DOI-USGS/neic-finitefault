@@ -58,7 +58,7 @@ def test_shift_match2():
             shutil.copyfile(a["file"], b["file"])
             shutil.copyfile(c["file"], d["file"])
         # TODO add example baseline data, for now make sure runs without error
-        shift_match2("tele", plot=True, directory=tempdir)
+        shift_match2("body", plot=True, directory=tempdir)
         for d in new_tele_waves:
             assert (tempdir / "tele_shift" / f"{d['name']}_{d['component']}.png").exists
         shift_match2("surf", plot=True, directory=tempdir)

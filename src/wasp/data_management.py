@@ -937,20 +937,20 @@ def filling_data_dicts(
     """
     data_folder = pathlib.Path(data_folder)
     working_directory = pathlib.Path(working_directory)
-    if "tele_body" in data_types:
-        tele_traces = get_traces_files("tele_body", directory=data_folder)
+    if "body" in data_types:
+        tele_traces = get_traces_files("body", directory=data_folder)
         if not os.path.isfile(working_directory / "tele_waves.json"):
             tele_body_traces(
                 tele_traces, tensor_info, data_prop, directory=working_directory
             )
-    if "surf_tele" in data_types:
-        surf_traces = get_traces_files("surf_tele", directory=data_folder)
+    if "surf" in data_types:
+        surf_traces = get_traces_files("surf", directory=data_folder)
         if not os.path.isfile(working_directory / "surf_waves.json"):
             tele_surf_traces(
                 surf_traces, tensor_info, data_prop, directory=working_directory
             )
-    if "strong_motion" in data_types:
-        strong_traces = get_traces_files("strong_motion", directory=data_folder)
+    if "strong" in data_types:
+        strong_traces = get_traces_files("strong", directory=data_folder)
         if not os.path.isfile(working_directory / "strong_motion_waves.json"):
             strong_motion_traces(
                 strong_traces, tensor_info, data_prop, directory=working_directory
@@ -972,7 +972,7 @@ def filling_data_dicts(
 
 
 def get_traces_files(
-    data_type: Literal["cgps", "strong_motion", "surf_tele", "tele_body"],
+    data_type: Literal["cgps", "strong", "surf", "body"],
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> List[Union[pathlib.Path, str]]:
     """Get list with waveform files (in sac format) for stations and
@@ -987,13 +987,13 @@ def get_traces_files(
     """
     directory = pathlib.Path(directory)
     traces_files: List[Union[pathlib.Path, str]] = []
-    if data_type == "tele_body":
+    if data_type == "body":
         p_traces_files = glob(os.path.join(directory / "P", "final*"))
         sh_traces_files = glob(os.path.join(directory / "SH", "final*"))
         traces_files = p_traces_files + sh_traces_files  # type: ignore
-    if data_type == "surf_tele":
+    if data_type == "surf":
         traces_files = glob(os.path.join(directory / "LONG", "final*"))  # type: ignore
-    if data_type == "strong_motion":
+    if data_type == "strong":
         traces_files = glob(os.path.join(directory / "STR", "final*"))  # type: ignore
     if data_type == "cgps":
         traces_files = glob(os.path.join(directory / "cGPS", "final*"))  # type: ignore

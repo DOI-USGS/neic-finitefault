@@ -414,7 +414,7 @@ def input_chen_tele_body(
             channel = info["component"]
             weight = info["trace_weight"]
             outfile.write("{} {} {}\n".format(weight, sta, channel))
-    return "tele_body"
+    return "body"
 
 
 def input_chen_tele_surf(
@@ -528,7 +528,7 @@ def input_chen_tele_surf(
 def input_chen_near_field(
     tensor_info: dict,
     data_prop: dict,
-    data_type: Literal["cgps", "strong_motion"],
+    data_type: Literal["cgps", "strong"],
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> Optional[str]:
     """Write text files, which are inputs for Chen's scripts, with information
@@ -551,7 +551,7 @@ def input_chen_near_field(
         sampling_filter.json!
     """
     directory = pathlib.Path(directory)
-    if data_type == "strong_motion":
+    if data_type == "strong":
         dict1 = directory / "strong_motion_waves.json"
         filename1 = directory / "filtro_strong.txt"
         filtro = data_prop["strong_filter"]
@@ -622,7 +622,7 @@ def input_chen_near_field(
         write_files_wavelet_observed(file1, file2, dt_strong, data_prop, traces_info)
 
     write_wavelet_freqs(dt_strong, directory / "Wavelets_strong_motion")
-    return "strong_motion"
+    return "strong"
 
 
 def input_chen_static(
@@ -1086,7 +1086,7 @@ def from_synthetic_to_obs(
     filtro_tele = data_prop["tele_filter"]
     nyq = 0.5 / dt if not data_type == "gps" else 10000
     std_shift: Union[float, int] = 0
-    if data_type == "strong_motion":
+    if data_type == "strong":
         max_val = 0.1
         syn_file = directory / "synthetics_strong.txt"
         obser_file = directory / "waveforms_strong.txt"
@@ -1106,7 +1106,7 @@ def from_synthetic_to_obs(
         corners = [high_freq / nyq]
         filters = ["lowpass"]
         orders = [4]
-    if data_type == "tele_body":
+    if data_type == "body":
         max_val = 10
         syn_file = directory / "synthetics_body.txt"
         obser_file = directory / "waveforms_body.txt"
@@ -1117,7 +1117,7 @@ def from_synthetic_to_obs(
         corners = [low_freq / nyq, high_freq / nyq]
         filters = ["highpass", "lowpass"]
         orders = [2, 2]
-    if data_type == "surf_tele":
+    if data_type == "surf":
         max_val = 0.01
         syn_file = directory / "synthetics_surf.txt"
         obser_file = directory / "waveforms_surf.txt"
@@ -1388,7 +1388,7 @@ def write_green_file(
 if __name__ == "__main__":
     import argparse
 
-    import wasp.manage_parser as mp
+    import wasp.manage_parser as mp  # type:ignore
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -1454,7 +1454,7 @@ if __name__ == "__main__":
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), "strong_motion_waves.json"
             )
-        input_chen_near_field(tensor_info, data_prop, "strong_motion")
+        input_chen_near_field(tensor_info, data_prop, "strong")
     if args.cgps:
         if not os.path.isfile("cgps_waves.json"):
             raise FileNotFoundError(

@@ -74,7 +74,7 @@ def test_plot_waveform_fits():
         plot_waveform_fits(
             files,
             ["HNZ", "HNN", "HNE"],
-            "strong_motion",
+            "strong",
             start_margin=10,
             event="test_event",
             plot_directory=tempdir,
@@ -82,7 +82,7 @@ def test_plot_waveform_fits():
         plot_waveform_fits(
             files,
             ["BHZ", "SH"],
-            "tele_body",
+            "body",
             start_margin=10,
             event="test_event",
             plot_directory=tempdir,
@@ -90,7 +90,7 @@ def test_plot_waveform_fits():
         plot_waveform_fits(
             files,
             ["BHZ", "SH"],
-            "surf_tele",
+            "surf",
             start_margin=10,
             event="test_event",
             plot_directory=tempdir,

@@ -77,12 +77,12 @@ def plot_ffm_sol(
     default_dirs: dict,
     autosize: bool = False,
     max_val: Optional[float] = None,
-    mr_time: bool = False,
+    mr_time: int = False,
     files_str: Optional[dict] = None,
     stations_gps: Optional[zip] = None,
     stations_cgps: Optional[str] = None,
-    legend_len: Optional[int] = None,
-    scale: Optional[int] = None,
+    legend_len: Optional[float] = None,
+    scale: Optional[float] = None,
     limits: List[Optional[float]] = [None, None, None, None],
     separate_planes: bool = False,
     label_stations: bool = False,
@@ -107,7 +107,7 @@ def plot_ffm_sol(
     :param files_str: The stations file properties, defaults to None
     :type files_str:Optional[dict], optional
     :param mr_time: Add moment rate time, defaults to False
-    :type mr_time: bool, optional
+    :type mr_time: int, optional
     :param files_str: The stations file properties, defaults to None
     :type files_str:Optional[dict], optional
     :param stations_gps: The gps stations description, defaults to None
@@ -115,7 +115,7 @@ def plot_ffm_sol(
     :param stations_cgps: The cgps stations description, defaults to None
     :type stations_cgps: Optional[str], optional
     :param legend_len: The length of the legend, defaults to None
-    :type legend_len: Optional[int], optional
+    :type legend_len: Optional[float], optional
     :param scale: The scale, defaults to None
     :type scale: Optional[int], optional
     :param limits: The extent of the map, defaults to [None, None, None, None]
@@ -129,7 +129,7 @@ def plot_ffm_sol(
     """
     directory = pathlib.Path(directory)
     segments = segments_data["segments"]
-    _plot_moment_rate_function(
+    plot_moment_rate_function(
         segments_data,
         shear,
         point_sources,
@@ -137,7 +137,7 @@ def plot_ffm_sol(
         separate_planes=separate_planes,
         directory=directory,
     )
-    _PlotSlipDistribution(
+    PlotSlipDistribution(
         segments,
         point_sources,
         solution,
@@ -145,7 +145,7 @@ def plot_ffm_sol(
         max_val=max_val,
         directory=directory,
     )
-    _PlotMap(
+    PlotMap(
         tensor_info,
         segments,
         point_sources,
@@ -161,7 +161,7 @@ def plot_ffm_sol(
         label_stations=label_stations,
         directory=directory,
     )
-    _PlotSlipTimes(segments, point_sources, solution, directory=directory)
+    PlotSlipTimes(segments, point_sources, solution, directory=directory)
 
 
 def plot_misfit(
@@ -176,7 +176,7 @@ def plot_misfit(
     :raises FileNotFoundError: When a data type's json file is not found
     """
     directory = pathlib.Path(directory)
-    if "tele_body" in used_data_type:
+    if "body" in used_data_type:
         if not os.path.isfile(directory / "tele_waves.json"):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), "tele_waves.json"
@@ -189,9 +189,9 @@ def plot_misfit(
         values = [["BHZ"], ["SH"]]
         for components in values:
             plot_waveform_fits(
-                traces_info, components, "tele_body", plot_directory=directory
+                traces_info, components, "body", plot_directory=directory
             )
-    if "surf_tele" in used_data_type:
+    if "surf" in used_data_type:
         if not os.path.isfile(directory / "surf_waves.json"):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), "surf_waves.json"
@@ -204,9 +204,9 @@ def plot_misfit(
         values = [["BHZ"], ["SH"]]
         for components in values:
             plot_waveform_fits(
-                traces_info, components, "surf_tele", plot_directory=directory
+                traces_info, components, "surf", plot_directory=directory
             )
-    if "strong_motion" in used_data_type:
+    if "strong" in used_data_type:
         if not os.path.isfile(directory / "strong_motion_waves.json"):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), "strong_motion_waves.json"
@@ -220,7 +220,7 @@ def plot_misfit(
         plot_waveform_fits(
             traces_info,
             values,
-            "strong_motion",
+            "strong",
             start_margin=10,
             plot_directory=directory,
         )
@@ -548,7 +548,7 @@ def _PlotMultiSlipDist(
     return
 
 
-def _PlotSlipDistribution(
+def PlotSlipDistribution(
     segments: dict,
     point_sources: list,
     solution: dict,
@@ -694,7 +694,7 @@ def _PlotSlipDistribution(
     return
 
 
-def _PlotSlipTimes(
+def PlotSlipTimes(
     segments: dict,
     point_sources: list,
     solution: dict,
@@ -711,7 +711,7 @@ def _PlotSlipTimes(
     :param directory: The location where to write plots, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     """
-    directory = pathlib.Path()
+    directory = pathlib.Path(directory)
     print("Creating Slip Times Plot...")
     slip = solution["slip"]
     rake = solution["rake"]
@@ -1218,7 +1218,7 @@ def _PlotCumulativeSlip(
     return corner_1, corner_2, corner_3, corner_4
 
 
-def _PlotSlipDist_Compare(
+def PlotSlipDist_Compare(
     segments: dict,
     point_sources: list,
     input_model: dict,
@@ -1315,7 +1315,7 @@ def _PlotSlipDist_Compare(
     return
 
 
-def _PlotMap(
+def PlotMap(
     tensor_info: dict,
     segments: List[dict],
     point_sources: list,
@@ -1325,8 +1325,8 @@ def _PlotMap(
     stations_gps: Optional[zip] = None,
     stations_cgps: Optional[str] = None,
     max_slip: Optional[float] = None,
-    legend_len: Optional[int] = None,
-    scale: Optional[int] = None,
+    legend_len: Optional[float] = None,
+    scale: Optional[float] = None,
     limits: List[Optional[float]] = [None, None, None, None],
     label_stations: bool = False,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
@@ -1354,7 +1354,7 @@ def _PlotMap(
     :param legend_len: The length of the legend, defaults to None
     :type legend_len: Optional[int], optional
     :param scale: The scale, defaults to None
-    :type scale: Optional[int], optional
+    :type scale: Optional[float], optional
     :param limits: The extent of the map, defaults to [None, None, None, None]
     :type limits: List[Optional[float]], optional
     :param label_stations: Label the stations, defaults to False
@@ -1969,7 +1969,7 @@ def _PlotMap(
     fig.savefig(directory / "Map.pdf")
 
 
-def _PlotInsar(
+def PlotInsar(
     tensor_info: dict,
     segments: List[dict],
     point_sources: list,
@@ -2169,7 +2169,7 @@ def _PlotInsar(
     return
 
 
-def _PlotComparisonMap(
+def PlotComparisonMap(
     tensor_info: dict,
     segments: List[dict],
     point_sources: list,
@@ -2319,7 +2319,7 @@ def __redefine_lat_lon(
     return segments_lats, segments_lons, segments_deps
 
 
-def _plot_moment_rate_function(
+def plot_moment_rate_function(
     segments_data: dict,
     shear: list,
     point_sources: list,
@@ -2867,11 +2867,11 @@ def _plot_waveforms(
         obs = np.array(file["observed"])
         if nstart >= 0:
             obs = np.concatenate((np.zeros(nstart), obs))
-        if type_str in ["tele_body", "strong_motion", "cgps"]:
+        if type_str in ["body", "strong", "cgps"]:
             obs = obs[nstart - margin :]
         if type_str == "cgps":
             obs = obs - obs[10]
-        if type_str == "surf_tele":
+        if type_str == "surf":
             if nstart >= 0:
                 obs = obs[nstart:]
             else:
@@ -2881,7 +2881,7 @@ def _plot_waveforms(
         syn = np.array(file["synthetic"])
         syn = np.concatenate((np.zeros(margin), syn))
         length = min(len(obs), len(syn), file["duration"])
-        length = min(length, int(950 / dt)) if not type_str in ["surf_tele"] else length
+        length = min(length, int(950 / dt)) if not type_str in ["surf"] else length
         obs = np.array(obs[:length])
         syn = np.array(syn[:length])
         dt = file["dt"]
@@ -2932,7 +2932,7 @@ def _plot_waveforms(
         if "LXE" in components:
             plot_name = "LXE_cgps_waves.png"
 
-    if type_str == "strong_motion":
+    if type_str == "strong":
         if "HNZ" in components:
             plot_name = "HNZ_strong_motion_waves.png"
         if "HNN" in components:
@@ -2940,13 +2940,13 @@ def _plot_waveforms(
         if "HNE" in components:
             plot_name = "HNE_strong_motion_waves.png"
 
-    if type_str == "tele_body":
+    if type_str == "body":
         if "P" in components:
             plot_name = "P_body_waves.png"
         if "SH" in components:
             plot_name = "SH_body_waves.png"
 
-    if type_str == "surf_tele":
+    if type_str == "surf":
         if "P" in components:
             plot_name = "Rayleigh_surf_waves.png"
         if "SH" in components:
@@ -3140,347 +3140,3 @@ def __add_watermark(fig: plt.Figure) -> plt.Figure:
         wrap=True,
     )
     return fig
-
-
-if __name__ == "__main__":
-    """ """
-    import wasp.eventpage_downloads as dwnlds
-    import wasp.management as mng
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser.add_argument(
-        "-gcmt", "--gcmt_tensor", help="location of GCMT moment tensor file"
-    )
-    parser.add_argument(
-        "-ffms",
-        "--ffm_solution",
-        action="store_true",
-        help="plot FFM solution slip maps, rise time",
-    )
-    parser.add_argument(
-        "-t", "--tele", action="store_true", help="plot misfit of teleseismic data"
-    )
-    parser.add_argument(
-        "-su",
-        "--surface",
-        action="store_true",
-        help="plot misfit of surface waves data",
-    )
-    parser.add_argument(
-        "-st",
-        "--strong",
-        action="store_true",
-        help="plot strong motion stations and strong motion misfit",
-    )
-    parser.add_argument("--cgps", action="store_true", help="plot misfit of cGPS data")
-    parser.add_argument("--gps", action="store_true", help="plot GPS data")
-    parser.add_argument("-in", "--insar", action="store_true", help="plot InSar data")
-    parser.add_argument(
-        "-o",
-        "--option",
-        choices=["autoscale", "noscale"],
-        help="choose whether Rupture plot needs to be scaled",
-    )
-    parser.add_argument(
-        "-mr",
-        "--mrtime",
-        default="0",
-        type=float,
-        help="choose cutoff time for Moment Rate plot",
-    )
-    parser.add_argument(
-        "-separate",
-        "--separate_mr_planes",
-        action="store_true",
-        help="include STFs for each plane separately in moment rate plot",
-    )
-    parser.add_argument(
-        "-label",
-        "--label_stations",
-        action="store_true",
-        help="Label local station IDs on map (applies to strong, cgps, gps)",
-    )
-    parser.add_argument(
-        "-shakemap",
-        "--shakemappolygon",
-        action="store_true",
-        help="create shakemap_polygon.txt",
-    )
-    parser.add_argument(
-        "-ev",
-        "--EventID",
-        nargs="?",
-        const="Not Provided",
-        type=str,
-        help="Provide event ID",
-    )
-    parser.add_argument(
-        "-d",
-        "--downloads",
-        action="store_true",
-        help="create event page download files",
-    )
-    parser.add_argument(
-        "-pub",
-        "--publish",
-        action="store_true",
-        help="rename files for use with sendproduct",
-    )
-    parser.add_argument(
-        "-check",
-        "--checkerboard",
-        action="store_true",
-        help="plot comparison for checkerboard test",
-    )
-    parser.add_argument(
-        "-max",
-        "--maxvalue",
-        default=None,
-        type=float,
-        help="Choose maximum slip value for plot",
-    )
-    parser.add_argument(
-        "-legend",
-        "--legend_length",
-        default=None,
-        type=float,
-        help="Length of static GNSS vector for legend (in cm)",
-    )
-    parser.add_argument(
-        "-scale",
-        "--scale_factor",
-        default=None,
-        type=float,
-        help="Scale factor for static GNSS vector lengths (larger means shorter vectors)",
-    )
-    parser.add_argument(
-        "-limits",
-        "--map_limits",
-        type=float,
-        nargs=4,
-        help="Specify map limits [W,E,N,S] from edges of plotted features. eg: 0.5 0.5 0.5 0.5\
-                        gives a 0.5 degree buffer on each side. Negative numbers will cut off plotted features.",
-    )
-    parser.add_argument(
-        "-MT",
-        "--cumulative_moment_tensor",
-        action="store_true",
-        help="Calculate cumulative moment tensor of FFM",
-    )
-    parser.add_argument(
-        "-srf", "--srf_format", action="store_true", help="Make SRF format file"
-    )
-    directory = pathlib.Path()
-    args = parser.parse_args()
-    os.chdir(args.folder)
-    used_data: List[str] = []
-    used_data = used_data + ["strong_motion"] if args.strong else used_data
-    used_data = used_data + ["cgps"] if args.cgps else used_data
-    used_data = used_data + ["tele_body"] if args.tele else used_data
-    used_data = used_data + ["surf_tele"] if args.surface else used_data
-    used_data = used_data + ["gps"] if args.gps else used_data
-    default_dirs = mng.default_dirs()
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-    with open(directory / "segments_data.json") as s:
-        segments_data = json.load(s)
-    segments = segments_data["segments"]
-    rise_time = segments_data["rise_time"]
-    connections = None
-    if "connections" in segments_data:
-        connections = segments_data["connections"]
-    point_sources = pf.point_sources_param(
-        segments, tensor_info, rise_time, connections=connections
-    )
-    solution = get_outputs.read_solution_static_format(segments)
-
-    traces_info, traces_info_cgps, stations_gps = [None, None, None]
-    if args.gps:
-        names, lats, lons, observed, synthetic, error = get_outputs.retrieve_gps()
-        stations_gps = zip(names, lats, lons, observed, synthetic, error)
-    if args.cgps:
-        with open(directory / "cgps_waves.json") as c:
-            traces_info_cgps = json.load(c)
-    if args.strong:
-        with open(directory / "strong_motion_waves.json") as s:
-            traces_info = json.load(s)
-    if args.maxvalue != None:
-        maxval = args.maxvalue
-    else:
-        maxval = None
-    if args.legend_length != None:
-        legend_len = args.legend_length
-    else:
-        legend_len = None
-    if args.scale_factor != None:
-        scale = args.scale_factor
-    else:
-        scale = None
-    if args.map_limits:
-        limits = [
-            args.map_limits[0],
-            args.map_limits[1],
-            args.map_limits[2],
-            args.map_limits[3],
-        ]
-        print(f"Axes limits: {limits}")
-    else:
-        limits = [None, None, None, None]
-    if args.ffm_solution:
-        if not os.path.isfile(directory / "velmodel_data.json"):
-            vel_model = mv.select_velmodel(tensor_info, default_dirs)
-        else:
-            with open(directory / "velmodel_data.json") as v:
-                vel_model = json.load(v)
-        shear = pf.shear_modulous(point_sources, velmodel=vel_model)  # type:ignore
-        if args.option == "autoscale":
-            autosize = True
-        else:
-            autosize = False
-        if args.mrtime > 0:
-            mr_time = args.mrtime
-        else:
-            mr_time = None
-        if args.EventID:
-            evID = args.EventID
-        else:
-            evID = None
-        if args.separate_mr_planes:
-            separate = True
-        else:
-            separate = False
-        if args.label_stations:
-            label_stations = True
-        else:
-            label_stations = False
-        static_to_fsp(tensor_info, segments_data, used_data, vel_model, solution)
-        plot_ffm_sol(  # type:ignore
-            tensor_info,
-            segments_data,
-            point_sources,  # type:ignore
-            shear,
-            solution,
-            default_dirs,
-            autosize=autosize,
-            mr_time=mr_time,
-            files_str=traces_info,
-            stations_gps=stations_gps,
-            stations_cgps=traces_info_cgps,
-            max_val=maxval,
-            legend_len=legend_len,
-            scale=scale,
-            limits=limits,
-            separate_planes=separate,
-            label_stations=label_stations,
-        )
-    if args.srf_format:
-        with open(directory / "velmodel_data.json") as v:
-            vel_model = json.load(v)
-        static_to_srf(tensor_info, segments_data, used_data, vel_model, solution)
-    if args.shakemappolygon:
-        if args.EventID:
-            evID = args.EventID
-        else:
-            evID = None
-        shakemap_polygon(
-            segments,
-            point_sources,  # type:ignore
-            solution,
-            tensor_info,
-            evID=evID,
-            directory=directory,
-        )
-
-    if args.checkerboard:
-        input_model = load_ffm_model.load_ffm_model(
-            segments_data, point_sources, option="fault&rise_time.txt"  # type:ignore
-        )
-        _PlotComparisonMap(
-            tensor_info,
-            segments,
-            point_sources,  # type:ignore
-            input_model,
-            solution,
-            max_val=maxval,
-            directory=directory,
-        )
-        _PlotSlipDist_Compare(
-            segments,
-            point_sources,  # type:ignore
-            input_model,
-            solution,
-            max_val=maxval,
-            directory=directory,
-        )
-        if not os.path.isfile(directory / "velmodel_data.json"):
-            vel_model = mv.select_velmodel(tensor_info, default_dirs)
-        else:
-            with open(directory / "velmodel_data.json") as v:
-                vel_model = json.load(v)
-        static_to_fsp(tensor_info, segments_data, used_data, vel_model, solution)
-    if args.insar:
-        solution = get_outputs.read_solution_static_format(segments)
-        insar_data = get_outputs.get_insar()
-        if "ascending" in insar_data:
-            for scene in range(len(insar_data["ascending"])):
-                print(scene)
-                insar_points = insar_data["ascending"][scene]["points"]
-                _PlotInsar(
-                    tensor_info,
-                    segments,
-                    point_sources,  # type:ignore
-                    solution,
-                    insar_points,
-                    str(scene),
-                    los="ascending",
-                    directory=directory,
-                )
-        if "descending" in insar_data:
-            for scene in range(len(insar_data["descending"])):
-                insar_points = insar_data["descending"][scene]["points"]
-                _PlotInsar(
-                    tensor_info,
-                    segments,
-                    point_sources,  # type:ignore
-                    solution,
-                    insar_points,
-                    str(scene),
-                    los="descending",
-                    directory=directory,
-                )
-    if args.downloads:
-        dwnlds.write_CMTSOLUTION_file()
-        if args.EventID:
-            evID = args.EventID
-        else:
-            evID = None
-        dwnlds.write_Coulomb_file(eventID=evID)
-        dwnlds.write_Okada_displacements()
-        dwnlds.make_waveproperties_json()
-
-    plot_misfit(used_data, directory=directory)
-
-    if args.cumulative_moment_tensor:
-        calculate_cumulative_moment_tensor(solution, directory=directory)
-
-    plot_files = glob.glob(os.path.join(directory, "plots", "*png"))
-    plot_files = glob.glob(str(directory) + "/*png")
-    for plot_file in plot_files:
-        if os.path.isfile(os.path.join(directory, "plots", plot_file)):
-            os.remove(os.path.join(directory, "plots", plot_file))
-        move(plot_file, os.path.join(directory, "plots"))
-
-    if args.publish:
-        if args.EventID:
-            evID = args.EventID
-            dwnlds.temporary_file_reorganization_for_publishing(evID=evID)
-        else:
-            print(
-                "This command cannot be run without an EventID. Rerun with '-ev EventID'"
-            )

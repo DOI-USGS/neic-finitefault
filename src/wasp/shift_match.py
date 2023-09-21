@@ -45,7 +45,7 @@ def shift_match2(
     :rtype: list
     """
     directory = pathlib.Path(directory)
-    if data_type == "tele":
+    if data_type == "body":
         json_file = "tele_waves.json"
     if data_type == "strong":
         json_file = "strong_motion_waves.json"
@@ -57,7 +57,7 @@ def shift_match2(
         files = json.load(f)
     synthetics_file = (
         "synthetics_body.txt"
-        if data_type == "tele"
+        if data_type == "body"
         else "synthetics_strong.txt"
         if data_type == "strong"
         else "synthetics_surf.txt"
@@ -68,7 +68,7 @@ def shift_match2(
     dt = float(files[0]["dt"])
     plot_folder: Union[pathlib.Path, str] = (
         "tele_shift"
-        if data_type == "tele"
+        if data_type == "body"
         else "strong_shift"
         if data_type == "strong"
         else "surf_shift"
@@ -107,7 +107,7 @@ def shift_match2(
         waveforms = [stream[0].data for stream in streams]
         nshift = (
             int(5 / dt)
-            if data_type == "tele"
+            if data_type == "body"
             else int(5 / dt)
             if data_type == "strong"
             else int(12 / dt)
@@ -328,7 +328,7 @@ def save_waveforms(data_type: str, files: List[dict]):
     :param files: The list of file property dictionaries
     :type files: List[dict]
     """
-    if data_type == "tele":
+    if data_type == "body":
         json_file = "tele_waves.json"
     if data_type == "strong":
         json_file = "strong_motion_waves.json"

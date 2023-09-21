@@ -508,7 +508,7 @@ def __rise_time_parameters(
             1.5 * max(delta_strike, delta_dip) * 6 / tensor_info["time_shift"]
         )
         delta_rise = tensor_info["time_shift"] / 12
-    if "tele_body" in data_type:
+    if "body" in data_type:
         windows = max(int(1.5 * max(delta_strike, delta_dip) / 3), windows)
         delta_rise = min(1.5, delta_rise)
     if tensor_info["depth"] > 200:
@@ -941,7 +941,7 @@ def is_fault_correct(
 if __name__ == "__main__":
     import argparse
 
-    import wasp.manage_parser as mp
+    import wasp.manage_parser as mp  # type:ignore
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -994,8 +994,8 @@ if __name__ == "__main__":
         event_mult_in_to_json()
     else:
         data_type: List[str] = []
-        data_type = data_type + ["tele_body"] if args.tele else data_type
-        data_type = data_type + ["strong_motion"] if args.strong else data_type
+        data_type = data_type + ["body"] if args.tele else data_type
+        data_type = data_type + ["strong"] if args.strong else data_type
         strike, dip, rake = args.nodal_plane
         np_plane_info = {"strike": strike, "dip": dip, "rake": rake}
         create_finite_fault(

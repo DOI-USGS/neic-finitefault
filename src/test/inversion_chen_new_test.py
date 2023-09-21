@@ -148,7 +148,7 @@ def _end_to_end(
                 [get_gf_bank, "cgps", f"{(directory)}/"], stdout=out_gf_cgps
             )
         p1.wait()
-    if "strong_motion" in data_type:
+    if "strong" in data_type:
         green_dict = fk_green_fun1(
             data_prop, tensor_info, gf_bank_str, directory=directory
         )
@@ -243,9 +243,9 @@ def test_automatic_usgs():
                 "cgps",
                 "gps",
                 "insar",
-                "strong_motion",
-                "surf_tele",
-                "tele_body",
+                "strong",
+                "surf",
+                "body",
             ],
             dt_cgps=None,
             default_dirs=updated_default_dirs,
@@ -536,7 +536,7 @@ def test_automatic_strong_motion():
         automatic_usgs(
             tensor_info=TENSOR,
             data_type=[
-                "strong_motion",
+                "strong",
             ],
             dt_cgps=None,
             default_dirs=updated_default_dirs,
@@ -600,8 +600,8 @@ def test_automatic_tele():
         automatic_usgs(
             tensor_info=TENSOR,
             data_type=[
-                "surf_tele",
-                "tele_body",
+                "surf",
+                "body",
             ],
             dt_cgps=None,
             default_dirs=updated_default_dirs,

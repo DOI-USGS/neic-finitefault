@@ -36,7 +36,7 @@ def _get_correction(correction_string: str) -> Tuple[str, List[str], float]:
     return station, channels, correction
 
 
-@app.command(help="Acquire strong motion and teleseismic data")
+@app.command(help="Acquire strong motion and teleseismic bodywave data")
 def acquire(
     directory: pathlib.Path = typer.Argument(..., help="Path to the data directory"),
     gcmt_tensor_file: str = typer.Argument(
@@ -46,7 +46,7 @@ def acquire(
         [],
         "-t",
         "--data-type",
-        help="Type to add to the data_types list, default is [strong, tele]",
+        help="Type to add to the data_types list, default is [strong, body]",
     ),
 ):
     # get the tensor information

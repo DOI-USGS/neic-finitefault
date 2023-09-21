@@ -128,7 +128,7 @@ def automatic_usgs(
                 [get_gf_bank, "cgps", f"{(directory)}/"], stdout=out_gf_cgps
             )
         p1.wait()
-    if "strong_motion" in data_type:
+    if "strong" in data_type:
         logger.info("Compute strong motion GF bank")
         green_dict = gf.fk_green_fun1(
             data_prop, tensor_info, gf_bank_str, directory=directory
@@ -340,12 +340,12 @@ def _check_surf_GF(
     depths = [ps[:, :, :, :, 2] for ps in point_sources]
     depths = [np.max(depths1) for depths1 in depths]
     max_depth = np.max(depths)
-    is_surf = "surf_tele" in used_data
+    is_surf = "surf" in used_data
     if max_depth > 125 and is_surf:
         warnings.warn(
             "Fault plane extends below 125 km depth limit for surface wave Green's functions. Surface waves won't be used."
         )
-        new_used_data.remove("surf_tele")
+        new_used_data.remove("surf")
         if logger:
             logger.info("Maximum depth larger than 125 km.")
     return new_used_data
@@ -430,7 +430,7 @@ def modelling_new_data(
                 [get_gf_bank, "cgps", f"{(directory)}/"], stdout=out_gf_cgps
             )
         p1.wait()
-    if "strong_motion" in data_type:
+    if "strong" in data_type:
         green_dict = gf.fk_green_fun1(
             data_prop,
             tensor_info,
@@ -449,11 +449,11 @@ def modelling_new_data(
         p2.wait()
     data_type2: list = []
     if os.path.isfile(directory / "tele_waves.json"):
-        data_type2 = data_type2 + ["tele_body"]
+        data_type2 = data_type2 + ["body"]
     if os.path.isfile(directory / "surf_waves.json"):
-        data_type2 = data_type2 + ["surf_tele"]
+        data_type2 = data_type2 + ["surf"]
     if os.path.isfile(directory / "strong_motion_waves.json"):
-        data_type2 = data_type2 + ["strong_motion"]
+        data_type2 = data_type2 + ["strong"]
     if os.path.isfile(directory / "cgps_waves.json"):
         data_type2 = data_type2 + ["cgps"]
     if os.path.isfile(directory / "static_data.json"):
@@ -677,11 +677,11 @@ def checkerboard(
     with open(folder_name / "sampling_filter.json") as sf:
         data_prop = json.load(sf)
     for data_type0 in data_type:
-        if data_type0 == "tele_body":
+        if data_type0 == "body":
             json_dict = "tele_waves.json"
-        if data_type0 == "surf_tele":
+        if data_type0 == "surf":
             json_dict = "surf_waves.json"
-        if data_type0 == "strong_motion":
+        if data_type0 == "strong":
             json_dict = "strong_motion_waves.json"
         if data_type0 == "cgps":
             json_dict = "cgps_waves.json"
@@ -800,15 +800,15 @@ def processing(
     cgps_files = glob.glob(str(directory) + "/*L[HXY]*sac") + glob.glob(
         str(directory) + "/*L[HXY]*SAC"
     )
-    if "tele_body" in data_type:
+    if "body" in data_type:
         proc.select_process_tele_body(
             tele_files, tensor_info, data_prop, directory=directory
         )
-    if "surf_tele" in data_type:
+    if "surf" in data_type:
         proc.select_process_surf_tele(
             tele_files, tensor_info, data_prop, directory=directory
         )
-    if "strong_motion" in data_type:
+    if "strong" in data_type:
         proc.select_process_strong(
             strong_files,
             tensor_info,
@@ -847,15 +847,15 @@ def writing_inputs0(
         )
     with open(directory / "sampling_filter.json") as dp:
         data_prop = json.load(dp)
-    if "tele_body" in data_type:
+    if "body" in data_type:
         input_files.input_chen_tele_body(tensor_info, data_prop, directory=directory)
-    if "surf_tele" in data_type:
+    if "surf" in data_type:
         input_files.input_chen_tele_surf(
             tensor_info, data_prop, config_path=config_path, directory=directory
         )
-    if "strong_motion" in data_type:
+    if "strong" in data_type:
         input_files.input_chen_near_field(
-            tensor_info, data_prop, "strong_motion", directory=directory
+            tensor_info, data_prop, "strong", directory=directory
         )
     if "cgps" in data_type:
         input_files.input_chen_near_field(
@@ -936,7 +936,7 @@ def writing_inputs(
         with open(directory / "cgps_gf.json") as cg:
             green_dict = json.load(cg)
         input_files.write_green_file(green_dict, cgps=True, directory=directory)
-    if "strong_motion" in data_type:
+    if "strong" in data_type:
         if not os.path.isfile(directory / "strong_motion_gf.json"):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), "strong_motion_gf.json"
@@ -987,10 +987,10 @@ def inversion(
     logger.info("Elapsed time of green_fun: {}".format(time1))
     time3 = time.time()
     args = ["auto"]
-    args = args + ["strong"] if "strong_motion" in data_type else args
+    args = args + ["strong"] if "strong" in data_type else args
     args = args + ["cgps"] if "cgps" in data_type else args
-    args = args + ["body"] if "tele_body" in data_type else args
-    args = args + ["surf"] if "surf_tele" in data_type else args
+    args = args + ["body"] if "body" in data_type else args
+    args = args + ["surf"] if "surf" in data_type else args
     args = args + ["gps"] if "gps" in data_type else args
     args = args + ["dart"] if "dart" in data_type else args
     args = args + ["insar"] if "insar" in data_type else args
@@ -1072,7 +1072,7 @@ def execute_plot(
     )
     plot.plot_misfit(data_type, directory=directory)
     traces_info, stations_gps = [None, None]
-    if "strong_motion" in data_type:
+    if "strong" in data_type:
         with open(directory / "strong_motion_waves.json") as smw:
             traces_info = json.load(smw)
     if "gps" in data_type:
@@ -1080,8 +1080,8 @@ def execute_plot(
             directory=directory
         )
         stations_gps = zip(names, lats, lons, observed, synthetic, error)
-    if "strong_motion" in data_type or "gps" in data_type:
-        plot._PlotMap(
+    if "strong" in data_type or "gps" in data_type:
+        plot.PlotMap(
             tensor_info,
             segments,
             point_sources,
@@ -1097,7 +1097,7 @@ def execute_plot(
             asc_properties = insar_data["ascending"]
             for i, asc_property in enumerate(asc_properties):
                 insar_points = asc_property["points"]
-                plot._PlotInsar(
+                plot.PlotInsar(
                     tensor_info,
                     segments,
                     point_sources,
@@ -1110,7 +1110,7 @@ def execute_plot(
             desc_properties = insar_data["descending"]
             for i, desc_property in enumerate(desc_properties):
                 insar_points = desc_property["points"]
-                plot._PlotInsar(
+                plot.PlotInsar(
                     tensor_info,
                     segments,
                     point_sources,
@@ -1126,10 +1126,10 @@ def execute_plot(
             option="fault&rise_time.txt",
             directory=directory,
         )
-        plot._PlotSlipDist_Compare(
+        plot.PlotSlipDist_Compare(
             segments, point_sources, input_model, solution, directory=directory
         )
-        plot._PlotComparisonMap(
+        plot.PlotComparisonMap(
             tensor_info,
             segments,
             point_sources,

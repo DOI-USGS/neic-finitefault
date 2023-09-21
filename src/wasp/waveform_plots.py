@@ -185,7 +185,7 @@ def plot_waveform_fits(
         if "LXE" in components:
             plot_name = "LXE_cgps_waves"
 
-    if type_str == "strong_motion":
+    if type_str == "strong":
         if "HNZ" in components:
             plot_name = "HNZ_strong_motion_waves"
         if "HNN" in components:
@@ -193,13 +193,13 @@ def plot_waveform_fits(
         if "HNE" in components:
             plot_name = "HNE_strong_motion_waves"
 
-    if type_str == "tele_body":
+    if type_str == "body":
         if "BHZ" in components:
             plot_name = "P_body_waves"
         if "SH" in components:
             plot_name = "SH_body_waves"
 
-    if type_str == "surf_tele":
+    if type_str == "surf":
         if "BHZ" in components:
             plot_name = "Rayleigh_surf_waves"
         if "SH" in components:

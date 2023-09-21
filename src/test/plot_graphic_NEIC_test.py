@@ -21,14 +21,14 @@ import pytest
 from wasp.fault_plane import point_sources_param, shear_modulous
 from wasp.get_outputs import get_insar, read_solution_static_format, retrieve_gps
 from wasp.plot_graphic_NEIC import (
+    PlotComparisonMap,
+    PlotInsar,
+    PlotSlipDist_Compare,
     _plot_vel_model,
-    _PlotComparisonMap,
     _PlotCumulativeSlip,
-    _PlotInsar,
     _PlotMultiSlipDist,
     _PlotRiseTime,
     _PlotRuptTime,
-    _PlotSlipDist_Compare,
     calculate_cumulative_moment_tensor,
     plot_beachball,
     plot_ffm_sol,
@@ -183,9 +183,9 @@ def test_plot():
         plot_misfit(
             used_data_type=[
                 "cgps",
-                "strong_motion",
-                "surf_tele",
-                "tele_body",
+                "strong",
+                "surf",
+                "body",
             ],
             directory=tempdir,
         )
@@ -227,13 +227,13 @@ def test__plot_vel_model():
 
 
 @pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None,
+    os.getenv("CI_REGISTRY") is not None or not os.getenv("RUN_ALL", False),
     reason="Build runner does not have the resources to run",
 )
-def test__PlotComparisonMap():
+def test_PlotComparisonMap():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        _PlotComparisonMap(
+        PlotComparisonMap(
             TENSOR,
             SEGMENTS["segments"],
             POINT_SOURCES,
@@ -262,7 +262,7 @@ def test___PlotCumulativeSlip():
         shutil.rmtree(tempdir)
 
 
-def test__PlotInsar():
+def test_PlotInsar():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
         shutil.copyfile(
@@ -286,7 +286,7 @@ def test__PlotInsar():
             json.dump(new_insar, f)
 
         insar_data = get_insar(data_dir=tempdir)
-        _PlotInsar(
+        PlotInsar(
             TENSOR,
             SEGMENTS["segments"],
             POINT_SOURCES,
@@ -296,7 +296,7 @@ def test__PlotInsar():
             "ascending",
             directory=tempdir,
         )
-        _PlotInsar(
+        PlotInsar(
             TENSOR,
             SEGMENTS["segments"],
             POINT_SOURCES,
@@ -346,10 +346,10 @@ def test__PlotRuptTime():
         shutil.rmtree(tempdir)
 
 
-def test__PlotSlipDist_Compare():
+def test_PlotSlipDist_Compare():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        _PlotSlipDist_Compare(
+        PlotSlipDist_Compare(
             SEGMENTS["segments"], POINT_SOURCES, SOLUTION, SOLUTION, directory=tempdir
         )
         assert (tempdir / "Checkerboard_SlipDist_plane0.png").exists()

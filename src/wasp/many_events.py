@@ -24,13 +24,13 @@ def get_waveforms_events(
     if "cgps" in data_type:
         file_name = "cgps_events.txt"
         dict_name = "cgps_waves.json"
-    if "strong_motion" in data_type:
+    if "strong" in data_type:
         file_name = "strong_motion_events.txt"
         dict_name = "strong_motion_waves.json"
-    if "tele_body" in data_type:
+    if "body" in data_type:
         file_name = "tele_events.txt"
         dict_name = "tele_waves.json"
-    if "surf_tele" in data_type:
+    if "surf" in data_type:
         file_name = "surf_events.txt"
         dict_name = "surf_waves.json"
     if "gps" in data_type:
@@ -275,7 +275,7 @@ def select_waveforms_event(traces_info: List[dict], event: int) -> List[dict]:
 if __name__ == "__main__":
     import argparse
 
-    import wasp.manage_parser as mp
+    import wasp.manage_parser as mp  # type:ignore
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -320,13 +320,13 @@ if __name__ == "__main__":
             segments_data = json.load(open("segments_data.json"))
             annealing_data = json.load(open("annealing_prop.json"))
             model_space = json.load(open("model_space.json"))
-            if "strong_motion" in data_type:
+            if "strong" in data_type:
                 traces_strong = json.load(open("strong_motion_waves.json"))
                 strong_motion_events = strong_motion_events + [traces_strong]
-            if "tele_body" in data_type:
+            if "body" in data_type:
                 traces_tele = json.load(open("tele_waves.json"))
                 tele_events = tele_events + [traces_tele]
-            if "surf_tele" in data_type:
+            if "surf" in data_type:
                 traces_surf = json.load(open("surf_waves.json"))
                 surf_events = surf_events + [traces_surf]
             if "cgps" in data_type:
@@ -343,13 +343,13 @@ if __name__ == "__main__":
         get_moment_events(annealing_events)
         get_model_space_events(model_events)
         get_segments_events(segments_events, tensors)
-        if "strong_motion" in data_type:
-            get_waveforms_events(strong_motion_events, "strong_motion")
+        if "strong" in data_type:
+            get_waveforms_events(strong_motion_events, "strong")
         if "cgps" in data_type:
             get_waveforms_events(cgps_events, "cgps")
-        if "tele_body" in data_type:
-            get_waveforms_events(tele_events, "tele_body")
-        if "surf_tele" in data_type:
-            get_waveforms_events(surf_events, "surf_tele")
+        if "body" in data_type:
+            get_waveforms_events(tele_events, "body")
+        if "surf" in data_type:
+            get_waveforms_events(surf_events, "surf")
         if "gps" in data_type:
             get_waveforms_events(static_events, "gps")

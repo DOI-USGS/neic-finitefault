@@ -4,7 +4,7 @@ import tempfile
 
 from wasp import get_outputs
 from wasp.fault_plane import point_sources_param
-from wasp.write_KML import _PlotMap_KML
+from wasp.write_KML import PlotMap_KML
 
 from .testutils import END_TO_END_DIR, RESULTS_DIR, get_segments_data, get_tensor_info
 
@@ -24,7 +24,7 @@ def test_write_KML():
         solution = get_outputs.read_solution_static_format(
             SEGMENTS["segments"], tempdir
         )
-        _PlotMap_KML(
+        PlotMap_KML(
             TENSOR,
             SEGMENTS["segments"],
             point_sources,
