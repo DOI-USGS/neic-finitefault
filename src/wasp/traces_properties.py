@@ -191,26 +191,3 @@ def wavelet_scales() -> List[int]:
     n_begin = 1
     n_end = 8
     return [n_begin, n_end]
-
-
-if __name__ == "__main__":
-    import argparse
-    import os
-
-    import wasp.seismic_tensor as tensor
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser.add_argument(
-        "-gcmt", "--gcmt_tensor", help="location of GCMT moment tensor file"
-    )
-    args = parser.parse_args()
-    os.chdir(args.folder)
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-    properties_json(tensor_info, dt_cgps=None)
