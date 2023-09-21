@@ -172,6 +172,7 @@ def kml(
         scale=scale,
         limits=list(map_limits),
         evID=event_id,
+        directory=directory,
     )
 
 

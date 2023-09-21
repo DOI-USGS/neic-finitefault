@@ -528,6 +528,7 @@ def PlotMap_KML(
         faults=True,
         aftershocks=True,
         transform=dictn["transform"],
+        directory=directory,
     )
     ax.plot(
         lon0,
