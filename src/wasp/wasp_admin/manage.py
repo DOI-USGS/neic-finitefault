@@ -18,11 +18,8 @@ from wasp.modify_sacs import correct_waveforms, plot_channels
 from wasp.read_config import CONFIG_PATH
 from wasp.seismic_tensor import get_tensor, modify_tensor, write_tensor
 from wasp.static2fsp import static_to_fsp as convert_static_to_fsp
-<<<<<<< HEAD
-from wasp.traces_properties import properties_json
-=======
 from wasp.static2srf import static_to_srf as convert_static_to_srf
->>>>>>> Add static-to-srf script
+from wasp.traces_properties import properties_json
 from wasp.velocity_models import model2dict, select_velmodel, velmodel2json
 
 from .datautils import (
@@ -368,7 +365,9 @@ def sampling_filtering(
     # get tensor information
     tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
     properties_json(tensor_info, dt_cgps=cgps_dt, data_directory=directory)
-@app.command(help="Convert static solution to SRF format")
+
+
+@app.command(help="Convert the static solution to SRF format")
 def static_to_srf(
     directory: pathlib.Path = typer.Argument(
         ..., help="Path to the directory to read/write from"
@@ -437,7 +436,7 @@ def static_to_srf(
     )
 
 
-@app.command(help="Convert static solution to FSP format")
+@app.command(help="Convert the static solution to FSP format")
 def static_to_fsp(
     directory: pathlib.Path = typer.Argument(
         ..., help="Path to the directory to read/write from"
