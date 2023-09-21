@@ -2375,7 +2375,6 @@ def plot_moment_rate_function(
     list = [item for sublist in tl for item in sublist]
     flat_list = [item for sublist in list for item in sublist]
     if all(flat_list) == 0:
-        print("EEEHHHHH")
         print("This looks like a static solution. Skipping moment rate plot.")
     else:
         ## Set up plot ##
@@ -2515,7 +2514,6 @@ def plot_moment_rate_function(
         ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.1))
         ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(20))
         ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(10))
-        print("HERE", directory / "MomentRate.png")
         plt.savefig(directory / "MomentRate.png")
         plt.close()
         return
