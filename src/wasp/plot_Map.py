@@ -35,8 +35,8 @@ def PlotMap(
     stations_gps: Optional[zip] = None,
     stations_cgps: Optional[str] = None,
     max_slip: Optional[float] = None,
-    legend_len: Optional[int] = None,
-    scale: Optional[int] = None,
+    legend_len: Optional[float] = None,
+    scale: Optional[float] = None,
     limits: List[Optional[float]] = [None, None, None, None],
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
@@ -61,9 +61,9 @@ def PlotMap(
     :param max_slip: A specified maximum slip, defaults to None
     :type max_slip: Optional[float], optional
     :param legend_len: The length of the legend, defaults to None
-    :type legend_len: Optional[int], optional
+    :type legend_len: Optional[float], optional
     :param scale: The scale, defaults to None
-    :type scale: Optional[int], optional
+    :type scale: Optional[float], optional
     :param limits: The extent of the map, defaults to [None, None, None, None]
     :type limits: List[Optional[float]], optional
     :param directory: The directory to read/write to, defaults to pathlib.Path()
@@ -581,203 +581,3 @@ def PlotMap(
         )
 
     fig.savefig(directory / "PyGMT_Map.png")
-
-
-if __name__ == "__main__":
-    """ """
-    import wasp.eventpage_downloads as dwnlds
-    import wasp.management as mng
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser.add_argument(
-        "-gcmt", "--gcmt_tensor", help="location of GCMT moment tensor file"
-    )
-    parser.add_argument(
-        "-ffms",
-        "--ffm_solution",
-        action="store_true",
-        help="plot FFM solution slip maps, rise time",
-    )
-    parser.add_argument(
-        "-t", "--tele", action="store_true", help="plot misfit of teleseismic data"
-    )
-    parser.add_argument(
-        "-su",
-        "--surface",
-        action="store_true",
-        help="plot misfit of surface waves data",
-    )
-    parser.add_argument(
-        "-st",
-        "--strong",
-        action="store_true",
-        help="plot strong motion stations and strong motion misfit",
-    )
-    parser.add_argument("--cgps", action="store_true", help="plot misfit of cGPS data")
-    parser.add_argument("--gps", action="store_true", help="plot GPS data")
-    parser.add_argument("-in", "--insar", action="store_true", help="plot InSar data")
-    parser.add_argument(
-        "-o",
-        "--option",
-        choices=["autoscale", "noscale"],
-        help="choose whether Rupture plot needs to be scaled",
-    )
-    parser.add_argument(
-        "-mr",
-        "--mrtime",
-        default="0",
-        type=float,
-        help="choose cutoff time for Moment Rate plot",
-    )
-    parser.add_argument(
-        "-shakemap",
-        "--shakemappolygon",
-        action="store_true",
-        help="create shakemap_polygon.txt",
-    )
-    parser.add_argument(
-        "-ev",
-        "--EventID",
-        nargs="?",
-        const="Not Provided",
-        type=str,
-        help="Provide event ID",
-    )
-    parser.add_argument(
-        "-d",
-        "--downloads",
-        action="store_true",
-        help="create event page download files",
-    )
-    parser.add_argument(
-        "-pub",
-        "--publish",
-        action="store_true",
-        help="rename files for use with sendproduct",
-    )
-    parser.add_argument(
-        "-check",
-        "--checkerboard",
-        action="store_true",
-        help="plot comparison for checkerboard test",
-    )
-    parser.add_argument(
-        "-max",
-        "--maxvalue",
-        default=None,
-        type=float,
-        help="Choose maximum slip value for plot",
-    )
-    parser.add_argument(
-        "-legend",
-        "--legend_length",
-        default=None,
-        type=float,
-        help="Length of static GNSS vector for legend (in cm)",
-    )
-    parser.add_argument(
-        "-scale",
-        "--scale_factor",
-        default=None,
-        type=float,
-        help="Scale factor for static GNSS vector lengths (larger means shorter vectors)",
-    )
-    parser.add_argument(
-        "-limits",
-        "--map_limits",
-        type=float,
-        nargs=4,
-        help="Specify map limits [W,E,N,S] from edges of plotted features. eg: 0.5 0.5 0.5 0.5\
-                        gives a 0.5 degree buffer on each side. Negative numbers will cut off plotted features.",
-    )
-    args = parser.parse_args()
-    os.chdir(args.folder)
-    used_data: List[str] = []
-    used_data = used_data + ["strong"] if args.strong else used_data
-    used_data = used_data + ["cgps"] if args.cgps else used_data
-    used_data = used_data + ["body"] if args.tele else used_data
-    used_data = used_data + ["surf"] if args.surface else used_data
-    default_dirs = mng.default_dirs()
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-    segments_data = json.load(open("segments_data.json"))
-    segments = segments_data["segments"]
-    rise_time = segments_data["rise_time"]
-    connections = None
-    if "connections" in segments_data:
-        connections = segments_data["connections"]
-    point_sources = pf.point_sources_param(
-        segments, tensor_info, rise_time, connections=connections
-    )
-    solution = get_outputs.read_solution_static_format(segments)
-
-    traces_info, traces_info_cgps, stations_gps = [None, None, None]
-    if args.gps:
-        names, lats, lons, observed, synthetic, error = get_outputs.retrieve_gps()
-        stations_gps = zip(names, lats, lons, observed, synthetic, error)
-    if args.cgps:
-        traces_info_cgps = json.load(open("cgps_waves.json"))
-    if args.strong:
-        traces_info = json.load(open("strong_motion_waves.json"))
-    if args.maxvalue != None:
-        maxval = args.maxvalue
-    else:
-        maxval = None
-    if args.legend_length != None:
-        legend_len = args.legend_length
-    else:
-        legend_len = None
-    if args.scale_factor != None:
-        scale = args.scale_factor
-    else:
-        scale = None
-    if args.map_limits:
-        limits = [
-            args.map_limits[0],
-            args.map_limits[1],
-            args.map_limits[2],
-            args.map_limits[3],
-        ]
-        print(f"Axes limits: {limits}")
-    else:
-        limits = [None, None, None, None]
-    if args.ffm_solution:
-        if not os.path.isfile("velmodel_data.json"):
-            vel_model = mv.select_velmodel(tensor_info, default_dirs)
-        else:
-            vel_model = json.load(open("velmodel_data.json"))
-        shear = pf.shear_modulous(point_sources, velmodel=vel_model)  # type:ignore
-        if args.option == "autoscale":
-            autosize = True
-        else:
-            autosize = False
-        if args.mrtime > 0:
-            mr_time = args.mrtime
-        else:
-            mr_time = None
-        if args.EventID:
-            evID = args.EventID
-        else:
-            evID = None
-
-        PlotMap(
-            tensor_info,
-            segments,
-            point_sources,  # type:ignore
-            solution,
-            default_dirs,
-            convex_hulls=[],
-            files_str=traces_info,
-            stations_gps=stations_gps,
-            stations_cgps=traces_info_cgps,
-            max_slip=maxval,
-            legend_len=legend_len,
-            scale=scale,
-            limits=limits,
-        )
