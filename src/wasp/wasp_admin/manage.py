@@ -15,7 +15,7 @@ from wasp.get_outputs import read_solution_static_format
 from wasp.management import default_dirs
 from wasp.modify_jsons import modify_channels
 from wasp.modify_sacs import correct_waveforms, plot_channels
-from wasp.read_config import CONFIG_PATH
+from wasp.read_config import CONFIG_PATH, PROJECT_DIRECTORY
 from wasp.seismic_tensor import get_tensor, modify_tensor, write_tensor
 from wasp.static2fsp import static_to_fsp as convert_static_to_fsp
 from wasp.static2srf import static_to_srf as convert_static_to_srf
@@ -437,6 +437,18 @@ def static_to_srf(
 
 
 @app.command(help="Convert the static solution to FSP format")
+@app.command(help="Display the configuration")
+def show_config(
+    config_file: pathlib.Path = typer.Option(
+        CONFIG_PATH, "-c", "--config-file", help="Path to config file"
+    ),
+):
+    validate_files([config_file])
+    with open(config_file) as f:
+        typer.echo(f.read())
+
+
+@app.command(help="Convert static solution to FSP format")
 def static_to_fsp(
     directory: pathlib.Path = typer.Argument(
         ..., help="Path to the directory to read/write from"
@@ -578,3 +590,27 @@ def velmodel_to_json(
 ):
     velmodel = model2dict(vel_model_file)
     velmodel2json(velmodel, directory=directory)
+
+
+@app.command(help="Display the configuration")
+def write_config(
+    config_file: pathlib.Path = typer.Option(
+        CONFIG_PATH, "-c", "--config-file", help="Path to config file"
+    ),
+    code_path: pathlib.Path = typer.Option(
+        PROJECT_DIRECTORY, "-code", "--code-path", help="The path to the code directory"
+    ),
+):
+    if config_file.exists():
+        raise FileExistsError(
+            f"The config file '{config_file}' already exists. Exiting."
+        )
+    with open(config_file, "w") as cf:
+        cf.write("[PATHS]\n")
+        cf.write(f"code_path = {str(code_path.resolve())}\n")
+        cf.write("surf_gf_bank = %(code_path)s/fortran_code/gfs_nm/long/low.in\n")
+        cf.write("modelling = %(code_path)s/fortran_code/bin_inversion_gfortran_f95\n")
+        cf.write("get_near_gf = %(code_path)s/fortran_code/bin_str_f95\n")
+        cf.write("compute_near_gf = %(code_path)s/fortran_code/src_dc_f95\n")
+        cf.write("info = %(code_path)s/fortran_code/info\n")
+        cf.write("cartopy_files = %(code_path)s/fortran_code/tectonicplates")
