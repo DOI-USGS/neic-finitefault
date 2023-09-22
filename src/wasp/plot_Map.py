@@ -25,7 +25,7 @@ from wasp import get_outputs
 from wasp.plot_graphic_NEIC import __redefine_lat_lon
 
 
-def _PlotMap(
+def PlotMap(
     tensor_info: dict,
     segments: List[dict],
     point_sources: list,
@@ -696,10 +696,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
     os.chdir(args.folder)
     used_data: List[str] = []
-    used_data = used_data + ["strong_motion"] if args.strong else used_data
+    used_data = used_data + ["strong"] if args.strong else used_data
     used_data = used_data + ["cgps"] if args.cgps else used_data
-    used_data = used_data + ["tele_body"] if args.tele else used_data
-    used_data = used_data + ["surf_tele"] if args.surface else used_data
+    used_data = used_data + ["body"] if args.tele else used_data
+    used_data = used_data + ["surf"] if args.surface else used_data
     default_dirs = mng.default_dirs()
     if args.gcmt_tensor:
         cmt_file = args.gcmt_tensor
@@ -766,7 +766,7 @@ if __name__ == "__main__":
         else:
             evID = None
 
-        _PlotMap(
+        PlotMap(
             tensor_info,
             segments,
             point_sources,  # type:ignore

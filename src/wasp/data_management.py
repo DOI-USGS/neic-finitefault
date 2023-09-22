@@ -937,20 +937,20 @@ def filling_data_dicts(
     """
     data_folder = pathlib.Path(data_folder)
     working_directory = pathlib.Path(working_directory)
-    if "tele_body" in data_types:
-        tele_traces = get_traces_files("tele_body", directory=data_folder)
+    if "body" in data_types:
+        tele_traces = get_traces_files("body", directory=data_folder)
         if not os.path.isfile(working_directory / "tele_waves.json"):
             tele_body_traces(
                 tele_traces, tensor_info, data_prop, directory=working_directory
             )
-    if "surf_tele" in data_types:
-        surf_traces = get_traces_files("surf_tele", directory=data_folder)
+    if "surf" in data_types:
+        surf_traces = get_traces_files("surf", directory=data_folder)
         if not os.path.isfile(working_directory / "surf_waves.json"):
             tele_surf_traces(
                 surf_traces, tensor_info, data_prop, directory=working_directory
             )
-    if "strong_motion" in data_types:
-        strong_traces = get_traces_files("strong_motion", directory=data_folder)
+    if "strong" in data_types:
+        strong_traces = get_traces_files("strong", directory=data_folder)
         if not os.path.isfile(working_directory / "strong_motion_waves.json"):
             strong_motion_traces(
                 strong_traces, tensor_info, data_prop, directory=working_directory
@@ -972,7 +972,7 @@ def filling_data_dicts(
 
 
 def get_traces_files(
-    data_type: Literal["cgps", "strong_motion", "surf_tele", "tele_body"],
+    data_type: Literal["cgps", "strong", "surf", "body"],
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> List[Union[pathlib.Path, str]]:
     """Get list with waveform files (in sac format) for stations and
@@ -987,13 +987,13 @@ def get_traces_files(
     """
     directory = pathlib.Path(directory)
     traces_files: List[Union[pathlib.Path, str]] = []
-    if data_type == "tele_body":
+    if data_type == "body":
         p_traces_files = glob(os.path.join(directory / "P", "final*"))
         sh_traces_files = glob(os.path.join(directory / "SH", "final*"))
         traces_files = p_traces_files + sh_traces_files  # type: ignore
-    if data_type == "surf_tele":
+    if data_type == "surf":
         traces_files = glob(os.path.join(directory / "LONG", "final*"))  # type: ignore
-    if data_type == "strong_motion":
+    if data_type == "strong":
         traces_files = glob(os.path.join(directory / "STR", "final*"))  # type: ignore
     if data_type == "cgps":
         traces_files = glob(os.path.join(directory / "cGPS", "final*"))  # type: ignore
@@ -1214,42 +1214,3 @@ def __is_number(value: Union[str, float]) -> bool:
         return True
     except ValueError:
         return False
-
-
-if __name__ == "__main__":
-    import wasp.manage_parser as mp
-    import wasp.seismic_tensor as tensor
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser.add_argument(
-        "-d", "--data_folder", default=os.getcwd(), help="folder with waveform data"
-    )
-    parser = mp.parser_add_tensor(parser)
-    parser = mp.parser_data_dict(parser)
-    args = parser.parse_args()
-    data_folder = os.path.abspath(args.data_folder)
-    if not os.path.isfile("sampling_filter.json"):
-        raise FileNotFoundError(
-            errno.ENOENT, os.strerror(errno.ENOENT), "sampling_filter.json"
-        )
-    data_prop = json.load(open("sampling_filter.json"))
-    os.chdir(args.folder)
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-    data_type = mp.get_used_data(args)
-    filling_data_dicts(
-        tensor_info,
-        data_type,
-        data_prop,
-        data_folder,
-        insar_asc=args.insar_asc,
-        insar_desc=args.insar_desc,
-        ramp_asc=args.insar_asc_ramp,
-        ramp_desc=args.insar_desc_ramp,
-    )

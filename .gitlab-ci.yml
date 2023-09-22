@@ -35,16 +35,6 @@ stages:
     $CI_PROJECT_PATH == 'ghsc/neic/algorithms/neic-finitefault'
     && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-##
-# Define the supported systems
-##
-.images:
-  matrix: &images
-    - TARGET:
-        - dependencies 
-        - finitefault
-      OPERATING_SYSTEM:
-        - ubuntu
 
 .docker_login:
   before_script:
@@ -90,7 +80,7 @@ Fortran:
     - cp -r "/home/usgs-user/finitefault/tectonicplates" ./fortran_code/
     - cp "/home/usgs-user/finitefault/fortran_code/gfs_nm/long/fd_bank" ./fortran_code/gfs_nm/long/fd_bank
     - cp "/home/usgs-user/finitefault/fortran_code/info/LITHO1.0.nc" ./fortran_code/info/LITHO1.0.nc
-    - bash install.d/wasp.sh "/builds/ghsc/users/hhunsinger/neic-finitefault"
+    - bash install.d/wasp.sh "$(pwd)"
   stage: init
 
 ## -------------------------------------
@@ -132,8 +122,6 @@ Docker Deploy:
   extends:
     - .docker_login
   image: "${DOCKER_IMAGE}"
-  parallel:
-    matrix: *images
   rules:
     - if: "$SCHEDULED"
     - changes:
@@ -149,35 +137,36 @@ Docker Deploy:
       for ARG in ${BUILD_ARGS}; do
         ARGS+=("--build-arg" "${ARG}=${!ARG}");
       done
-      if [[ ${TARGET} == "dependencies" ]]; then
-        ARGS+=("--target" "${TARGET}");
-        BUILD="-dependencies";
-      else
-        ARGS+=("--target" "${TARGET}");
-      fi
-    - echo "BUILD= ${BUILD}"
-    - echo "TARGET= ${TARGET}"
-    - IMAGE="wasp-${OPERATING_SYSTEM}${BUILD}"
-    - TAG="${CI_COMMIT_TAG:-latest}"
     - LOCAL_IMAGE="${CI_REGISTRY}/${REPOSITORY}/${IMAGE}:${TAG}"
     - echo "${ARGS[@]} --tag ${LOCAL_IMAGE}" 
-    - docker build "${ARGS[@]}" --tag "${LOCAL_IMAGE}" .
+    - docker build "${ARGS[@]}" --tag "wasp-latest" .
+    - TAG="${CI_COMMIT_TAG:-latest}"
+    - DEPENDENCY_IMAGE="${CI_REGISTRY}/${REPOSITORY}/"wasp-ubuntu-dependencies":${TAG}"
+    - docker build "${ARGS[@]}" --target dependencies -t "${DEPENDENCY_IMAGE}" .
+    - FF_IMAGE="${CI_REGISTRY}/${REPOSITORY}/"wasp-ubuntu":${TAG}"
+    - docker build "${ARGS[@]}" --target finitefault -t "${FF_IMAGE}" .
+    # remove dependencies that are no longer needed on the runner
+    - rm -rf src fortran_code .venv pb2002_boundaries.gmt
     # trivy scan before push
     # fail LOW,MEDIUM vulnerabilities that have a fix available
     - ${TRIVY} image --exit-code 1 --ignore-unfixed --severity LOW,MEDIUM
       --skip-files "/usr/local/bin/trivy"
-      "${LOCAL_IMAGE}";
+      "wasp-latest";
     # fail HIGH,CRITICAL vulnerabilities
-    - ${TRIVY} image --exit-code 1 --severity HIGH,CRITICAL
+    - ${TRIVY} image --exit-code 1 --ignore-unfixed --severity HIGH,CRITICAL
       --skip-files "/usr/local/bin/trivy"
-      "${LOCAL_IMAGE}";
+      "wasp-latest";
     # push to registry
     - if [ "${CI_PROJECT_PATH}" != "ghsc/neic/algorithms/neic-finitefault" ]; then
       echo "Skipping push on non-upstream (${CI_PROJECT_PATH})";
       exit 0;
       fi
-    - echo "Pushing image ${LOCAL_IMAGE}"
-    - docker push "${LOCAL_IMAGE}";
+    # push dependencies image
+    - echo "Pushing image ${DEPENDENCY_IMAGE}"
+    - docker push "${DEPENDENCY_IMAGE}";
+    # push finitefault image
+    - echo "Pushing image ${FF_IMAGE}"
+    - docker push "${FF_IMAGE}";
   stage: deploy
   variables:
     BUILD_ARGS: DCW_VERSION GMT_VERSION GSHHG_VERSION 

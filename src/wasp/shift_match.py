@@ -45,7 +45,7 @@ def shift_match2(
     :rtype: list
     """
     directory = pathlib.Path(directory)
-    if data_type == "tele":
+    if data_type == "body":
         json_file = "tele_waves.json"
     if data_type == "strong":
         json_file = "strong_motion_waves.json"
@@ -57,7 +57,7 @@ def shift_match2(
         files = json.load(f)
     synthetics_file = (
         "synthetics_body.txt"
-        if data_type == "tele"
+        if data_type == "body"
         else "synthetics_strong.txt"
         if data_type == "strong"
         else "synthetics_surf.txt"
@@ -68,7 +68,7 @@ def shift_match2(
     dt = float(files[0]["dt"])
     plot_folder: Union[pathlib.Path, str] = (
         "tele_shift"
-        if data_type == "tele"
+        if data_type == "body"
         else "strong_shift"
         if data_type == "strong"
         else "surf_shift"
@@ -107,7 +107,7 @@ def shift_match2(
         waveforms = [stream[0].data for stream in streams]
         nshift = (
             int(5 / dt)
-            if data_type == "tele"
+            if data_type == "body"
             else int(5 / dt)
             if data_type == "strong"
             else int(12 / dt)
@@ -184,7 +184,6 @@ def shift_match2(
                 axes2, syn_times, syn_waveforms, color="red", custom="fill"
             )
             name_file = os.path.join(plot_folder, "{}_{}.png".format(station, channel))
-            print(name_file)
             plt.savefig(directory / name_file)
             plt.close(fig)
 
@@ -329,7 +328,7 @@ def save_waveforms(data_type: str, files: List[dict]):
     :param files: The list of file property dictionaries
     :type files: List[dict]
     """
-    if data_type == "tele":
+    if data_type == "body":
         json_file = "tele_waves.json"
     if data_type == "strong":
         json_file = "strong_motion_waves.json"
@@ -442,7 +441,7 @@ def _shift2(
     return j_min
 
 
-def _print_arrival(
+def print_arrival(
     tensor_info: dict, directory: Union[pathlib.Path, str] = pathlib.Path()
 ):
     """Plot the data with the arrival time annotated
@@ -471,6 +470,8 @@ def _print_arrival(
         if not chan == "BHZ":
             continue
         other_file = [v for v in other_files if stat in v]
+        if not len(other_file):
+            continue
         other_stream = read(other_file[0])
         trace2 = other_stream[0]
         if not "t1" in trace2.stats.sac:
@@ -488,58 +489,3 @@ def _print_arrival(
         fig.savefig(os.path.join(plot_folder, "{}_pick".format(stat)))
         del fig
     return
-
-
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser.add_argument(
-        "-o",
-        "--option",
-        choices=["match", "manual"],
-        help="choose whether to shift by cross-correlation\
-                        or plot to pick manually",
-    )
-    parser.add_argument(
-        "-t",
-        "--type",
-        choices=["tele", "strong", "cgps", "surf"],
-        help="type of data to apply shift",
-    )
-    parser.add_argument(
-        "-p", "--plot", action="store_true", help="plot or not results of shift"
-    )
-    parser.add_argument(
-        "-gcmt", "--gcmt_tensor", help="location of GCMT moment tensor file"
-    )
-    parser.add_argument(
-        "-me", "--many_events", action="store_true", help="plots for many events"
-    )
-    args = parser.parse_args()
-    os.chdir(args.folder)
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    if args.option == "match":
-        plot = False if not args.plot else True
-        if not args.many_events:
-            if args.type in ["tele", "surf"]:
-                files = shift_match2(args.type, plot=plot)
-            else:
-                files = shift_match_regional(args.type, plot=plot)
-        else:
-            if args.type in ["tele", "surf"]:
-                files1 = shift_match2(args.type, plot=plot, event=1)
-                files2 = shift_match2(args.type, plot=plot, event=2)
-                files = files1 + files2
-            else:
-                files1 = shift_match_regional(args.type, plot=plot, event=1)
-                files2 = shift_match_regional(args.type, plot=plot, event=2)
-                files = files1 + files2
-        save_waveforms(args.type, files)
-    else:
-        _print_arrival(tensor_info)

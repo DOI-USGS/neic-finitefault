@@ -61,7 +61,7 @@ def set_map_cartopy(
     :type aftershocks: bool, optional
     :param transform: Coordinate transform to use, defaults to None
     :type transform: Optional[Projection], optional
-    :param directory: _description_, defaults to "."
+    :param directory: Where to write plots to, defaults to "."
     :type directory: Union[pathlib.Path, str], optional
     :return: The updated axes
     :rtype: GeoAxes

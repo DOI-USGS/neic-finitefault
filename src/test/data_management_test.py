@@ -153,7 +153,7 @@ def test_filling_data_dicts():
         shutil.copyfile(RESULTS_DIR / "NP1" / "gps_data", tempdir / "gps_data")
         filling_data_dicts(
             CMT,
-            ["cgps", "gps", "insar", "strong_motion", "surf_tele", "tele_body"],
+            ["cgps", "gps", "insar", "strong", "surf", "body"],
             SAMPLING_FILTER,
             tempdir / "data",
             [w["name"] for w in new_insar["ascending"]],
@@ -218,7 +218,7 @@ def test_filling_data_dicts():
 
 def test_get_traces_files():
     tele_files = [
-        f.split("/")[-1] for f in get_traces_files("tele_body", RESULTS_DIR / "data")
+        f.split("/")[-1] for f in get_traces_files("body", RESULTS_DIR / "data")
     ]
     assert len(tele_files) == 20
     for target in [
@@ -228,7 +228,7 @@ def test_get_traces_files():
     ]:
         assert target in tele_files
     surf_files = [
-        f.split("/")[-1] for f in get_traces_files("surf_tele", RESULTS_DIR / "data")
+        f.split("/")[-1] for f in get_traces_files("surf", RESULTS_DIR / "data")
     ]
     assert len(surf_files) == 20
     for target in [
@@ -238,8 +238,7 @@ def test_get_traces_files():
     ]:
         assert target in surf_files
     sm_files = [
-        f.split("/")[-1]
-        for f in get_traces_files("strong_motion", RESULTS_DIR / "data")
+        f.split("/")[-1] for f in get_traces_files("strong", RESULTS_DIR / "data")
     ]
     assert len(sm_files) == 9
     for target in [

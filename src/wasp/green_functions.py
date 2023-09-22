@@ -42,7 +42,7 @@ def gf_retrieve(
     ch.setFormatter(formatter)
     ch.setLevel(logging.ERROR)
 
-    if "tele_body" in used_data_type:
+    if "body" in used_data_type:
         print("Computing teleseismic GFs")
         logger1 = ml.create_log("body_wave_GF", directory / "logs" / "green_tele_log")
         logger1.addHandler(ch)
@@ -54,7 +54,7 @@ def gf_retrieve(
         processes = processes + [p1]
         loggers = loggers + [logger1]
         data_types = data_types + ["body waves"]
-    if "strong_motion" in used_data_type:
+    if "strong" in used_data_type:
         print("Computing strong motion GFs")
         logger2 = ml.create_log(
             "get_strong_motion_GF", directory / "logs" / "green_str_log"
@@ -128,19 +128,19 @@ def fk_green_fun1(
 ) -> dict:
     """Write data for computing/retrieving strong motion Green's functions
 
-    :param data_prop: _description_
+    :param data_prop: The sampling filtering properties
     :type data_prop: dict
-    :param tensor_info: _description_
+    :param tensor_info: The moment tensor information
     :type tensor_info: dict
-    :param location: _description_
+    :param location: The file location
     :type location: Union[pathlib.Path, str]
-    :param cgps: _description_, defaults to False
+    :param cgps: Whether cgps data is included, defaults to False
     :type cgps: bool, optional
-    :param max_depth: _description_, defaults to None
+    :param max_depth: The max depth, defaults to None
     :type max_depth: Optional[Union[float,int]], optional
-    :param directory: _description_, defaults to pathlib.Path()
+    :param directory: The directory to read/write at, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
-    :return: _description_
+    :return: the green dictionary
     :rtype: dict
     """
     directory = pathlib.Path(directory)
@@ -183,7 +183,7 @@ def fk_green_fun1(
 if __name__ == "__main__":
     import argparse
 
-    import wasp.manage_parser as mp
+    import wasp.manage_parser as mp  # type:ignore
     import wasp.management as mng
     import wasp.seismic_tensor as tensor
 
@@ -207,7 +207,7 @@ if __name__ == "__main__":
     used_data = mp.get_used_data(args)
     default_dirs = mng.default_dirs()
     # fk_green_fun0 removed since it isn't used anywhere
-    # if "strong_motion" in used_data and not os.path.isfile("strong_motion_gf.json"):
+    # if "strong" in used_data and not os.path.isfile("strong_motion_gf.json"):
     #     green_dict = fk_green_fun0(args.dt, tensor_info, default_dirs)
     # #        write_green_file(green_dict)
     # if "cgps" in used_data and not os.path.isfile("cgps_gf.json"):

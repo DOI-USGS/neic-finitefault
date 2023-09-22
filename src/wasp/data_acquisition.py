@@ -30,7 +30,7 @@ def acquisition(
     lat_ep: float,
     lon_ep: float,
     depth: float,
-    data_to_use: List[Literal["strong", "tele"]],
+    data_to_use: List[str],
     minutes_before: int = 3,
     minutes_after: int = 67,
     strong_before: int = 1,
@@ -63,7 +63,7 @@ def acquisition(
     :type tele_before: int, optional
     :param tele_after: Minutes post-event included in station query, defaults to 120
     :type tele_after: int, optional
-    :param waveform_directory: _description_, defaults to "."
+    :param waveform_directory: The waveform directory, defaults to "."
     :type waveform_directory: Union[pathlib.Path, str], optional
     """
     t1 = event_time - minutes_before * 60
@@ -105,7 +105,7 @@ def acquisition(
         except:
             pass
     inventory_tele = Inventory([], None)
-    if "tele" in data_to_use:
+    if "body" in data_to_use:
         networks = "II,G,IU,GE"
         max_dist = 90
         inventory_tele = client_iris.get_stations(
@@ -175,7 +175,7 @@ def acquisition(
                         sac_dict,
                         t1,
                         t2,
-                        "strong_motion",
+                        "strong",
                         waveform_directory,
                     ]
                 )
@@ -309,7 +309,7 @@ def worker3(
     """
     try:
         response_data = "SAC_PZs_{}_{}_{}_{}".format(netwk, statn, channel, loc_code)
-        if len(loc_code) is 0:
+        if len(loc_code) == 0:
             response_data = "SAC_PZs_{}_{}_{}___".format(netwk, statn, channel)
         iris_client.sacpz(
             netwk,
@@ -360,7 +360,7 @@ def worker4(
     try:
         response = canal.response
         response_data = "SAC_PZs_{}_{}_{}_{}".format(netwk, statn, channel, loc_code)
-        if len(loc_code) is 0:
+        if len(loc_code) == 0:
             response_data = "SAC_PZs_{}_{}_{}___".format(netwk, statn, channel)
         sacpz = response.get_sacpz()
         with open(waveform_directory / response_data, "w") as file:
@@ -406,32 +406,3 @@ def __get_channel_information_manual(
         "evdp": depth,
     }
     return sac_dict
-
-
-if __name__ == "__main__":
-    import argparse
-
-    from obspy.core.utcdatetime import UTCDateTime
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser.add_argument(
-        "-gcmt", "--gcmt_tensor", help="location of GCMT moment tensor file"
-    )
-    args = parser.parse_args()
-    os.chdir(args.folder)
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-    event_time = tensor_info["datetime"]
-    event_time = UTCDateTime(event_time)
-    lat_ep = tensor_info["lat"]
-    lon_ep = tensor_info["lon"]
-    depth = tensor_info["depth"]
-    time0 = time.time()
-    acquisition(event_time, lat_ep, lon_ep, depth, ["strong", "tele"])
-    print("time spent downloading metadata: ", time.time() - time0)

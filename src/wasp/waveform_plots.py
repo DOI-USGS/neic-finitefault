@@ -185,7 +185,7 @@ def plot_waveform_fits(
         if "LXE" in components:
             plot_name = "LXE_cgps_waves"
 
-    if type_str == "strong_motion":
+    if type_str == "strong":
         if "HNZ" in components:
             plot_name = "HNZ_strong_motion_waves"
         if "HNN" in components:
@@ -193,13 +193,13 @@ def plot_waveform_fits(
         if "HNE" in components:
             plot_name = "HNE_strong_motion_waves"
 
-    if type_str == "tele_body":
+    if type_str == "body":
         if "BHZ" in components:
             plot_name = "P_body_waves"
         if "SH" in components:
             plot_name = "SH_body_waves"
 
-    if type_str == "surf_tele":
+    if type_str == "surf":
         if "BHZ" in components:
             plot_name = "Rayleigh_surf_waves"
         if "SH" in components:
@@ -210,40 +210,3 @@ def plot_waveform_fits(
     plt.savefig(plot_directory / plot_name, bbox_inches="tight")
     plt.close()
     return
-
-
-if __name__ == "__main__":
-    files = [
-        {
-            "file": "/home/pkoch/folder_plot16/STR.MT07.HNE.C1.ACC",
-            "name": "MT07",
-            "component": "HNE",
-            "synthetic": [],
-        },
-        {
-            "file": "/home/pkoch/folder_plot16/STR.MT07.HNN.C1.ACC",
-            "name": "MT07",
-            "component": "HNN",
-            "synthetic": [],
-        },
-        {
-            "file": "/home/pkoch/folder_plot16/STR.MT07.HNZ.C1.ACC",
-            "name": "MT07",
-            "component": "HNZ",
-            "synthetic": [],
-        },
-    ]
-    high_freq = 15
-    for file in files:
-        file = filt_waveform(file, high_freq)
-    plot_spectra(files, 0.01)
-    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-    waveforms = [file["synthetic"] for file in files]
-    times = [np.arange(len(waveform)) * 0.01 for waveform in waveforms]
-    axes = plot_waveforms(axes, times, waveforms)  # type: ignore
-    axes[0].set_title("N")
-    axes[1].set_title("E")
-    axes[2].set_title("Z")
-    plot_name = "MT07_lowpass_{}".format(high_freq)
-    plt.savefig(plot_name, bbox_inches="tight")
-    print(1)

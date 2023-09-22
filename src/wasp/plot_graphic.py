@@ -119,13 +119,13 @@ def plot_ffm_sol(
     segments = segments_data["segments"]
     _plot_vel_model(vel_model, point_sources, directory=directory)
     if use_waveforms:
-        _plot_moment_rate_function(
+        plot_moment_rate_function(
             segments_data, shear, point_sources, event=event, directory=directory
         )
         _PlotRiseTime(segments, point_sources, solution, directory=directory)
         _PlotRuptTime(segments, point_sources, solution, directory=directory)
-    _PlotSlipDistribution(segments, point_sources, solution, directory=directory)
-    _PlotMap(
+    PlotSlipDistribution(segments, point_sources, solution, directory=directory)
+    PlotMap(
         tensor_info,
         segments,
         point_sources,
@@ -152,7 +152,7 @@ def plot_beachballs(
     :raises FileNotFoundError: If tele_waves.json cannot be found
     """
     directory = pathlib.Path(directory)
-    if "tele_body" in data_type:
+    if "body" in data_type:
         if not os.path.isfile(directory / "tele_waves.json"):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), "tele_waves.json"
@@ -170,7 +170,7 @@ def plot_misfit(
 ):
     """Plot misfit of observed and synthetic data
 
-    :param used_data_type: _description_
+    :param used_data_type: The data types used
     :type used_data_type: List[str]
     :param event: The event, defaults to None
     :type event: Optional[int], optional
@@ -201,7 +201,7 @@ def plot_misfit(
                 start_margin=0,
                 plot_directory=directory,
             )
-    if "tele_body" in used_data_type:
+    if "body" in used_data_type:
         if not os.path.isfile(directory / "tele_waves.json"):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), "tele_waves.json"
@@ -223,11 +223,11 @@ def plot_misfit(
             plot_waveform_fits(
                 traces_info,
                 components,
-                "tele_body",
+                "body",
                 event=event,
                 plot_directory=directory,
             )
-    if "surf_tele" in used_data_type:
+    if "surf" in used_data_type:
         if not os.path.isfile(directory / "surf_waves.json"):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), "surf_waves.json"
@@ -250,11 +250,11 @@ def plot_misfit(
             plot_waveform_fits(
                 traces_info,
                 components,
-                "surf_tele",
+                "surf",
                 event=event,
                 plot_directory=directory,
             )
-    if "strong_motion" in used_data_type:
+    if "strong" in used_data_type:
         if not os.path.isfile(directory / "strong_motion_waves.json"):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), "strong_motion_waves.json"
@@ -276,7 +276,7 @@ def plot_misfit(
             plot_waveform_fits(
                 traces_info,
                 components,
-                "strong_motion",
+                "strong",
                 event=event,
                 plot_directory=directory,
             )
@@ -484,7 +484,7 @@ def _PlotRiseTime(
     return
 
 
-def _PlotSlipDistribution(
+def PlotSlipDistribution(
     segments: dict,
     point_sources: list,
     solution: dict,
@@ -546,7 +546,7 @@ def _PlotSlipDistribution(
     return
 
 
-def _PlotSlipDist_Compare(
+def PlotSlipDist_Compare(
     segments: dict,
     point_sources: list,
     input_model: dict,
@@ -638,7 +638,7 @@ def _PlotSlipDist_Compare(
     return
 
 
-def _PlotMap(
+def PlotMap(
     tensor_info: dict,
     segments: List[dict],
     point_sources: list,
@@ -910,7 +910,7 @@ def _PlotMap(
     return
 
 
-def _PlotInsar(
+def PlotInsar(
     tensor_info: dict,
     segments: List[dict],
     point_sources: list,
@@ -1053,7 +1053,7 @@ def _PlotInsar(
     return
 
 
-def _PlotComparisonMap(
+def PlotComparisonMap(
     tensor_info: dict,
     segments: List[dict],
     point_sources: list,
@@ -1183,7 +1183,7 @@ def __redefine_lat_lon(segments: List[dict], point_sources: list) -> Tuple[list,
     return segments_lats, segments_lons
 
 
-def _plot_moment_rate_function(
+def plot_moment_rate_function(
     segments_data: dict,
     shear: list,
     point_sources: list,
@@ -1655,163 +1655,3 @@ def __add_watermark(fig: plt.Figure) -> plt.Figure:
         wrap=True,
     )
     return fig
-
-
-if __name__ == "__main__":
-    """ """
-    import wasp.manage_parser as mp
-    import wasp.management as mng
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser = mp.parser_add_tensor(parser)
-    parser = mp.parser_data_plot(parser)
-    parser.add_argument(
-        "-ffms",
-        "--ffm_solution",
-        action="store_true",
-        help="plot FFM solution slip maps, rise time",
-    )
-    parser.add_argument(
-        "-bb", "--beachballs", action="store_true", help="plot beachballs"
-    )
-    parser.add_argument(
-        "-me", "--many_events", action="store_true", help="plots for many events"
-    )
-    args = parser.parse_args()
-    os.chdir(args.folder)
-    if args.gcmt_tensor:
-        args.gcmt_tensor = os.path.abspath(args.gcmt_tensor)
-    used_data = mp.get_used_data(args)
-    use_waveforms = False
-    use_waveforms = use_waveforms if not "strong_motion" in used_data else True
-    use_waveforms = use_waveforms if not "cgps" in used_data else True
-    use_waveforms = use_waveforms if not "tele_body" in used_data else True
-    use_waveforms = use_waveforms if not "surf_tele" in used_data else True
-    default_dirs = mng.default_dirs()
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-    segments_data = json.load(open("segments_data.json"))
-    segments = segments_data["segments"]
-    rise_time = segments_data["rise_time"]
-    connections = None
-    if "connections" in segments_data:
-        connections = segments_data["connections"]
-    point_sources = pf.point_sources_param(
-        segments, tensor_info, rise_time, connections=connections
-    )
-    if args.ffm_solution:
-        solution = get_outputs.read_solution_static_format(segments)
-        if not os.path.isfile("velmodel_data.json"):
-            vel_model = mv.select_velmodel(tensor_info, default_dirs)
-        else:
-            vel_model = json.load(open("velmodel_data.json"))
-        shear = pf.shear_modulous(point_sources, velmodel=vel_model)  # type:ignore
-        plot_ffm_sol(
-            tensor_info,
-            segments_data,
-            point_sources,  # type:ignore
-            shear,
-            solution,
-            vel_model,
-            default_dirs,
-            use_waveforms=use_waveforms,
-        )
-        if args.many_events:
-            plot_ffm_sol(
-                tensor_info,
-                segments_data,
-                point_sources,  # type:ignore
-                shear,
-                solution,
-                vel_model,
-                default_dirs,
-                event=str(1),
-                use_waveforms=use_waveforms,
-            )
-            plot_ffm_sol(
-                tensor_info,
-                segments_data,
-                point_sources,  # type:ignore
-                shear,
-                solution,
-                vel_model,
-                default_dirs,
-                event=str(2),
-                use_waveforms=use_waveforms,
-            )
-
-    traces_info, stations_gps = [None, None]
-    if args.gps:
-        names, lats, lons, observed, synthetic, error = get_outputs.retrieve_gps()
-        stations_gps = zip(names, lats, lons, observed, synthetic, error)
-    if args.strong:
-        traces_info = json.load(open("strong_motion_waves.json"))
-    if args.strong or args.gps:
-        solution = get_outputs.read_solution_static_format(segments)
-        _PlotMap(
-            tensor_info,
-            segments,
-            point_sources,  # type:ignore
-            solution,
-            default_dirs,
-            files_str=traces_info,
-            stations_gps=stations_gps,
-        )
-        input_model = load_ffm_model.load_ffm_model(
-            segments_data, point_sources, option="fault&rise_time.txt"  # type:ignore
-        )
-        _PlotSlipDist_Compare(  # type:ignore
-            segments, point_sources, input_model, solution  # type:ignore
-        )
-        _PlotComparisonMap(  # type:ignore
-            tensor_info, segments, point_sources, input_model, solution  # type:ignore
-        )
-    if args.insar:
-        solution = get_outputs.read_solution_static_format(segments)
-        _PlotMap(  # type:ignore
-            tensor_info, segments, point_sources, solution, default_dirs  # type:ignore
-        )
-        insar_data = get_outputs.get_insar()
-        if "ascending" in insar_data:
-            asc_properties = insar_data["ascending"]
-            for i, asc_property in enumerate(asc_properties):
-                insar_points = asc_property["points"]
-                _PlotInsar(
-                    tensor_info,
-                    segments,
-                    point_sources,  # type:ignore
-                    default_dirs,
-                    insar_points,
-                    los="ascending{}".format(i),
-                )
-        if "descending" in insar_data:
-            desc_properties = insar_data["descending"]
-            for i, desc_property in enumerate(desc_properties):
-                insar_points = desc_property["points"]
-                _PlotInsar(
-                    tensor_info,
-                    segments,
-                    point_sources,  # type:ignore
-                    default_dirs,
-                    insar_points,
-                    los="descending{}".format(i),
-                )
-
-    if args.beachballs:
-        plot_beachballs(segments, used_data)
-    plot_misfit(used_data)
-    if args.many_events:
-        plot_misfit(used_data, event=1)
-        plot_misfit(used_data, event=2)
-    plot_files = glob.glob(os.path.join("plots", "*png"))
-    for plot_file in plot_files:
-        os.remove(plot_file)
-    plot_files = glob.glob("*png")
-    for plot_file in plot_files:
-        move(plot_file, "plots")

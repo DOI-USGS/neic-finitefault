@@ -44,7 +44,7 @@ def test_create_finite_fault():
     data = create_finite_fault(
         TENSOR,
         info_np1["plane_info"],
-        ["cgps", "gps", "insar", "strong_motion", "tele_body", "surf_waves"],
+        ["cgps", "gps", "insar", "strong", "body", "surf_waves"],
     )
     assert data == SEGMENTS
 
@@ -158,7 +158,7 @@ def test_point_sources_general():
             __rise_time_parameters(
                 TENSOR,
                 SEGMENTS["segments"][0],
-                "tele_body",
+                "body",
             )
             == SEGMENTS["rise_time"]
         )
@@ -261,7 +261,7 @@ def test_point_sources_general():
             "stk_subfaults": 21,
             "strike": 197.57412152089023,
         },
-        ["tele_body"],
+        ["body"],
     ) == {"delta_rise": 1.0, "min_rise": 1.0, "windows": 4}
 
 

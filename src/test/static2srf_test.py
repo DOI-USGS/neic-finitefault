@@ -52,7 +52,7 @@ def test_static_to_srf():
         static_to_srf(
             get_tensor_info(),
             segments,
-            ["cgps", "gps", "insar", "strong_motion", "surf_tele", "tele_body"],
+            ["cgps", "gps", "insar", "strong", "surf", "body"],
             get_velmodel_data(),
             solution,
             directory=tempdir,

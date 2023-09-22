@@ -145,7 +145,7 @@ def test_input_chen_near_field():
         for o, n in zip(get_strong_motion_json(all=True), new_strong_motion):
             shutil.copyfile(o["file"], n["file"])
 
-        input_chen_near_field(CMT, SAMPLE_FILTER, "strong_motion", tempdir)
+        input_chen_near_field(CMT, SAMPLE_FILTER, "strong", tempdir)
         for f in [
             "filtro_strong.txt",
             "channels_strong.txt",
@@ -336,7 +336,7 @@ def test_from_synthetic_to_obs():
         os.makedirs(tempdir / "LONG")
         os.makedirs(tempdir / "STR")
         for data_type, method in zip(
-            ["cgps", "strong_motion", "surf_tele", "tele_body"],
+            ["cgps", "strong", "surf", "body"],
             [
                 get_cgps_json,
                 get_strong_motion_json,

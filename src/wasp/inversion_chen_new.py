@@ -128,7 +128,7 @@ def automatic_usgs(
                 [get_gf_bank, "cgps", f"{(directory)}/"], stdout=out_gf_cgps
             )
         p1.wait()
-    if "strong_motion" in data_type:
+    if "strong" in data_type:
         logger.info("Compute strong motion GF bank")
         green_dict = gf.fk_green_fun1(
             data_prop, tensor_info, gf_bank_str, directory=directory
@@ -326,8 +326,7 @@ def _automatic2(
 def _check_surf_GF(
     point_sources: list, used_data: List[str], logger: Optional[logging.Logger] = None
 ) -> List[str]:
-    """Check the maximum depth is greater than 125km and whether the surface wave data can be used
-
+    """Check maximum fault depth to determine whether the surface wave data can be used (No surface wave GFs calculated below 125km)
     :param point_sources: The location of point sources
     :type point_sources: list
     :param data_type: The data types available
@@ -341,10 +340,12 @@ def _check_surf_GF(
     depths = [ps[:, :, :, :, 2] for ps in point_sources]
     depths = [np.max(depths1) for depths1 in depths]
     max_depth = np.max(depths)
-    is_surf = "surf_tele" in used_data
+    is_surf = "surf" in used_data
     if max_depth > 125 and is_surf:
-        warnings.warn("Maximum depth larger than 125 km. Surface waves won't be used")
-        new_used_data.remove("surf_tele")
+        warnings.warn(
+            "Fault plane extends below 125 km depth limit for surface wave Green's functions. Surface waves won't be used."
+        )
+        new_used_data.remove("surf")
         if logger:
             logger.info("Maximum depth larger than 125 km.")
     return new_used_data
@@ -429,7 +430,7 @@ def modelling_new_data(
                 [get_gf_bank, "cgps", f"{(directory)}/"], stdout=out_gf_cgps
             )
         p1.wait()
-    if "strong_motion" in data_type:
+    if "strong" in data_type:
         green_dict = gf.fk_green_fun1(
             data_prop,
             tensor_info,
@@ -448,11 +449,11 @@ def modelling_new_data(
         p2.wait()
     data_type2: list = []
     if os.path.isfile(directory / "tele_waves.json"):
-        data_type2 = data_type2 + ["tele_body"]
+        data_type2 = data_type2 + ["body"]
     if os.path.isfile(directory / "surf_waves.json"):
-        data_type2 = data_type2 + ["surf_tele"]
+        data_type2 = data_type2 + ["surf"]
     if os.path.isfile(directory / "strong_motion_waves.json"):
-        data_type2 = data_type2 + ["strong_motion"]
+        data_type2 = data_type2 + ["strong"]
     if os.path.isfile(directory / "cgps_waves.json"):
         data_type2 = data_type2 + ["cgps"]
     if os.path.isfile(directory / "static_data.json"):
@@ -676,11 +677,11 @@ def checkerboard(
     with open(folder_name / "sampling_filter.json") as sf:
         data_prop = json.load(sf)
     for data_type0 in data_type:
-        if data_type0 == "tele_body":
+        if data_type0 == "body":
             json_dict = "tele_waves.json"
-        if data_type0 == "surf_tele":
+        if data_type0 == "surf":
             json_dict = "surf_waves.json"
-        if data_type0 == "strong_motion":
+        if data_type0 == "strong":
             json_dict = "strong_motion_waves.json"
         if data_type0 == "cgps":
             json_dict = "cgps_waves.json"
@@ -714,13 +715,15 @@ def checkerboard(
 
 def set_directory_structure(
     tensor_info: dict, directory: Union[pathlib.Path, str] = pathlib.Path()
-):
+) -> pathlib.Path:
     """Create directory structure
 
     :param tensor_info: The moment tensor information
     :type tensor_info: dict
     :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
+    :return: The solution folder
+    :rtype: pathlib.Path
     """
     directory = pathlib.Path(directory)
     sol_folder = directory / mng.start_time_id(tensor_info)
@@ -754,7 +757,7 @@ def set_directory_structure(
         if os.path.exists(new_folder):
             continue
         os.mkdir(new_folder)
-    return
+    return pathlib.Path(sol_folder2)
 
 
 def processing(
@@ -797,15 +800,15 @@ def processing(
     cgps_files = glob.glob(str(directory) + "/*L[HXY]*sac") + glob.glob(
         str(directory) + "/*L[HXY]*SAC"
     )
-    if "tele_body" in data_type:
+    if "body" in data_type:
         proc.select_process_tele_body(
             tele_files, tensor_info, data_prop, directory=directory
         )
-    if "surf_tele" in data_type:
+    if "surf" in data_type:
         proc.select_process_surf_tele(
             tele_files, tensor_info, data_prop, directory=directory
         )
-    if "strong_motion" in data_type:
+    if "strong" in data_type:
         proc.select_process_strong(
             strong_files,
             tensor_info,
@@ -844,15 +847,15 @@ def writing_inputs0(
         )
     with open(directory / "sampling_filter.json") as dp:
         data_prop = json.load(dp)
-    if "tele_body" in data_type:
+    if "body" in data_type:
         input_files.input_chen_tele_body(tensor_info, data_prop, directory=directory)
-    if "surf_tele" in data_type:
+    if "surf" in data_type:
         input_files.input_chen_tele_surf(
             tensor_info, data_prop, config_path=config_path, directory=directory
         )
-    if "strong_motion" in data_type:
+    if "strong" in data_type:
         input_files.input_chen_near_field(
-            tensor_info, data_prop, "strong_motion", directory=directory
+            tensor_info, data_prop, "strong", directory=directory
         )
     if "cgps" in data_type:
         input_files.input_chen_near_field(
@@ -933,7 +936,7 @@ def writing_inputs(
         with open(directory / "cgps_gf.json") as cg:
             green_dict = json.load(cg)
         input_files.write_green_file(green_dict, cgps=True, directory=directory)
-    if "strong_motion" in data_type:
+    if "strong" in data_type:
         if not os.path.isfile(directory / "strong_motion_gf.json"):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), "strong_motion_gf.json"
@@ -984,10 +987,10 @@ def inversion(
     logger.info("Elapsed time of green_fun: {}".format(time1))
     time3 = time.time()
     args = ["auto"]
-    args = args + ["strong"] if "strong_motion" in data_type else args
+    args = args + ["strong"] if "strong" in data_type else args
     args = args + ["cgps"] if "cgps" in data_type else args
-    args = args + ["body"] if "tele_body" in data_type else args
-    args = args + ["surf"] if "surf_tele" in data_type else args
+    args = args + ["body"] if "body" in data_type else args
+    args = args + ["surf"] if "surf" in data_type else args
     args = args + ["gps"] if "gps" in data_type else args
     args = args + ["dart"] if "dart" in data_type else args
     args = args + ["insar"] if "insar" in data_type else args
@@ -1069,7 +1072,7 @@ def execute_plot(
     )
     plot.plot_misfit(data_type, directory=directory)
     traces_info, stations_gps = [None, None]
-    if "strong_motion" in data_type:
+    if "strong" in data_type:
         with open(directory / "strong_motion_waves.json") as smw:
             traces_info = json.load(smw)
     if "gps" in data_type:
@@ -1077,8 +1080,8 @@ def execute_plot(
             directory=directory
         )
         stations_gps = zip(names, lats, lons, observed, synthetic, error)
-    if "strong_motion" in data_type or "gps" in data_type:
-        plot._PlotMap(
+    if "strong" in data_type or "gps" in data_type:
+        plot.PlotMap(
             tensor_info,
             segments,
             point_sources,
@@ -1094,7 +1097,7 @@ def execute_plot(
             asc_properties = insar_data["ascending"]
             for i, asc_property in enumerate(asc_properties):
                 insar_points = asc_property["points"]
-                plot._PlotInsar(
+                plot.PlotInsar(
                     tensor_info,
                     segments,
                     point_sources,
@@ -1107,7 +1110,7 @@ def execute_plot(
             desc_properties = insar_data["descending"]
             for i, desc_property in enumerate(desc_properties):
                 insar_points = desc_property["points"]
-                plot._PlotInsar(
+                plot.PlotInsar(
                     tensor_info,
                     segments,
                     point_sources,
@@ -1123,10 +1126,10 @@ def execute_plot(
             option="fault&rise_time.txt",
             directory=directory,
         )
-        plot._PlotSlipDist_Compare(
+        plot.PlotSlipDist_Compare(
             segments, point_sources, input_model, solution, directory=directory
         )
-        plot._PlotComparisonMap(
+        plot.PlotComparisonMap(
             tensor_info,
             segments,
             point_sources,
@@ -1174,226 +1177,3 @@ def __ask_velrange(
     min_vel = float(lines[1][5])
     max_vel = float(lines[1][6])
     return min_vel, max_vel
-
-
-if __name__ == "__main__":
-    import argparse
-
-    import wasp.manage_parser as mpar
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser = mpar.parser_add_tensor(parser)
-    parser = mpar.parser_ffm_data(parser)
-    parser.add_argument(
-        "-o",
-        "--option",
-        choices=[
-            "auto",
-            "manual",
-            "forward",
-            "point_source",
-            "checker_mod",
-            "checker_noise",
-            "point_source_err",
-            "forward_patch",
-            "add_data",
-        ],
-        required=True,
-        help="which method to run",
-    )
-    parser.add_argument("-d", "--data", help="direction of folder with seismic data")
-    parser.add_argument("-v", "--velmodel", help="direction of velocity model file")
-    parser.add_argument(
-        "-rst",
-        "--st_response",
-        action="store_false",
-        help="whether to remove response of strong_motion or not",
-    )
-    args = parser.parse_args()
-    if args.gcmt_tensor:
-        args.gcmt_tensor = os.path.abspath(args.gcmt_tensor)
-    if args.qcmt_tensor:
-        args.qcmt_tensor = os.path.abspath(args.qcmt_tensor)
-    if args.data:
-        args.data = os.path.abspath(args.data)
-    velmodel = args.velmodel if args.velmodel else None
-    if velmodel:
-        velmodel = mv.model2dict(velmodel)
-    os.chdir(args.folder)
-    data_type = mpar.get_used_data(args)
-    data_type = data_type + ["insar"] if args.insar else data_type
-
-    default_dirs = mng.default_dirs()
-    if args.option not in ["auto"]:
-        segments_data = json.load(open("segments_data.json"))
-    if args.option == "auto":
-        if not args.gcmt_tensor and not args.qcmt_tensor:
-            raise RuntimeError("You must select direction of input GCMT file")
-        if args.gcmt_tensor:
-            tensor_info = tensor.get_tensor(
-                cmt_file=args.gcmt_tensor, directory=pathlib.Path()
-            )
-        if args.qcmt_tensor:
-            tensor_info = tensor.get_tensor(
-                quake_file=args.qcmt_tensor, directory=pathlib.Path()
-            )
-        set_directory_structure(tensor_info, directory=pathlib.Path())
-        if args.data:
-            for file in os.listdir(args.data):
-                if os.path.isfile(os.path.join(args.data, file)):
-                    copy2(os.path.join(args.data, file), "data")
-        data_type = data_type if len(data_type) >= 1 else ["tele_body"]
-        automatic_usgs(
-            tensor_info,
-            data_type,
-            default_dirs,
-            velmodel=velmodel,
-            dt_cgps=None,
-            st_response=args.st_response,
-            directory=pathlib.Path(),
-        )
-    if args.option == "add_data":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        modelling_new_data(
-            tensor_info,
-            data_type,
-            default_dirs,
-            data_folder,
-            segments_data,
-            st_response=args.st_response,
-            directory=pathlib.Path(),
-        )
-    if args.option == "manual":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        manual_modelling(
-            tensor_info,
-            data_type,
-            default_dirs,
-            segments_data,
-            directory=pathlib.Path(),
-        )
-    if args.option == "forward":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        forward_modelling(
-            tensor_info,
-            data_type,
-            default_dirs,
-            segments_data,
-            option="Solucion.txt",
-            directory=pathlib.Path(),
-        )
-    if args.option == "forward_patch":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        checkerboard(
-            tensor_info,
-            data_type,
-            default_dirs,
-            segments_data,
-            max_slip=400,
-            option="Patches",
-            option2="forward",
-            directory=pathlib.Path(),
-        )
-    if args.option == "checker_mod":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        checkerboard(
-            tensor_info,
-            data_type,
-            default_dirs,
-            segments_data,
-            add_error=True,
-            directory=pathlib.Path(),
-        )
-    if args.option == "checker_noise":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        checkerboard(
-            tensor_info,
-            data_type,
-            default_dirs,
-            segments_data,
-            max_slip=0,
-            add_error=True,
-            directory=pathlib.Path(),
-        )
-    if args.option == "point_source":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        checkerboard(
-            tensor_info,
-            data_type,
-            default_dirs,
-            segments_data,
-            max_slip=500,
-            option="Patches",
-            directory=pathlib.Path(),
-        )
-    if args.option == "point_source_err":
-        if args.gcmt_tensor:
-            cmt_file = args.gcmt_tensor
-            tensor_info = tensor.get_tensor(cmt_file=cmt_file, directory=pathlib.Path())
-        else:
-            tensor_info = tensor.get_tensor(directory=pathlib.Path())
-        if len(data_type) == 0:
-            raise RuntimeError("You must input at least one data type")
-        data_folder = args.data if args.data else None
-        checkerboard(
-            tensor_info,
-            data_type,
-            default_dirs,
-            segments_data,
-            max_slip=300,
-            option="Patches",
-            add_error=True,
-            directory=pathlib.Path(),
-        )

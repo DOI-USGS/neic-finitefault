@@ -26,7 +26,7 @@ def test_acquisition(mock_iris, mock_fdsn):
             lat_ep,
             lon_ep,
             depth,
-            ["strong", "tele"],
+            ["strong", "body"],
             waveform_directory=pathlib.Path(tempdir),
         )
         num_files = glob(f"{tempdir}/*")

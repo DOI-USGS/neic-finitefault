@@ -304,7 +304,7 @@ def __strike_dip_rake_from_ln(
     slip_vector: np.ndarray, fault_normal: np.ndarray
 ) -> Tuple[float, float, float]:
     """Calculate strike, dip, and rake from the slip vector and fault plane's
-       normal vector (Following Udias Fig 16.19)
+       normal vector (Following Udias (1999) Principles of Seismology, Fig 16.19)
 
     :param slip_vector: The slip vectory
     :type slip_vector: np.ndarray
@@ -376,22 +376,3 @@ def __is_number(value: Union[str, float, int]) -> bool:
         return False
     except TypeError:
         return False
-
-
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-gcmt", "--gcmt_tensor", help="location of GCMT moment tensor file"
-    )
-    args = parser.parse_args()
-
-    tensor_info = read_gcmt_file(args.gcmt_tensor)
-    tensor_info = modify_tensor(tensor_info)
-    delta = datetime.utcnow() - tensor_info["date_origin"]
-    tensor_info["timedelta"] = delta.total_second
-    moment_mag = tensor_info["moment_mag"]
-    moment_mag = 2 * np.log10(moment_mag) / 3 - 10.7
-    print(tensor_info)
-    write_tensor(tensor_info)

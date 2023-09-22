@@ -31,7 +31,7 @@ def test_is_number():
 
 
 def test_plot_channels():
-    tempdir = tempfile.mkdtemp()
+    tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
         with open(pathlib.Path(tempdir) / "tele_waves.json", "w") as f:
             json.dump(TELE_WAVES, f)
@@ -40,9 +40,9 @@ def test_plot_channels():
         with open(pathlib.Path(tempdir) / "surf_waves.json", "w") as f:
             json.dump(SURF_WAVES, f)
 
-        plot_channels("tele_waves.json", tempdir, tempdir)
-        plot_channels("strong_motion_waves.json", tempdir, tempdir)
-        plot_channels("surf_waves.json", tempdir, tempdir)
+        plot_channels(tempdir / "tele_waves.json", tempdir)
+        plot_channels(tempdir / "strong_motion_waves.json", tempdir)
+        plot_channels(tempdir / "surf_waves.json", tempdir)
         written_plots = [f.replace(f"{tempdir}/", "") for f in glob(f"{tempdir}/*/*")]
         assert len(written_plots) == 9
         target_plots = [

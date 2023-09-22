@@ -96,7 +96,7 @@ def static_to_srf(
     quantity_strong = 0
     strong_phimx = 0
     strong_r = 0
-    if "strong_motion" in used_data:
+    if "strong" in used_data:
         strong_data = pd.read_json(directory / "strong_motion_waves.json")
         quantity_strong = int(
             len(strong_data) / 3
@@ -128,7 +128,7 @@ def static_to_srf(
     quantity_tele = 0
     tele_phimx = 0
     tele_r = 0
-    if "tele_body" in used_data:
+    if "body" in used_data:
         tele_data = pd.read_json(directory / "tele_waves.json")
         quantity_tele = len(tele_data)
         tele_r = min(tele_data["distance"])
@@ -138,7 +138,7 @@ def static_to_srf(
     quantity_surf = 0
     surf_phimx = 0
     surf_r = 0
-    if "surf_tele" in used_data:
+    if "surf" in used_data:
         surf_data = pd.read_json(directory / "surf_waves.json")
         quantity_surf = len(surf_data)
         surf_r = min(surf_data["distance"])
@@ -442,7 +442,7 @@ def build_source_time_function(
     :type t_ris: np.ndarray
     :param t_fal: The fall time
     :type t_fal: np.ndarray
-    :param dt: _description_
+    :param dt: The dt
     :type dt: float
     :param total_time: The total time
     :type total_time: int
@@ -490,34 +490,3 @@ def build_source_time_function(
         return  # type:ignore
 
     return t, Mdot
-
-
-if __name__ == "__main__":
-    import argparse
-    import errno
-
-    import wasp.manage_parser as mp
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser = mp.parser_add_tensor(parser)
-    parser = mp.parser_ffm_data(parser)
-    args = parser.parse_args()
-    os.chdir(args.folder)
-    used_data = mp.get_used_data(args)
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-    segments_data = json.load(open("segments_data.json"))
-    segments = segments_data["segments"]
-    if not os.path.isfile("velmodel_data.json"):
-        raise FileNotFoundError(
-            errno.ENOENT, os.strerror(errno.ENOENT), "velmodel_data.json"
-        )
-    vel_model = json.load(open("velmodel_data.json"))
-    solution = get_outputs.read_solution_static_format(segments)
-    static_to_srf(tensor_info, segments_data, used_data, vel_model, solution)

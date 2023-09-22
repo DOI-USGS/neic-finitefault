@@ -29,8 +29,6 @@ from scipy.signal import butter, filtfilt  # type: ignore
 
 import wasp.management as mng
 import wasp.modulo_logs as ml
-import wasp.remove_response as response
-import wasp.seismic_tensor as tensor
 import wasp.wang_baseline_removal_v1 as wang1
 
 ###################################
@@ -807,7 +805,8 @@ def __select_cgps_files(
     tensor_info: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Select cgps data and make sure our cgps data is not of bad quality
+    """Select cgps data and do some basic quality control
+       (synthetic length, missing data check, station distance within bounds)
 
     :param cgps_files: The cgps files
     :type cgps_files: List[str]
@@ -992,7 +991,7 @@ def new_process_cgps(
 
 
 def __linear_fill(data: np.ndarray, begin: int, end: int) -> np.ndarray:
-    """Linearly fill the data
+    """Linear interpolation for data gaps
 
     :param data: The data to fill
     :type data: np.ndarray
@@ -1051,7 +1050,7 @@ def _filter_decimate(
     :type corners: int, optional
     :param passes: The number of passes, defaults to 2
     :type passes: int, optional
-    :param decimate: Whether to decimate the data, defaults to True
+    :param decimate: Decimate the data to sampling defined in traces_properties.py, defaults to True
     :type decimate: bool, optional
     :param logger: A logger, defaults to None
     :type logger: logging.Logger, optional
@@ -1588,51 +1587,3 @@ def select_strong_stations(tensor_info: dict, files: List[str]) -> List[str]:
         if not file in select_stations:
             os.remove(file)
     return select_stations
-
-
-if __name__ == "__main__":
-    import argparse
-
-    import wasp.manage_parser as mp
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser = mp.parser_add_tensor(parser)
-    parser = mp.parser_data_process(parser)
-    parser.add_argument("-dt", "--sampling_delta", help="process cGPS data")
-    parser.add_argument("--pick", action="store_true", help="pick of teleseismic waves")
-    args = parser.parse_args()
-    if not os.path.isfile("sampling_filter.json"):
-        raise FileNotFoundError(
-            errno.ENOENT, os.strerror(errno.ENOENT), "sampling_filter.json"
-        )
-    data_prop = json.load(open("sampling_filter.json"))
-    os.chdir(args.folder)
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-    if args.tele:
-        tele_files = glob.glob("*BH*SAC") + glob.glob("*BH*sac")
-        select_process_tele_body(tele_files, tensor_info, data_prop)
-    if args.surface:
-        tele_files = glob.glob("*BH*SAC") + glob.glob("*BH*sac")
-        select_process_surf_tele(tele_files, tensor_info, data_prop)
-    if args.strong:
-        strong_files = (
-            glob.glob("*.HN*SAC")
-            + glob.glob("*.HL*SAC")
-            + glob.glob("*.HN*sac")
-            + glob.glob("*.HL*sac")
-            + glob.glob("*.AH?.*")
-            + glob.glob("*.AH?.*")
-            + glob.glob("*_HN*sac")
-            + glob.glob("*_HL*sac")
-        )
-        select_process_strong(strong_files, tensor_info, data_prop)
-    if args.cgps:
-        cgps_files = glob.glob("*.L[HXY]*SAC") + glob.glob("*.L[HXY]*sac")
-        select_process_cgps(cgps_files, tensor_info, data_prop)

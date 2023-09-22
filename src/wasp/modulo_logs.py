@@ -15,7 +15,7 @@ def create_log(name: str, log_file: Union[pathlib.Path, str]) -> logging.Logger:
     :type name: str
     :param log_file: The path to the log file
     :type log_file: Union[pathlib.Path, str]
-    :return: _description_
+    :return: The logger
     :rtype: logging.Logger
     """
     logger = logging.getLogger(name)

@@ -1,5 +1,3 @@
-import argparse
-import errno
 import json
 import os
 import pathlib
@@ -191,7 +189,7 @@ def correct_waveforms(
                             }
                             defaults to {}
     :type station_dict: Dict[str, List[Dict[str, Union[float, int, str]]]], optional
-    :raises ValueError: _description_
+    :raises ValueError: If input is false and a station_dict is not provided
     """
     if input:
         _modify_by_input(json_file=json_file)
@@ -202,34 +200,26 @@ def correct_waveforms(
 
 
 def plot_channels(
-    json_file: Literal[
-        "strong_motion_waves.json",
-        "surf_waves.json",
-        "tele_waves.json",
-    ],
+    json_file: pathlib.Path,
     plot_directory: Union[pathlib.Path, str],
-    data_directory: Union[str, pathlib.Path] = pathlib.Path(),
 ):
     """Plot channels
 
-    :param json_file: The json file with the available files
-    :type json_file: Literal[ &quot;strong_motion_waves.json&quot;, &quot;surf_waves.json&quot;, &quot;tele_waves.json&quot;, ]
+    :param json_file: The full path to the json file with the available files
+    :type json_file: str
     :param plot_directory: Where plots (and plot folders) should be saved
     :type plot_directory: Union[pathlib.Path, str]
-    :param data_directory: The directory where the json_file exists,
-                            defaults to pathlib.Path()
-    :type data_directory: Union[str, pathlib.Path], optional
     """
-    with open(pathlib.Path(data_directory) / json_file, "r") as f:
+    with open(json_file, "r") as f:
         files = json.load(f)
 
     plot_folder: Union[pathlib.Path, str] = (
         "review_tele"
-        if json_file == "tele_waves.json"
+        if os.path.basename(json_file) == "tele_waves.json"
         else "review_strong"
-        if json_file == "strong_motion_waves.json"
+        if os.path.basename(json_file) == "strong_motion_waves.json"
         else "review_surf"
-        if json_file == "surf_waves.json"
+        if os.path.basename(json_file) == "surf_waves.json"
         else "review_manual"
     )
     plot_folder = pathlib.Path(plot_directory) / plot_folder
@@ -265,15 +255,6 @@ def plot_channels(
         plt.close(fig)
 
 
-def main(json_file, plot=False, modify=False):
-    """ """
-    if plot:
-        plot_channels(json_file)
-    if modify:
-        correct_waveforms(json_file)
-    return
-
-
 def __is_number(value: Union[str, float]) -> bool:
     """Determine if the provided value is a number
 
@@ -287,59 +268,3 @@ def __is_number(value: Union[str, float]) -> bool:
         return True
     except ValueError:
         return False
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser.add_argument(
-        "-t", "--tele", action="store_true", help="select teleseismic data"
-    )
-    parser.add_argument(
-        "-su", "--surface", action="store_true", help="select surface waves data"
-    )
-    parser.add_argument(
-        "-st", "--strong", action="store_true", help="select strong motion data"
-    )
-    parser.add_argument("--cgps", action="store_true", help="select cGPS data")
-    parser.add_argument(
-        "-p",
-        "--plot",
-        action="store_true",
-        help="create more detailed plots of waveforms",
-    )
-    parser.add_argument(
-        "-m", "--modify", action="store_true", help="manual modification of waveforms"
-    )
-    args = parser.parse_args()
-    os.chdir(args.folder)
-    if args.tele:
-        if not os.path.isfile("tele_waves.json"):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "tele_waves.json"
-            )
-        json_file = "tele_waves.json"
-        main(json_file, plot=args.plot, modify=args.modify)
-    if args.surface:
-        if not os.path.isfile("surf_waves.json"):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "surf_waves.json"
-            )
-        json_file = "surf_waves.json"
-        main(json_file, plot=args.plot, modify=args.modify)
-    if args.strong:
-        if not os.path.isfile("strong_motion_waves.json"):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "strong_motion_waves.json"
-            )
-        json_file = "strong_motion_waves.json"
-        main(json_file, plot=args.plot, modify=args.modify)
-    if args.cgps:
-        if not os.path.isfile("cgps_waves.json"):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "cgps_waves.json"
-            )
-        json_file = "cgps_waves.json"
-        main(json_file, plot=args.plot, modify=args.modify)

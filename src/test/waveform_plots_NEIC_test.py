@@ -34,7 +34,7 @@ def test_plot_waveforms():
         [time, time, time, time],
         [waveform1, waveform2, waveform2, waveform2],
         [1, 0, 1, 1],
-        ["tele_body", "surf_tele", "strong_motion", "tele_body"],
+        ["body", "surf", "strong", "body"],
         ["BHZ", "SH", "BHZ", "SH"],
         custom="fill",
     )
@@ -49,7 +49,7 @@ def test_add_metadata():
         comps=["BHZ", "SH", "BHZ", "SH"],
         distances=[5, 100, 20, 10],
         names=["name1", "name2", "name3", "name4"],
-        type_str=["tele_body", "surf_tele", "strong_motion", "tele_body"],
+        type_str=["body", "surf", "strong", "body"],
         weights=[0, 1, 2, 3],
     )
     plt.close()
@@ -96,21 +96,21 @@ def test_plot_waveform_fits():
         plot_waveform_fits(
             files,
             ["HNZ", "HNN", "HNE"],
-            "strong_motion",
+            "strong",
             start_margin=10,
             plot_directory=tempdir,
         )
         plot_waveform_fits(
             files,
             ["BHZ", "SH"],
-            "tele_body",
+            "body",
             start_margin=10,
             plot_directory=tempdir,
         )
         plot_waveform_fits(
             files,
             ["BHZ", "SH"],
-            "surf_tele",
+            "surf",
             start_margin=10,
             plot_directory=tempdir,
         )

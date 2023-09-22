@@ -379,34 +379,35 @@ def shear_modulous(point_sources: list, velmodel: Optional[dict] = None) -> list
 
 def __default_vel_of_eq(tensor_info: dict) -> float:
     """Get a default rupture velocity
+       Rupture velocity is roughly 0.7*shear wave velocity, Vs. Vs increases with depth.
+       Rupture velocity can be modified manually in segments_data.json.
 
     :param tensor_info: Dictionary with plane tensor information
     :type tensor_info: dict
-    :return: _description_
+    :return: Rupture velocity
     :rtype: float
     """
     #
-    #  2.5 km/sec is a nice guess for subduction events.
+    #  Default rupture velocity for shallow crustal events is 2.5 km/sec.
     #
     time_shift = tensor_info["time_shift"]
     moment_mag = tensor_info["moment_mag"]
     depth = tensor_info["depth"]
     default_vel = 2.5
     #
-    # for intermediate depth earthquakes (100-300 km), we guess 3.0 km/sec.
+    # Default rupture velocity for intermediate depth earthquakes (100-300 km) is 3.0 km/sec.
     #
     if depth > 100:
         default_vel = 3.0
     #
-    # for deep earthquakes, we guess 3.6 km/sec. As they take place in
-    # locations where body wave velocities are higher.
+    # Default rupture velocity for deep earthquakes (>300 km) is 3.6 km/sec.
     #
     if depth > 300:
         default_vel = 3.6
     #
-    # we loosely follow duputel (2013). He stablishes that a criteria for
-    # saying whether an earthquake is slow, is if the centroid time delay
-    # is much larger than a first estimate of the half-duration, based on magnitude
+    # Default rupture velocity for "slow" earthquakes follows Duputel et al. (2013),
+    # Earth and Planetary Science Letters, in which earthquake is classified as slow if the
+    # centroid time delay is much larger than a magnitude-based estimate of the half-duration
     #
     if time_shift / (1.2 * 10**-8 * moment_mag ** (1 / 3)) > 3:
         default_vel = 1.5
@@ -432,14 +433,12 @@ def __fault_plane_properties(
     """
     #
     # Fault dimensions
-    #
-    #  The fault plane is constrained by following 3 conditions
-    #
-    #  1.  width is less than length
-    #  2.  0.5*width<(depth-water_depth)/sind
-    #  3.  If it is strike-slip event (I define as dip>60 abs(sin(rake))<0.7)
-    #      in the crust (dep_hy<30), the
-    #      maximum depth is fixed to 33 km (don't ask me why).
+    #  The fault plane is constrained by following conditions (from Goldberg et al., 2022 SRL):
+    #  1. Length = 3.3*Vr*Tc  where Vr is rupture velocity and Tc is the centroid time
+    #  2. Width < 2z/sin(d)  where z is hypocentral depth and d is fault dip
+    #  3. Width < Length
+    #  4. Width < 300 km
+    #  5. Fault plane is divided into ~225 subfaults of equal size
     #
     dip = plane_info["dip"]
     default_vel = plane_info["rupture_vel"]
@@ -450,14 +449,7 @@ def __fault_plane_properties(
     max_length = default_vel * eq_time
     max_width = min(300.0, max_length, 2 * dist_hypo_surface)
     max_width = max(max_width, 30)
-    #
-    # now we find the number of grids in strike and dip direction,
-    # as well as their size
-    #  2 sec P wave has a wave length of 40 km. So default grid size of subfault is
-    #  a quarter of wavelength
-    #
     size0 = np.sqrt(max_width * max_length / 225.0)
-    #    min_size = 10 if time_shift > 10 else 5
     delta_strike = max(size0, 1.0)
     delta_dip = max(size0, 1.0)
     stk_subfaults = int(min(int(max_length / delta_strike), 45))
@@ -516,7 +508,7 @@ def __rise_time_parameters(
             1.5 * max(delta_strike, delta_dip) * 6 / tensor_info["time_shift"]
         )
         delta_rise = tensor_info["time_shift"] / 12
-    if "tele_body" in data_type:
+    if "body" in data_type:
         windows = max(int(1.5 * max(delta_strike, delta_dip) / 3), windows)
         delta_rise = min(1.5, delta_rise)
     if tensor_info["depth"] > 200:
@@ -740,7 +732,7 @@ def __epicenter_location(hyp_stk: float, hyp_dip: float) -> Dict[str, float]:
     :type hyp_stk: float
     :param hyp_dip: Hypocenter dip
     :type hyp_dip: float
-    :return: _description_
+    :return: Epicenter location
     :rtype: Dict[str, float]
     """
     values = {
@@ -853,15 +845,15 @@ def __write_event_mult_in(
         infile.write("{} {} 1 {}\n".format(hyp_stk, hyp_dip, depth))
 
 
-def event_mult_in_to_json(output_directory: Union[pathlib.Path, str] = pathlib.Path()):
+def event_mult_in_to_json(directory: Union[pathlib.Path, str] = pathlib.Path()):
     """Parse fault properties in event_mult_in file to json file
 
-    :param output_directory: The directory where modelling outputs exist,
+    :param directory: The directory where modelling outputs exist,
                             defaults to pathlib.Path()
-    :type output_directory: Union[pathlib.Path, str], optional
+    :type directory: Union[pathlib.Path, str], optional
     """
-    output_directory = pathlib.Path(output_directory)
-    with open(output_directory / "Event_mult.in", "r") as infile:
+    directory = pathlib.Path(directory)
+    with open(directory / "Event_mult.in", "r") as infile:
         lines = [line.split() for line in infile]
     t1 = float(lines[4][0])
     t2 = float(lines[4][1])
@@ -913,7 +905,7 @@ def event_mult_in_to_json(output_directory: Union[pathlib.Path, str] = pathlib.P
             index0 = index0 + 6
         segments = segments + [dict1]
     dict3 = {"rise_time": rise_time, "segments": segments}
-    with open(output_directory / "segments_data.json", "w") as f:
+    with open(directory / "segments_data.json", "w") as f:
         json.dump(
             dict3,
             f,
@@ -944,72 +936,3 @@ def is_fault_correct(
     length = (hyp_dip - 0.2) * delta_dip
     height = np.sin(dip * np.pi / 180) * length
     return depth > height
-
-
-if __name__ == "__main__":
-    import argparse
-
-    import wasp.manage_parser as mp
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser = mp.parser_add_tensor(parser)
-    parser.add_argument(
-        "-v", "--rupt_vel", default=2.5, type=float, help="Rupture velocity to use"
-    )
-    parser.add_argument(
-        "-np",
-        "--nodal_plane",
-        nargs=3,
-        default=[0, 17, 90],
-        type=float,
-        help="Mechanism (strike, dip, rake) of nodal plane",
-    )
-    parser.add_argument(
-        "-t",
-        "--tele",
-        action="store_true",
-        help="automatic parametrization for teleseismic data",
-    )
-    parser.add_argument(
-        "-st",
-        "--strong",
-        action="store_true",
-        help="automatic parametrization for strong motion data",
-    )
-    parser.add_argument(
-        "-e2j",
-        "--event_to_json",
-        action="store_true",
-        help="Translate Event_mult.in file to JSON file",
-    )
-    args = parser.parse_args()
-
-    os.chdir(args.folder)
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-
-    if args.event_to_json:
-        if not os.path.isfile("Event_mult.in"):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "Event_mult.in"
-            )
-        event_mult_in_to_json()
-    else:
-        data_type: List[str] = []
-        data_type = data_type + ["tele_body"] if args.tele else data_type
-        data_type = data_type + ["strong_motion"] if args.strong else data_type
-        strike, dip, rake = args.nodal_plane
-        np_plane_info = {"strike": strike, "dip": dip, "rake": rake}
-        create_finite_fault(
-            tensor_info,
-            np_plane_info,
-            data_type,
-            water_level=0,
-            rupture_vel=args.rupt_vel,
-        )

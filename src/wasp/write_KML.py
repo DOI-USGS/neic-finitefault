@@ -5,9 +5,7 @@ Created on Mon Jul 11 11:21:45 2022
 
 @author: degoldberg
 """
-import argparse
 import collections
-import json
 import pathlib
 from glob import glob
 from typing import List, Optional, Tuple, Union
@@ -23,11 +21,7 @@ from matplotlib import pyplot as plt  # type: ignore
 from matplotlib.colors import ListedColormap  # type: ignore
 from matplotlib.patches import Rectangle  # type: ignore
 
-import wasp.fault_plane as pf
-import wasp.management as mng
 import wasp.plane_management as pl_mng
-import wasp.seismic_tensor as tensor
-from wasp import get_outputs
 from wasp.plot_graphic_NEIC import __redefine_lat_lon
 from wasp.plot_maps_NEIC import plot_map
 
@@ -66,7 +60,7 @@ def _write_KML(
     :type segments: List[dict]
     :param point_sources: The point source locations
     :type point_sources: list
-    :param evID: _description_
+    :param evID: The event id/name
     :type evID: str
     :param margins: The extent of the map
     :type margins: list
@@ -249,7 +243,7 @@ def _write_KML(
     return
 
 
-def _PlotMap_KML(
+def PlotMap_KML(
     tensor_info: dict,
     segments: List[dict],
     point_sources: list,
@@ -259,8 +253,8 @@ def _PlotMap_KML(
     stations_gps: Optional[zip] = None,
     stations_cgps: Optional[str] = None,
     max_slip: Optional[float] = None,
-    legend_len: Optional[int] = None,
-    scale: Optional[int] = None,
+    legend_len: Optional[float] = None,
+    scale: Optional[float] = None,
     limits: List[Optional[float]] = [None, None, None, None],
     evID: Optional[str] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
@@ -286,9 +280,9 @@ def _PlotMap_KML(
     :param max_slip: A specified maximum slip, defaults to None
     :type max_slip: Optional[float], optional
     :param legend_len: The length of the legend, defaults to None
-    :type legend_len: Optional[int], optional
+    :type legend_len: Optional[float], optional
     :param scale: The scale, defaults to None
-    :type scale: Optional[int], optional
+    :type scale: Optional[float], optional
     :param limits: The extent of the map, defaults to [None, None, None, None]
     :type limits: List[Optional[float]], optional
     :param evID: The event name/ID, defaults to None
@@ -534,6 +528,7 @@ def _PlotMap_KML(
         faults=True,
         aftershocks=True,
         transform=dictn["transform"],
+        directory=directory,
     )
     ax.plot(
         lon0,
@@ -693,7 +688,7 @@ def set_KML_map_cartopy(
     :type aftershocks: bool, optional
     :param transform: Coordinate transform to use, defaults to None
     :type transform: Optional[Projection], optional
-    :param directory: _description_, defaults to "."
+    :param directory: The directory to read/write from, defaults to "."
     :type directory: Union[pathlib.Path, str], optional
     :return: The updated axes
     :rtype: GeoAxes
@@ -755,127 +750,3 @@ def set_KML_map_cartopy(
 
     min_lon, max_lon, min_lat, max_lat = margins
     return ax
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-ev",
-        "--EventID",
-        nargs="?",
-        const="Not Provided",
-        type=str,
-        help="Provide event ID",
-    )
-    parser.add_argument(
-        "-st",
-        "--strong",
-        action="store_true",
-        help="plot strong motion stations and strong motion misfit",
-    )
-    parser.add_argument("--cgps", action="store_true", help="plot misfit of cGPS data")
-    parser.add_argument("--gps", action="store_true", help="plot GPS data")
-    parser.add_argument(
-        "-gcmt", "--gcmt_tensor", help="location of GCMT moment tensor file"
-    )
-    parser.add_argument(
-        "-max",
-        "--maxvalue",
-        default=None,
-        type=float,
-        help="Choose maximum slip value for plot",
-    )
-    parser.add_argument(
-        "-legend",
-        "--legend_length",
-        default=None,
-        type=float,
-        help="Length of static GNSS vector for legend (in cm)",
-    )
-    parser.add_argument(
-        "-scale",
-        "--scale_factor",
-        default=None,
-        type=float,
-        help="Scale factor for static GNSS vector lengths (larger means shorter vectors)",
-    )
-    parser.add_argument(
-        "-limits",
-        "--map_limits",
-        type=float,
-        nargs=4,
-        help="Specify map limits [W,E,N,S] from edges of plotted features. eg: 0.5 0.5 0.5 0.5\
-                        gives a 0.5 degree buffer on each side. Negative numbers will cut off plotted features.",
-    )
-    args = parser.parse_args()
-
-    default_dirs = mng.default_dirs()
-
-    stations_str, stations_cgps, stations_gps = [None, None, None]
-    if args.gps:
-        names, lats, lons, observed, synthetic, error = get_outputs.retrieve_gps()
-        stations_gps = zip(names, lats, lons, observed, synthetic, error)
-    if args.cgps:
-        traces_info_cgps = json.load(open("cgps_waves.json"))
-    if args.strong:
-        traces_info = json.load(open("strong_motion_waves.json"))
-
-    if args.EventID:
-        evID = args.EventID
-    else:
-        evID = None
-
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-    segments_data = json.load(open("segments_data.json"))
-    segments = segments_data["segments"]
-    rise_time = segments_data["rise_time"]
-    connections = None
-    if "connections" in segments_data:
-        connections = segments_data["connections"]
-    point_sources = pf.point_sources_param(
-        segments, tensor_info, rise_time, connections=connections
-    )
-    solution = get_outputs.read_solution_static_format(segments)
-
-    if args.maxvalue != None:
-        max_val = args.maxvalue
-    else:
-        max_val = None
-    if args.legend_length != None:
-        legend_len = args.legend_length
-    else:
-        legend_len = None
-    if args.scale_factor != None:
-        scale = args.scale_factor
-    else:
-        scale = None
-    if args.map_limits:
-        limits = [
-            args.map_limits[0],
-            args.map_limits[1],
-            args.map_limits[2],
-            args.map_limits[3],
-        ]
-        print(f"Axes limits: {limits}")
-    else:
-        limits = [None, None, None, None]
-
-    _PlotMap_KML(
-        tensor_info,
-        segments,
-        point_sources,
-        solution,
-        default_dirs,
-        stations_str=stations_str,
-        stations_gps=stations_gps,
-        stations_cgps=stations_cgps,
-        max_slip=max_val,
-        legend_len=legend_len,
-        scale=scale,
-        limits=limits,
-        evID=evID,
-    )
