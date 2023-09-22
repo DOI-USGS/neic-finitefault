@@ -40,14 +40,20 @@ RUN bash ./install.d/data_dependencies.sh \
     "${FINITEFAULT_DIR}" \
     --fd-bank "${FINITEFAULT_DIR}/${FD_BANK}" \
     --lith "${FINITEFAULT_DIR}/${LITHO1}"
-## cleanup scripts
+## cleanup files
 RUN rm -rf install.d src poetry.lock pyproject.toml pb2002_boundaries.gmt
 RUN if [ "${FD_BANK}" != "fortran_code/gfs_nm/long/fd_bank" ]; then rm -f "${FINITEFAULT_DIR}/${FD_BANK}"; fi
 RUN if [ "${LITHO1}" != "fortran_code/info/LITHO1.0.nc" ]; then rm -f "${FINITEFAULT_DIR}/${LITHO1}"; fi
-
+## set permissions
+RUN chown usgs-user:usgs-user "fortran_code/gfs_nm/long/fd_bank"
+RUN chmod 777 "fortran_code/gfs_nm/long/fd_bank"
+RUN chown usgs-user:usgs-user "fortran_code/info/LITHO1.0.nc"
+RUN chmod 777 "fortran_code/info/LITHO1.0.nc"
+RUN chown -R usgs-user:usgs-user "tectonicplates"
+RUN chmod -R 777 "tectonicplates"
 USER usgs-user
 
-# Add and install/compile code
+# Add and install and compile code
 FROM dependencies as finitefault
 
 USER root
@@ -61,19 +67,22 @@ WORKDIR /home/usgs-user/finitefault/
 RUN cd $FINITEFAULT_DIR \
     && bash install.d/wasp.sh \
     "${FINITEFAULT_DIR}"
-## install python dependencies
+## install python packages
 RUN cd $FINITEFAULT_DIR && poetry build 
 RUN pip install $FINITEFAULT_DIR/dist/neic_finitefault*.whl
 RUN pip install okada-wrapper==18.12.07.3
 ## update permissions
 RUN chown -R usgs-user:usgs-user "${FINITEFAULT_DIR}"
 RUN chmod -R 777 "${FINITEFAULT_DIR}"
-## cleanup
-RUN rm -rf "${FINITEFAULT_DIR}/install.d" src pyproject.toml poetry.lock
+## cleanup files and packages
+RUN rm -rf "${FINITEFAULT_DIR}/install.d" src pyproject.toml poetry.lock 
 RUN apt remove -y \
     cmake \
     curl \
     gcc \
     gfortran \
-    git;
+    git \
+    libnetcdf-dev \
+    libgdal-dev \
+    libgeos-dev;
 USER usgs-user
