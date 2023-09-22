@@ -13,6 +13,7 @@ from wasp.data_management import filling_data_dicts
 from wasp.fault_plane import create_finite_fault, event_mult_in_to_json
 from wasp.get_outputs import read_solution_static_format
 from wasp.management import default_dirs
+from wasp.modelling_parameters import modelling_prop
 from wasp.modify_jsons import modify_channels
 from wasp.modify_sacs import correct_waveforms, plot_channels
 from wasp.read_config import CONFIG_PATH, PROJECT_DIRECTORY
@@ -209,6 +210,54 @@ def fill_dicts(
         ramp_asc=[insar_ascending_ramp],
         ramp_desc=[insar_descending_ramp],
         working_directory=directory,
+    )
+
+
+@app.command(help="Write modelling properties file")
+def model_props(
+    directory: pathlib.Path = typer.Argument(
+        ..., help="Path to the directory to read/write from"
+    ),
+    gcmt_tensor_file: pathlib.Path = typer.Argument(
+        ..., help="Path to the GCMT moment tensor file"
+    ),
+    data_types: List[ManagedDataTypes] = typer.Option(
+        [],
+        "-t",
+        "--data-type",
+        help="Type to add to the data_types list, default is []",
+    ),
+    segments_file: pathlib.Path = typer.Option(
+        None,
+        "-s",
+        "--segments",
+        help="Path to the segments file (otherwise assumes in specified directory)",
+    ),
+):
+    # set default data type
+    chosen_data_types: List[str]
+    chosen_data_types = [d.value for d in data_types]
+
+    # validate required file(s)
+    validate_files([gcmt_tensor_file])
+
+    # get tensor information
+    tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
+
+    # get velocity model
+    if segments_file:
+        with open(segments_file) as s:
+            segments_data = json.load(s)
+    else:
+        with open(directory / "segments_data.json") as s:
+            segments_data = json.load(s)
+
+    # convert write modelling props
+    modelling_prop(
+        tensor_info=tensor_info,
+        segments_data=segments_data,
+        data_type=chosen_data_types,
+        directory=directory,
     )
 
 

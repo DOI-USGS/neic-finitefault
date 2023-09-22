@@ -197,6 +197,55 @@ def test_fill_dicts_missing_file():
         shutil.rmtree(tempdir)
 
 
+def test_model_props():
+    from wasp.wasp_admin.manage import app
+
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        shutil.copyfile(
+            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT",
+            tempdir / "20003k7a_cmt_CMT",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "segments_data.json", tempdir / "segments_data.json"
+        )
+        result = runner.invoke(
+            app,
+            [
+                "model-props",
+                str(tempdir),
+                str(tempdir / "20003k7a_cmt_CMT"),
+                "-t",
+                "cgps",
+                "-t",
+                "insar",
+                "-t",
+                "surf",
+                "-t",
+                "strong",
+                "-t",
+                "body",
+            ],
+        )
+        print(result.exception)
+        assert result.exit_code == 0
+        # compare annealing_prop
+        with open(tempdir / "annealing_prop.json") as ad:
+            annealing_data = json.load(ad)
+        with open(RESULTS_DIR / "NP1" / "annealing_prop.json") as ad:
+            target_annealing = json.load(ad)
+        assert annealing_data == target_annealing
+        # compare model_space
+        with open(tempdir / "model_space.json") as md:
+            model_data = json.load(md)
+        with open(RESULTS_DIR / "NP1" / "model_space.json") as md:
+            target_model = json.load(md)
+        assert model_data == target_model
+    finally:
+        print("Cleaning up test directory.")
+        shutil.rmtree(tempdir)
+
+
 def test_modify_dicts():
     from wasp.wasp_admin.manage import app
 
