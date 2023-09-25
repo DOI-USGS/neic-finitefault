@@ -8,7 +8,7 @@ profile = "black"
 [tool.poetry]
 authors = [
     "Koch, Pablo <pkoch@csn.uchile.cl>", 
-    "Goldberg, Dara <dgoldberg@usgs.gov>",
+    "Goldberg, Dara <degoldberg@usgs.gov>",
     "Hunsinger, Heather <hhunsinger@usgs.gov>",
     "Haynie, Kirstie <khaynie@usgs.gov>"
 ]
