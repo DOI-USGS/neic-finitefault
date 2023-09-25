@@ -567,6 +567,8 @@ def input_chen_near_field(
         filename3 = directory / "wavelets_cgps.txt"
         filename4 = directory / "waveforms_cgps.txt"
         filename5 = directory / "Wavelets_cgps.txt"
+    else:
+        return
 
     if not os.path.isfile(dict1):
         return None
@@ -1378,112 +1380,3 @@ def write_green_file(
         )
         green_file.write("10 {} 50000 {}\n".format(dt, time_corr))
         green_file.write(location)
-
-
-###############################
-# as program
-###############################
-
-
-if __name__ == "__main__":
-    import argparse
-
-    import wasp.manage_parser as mp  # type:ignore
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser = mp.parser_add_tensor(parser)
-    parser = mp.parser_fill_data_files(parser)
-    parser.add_argument(
-        "-p",
-        "--plane",
-        action="store_true",
-        help="compute Fault.pos, Fault.time, Niu_model",
-    )
-    parser.add_argument(
-        "-l", "--list", nargs="+", help="list of strong motion stations"
-    )
-    parser.add_argument(
-        "-a", "--annealing", action="store_true", help="compute files for annealing"
-    )
-    parser.add_argument(
-        "-m", "--model_space", action="store_true", help="compute files for model space"
-    )
-    parser.add_argument(
-        "-reg",
-        "--regularization",
-        action="store_true",
-        help="compute files for regularization",
-    )
-    args = parser.parse_args()
-    os.chdir(args.folder)
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-    if args.plane:
-        velmodel = json.load(open("velmodel_data.json"))
-        #        write_velmodel(velmodel)
-        segments_data = json.load(open("segments_data.json"))
-        segments = segments_data["segments"]
-        min_vel = segments[0]["min_vel"]
-        max_vel = segments[0]["max_vel"]
-        plane_for_chen(tensor_info, segments_data, min_vel, max_vel, velmodel)
-    if not os.path.isfile("sampling_filter.json"):
-        raise FileNotFoundError(
-            errno.ENOENT, os.strerror(errno.ENOENT), "sampling_filter.json"
-        )
-    data_prop = json.load(open("sampling_filter.json"))
-    if args.tele:
-        if not os.path.isfile("tele_waves.json"):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "tele_waves.json"
-            )
-        input_chen_tele_body(tensor_info, data_prop)
-    if args.surface:
-        if not os.path.isfile("surf_waves.json"):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "surf_waves.json"
-            )
-        input_chen_tele_surf(tensor_info, data_prop)
-    if args.strong:
-        if not os.path.isfile("strong_motion_waves.json"):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "strong_motion_waves.json"
-            )
-        input_chen_near_field(tensor_info, data_prop, "strong")
-    if args.cgps:
-        if not os.path.isfile("cgps_waves.json"):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "cgps_waves.json"
-            )
-        input_chen_near_field(tensor_info, data_prop, "cgps")
-    if args.gps:
-        if not os.path.isfile("static_data.json"):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "static_data.json"
-            )
-        input_chen_static()
-    if args.insar:
-        if not os.path.isfile("insar_data.json"):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "insar_data.json"
-            )
-        input_chen_insar()
-    if args.model_space:
-        if not os.path.isfile("model_space.json"):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "model_space.json"
-            )
-        dictionary = json.load(open("model_space.json"))
-        model_space(dictionary)
-    if args.annealing:
-        if not os.path.isfile("annealing_prop.json"):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "annealing_prop.json"
-            )
-        dictionary = json.load(open("annealing_prop.json"))
-        inputs_simmulated_annealing(dictionary, "dart")
