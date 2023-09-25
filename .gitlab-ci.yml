@@ -67,6 +67,7 @@ Poetry:
     - poetry config virtualenvs.in-project true --local
     - poetry install
     - poetry run poe okada
+    - poetry run safety check
   stage: init
 
 Fortran:
@@ -119,6 +120,9 @@ Shell Check:
 ## -------------------------------------
 
 Docker Deploy:
+  dependencies:
+    - "Python Test"
+    - "Shell Check"
   extends:
     - .docker_login
   image: "${DOCKER_IMAGE}"
@@ -146,16 +150,7 @@ Docker Deploy:
     - FF_IMAGE="${CI_REGISTRY}/${REPOSITORY}/"wasp-ubuntu":${TAG}"
     - docker build "${ARGS[@]}" --target finitefault -t "${FF_IMAGE}" .
     # remove dependencies that are no longer needed on the runner
-    - rm -rf src fortran_code .venv pb2002_boundaries.gmt
-    # trivy scan before push
-    # fail LOW,MEDIUM vulnerabilities that have a fix available
-    - ${TRIVY} image --exit-code 1 --ignore-unfixed --severity LOW,MEDIUM
-      --skip-files "/usr/local/bin/trivy"
-      "wasp-latest";
-    # fail HIGH,CRITICAL vulnerabilities
-    - ${TRIVY} image --exit-code 1 --ignore-unfixed --severity HIGH,CRITICAL
-      --skip-files "/usr/local/bin/trivy"
-      "wasp-latest";
+    - rm -rf ./*
     # push to registry
     - if [ "${CI_PROJECT_PATH}" != "ghsc/neic/algorithms/neic-finitefault" ]; then
       echo "Skipping push on non-upstream (${CI_PROJECT_PATH})";
@@ -175,4 +170,3 @@ Docker Deploy:
     GMT_VERSION: "6.4.0"
     GSHHG_VERSION: "2.3.7"
     PYTHON_VERSION: "3.10"
-    TRIVY: trivy --cache-dir .trivy --timeout 10m
