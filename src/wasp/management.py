@@ -347,24 +347,3 @@ def use_waveforms(data_type: List[str]) -> bool:
         use_waveforms = True
     return use_waveforms
 
-
-if __name__ == "__main__":
-    import argparse
-    import glob
-
-    import seismic_tensor as tensor  # type: ignore
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser.add_argument(
-        "-gcmt", "--gcmt_tensor", help="location of GCMT moment tensor file"
-    )
-
-    args = parser.parse_args()
-    os.chdir(args.folder)
-    files = glob.glob("SACPZ*")
-    tensor_info = tensor.get_tensor(cmt_file=args.gcmt_tensor)
-    for pzfile in files:
-        correct_response_file(tensor_info, pzfile)
