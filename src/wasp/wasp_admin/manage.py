@@ -13,6 +13,12 @@ from wasp.data_management import filling_data_dicts
 from wasp.fault_plane import create_finite_fault, event_mult_in_to_json
 from wasp.get_outputs import read_solution_static_format
 from wasp.management import default_dirs
+from wasp.many_events import (
+    get_model_space_events,
+    get_moment_events,
+    get_segments_events,
+    get_waveforms_events,
+)
 from wasp.modelling_parameters import modelling_prop
 from wasp.modify_jsons import modify_channels
 from wasp.modify_sacs import correct_waveforms, plot_channels
@@ -211,6 +217,118 @@ def fill_dicts(
         ramp_desc=[insar_descending_ramp],
         working_directory=directory,
     )
+
+
+@app.command(help="Manage the data for many events")
+def many_events(
+    directory: pathlib.Path = typer.Argument(..., help="Path to the data directory"),
+    gcmt_tensor_file: pathlib.Path = typer.Argument(
+        ..., help="Path to the GCMT moment tensor file"
+    ),
+    data_types: List[ManagedDataTypes] = typer.Option(
+        [],
+        "-t",
+        "--data-type",
+        help=f"Type to add to the data_types list, default is []",
+    ),
+    event_folders: List[pathlib.Path] = typer.Option(
+        [],
+        "-e",
+        "--event-folder",
+        help=f"The path to the folders where different events are stored",
+    ),
+):
+    # set data types
+    chosen_data_types: List[str]
+    if data_types == []:
+        chosen_data_types = [d.value for d in ManagedDataTypes]
+    else:
+        chosen_data_types = [d.value for d in data_types]
+
+    for event_folder in event_folders:
+        tensors: list = []
+        segments_events: list = []
+        model_events: list = []
+        annealing_events: list = []
+        strong_motion_events: list = []
+        tele_events: list = []
+        surf_events: list = []
+        cgps_events: list = []
+        static_events: list = []
+
+        # validate files
+        files_to_validate = []
+        for d in chosen_data_types:
+            if d not in ["insar"]:
+                files_to_validate += [event_folder / DEFAULT_MANAGEMENT_FILES[d]]
+        sampling_filtering_file = event_folder / "sampling_filter.json"
+        files_to_validate += [sampling_filtering_file.resolve()]
+        annealing_file = event_folder / "annealing_prop.json"
+        files_to_validate += [annealing_file.resolve()]
+        model_file = event_folder / "model_space.json"
+        files_to_validate += [model_file.resolve()]
+        segments_file = event_folder / "segments_data.json"
+        files_to_validate += [segments_file.resolve()]
+        files_to_validate += [gcmt_tensor_file]
+        validate_files(files_to_validate)
+
+        # get the tensor information
+        tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
+
+        # get the sampling filtering properties
+        with open(sampling_filtering_file) as sf:
+            data_prop = json.load(sf)
+
+        # get the annealing properties
+        with open(annealing_file) as af:
+            annealing_props = json.load(af)
+
+        # get the segment properties
+        with open(segments_file) as sf:
+            segments_data = json.load(sf)
+
+        # get the model properties
+        with open(model_file) as mf:
+            model_data = json.load(mf)
+
+        # fill data dictionaries
+        if "strong" in chosen_data_types:
+            with open(event_folder / "strong_motion_waves.json") as smw:
+                traces_strong = json.load(smw)
+            strong_motion_events = strong_motion_events + [traces_strong]
+        if "body" in chosen_data_types:
+            with open(event_folder / "tele_waves.json") as tw:
+                traces_tele = json.load(tw)
+            tele_events = tele_events + [traces_tele]
+        if "surf" in chosen_data_types:
+            with open(event_folder / "surf_waves.json") as sw:
+                traces_surf = json.load(sw)
+            surf_events = surf_events + [traces_surf]
+        if "cgps" in chosen_data_types:
+            with open(event_folder / "cgps_waves.json") as cw:
+                traces_cgps = json.load(cw)
+            cgps_events = cgps_events + [traces_cgps]
+        if "gps" in chosen_data_types:
+            with open(event_folder / "static_data.json") as sd:
+                static_data = json.load(sd)
+            static_events = static_events + [static_data]
+        segments_events += [segments_data]
+        annealing_events += [annealing_props]
+        model_events += [model_data]
+        tensors += [tensor_info]
+    get_moment_events(annealing_events, directory=directory)
+    get_model_space_events(model_events, directory=directory)
+    get_segments_events(segments_events, tensors, directory=directory)
+    if "strong" in chosen_data_types:
+        get_waveforms_events(strong_motion_events, "strong", directory=directory)
+    if "cgps" in chosen_data_types:
+        get_waveforms_events(cgps_events, "cgps", directory=directory)
+    if "body" in chosen_data_types:
+        get_waveforms_events(tele_events, "body", directory=directory)
+    if "surf" in chosen_data_types:
+        get_waveforms_events(surf_events, "surf", directory=directory)
+    if "gps" in chosen_data_types:
+        get_waveforms_events(static_events, "gps", directory=directory)
 
 
 @app.command(help="Write modelling properties file")

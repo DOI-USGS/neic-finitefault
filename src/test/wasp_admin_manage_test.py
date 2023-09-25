@@ -197,6 +197,99 @@ def test_fill_dicts_missing_file():
         shutil.rmtree(tempdir)
 
 
+def test_many_events():
+    from wasp.wasp_admin.manage import app
+
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "strong_motion_waves.json",
+            tempdir / "strong_motion_waves.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "cgps_waves.json",
+            tempdir / "cgps_waves.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "static_data.json",
+            tempdir / "static_data.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "tele_waves.json",
+            tempdir / "tele_waves.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "surf_waves.json",
+            tempdir / "surf_waves.json",
+        )
+        shutil.copyfile(
+            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "velmodel_data.json", tempdir / "velmodel_data.json"
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "segments_data.json", tempdir / "segments_data.json"
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "strong_motion_waves.json",
+            tempdir / "strong_motion_waves.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "tele_waves.json",
+            tempdir / "tele_waves.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "surf_waves.json",
+            tempdir / "surf_waves.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "cgps_waves.json",
+            tempdir / "cgps_waves.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "sampling_filter.json",
+            tempdir / "sampling_filter.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "annealing_prop.json",
+            tempdir / "annealing_prop.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "model_space.json",
+            tempdir / "model_space.json",
+        )
+
+        result = runner.invoke(
+            app,
+            [
+                "many-events",
+                str(tempdir),
+                str(tempdir / "20003k7a_cmt_CMT"),
+                "-t",
+                "cgps",
+                "-t",
+                "gps",
+                "-t",
+                "insar",
+                "-t",
+                "strong",
+                "-t",
+                "surf",
+                "-t",
+                "body",
+                "-e",
+                str(tempdir),
+            ],
+        )
+        assert result.exit_code == 0
+        assert (tempdir / "segments_events.txt").exists()
+        assert (tempdir / "moment_events.txt").exists()
+    finally:
+        shutil.rmtree(tempdir)
+
+
 def test_model_props():
     from wasp.wasp_admin.manage import app
 
