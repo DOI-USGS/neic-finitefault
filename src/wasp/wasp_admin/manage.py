@@ -12,6 +12,16 @@ from wasp.data_acquisition import acquisition
 from wasp.data_management import filling_data_dicts
 from wasp.fault_plane import create_finite_fault, event_mult_in_to_json
 from wasp.get_outputs import read_solution_static_format
+from wasp.input_files import (
+    input_chen_insar,
+    input_chen_near_field,
+    input_chen_static,
+    input_chen_tele_body,
+    input_chen_tele_surf,
+    inputs_simmulated_annealing,
+)
+from wasp.input_files import model_space as model_space_update
+from wasp.input_files import plane_for_chen
 from wasp.management import default_dirs
 from wasp.many_events import (
     get_model_space_events,
@@ -707,6 +717,118 @@ def tensor_from_gcmt(
     moment_mag = tensor_info["moment_mag"]
     moment_mag = 2 * np.log10(moment_mag) / 3 - 10.7
     write_tensor(tensor_info, directory=directory)
+
+
+@app.command(help="Update the input data dict after changes")
+def update_inputs(
+    gcmt_tensor_file: str = typer.Argument(
+        ..., help="Path to the GCMT moment tensor file"
+    ),
+    annealing: bool = typer.Option(
+        False, "-a", "--annealing", help="Compute files for annealing"
+    ),
+    config_file: pathlib.Path = typer.Option(
+        CONFIG_PATH, "-c", "--config-file", help="Path to config file"
+    ),
+    data_types: List[ManagedDataTypes] = typer.Option(
+        [],
+        "-t",
+        "--data-type",
+        help="Type to add to the data_types list, default is []",
+    ),
+    directory: pathlib.Path = typer.Option(
+        pathlib.Path(),
+        "-d",
+        "--directory",
+        help="Directory where to write the tensor file. Default is working directory",
+    ),
+    model_space: bool = typer.Option(
+        False, "-m", "--model_space", help="compute files for model space"
+    ),
+    plane: bool = typer.Option(
+        False, "-p", "--plane", help="Compute Fault.pos, Fault.time, Niu_model"
+    ),
+):
+    # set data types
+    chosen_data_types = [d.value for d in data_types]
+
+    # get tensor information
+    tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
+
+    # get sampling filtering data
+    sampling_file = directory / "sampling_filter.json"
+    validate_files([sampling_file])
+    with open(sampling_file) as sf:
+        data_prop = json.load(sf)
+
+    if plane:
+        # validate files
+        velocity__file = directory / "velmodel_data.json"
+        segments_file = directory / "segments_data.json"
+        validate_files([velocity__file, segments_file, sampling_file])
+
+        with open(velocity__file) as vm:
+            velmodel = json.load(vm)
+        with open(segments_file) as sd:
+            segments_data = json.load(sd)
+        segments = segments_data["segments"]
+        min_vel = segments[0]["min_vel"]
+        max_vel = segments[0]["max_vel"]
+        plane_for_chen(
+            tensor_info=tensor_info,
+            segments_data=segments_data,
+            min_vel=min_vel,
+            max_vel=max_vel,
+            velmodel=velmodel,
+            directory=directory,
+        )
+    if "body" in chosen_data_types:
+        validate_files([directory / "tele_waves.json"])
+        input_chen_tele_body(
+            tensor_info=tensor_info,
+            data_prop=data_prop,
+            directory=directory,
+        )
+    if "surf" in chosen_data_types:
+        validate_files([directory / "surf_waves.json"])
+        input_chen_tele_surf(
+            tensor_info=tensor_info,
+            data_prop=data_prop,
+            directory=directory,
+            config_path=config_file,
+        )
+    if "strong" in chosen_data_types:
+        validate_files([directory / "strong_motion_waves.json"])
+        input_chen_near_field(
+            tensor_info=tensor_info,
+            data_prop=data_prop,
+            data_type="strong",
+            directory=directory,
+        )
+    if "cgps" in chosen_data_types:
+        validate_files([directory / "cgps_waves.json"])
+        input_chen_near_field(
+            tensor_info=tensor_info,
+            data_prop=data_prop,
+            data_type="cgps",
+            directory=directory,
+        )
+    if "gps" in chosen_data_types:
+        validate_files([directory / "static_data.json"])
+        input_chen_static(directory=directory)
+    if "insar" in chosen_data_types:
+        validate_files([directory / "insar_data.json"])
+        input_chen_insar(directory=directory)
+    if model_space:
+        validate_files([directory / "model_space.json"])
+        with open(directory / "model_space.json") as mf:
+            model_dict = json.load(mf)
+        model_space_update(model_dict, directory=directory)
+    if annealing:
+        validate_files([directory / "annealing_prop.json"])
+        with open(directory / "annealing_prop.json") as af:
+            annealing_dict = json.load(af)
+        inputs_simmulated_annealing(annealing_dict, directory=directory)
 
 
 @app.command(help="Write a velocity model")

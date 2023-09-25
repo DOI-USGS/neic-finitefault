@@ -14,7 +14,14 @@ from .testutils import (
     END_TO_END_DIR,
     HOME,
     RESULTS_DIR,
+    get_cgps_json,
+    get_insar_json,
+    get_sampling_filter,
+    get_static_json,
+    get_strong_motion_json,
+    get_surf_waves_json,
     get_tele_waves_json,
+    get_tensor_info,
     update_manager_file_locations,
 )
 
@@ -41,6 +48,14 @@ CHANNELS = [
         "trace_weight": 1.0,
     },
 ]
+CGPS_WAVES = get_cgps_json()
+CMT = get_tensor_info()
+INSAR_DATA = get_insar_json()
+SAMPLING_FILTER = get_sampling_filter()
+STATIC_DATA = get_static_json()
+STRONG_WAVES = get_strong_motion_json()
+SURF_WAVES = get_surf_waves_json()
+TELE_WAVES = get_tele_waves_json()
 
 
 @mock.patch("wasp.data_acquisition.acquisition", return_value=None)
@@ -796,6 +811,116 @@ def test_static_fsp():
             target = f.readlines()[41:]
         for l, t in zip(data, target):
             assert l == t
+    finally:
+        shutil.rmtree(tempdir)
+
+
+def test_update_inputs():
+    from wasp.wasp_admin.manage import app
+
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        new_surf_waves = update_manager_file_locations(
+            SURF_WAVES, tempdir, replace_dir=str(RESULTS_DIR / "data")
+        )
+        new_tele_waves = update_manager_file_locations(
+            TELE_WAVES, tempdir, replace_dir=str(RESULTS_DIR / "data")
+        )
+        new_strong_waves = update_manager_file_locations(
+            STRONG_WAVES,
+            tempdir,
+            replace_dir=str(RESULTS_DIR / "data"),
+        )
+        new_cgps_waves = update_manager_file_locations(
+            CGPS_WAVES, tempdir, replace_dir=str(RESULTS_DIR / "data")
+        )
+        new_insar = update_manager_file_locations(
+            INSAR_DATA, tempdir, replace_dir=str(RESULTS_DIR / "NP1"), file_key="name"
+        )
+        with open(tempdir / "tele_waves.json", "w") as f:
+            json.dump(new_tele_waves, f)
+        with open(tempdir / "surf_waves.json", "w") as f:
+            json.dump(new_surf_waves, f)
+        with open(tempdir / "strong_motion_waves.json", "w") as f:
+            json.dump(new_strong_waves, f)
+        with open(tempdir / "cgps_waves.json", "w") as f:
+            json.dump(new_cgps_waves, f)
+        with open(tempdir / "insar_data.json", "w") as f:
+            json.dump(new_insar, f)
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "insar_ascending.txt",
+            tempdir / "insar_ascending.txt",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "insar_descending.txt",
+            tempdir / "insar_descending.txt",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "static_data.json",
+            tempdir / "static_data.json",
+        )
+        os.mkdir(tempdir / "STR")
+        os.mkdir(tempdir / "cGPS")
+        os.mkdir(tempdir / "SH")
+        os.mkdir(tempdir / "P")
+        os.mkdir(tempdir / "LONG")
+        for a, b, c, d, e, f, g, h in zip(
+            SURF_WAVES,
+            new_surf_waves,
+            TELE_WAVES,
+            new_tele_waves,
+            STRONG_WAVES,
+            new_strong_waves,
+            CGPS_WAVES,
+            new_cgps_waves,
+        ):
+            shutil.copyfile(a["file"], b["file"])
+            shutil.copyfile(c["file"], d["file"])
+            shutil.copyfile(e["file"], f["file"])
+            shutil.copyfile(g["file"], h["file"])
+        shutil.copyfile(
+            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "velmodel_data.json", tempdir / "velmodel_data.json"
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "segments_data.json", tempdir / "segments_data.json"
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "sampling_filter.json",
+            tempdir / "sampling_filter.json",
+        )
+        with open(DATA_DIR / "config.ini") as f:
+            config = f.read().replace("/home/user/neic-finitefault", str(HOME))
+        with open(tempdir / "config.ini", "w") as wf:
+            wf.write(config)
+        result = runner.invoke(
+            app,
+            [
+                "update-inputs",
+                str(tempdir / "20003k7a_cmt_CMT"),
+                "-d",
+                str(tempdir),
+                "-t",
+                "cgps",
+                "-t",
+                "gps",
+                "-t",
+                "insar",
+                "-t",
+                "strong",
+                "-t",
+                "surf",
+                "-t",
+                "body",
+                "-c",
+                str(tempdir / "config.ini"),
+            ],
+        )
+        print(result.exception)
+        assert result.exit_code == 0
+
     finally:
         shutil.rmtree(tempdir)
 
