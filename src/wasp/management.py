@@ -346,4 +346,3 @@ def use_waveforms(data_type: List[str]) -> bool:
     if "surf" in data_type:
         use_waveforms = True
     return use_waveforms
-
