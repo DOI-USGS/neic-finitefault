@@ -178,39 +178,3 @@ def fk_green_fun1(
             ensure_ascii=False,
         )
     return green_dict
-
-
-if __name__ == "__main__":
-    import argparse
-
-    import wasp.manage_parser as mp  # type:ignore
-    import wasp.management as mng
-    import wasp.seismic_tensor as tensor
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser = mp.parser_add_tensor(parser)
-    parser = mp.parser_add_gf(parser)
-    parser.add_argument(
-        "-dt", type=float, default=0.2, help="sampling step of strong motion data"
-    )
-    args = parser.parse_args()
-    os.chdir(args.folder)
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-    tensor_info["timedelta"] = 81 * 90
-    used_data = mp.get_used_data(args)
-    default_dirs = mng.default_dirs()
-    # fk_green_fun0 removed since it isn't used anywhere
-    # if "strong" in used_data and not os.path.isfile("strong_motion_gf.json"):
-    #     green_dict = fk_green_fun0(args.dt, tensor_info, default_dirs)
-    # #        write_green_file(green_dict)
-    # if "cgps" in used_data and not os.path.isfile("cgps_gf.json"):
-    #     green_dict = fk_green_fun0(1.0, tensor_info)
-    # #        write_green_file(green_dict)
-    gf_retrieve(used_data, default_dirs)
