@@ -16,6 +16,7 @@ from wasp.inversion_chen_new import (
     set_directory_structure,
 )
 from wasp.management import default_dirs
+from wasp.multiple_solutions import multiple_solutions
 from wasp.read_config import CONFIG_PATH
 from wasp.seismic_tensor import get_tensor
 from wasp.velocity_models import model2dict
@@ -229,3 +230,108 @@ def run(
             config_path=config_file,
             directory=solution_folder,
         )
+
+
+@app.command(help="Run a modelling routine for multiple solutions")
+def run_multiple(
+    directory: pathlib.Path = typer.Argument(
+        ..., help="Path to the modelling directory"
+    ),
+    config_file: pathlib.Path = typer.Option(
+        CONFIG_PATH, "-c", "--config-file", help="Path to config file"
+    ),
+    data_types: List[ManagedDataTypes] = typer.Option(
+        [],
+        "-t",
+        "--data-type",
+        help="Type to add to the data_types list, default is []",
+    ),
+    dips: List[float] = typer.Option(
+        [],
+        "-l",
+        "--list",
+        help="The dips corresponding to the solutions in each solution folder",
+    ),
+    solution_folders: List[ManagedDataTypes] = typer.Option(
+        [],
+        "-sf",
+        "--solution-folder",
+        help="The solution folders where the modelling is run, default is []",
+    ),
+    gcmt_tensor_file: pathlib.Path = typer.Option(
+        None, "-g", "--gcmt", help="Path to the GCMT moment tensor file"
+    ),
+    qcmt_tensor_file: pathlib.Path = typer.Option(
+        None, "-q", "--qcmt", help="Path to the QuakeML moment tensor file"
+    ),
+    insar_ascending: pathlib.Path = typer.Option(
+        None, "-ina", "--insar-ascending", help="Path to an ascending insar file"
+    ),
+    insar_descending: pathlib.Path = typer.Option(
+        None, "-ind", "--insar-descending", help="Path to an descending insar file"
+    ),
+    rupture_velocity: List[float] = typer.Option(
+        [],
+        "-v",
+        "--rupture-velocity",
+        help="The rupture velocity to use in the finite fault creation",
+    ),
+    strikes: List[float] = typer.Option(
+        [],
+        "-s",
+        "--strike",
+        help="The strikes corresponding to the solutions in each solution folder",
+    ),
+    velocity_model_file: pathlib.Path = typer.Option(
+        None, "-v", "--velocity-model", help="Path to the velocity model file"
+    ),
+):
+    # validate that the number of strikes, dips, and folders match
+    if not len(strikes) == len(dips) == len(solution_folders) == len(rupture_velocity):
+        raise ValueError(
+            "The number of strikes, dips, rupture_velocity, and solution folders "
+            "must match and be in a matching order."
+        )
+
+    # set default data type
+    chosen_data_types: List[str]
+    chosen_data_types = [d.value for d in data_types]
+    if (
+        insar_ascending is not None or insar_descending is not None
+    ) and "insar" not in data_types:
+        chosen_data_types += ["insar"]
+
+    # Set and validate files
+    paths_to_validate: list[pathlib.Path] = []
+    if (gcmt_tensor_file is None and qcmt_tensor_file is None) or (
+        gcmt_tensor_file is not None and qcmt_tensor_file is not None
+    ):
+        raise ValueError("Either gcmt_tensor_file or qcmt_tensor_file must be defined.")
+    tensor_file = gcmt_tensor_file or qcmt_tensor_file
+    paths_to_validate += [tensor_file]
+    if insar_ascending is not None:
+        paths_to_validate += [insar_ascending]
+    if insar_descending is not None:
+        paths_to_validate += [insar_descending]
+    if velocity_model_file is not None:
+        paths_to_validate += velocity_model_file
+    tensor_info = get_tensor(cmt_file=gcmt_tensor_file or qcmt_tensor_file)
+    segments_file = directory / "segments_data.json"
+    paths_to_validate += [segments_file]
+    validate_files(paths_to_validate)
+
+    # get default directories
+    default_directories = default_dirs(config_path=config_file)
+
+    # get the tensor information
+    tensor_info = get_tensor(cmt_file=gcmt_tensor_file, quake_file=qcmt_tensor_file)
+    multiple_solutions(
+        tensor_info=tensor_info,
+        data_type=chosen_data_types,
+        default_dirs=default_directories,
+        folders=solution_folders,
+        strike=strikes,
+        dip=dips,
+        rupt_vel=rupture_velocity,
+        directory=directory,
+    )

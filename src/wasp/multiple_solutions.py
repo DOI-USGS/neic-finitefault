@@ -48,6 +48,9 @@ def multiple_solutions(
     :param directory: The base directory to read/write to, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     """
+    if not len(folders):
+        print("No folders defined. Exiting.")
+        return
     directory = pathlib.Path(directory)
     this_folder = os.path.abspath(os.getcwd())
     event_folder = os.path.dirname(this_folder)
@@ -203,69 +206,3 @@ def get_summary(directory: Union[pathlib.Path, str] = pathlib.Path()) -> dict:
             error2 = float(line[-1])
     errors = {"misfit_error": error1, "objective_error": error2}
     return errors
-
-
-if __name__ == "__main__":
-    import argparse
-
-    import wasp.manage_parser as mp  # type:ignore
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--folder", default=os.getcwd(), help="folder where there are input files"
-    )
-    parser = mp.parser_add_tensor(parser)
-    parser = mp.parser_ffm_data(parser)
-    parser.add_argument(
-        "--strike", default=[], nargs="*", type=float, help="strike values to model"
-    )
-    parser.add_argument(
-        "--dip", default=[], nargs="*", type=float, help="dip values to model"
-    )
-    parser.add_argument(
-        "--rupt_vel",
-        default=[],
-        nargs="*",
-        type=float,
-        help="rupture velocity values to model",
-    )
-    parser.add_argument("-r", "--run", action="store_true", help="run multiple models")
-    parser.add_argument(
-        "-v",
-        "--view_results",
-        action="store_true",
-        help="view results from multiple models",
-    )
-    parser.add_argument("--folders", default="NP3", help="where to store results")
-    args = parser.parse_args()
-
-    this_folder = os.path.abspath(args.folder)
-    os.chdir(this_folder)
-    data_type = mp.get_used_data(args)
-
-    default_dirs = mng.default_dirs()
-    segments_data = json.load(open("segments_data.json"))
-    if args.gcmt_tensor:
-        cmt_file = args.gcmt_tensor
-        tensor_info = tensor.get_tensor(cmt_file=cmt_file)
-    else:
-        tensor_info = tensor.get_tensor()
-    strike = args.strike
-    dip = args.dip
-    rupt_vel = args.rupt_vel
-
-    if args.run:
-        multiple_solutions(
-            tensor_info,
-            data_type,
-            default_dirs,
-            args.folders,
-            strike=strike,
-            dip=dip,
-            rupt_vel=rupt_vel,
-        )
-    if args.view_results:
-        os.chdir(this_folder)
-        os.chdir("..")
-        subfolders = glob.glob("{}.*".format(args.folders))
-        get_summary_all_models(subfolders)
