@@ -63,7 +63,7 @@ def _get_correction(correction_string: str) -> Tuple[str, List[str], float]:
 @app.command(help="Acquire strong motion and teleseismic bodywave data")
 def acquire(
     directory: pathlib.Path = typer.Argument(..., help="Path to the data directory"),
-    gcmt_tensor_file: str = typer.Argument(
+    gcmt_tensor_file: pathlib.Path = typer.Argument(
         ..., help="Path to the GCMT moment tensor file"
     ),
     data_types: List[AcquireDataTypes] = typer.Option(
@@ -529,7 +529,7 @@ def modify_sacs(
 @app.command(help="Write trace properties (sampling_filter.json)")
 def sampling_filtering(
     directory: pathlib.Path = typer.Argument(..., help="Path to the data directory"),
-    gcmt_tensor_file: str = typer.Argument(
+    gcmt_tensor_file: pathlib.Path = typer.Argument(
         ..., help="Path to the GCMT moment tensor file"
     ),
     cgps_dt: float = typer.Option(
@@ -696,7 +696,7 @@ def static_to_fsp(
 
 @app.command(help="Write the tensor file from a GCMT moment tensor")
 def tensor_from_gcmt(
-    gcmt_tensor_file: str = typer.Argument(
+    gcmt_tensor_file: pathlib.Path = typer.Argument(
         ..., help="Path to the GCMT moment tensor file"
     ),
     directory: pathlib.Path = typer.Option(
@@ -833,7 +833,7 @@ def update_inputs(
 
 @app.command(help="Write a velocity model")
 def velmodel_from_tensor(
-    gcmt_tensor_file: str = typer.Argument(
+    gcmt_tensor_file: pathlib.Path = typer.Argument(
         ..., help="Path to the GCMT moment tensor file"
     ),
     vel_model_file: pathlib.Path = typer.Argument(
