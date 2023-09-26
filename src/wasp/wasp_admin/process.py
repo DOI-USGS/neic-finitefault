@@ -3,6 +3,7 @@ import os
 import pathlib
 import time
 from glob import glob
+from typing import List
 
 import typer
 
@@ -12,6 +13,9 @@ from wasp.data_processing import (
     select_process_surf_tele,
     select_process_tele_body,
 )
+from wasp.green_functions import fk_green_fun1, gf_retrieve
+from wasp.management import default_dirs
+from wasp.read_config import CONFIG_PATH
 from wasp.seismic_tensor import get_tensor
 from wasp.shift_match import (
     print_arrival,
@@ -21,19 +25,82 @@ from wasp.shift_match import (
 )
 from wasp.wang_baseline_removal_v1 import wang_process
 
-from .datautils import DEFAULT_MANAGEMENT_FILES, ProcessDataTypes, ShiftMatchDataTypes
+from .datautils import (
+    DEFAULT_MANAGEMENT_FILES,
+    ManagedDataTypes,
+    ProcessDataTypes,
+    ShiftMatchDataTypes,
+)
 from .fileutils import validate_files
 
 app = typer.Typer(help="WASP data processing")
 
-DATA_TYPES = [
-    "cgps",
-    "gps",
-    "insar",
-    "strong",
-    "surf",
-    "body",
-]
+
+@app.command(help="Recalculate Green's functions")
+def greens(
+    directory: pathlib.Path = typer.Argument(..., help="Path to the data directory"),
+    gcmt_tensor_file: pathlib.Path = typer.Argument(
+        ..., help="Path to the GCMT moment tensor file"
+    ),
+    config_file: pathlib.Path = typer.Option(
+        CONFIG_PATH, "-c", "--config-file", help="Path to config file"
+    ),
+    data_types: List[ManagedDataTypes] = typer.Option(
+        [],
+        "-t",
+        "--data-type",
+        help="Data types to plot misfit for, default is []",
+    ),
+    max_depth: float = typer.Option(
+        None, "-m", "--max-depth", help="The maximum depth"
+    ),
+):
+    # set data type
+    chosen_data_types = [d.value for d in data_types]
+
+    # validate files
+    files_to_validate = []
+    sampling_filtering_file = directory / "sampling_filter.json"
+    files_to_validate += [sampling_filtering_file.resolve(), gcmt_tensor_file]
+    if "cgps" in chosen_data_types:
+        gf_bank_cgps = directory / "GF_cgps"
+        files_to_validate += [gf_bank_cgps]
+    if "strong" in chosen_data_types:
+        gf_bank_strong = directory / "GF_strong"
+        files_to_validate += [gf_bank_strong]
+    validate_files(files_to_validate)
+
+    # get the tensor information
+    tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
+
+    # get the sampling filtering properties
+    with open(sampling_filtering_file) as sf:
+        data_prop = json.load(sf)
+
+    # set default data type
+    chosen_data_types = [d.value for d in data_types]
+
+    # get default directories
+    default_directories = default_dirs(config_path=config_file)
+
+    if "strong" in chosen_data_types:
+        green_dict = fk_green_fun1(
+            data_prop=data_prop,
+            tensor_info=tensor_info,
+            location=gf_bank_strong,
+            max_depth=max_depth,
+            directory=directory,
+        )
+    if "cgps" in chosen_data_types:
+        green_dict = fk_green_fun1(
+            data_prop=data_prop,
+            tensor_info=tensor_info,
+            location=gf_bank_cgps,
+            cgps=True,
+            max_depth=max_depth,
+            directory=directory,
+        )
+    gf_retrieve(chosen_data_types, default_directories, directory=directory)
 
 
 @app.command(help="Base data processing routine")
@@ -136,7 +203,7 @@ def shift_match(
         ...,
         help="Type of data being processed",
     ),
-    gcmt_tensor_file: str = typer.Argument(
+    gcmt_tensor_file: pathlib.Path = typer.Argument(
         ..., help="Path to the GCMT moment tensor file"
     ),
     option: str = typer.Option(

@@ -3,13 +3,16 @@ import os
 import pathlib
 import shutil
 import tempfile
+from unittest import mock
 
 import numpy as np
 from obspy import read
 from typer.testing import CliRunner
 
 from .testutils import (
+    DATA_DIR,
     END_TO_END_DIR,
+    HOME,
     RESULTS_DIR,
     get_strong_motion_json,
     get_tele_waves_json,
@@ -17,6 +20,77 @@ from .testutils import (
 )
 
 runner = CliRunner()
+
+
+@mock.patch(target="wasp.green_functions.gf_retrieve")
+def test_greens(p1):
+    from wasp.wasp_admin.process import app
+
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        shutil.copyfile(
+            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "sampling_filter.json",
+            tempdir / "sampling_filter.json",
+        )
+        with open(DATA_DIR / "config.ini") as f:
+            config = f.read().replace("/home/user/neic-finitefault", str(HOME))
+        with open(tempdir / "config.ini", "w") as wf:
+            wf.write(config)
+        with open(tempdir / "GF_cgps", "w"):
+            pass
+        with open(tempdir / "GF_strong", "w"):
+            pass
+        os.mkdir(tempdir / "logs")
+
+        shutil.copy(
+            RESULTS_DIR / "NP1" / "waveforms_body.txt", tempdir / "waveforms_body.txt"
+        )
+        # test greens
+        result = runner.invoke(
+            app,
+            [
+                "greens",
+                str(tempdir),
+                str(tempdir / "20003k7a_cmt_CMT"),
+                "-t",
+                "cgps",
+                "-t",
+                "gps",
+                "-t",
+                "strong",
+                "-t",
+                "body",
+            ],
+        )
+        assert result.exit_code == 0
+        with open(tempdir / "strong_motion_gf.json") as f:
+            strong = json.load(f)
+        with open(tempdir / "cgps_gf.json") as f:
+            cgps = json.load(f)
+        assert cgps == {
+            "location": str(tempdir / "GF_cgps"),
+            "min_depth": 1,
+            "max_depth": 49.8,
+            "min_dist": 0,
+            "max_dist": 1000,
+            "dt": 0.4,
+            "time_corr": 25,
+        }
+        assert strong == {
+            "location": str(tempdir / "GF_strong"),
+            "min_depth": 1,
+            "max_depth": 49.8,
+            "min_dist": 0,
+            "max_dist": 1000,
+            "dt": 0.4,
+            "time_corr": 10,
+        }
+    finally:
+        print("Cleaning up test directory.")
+        shutil.rmtree(tempdir)
 
 
 def test_process_tele():

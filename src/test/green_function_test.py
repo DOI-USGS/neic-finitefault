@@ -96,7 +96,7 @@ def test_gf_retrieve_tele():
         shutil.rmtree(tempdir)
 
 
-def test_fk_green_fun0():
+def test_fk_green_fun1():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
         cgps = fk_green_fun1(
