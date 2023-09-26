@@ -63,6 +63,8 @@ def test_greens(p1):
                 "strong",
                 "-t",
                 "body",
+                "-c",
+                str(tempdir / "config.ini"),
             ],
         )
         assert result.exit_code == 0
