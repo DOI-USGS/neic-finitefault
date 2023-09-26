@@ -42,7 +42,7 @@ Bad channels can be removed or downweighted using the provided management script
 
 ### Shift Timing for Autocorrelation
 
-To shift timing use the shift matching script: `wasp process-data shift-match --help`. For example `wasp process-data shift-match /home/user/us20003k7a_product/20150916225432/ffm.0/NP3 cgps /home/user/us20003k7a_product/us20003k7a_cmt_cmt`
+To shift timing use the shift matching script: `wasp process shift-match --help`. For example `wasp process-data shift-match /home/user/us20003k7a_product/20150916225432/ffm.0/NP3 cgps /home/user/us20003k7a_product/us20003k7a_cmt_cmt`
 
 ### Update Plane Orientation
 
@@ -56,9 +56,7 @@ In order for the changes from [4. Make Changes](#4-make-changes) to be accepted 
 
 ### Recalculate Green's Functions
 
-Rerun the greens function for whatever dataset you have.
-
-> > Note: the script for Green's functions is currently in progress
+Rerun the greens function for all the data sets you updated: `wasp process greens /home/user/us20003k7a_product/20150916225432/ffm.0/NP3 /home/user/us20003k7a_product/us20003k7a_cmt_cmt -t cgps -t tele`
 
 ## 6. Rerun modelling
 
