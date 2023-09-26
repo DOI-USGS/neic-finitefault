@@ -4,11 +4,8 @@
 - [Installation](#installation)
   - [Prior Dependencies](#prior-dependencies)
   - [Install Scripts](#install-scripts)
-- [Testing](#testing)
-  - [Local Testing](#local-testing)
-  - [Pipeline Testing](#pipeline-testing)
-- [Contributing](#contributing)
-- [Generating an NEIC Finite Fault model](#generating-an-neic-finite-fault-model)
+  - [Using the Poetry Environment](#using-the-poetry-environment)
+- [Local Testing](#local-testing)
 
 # Wavelet and simulated Annealing SliP inversion (WASP)
 
@@ -50,12 +47,14 @@ The following dependencies are not handled by any install scripts and/or package
 
 ## Install Scripts
 
-Automated installation of the dependencies and fortran code has been provided in the form of an [install script](./install.sh). Currently this install script only supports installation on linux systems (specifically Ubuntu for the system packages). Installation of Python dependencies and code is managed with the provided Poetry environment setupy by pyproject.toml and package-lock.json. To install the dependencies and code run the three commands:
+Automated installation of the dependencies and fortran code has been provided in the form of an [install script](./install.sh). Currently this install script only supports installation on linux systems (specifically Ubuntu for the system packages). Installation of Python dependencies and code is managed with the provided Poetry environment setup by pyproject.toml and package-lock.json. To install the dependencies and code run the two commands:
 
 1. `sudo ./install.sh` (with optional configurations)
+   1. > NOTE: The scripts in [./install.d](./install.d/) may be run individually to suite the individuals needs. For example, if GMT is already installed, there may be no need to run [gmt.sh](./install.d/gmt.sh).
 2. `sudo ./environment.d/<operating_system>.sh`
    1. If you want the configurations in to be loaded automatically consider adding them to your .bashrc or .bash_profile: `echo "source /home/user/neic-finitefault/environment.d/ubuntu.sh" >> ~/.bashrc`
 3. `poetry install`
+4. Manually install okada_wrapper after other Python dependencies: `pip install okada_wrapper`
 
 > Note 1: the installation of system packages, GEOS, GMT, and PROJ, requires that the install script be run as root. A full list of configurations can be found by running `sudo ./install.sh --help`
 > Note 2: the install scripts can also be run individually if some of the dependencies (e.g. proj, gmt, etc) are already satisfied on your system. The usage for each individual script can be accessed using the `--help` flag (e.g. `./install.d/proj.sh --help`).
@@ -67,25 +66,26 @@ The following documents provide more information about the installation process:
 - [Code Dependencies](./docs/code-dependecies.md): Provides a list of dependencies required to run the code
 - [Manual Installation](./docs/code-dependecies.md): Provides a list of steps to manually install dependencies and code without reference to a specific operating system.
 
-# Testing
+## Using the Poetry Environment
 
-## Local Testing
+After running `poetry install`, you will need to activate your environment. This can be done a number of ways:
+
+- `poetry shell` (from within the project at the same location of the pyproject.toml)
+- `source <path to poetry virtual environments>/<environment name>/bin/activate`
+
+The following commands may also be useful:
+
+- `poetry config --list`: shows your poetry configuration including the path to poetry virtual environments
+- `poetry env list`: Shows the virtual environments associated with the project you are in
+- `poetry env info`: Shows the information about the currently activated virtual environment
+
+You can also skip activating the environment by prefixing commands run with `poetry run` (Example: `poetry run wasp --help`). These commands must be run from within the project at the same location of the pyproject.toml.
+
+See official [Poetry documentation](https://python-poetry.org/docs/managing-environments/) for a full description of managing environments.
+
+# Local Testing
 
 Tests and linting can both be run locally:
 
 1. To run all python unit tests: `poetry run poe test`
 2. To run python linting: `poetry run poe lint`
-
-> NOTE: Some tests take more memory and/or time to run. As a result they are skipped unless the environment variable `RUN_ALL` is set to "true". The complete end to end test takes hours to run on a standard laptop; it is skipped unless the environment variable `RUN_END_TO_END` is set to "true".
-
-## Pipeline Testing
-
-Code is automatically tested in the GitLab pipeline, except for tests that require excess time or memory (see note above). Upon a merge to the default branch (main) and all tests passing, the code is deployed as a Docker image in the repository's [container registry](https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault/container_registry).
-
-# Contributing
-
-Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for more information about how to contribute to this project.
-
-# Generating an NEIC Finite Fault model
-
-See [neic-process.md](./docs/neic-process.md) for the workflow used by the NEIC to create a finite fault model.

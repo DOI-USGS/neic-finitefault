@@ -56,7 +56,7 @@ In order for the changes from [4. Make Changes](#4-make-changes) to be accepted 
 
 ### Recalculate Green's Functions
 
-Rerun the greens function for all the data sets you updated: `wasp process greens /home/user/us20003k7a_product/20150916225432/ffm.0/NP3 /home/user/us20003k7a_product/us20003k7a_cmt_cmt -t cgps -t tele`
+Rerun the greens function for all the data sets you updated: `wasp process greens /home/user/us20003k7a_product/20150916225432/ffm.0/NP3 /home/user/us20003k7a_product/us20003k7a_cmt_cmt -t cgps -t body`
 
 ## 6. Rerun modelling
 
