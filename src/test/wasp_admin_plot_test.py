@@ -345,7 +345,6 @@ def test_neic():
             [
                 "neic",
                 str(tempdir),
-                str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
                 "cgps",
                 "-t",
