@@ -308,7 +308,7 @@ def neic(
     ),
     checkerboard: bool = typer.Option(
         False,
-        "-c",
+        "-cb",
         "--checkerboard",
         help="Plot comparisons for the checkerboard test",
     ),
