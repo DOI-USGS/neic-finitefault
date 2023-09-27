@@ -45,7 +45,7 @@ class ModellingRoutine(str, Enum):
     forward_model = "forward_model"
     manual_model = "manual_model"
     manual_model_add_data = "manual_model_add_data"
-    usgs_model = "usgs_model"
+    auto_model = "auto_model"
 
 
 @app.command(help="Run a modelling routine")
@@ -151,9 +151,10 @@ def run(
         paths_to_validate += [insar_descending]
     if velocity_model_file is not None:
         paths_to_validate += velocity_model_file
+    if modelling_routine != ModellingRoutine.auto_model:
+        segments_file = directory / "segments_data.json"
+        paths_to_validate += [segments_file]
     tensor_info = get_tensor(cmt_file=gcmt_tensor_file or qcmt_tensor_file)
-    segments_file = directory / "segments_data.json"
-    paths_to_validate += [segments_file]
     validate_files(paths_to_validate)
 
     # get default directories
@@ -162,9 +163,10 @@ def run(
     # get the tensor information
     tensor_info = get_tensor(cmt_file=gcmt_tensor_file, quake_file=qcmt_tensor_file)
 
-    # get the segments data
-    with open(segments_file) as sf:
-        segments_data = json.load(sf)
+    if modelling_routine != ModellingRoutine.auto_model:
+        # get the segments data
+        with open(segments_file) as sf:
+            segments_data = json.load(sf)
 
     if modelling_routine == ModellingRoutine.checkerboard_model:
         checkerboard(
@@ -207,7 +209,7 @@ def run(
             st_response=remove_response,
             directory=data_directory,
         )
-    if modelling_routine == ModellingRoutine.usgs_model:
+    if modelling_routine == ModellingRoutine.auto_model:
         solution_folder = set_directory_structure(tensor_info, directory=directory)
         if data_directory:
             for file in os.listdir(data_directory):
