@@ -44,9 +44,11 @@ def test_greens(p1):
         with open(tempdir / "GF_strong", "w"):
             pass
         os.mkdir(tempdir / "logs")
-
         shutil.copy(
             RESULTS_DIR / "NP1" / "waveforms_body.txt", tempdir / "waveforms_body.txt"
+        )
+        shutil.copy(
+            RESULTS_DIR / "NP1" / "tensor_info.json", tempdir / "tensor_info.json"
         )
         # test greens
         result = runner.invoke(
@@ -54,7 +56,6 @@ def test_greens(p1):
             [
                 "greens",
                 str(tempdir),
-                str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
                 "cgps",
                 "-t",
@@ -67,6 +68,7 @@ def test_greens(p1):
                 str(tempdir / "config.ini"),
             ],
         )
+        print(result.exception)
         assert result.exit_code == 0
         with open(tempdir / "strong_motion_gf.json") as f:
             strong = json.load(f)
@@ -207,6 +209,10 @@ def test_remove_baseline():
             shutil.copyfile(o["file"], n["file"])
         with open(pathlib.Path(tempdir) / "strong_motion_waves.json", "w") as f:
             json.dump(new_strong_motion, f)
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "tensor_info.json",
+            tempdir / "tensor_info.json",
+        )
         # test remove baseline
         result = runner.invoke(
             app,
@@ -231,11 +237,11 @@ def test_shift_match():
             tele_waves, tempdir, replace_dir=str(RESULTS_DIR)
         )
         shutil.copyfile(
-            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
-        )
-        shutil.copyfile(
             RESULTS_DIR / "NP1" / "sampling_filter.json",
             tempdir / "sampling_filter.json",
+        )
+        shutil.copyfile(
+            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
         )
         os.mkdir(pathlib.Path(tempdir) / "data")
         os.mkdir(pathlib.Path(tempdir) / "data" / "P")
@@ -252,7 +258,6 @@ def test_shift_match():
                 "shift-match",
                 str(tempdir),
                 "body",
-                str(tempdir / "20003k7a_cmt_CMT"),
             ],
         )
         result = runner.invoke(
@@ -260,13 +265,14 @@ def test_shift_match():
             [
                 "shift-match",
                 str(tempdir),
-                "body",
+                "-g",
                 str(tempdir / "20003k7a_cmt_CMT"),
+                "body",
                 "-o",
                 "manual",
             ],
         )
-
+        print(result.exception)
         assert result.exit_code == 0
     finally:
         print("Cleaning up test directory.")

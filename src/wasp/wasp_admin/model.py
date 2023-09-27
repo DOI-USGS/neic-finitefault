@@ -139,37 +139,48 @@ def run(
     directory = directory.resolve()
     data_directory = (data_directory or directory / "data").resolve()
     paths_to_validate += [directory, data_directory]
-    if (gcmt_tensor_file is None and qcmt_tensor_file is None) or (
-        gcmt_tensor_file is not None and qcmt_tensor_file is not None
-    ):
-        raise ValueError("Either gcmt_tensor_file or qcmt_tensor_file must be defined.")
-    tensor_file = gcmt_tensor_file or qcmt_tensor_file
+    if modelling_routine != ModellingRoutine.auto_model:
+        tensor_file = directory / "tensor_info.json"
+    else:
+        if (gcmt_tensor_file is None and qcmt_tensor_file is None) or (
+            gcmt_tensor_file is not None and qcmt_tensor_file is not None
+        ):
+            raise ValueError(
+                "Either gcmt_tensor_file or qcmt_tensor_file must be defined."
+            )
+        tensor_file = gcmt_tensor_file or qcmt_tensor_file
     paths_to_validate += [tensor_file]
     if insar_ascending is not None:
         paths_to_validate += [insar_ascending]
     if insar_descending is not None:
         paths_to_validate += [insar_descending]
     if velocity_model_file is not None:
-        paths_to_validate += velocity_model_file
+        paths_to_validate += [velocity_model_file]
     tensor_info = get_tensor(cmt_file=gcmt_tensor_file or qcmt_tensor_file)
-    segments_file = directory / "segments_data.json"
-    paths_to_validate += [segments_file]
+    if modelling_routine != ModellingRoutine.auto_model:
+        segments_file = directory / "segments_data.json"
+        paths_to_validate += [segments_file]
     validate_files(paths_to_validate)
 
     # get default directories
     default_directories = default_dirs(config_path=config_file)
 
     # get the tensor information
-    tensor_info = get_tensor(cmt_file=gcmt_tensor_file, quake_file=qcmt_tensor_file)
+    if modelling_routine != ModellingRoutine.auto_model:
+        with open(tensor_file) as tf:
+            tensor_info = json.load(tf)
+    else:
+        tensor_info = get_tensor(cmt_file=gcmt_tensor_file, quake_file=qcmt_tensor_file)
 
     # get the segments data
-    with open(segments_file) as sf:
-        segments_data = json.load(sf)
+    if modelling_routine != ModellingRoutine.auto_model:
+        with open(segments_file) as sf:
+            segments_data = json.load(sf)
 
     if modelling_routine == ModellingRoutine.checkerboard_model:
         checkerboard(
             tensor_info=tensor_info,
-            data_type=data_types,
+            data_type=chosen_data_types,
             default_dirs=default_directories,
             segments_data=segments_data,
             max_slip=max_slip,
@@ -181,7 +192,7 @@ def run(
     if modelling_routine == ModellingRoutine.forward_model:
         forward_modelling(
             tensor_info=tensor_info,
-            data_type=data_types,
+            data_type=chosen_data_types,
             default_dirs=default_directories,
             segments_data=segments_data,
             option=option,
@@ -191,7 +202,7 @@ def run(
     if modelling_routine == ModellingRoutine.manual_model:
         manual_modelling(
             tensor_info=tensor_info,
-            data_type=data_types,
+            data_type=chosen_data_types,
             default_dirs=default_directories,
             segments_data=segments_data,
             directory=directory,
@@ -200,7 +211,7 @@ def run(
     if modelling_routine == ModellingRoutine.manual_model_add_data:
         modelling_new_data(
             tensor_info=tensor_info,
-            data_type=data_types,
+            data_type=chosen_data_types,
             default_dirs=default_directories,
             data_folder=data_directory,
             segments_data=segments_data,

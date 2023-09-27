@@ -613,8 +613,7 @@ def static_to_srf(
     )
 
 
-@app.command(help="Convert the static solution to FSP format")
-@app.command(help="Display the configuration")
+@app.command(help="Display the configuration file")
 def show_config(
     config_file: pathlib.Path = typer.Option(
         CONFIG_PATH, "-c", "--config-file", help="Path to config file"

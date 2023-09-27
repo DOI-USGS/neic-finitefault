@@ -1,3 +1,12 @@
+- [Wavelet and simulated Annealing SliP inversion (WASP)](#wavelet-and-simulated-annealing-slip-inversion-wasp)
+  - [Authors](#authors)
+  - [References](#references)
+- [Installation](#installation)
+  - [Prior Dependencies](#prior-dependencies)
+  - [Install Scripts](#install-scripts)
+  - [Using the Poetry Environment](#using-the-poetry-environment)
+- [Local Testing](#local-testing)
+
 # Wavelet and simulated Annealing SliP inversion (WASP)
 
 ---
@@ -12,7 +21,7 @@ The code is based on the approach of Ji et al. (2002). Regional Green's function
 
 - **[Pablo Koch](https://www.cmm.uchile.cl/?cmm_people=pablo-koch)** - [National Seismological Center, University of Chile](https://www.sismologia.cl/)
 - **[Dara Goldberg](https://www.usgs.gov/staff-profiles/dara-e-goldberg)** - [National Earthquake Information Center (NEIC) of the Geologic Hazards Science center](https://www.usgs.gov/centers/geohazards)
-- **[Heather Hunsinger]()** - [Geologic Hazards Science Center](https://www.usgs.gov/centers/geohazards)
+- **Heather Hunsinger** - [Geologic Hazards Science Center](https://www.usgs.gov/centers/geohazards)
 - **[Diego Melgar](https://earthsciences.uoregon.edu/profile/dmelgarm/)** - [Department of Earth Sciences, University of Oregon](https://earthsciences.uoregon.edu)
 - **[Sebastian Riquelme](http://www.dgf.uchile.cl/academicas-y-academicos/profesores-expertos)** - [National Seismological Center, University of Chile](https://www.sismologia.cl/)
 - **[William Yeck](https://www.usgs.gov/staff-profiles/william-l-yeck)** - [National Earthquake Information Center (NEIC) of the Geologic Hazards Science Center](https://www.usgs.gov/centers/geohazards)
@@ -38,12 +47,14 @@ The following dependencies are not handled by any install scripts and/or package
 
 ## Install Scripts
 
-Automated installation of the dependencies and fortran code has been provided in the form of an [install script](./install.sh). Currently this install script only supports installation on linux systems (specifically Ubuntu for the system packages). Installation of Python dependencies and code is managed with the provided Poetry environment setupy by pyproject.toml and package-lock.json. To install the dependencies and code run the two commands:
+Automated installation of the dependencies and fortran code has been provided in the form of an [install script](./install.sh). Currently this install script only supports installation on linux systems (specifically Ubuntu for the system packages). Installation of Python dependencies and code is managed with the provided Poetry environment setup by pyproject.toml and package-lock.json. To install the dependencies and code run the two commands:
 
-1. `sudo ./install.sh` (with optional configurations)
+1. `sudo bash install.sh <path to the local neic-finitefault repository> <the os (currently only "ubuntu")> <Python major version (e.g. 3.9 or 3.10)>` (with other optional configurations available, run `sudo bash install.sh -h` for the help information)
+   1. > NOTE: The scripts in [./install.d](./install.d/) may be run individually to suit the individuals needs. For example, if GMT is already installed, there may be no need to run [gmt.sh](./install.d/gmt.sh).
 2. `sudo ./environment.d/<operating_system>.sh`
    1. If you want the configurations in to be loaded automatically consider adding them to your .bashrc or .bash_profile: `echo "source /home/user/neic-finitefault/environment.d/ubuntu.sh" >> ~/.bashrc`
 3. `poetry install`
+4. Manually install okada_wrapper after other Python dependencies: `pip install okada_wrapper`
 
 > Note 1: the installation of system packages, GEOS, GMT, and PROJ, requires that the install script be run as root. A full list of configurations can be found by running `sudo ./install.sh --help`
 > Note 2: the install scripts can also be run individually if some of the dependencies (e.g. proj, gmt, etc) are already satisfied on your system. The usage for each individual script can be accessed using the `--help` flag (e.g. `./install.d/proj.sh --help`).
@@ -54,6 +65,23 @@ The following documents provide more information about the installation process:
 - [Data Dependencies](./docs/data-dependencies.md): Provides a list of data required to run the code
 - [Code Dependencies](./docs/code-dependecies.md): Provides a list of dependencies required to run the code
 - [Manual Installation](./docs/code-dependecies.md): Provides a list of steps to manually install dependencies and code without reference to a specific operating system.
+
+## Using the Poetry Environment
+
+After running `poetry install`, you will need to activate your environment. This can be done a number of ways:
+
+- `poetry shell` (from within the project at the same location of the pyproject.toml)
+- `source <path to poetry virtual environments>/<environment name>/bin/activate`
+
+The following commands may also be useful:
+
+- `poetry config --list`: shows your poetry configuration including the path to poetry virtual environments
+- `poetry env list`: Shows the virtual environments associated with the project you are in
+- `poetry env info`: Shows the information about the currently activated virtual environment
+
+You can also skip activating the environment by prefixing commands run with `poetry run` (Example: `poetry run wasp --help`). These commands must be run from within the project at the same location of the pyproject.toml.
+
+See official [Poetry documentation](https://python-poetry.org/docs/managing-environments/) for a full description of managing environments.
 
 # Local Testing
 

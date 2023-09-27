@@ -8,7 +8,7 @@ issue.
 
 If you have direct contributions you would like considered for incorporation
 into the project you can [fork this repository][2] and
-[submit a merge request][3] for review.
+[submit a merge request][3] for review. Please use the forking workflow outlined in [contributor-workflow.md](./docs/contributor-workflow.md)
 
 [1]: https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault/-/issues
 [2]: https://docs.gitlab.com/ee/user/project/repository/forking_workflow.html#creating-a-fork

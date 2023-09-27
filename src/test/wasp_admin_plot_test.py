@@ -335,9 +335,8 @@ def test_neic():
             json.dump(new_strong_waves, f)
         with open(tempdir / "cgps_waves.json", "w") as f:
             json.dump(new_cgps_waves, f)
-
         shutil.copyfile(
-            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
+            RESULTS_DIR / "NP1" / "tensor_info.json", tempdir / "tensor_info.json"
         )
 
         # test neic
@@ -346,7 +345,6 @@ def test_neic():
             [
                 "neic",
                 str(tempdir),
-                str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
                 "cgps",
                 "-t",
