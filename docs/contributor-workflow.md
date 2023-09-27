@@ -88,7 +88,7 @@ As part of [Reviewing a Merge Request](#reviewing-a-merge-request), you may have
 1. Open the comment
 2. (if applicable) Make changes to your local branch, commit, and push the changes
 3. Add text to the comment (if useful include the commit number and link)
-4. Click "Resolve comment" if you think the comment was addressed, leave open if there is more clarification/discussion needed, or click "Resolve to issue" if the comment merits a separate MR
+4. Click "Resolve comment" if you think the comment was addressed, leave open if there is more clarification/discussion needed, or click "Resolve to issue" if the comment merits a separate merge request
 5. Repeat 1-4 until all comments have been addressed
 6. Submit the review
    ![submit-review](./figures/submit-review.png)

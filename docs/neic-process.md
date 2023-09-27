@@ -21,16 +21,16 @@ The information in this document outlines the steps taken to create a finite fau
 Put all data into a folder that you plan to work within:
 
 1. Put waveform and displacement data in a data folder
-   1. Teleseismic and strong motion data can both be retrieved from [IRIS fdsnws](https://service.iris.edu/fdsnws/). The data acquisition script uses obspy to get this data: `wasp manage acquire --help`. Other data types (insar, cgps, gps, etc) are generally, manually acquired from a contributor.
-2. Get the moment tensor information and save it in a file in the format `<eventid>_cmt_CMT`. QuakeML data with tensor information can be retrieved from a USGS event's origin product page. For example: https://earthquake.usgs.gov/earthquakes/eventpage/us20003k7a/origin/detail
+   1. Teleseismic and strong motion data can both be retrieved from [IRIS fdsnws](https://service.iris.edu/fdsnws/). The data acquisition script uses obspy to get this data: `wasp manage acquire --help`. Other data types (insar, cgps, gps, etc) are acquired from a contributor.
+2. Get the moment tensor information and save it in a file in the format `<eventid>_cmt_CMT`. QuakeML data with tensor information can be retrieved from a USGS event's origin product page. For example: See the Downloads section at the bottom of the page at https://earthquake.usgs.gov/earthquakes/eventpage/us20003k7a/origin/detail. The CMT file format is described here
 
 ## 2. Inversion
 
-Execute the full process and inversion script: `wasp model run --help`. For example, running an event ("us20003k7a") with all data from a folder "/home/user/us20003k7a_product" might look something like `wasp model run /home/user/us20003k7a_product usgs_model -g /home/user/us20003k7a_product/us20003k7a_cmt_cmt -d /home/user/us20003k7a_product/data -t cgps -t gps -t insar -t strong -t surf -t body -ina /home/user/us20003k7a_product/insar_ascending.txt -v /home/user/us20003k7a_product/vel_model.txt`
+Execute the full process and inversion script: `wasp model run --help`. For example, running an event ("us20003k7a") with all data from a folder "/home/user/us20003k7a_product" might look something like `wasp model run /home/user/us20003k7a_product auto_model -g /home/user/us20003k7a_product/us20003k7a_cmt_CMT -d /home/user/us20003k7a_product/data -t cgps -t gps -t insar -t strong -t surf -t body -ina /home/user/us20003k7a_product/insar_ascending.txt -v /home/user/us20003k7a_product/vel_model.txt`
 
 ## 3. Plot the results
 
-For each nodal plane folder (NPX), run the plotting routine. For example: `wasp plot neic /home/user/us20003k7a_product/20150916225432/ffm.0/NP1 /home/user/us20003k7a_product/us20003k7a_cmt_cmt -a -t cgps -t gps -t insar -t strong -t surf -t body -d -p --pub -e us20003k7a`
+For each nodal plane folder (NPX), run the plotting routine. For example: `wasp plot neic /home/user/us20003k7a_product/20150916225432/ffm.0/NP1 -a -t cgps -t gps -t insar -t strong -t surf -t body -d -p --pub -ffms -e us20003k7a`
 
 ## 4. Make Changes
 
@@ -42,7 +42,7 @@ Bad channels can be removed or downweighted using the provided management script
 
 ### Shift Timing for Autocorrelation
 
-To shift timing use the shift matching script: `wasp process shift-match --help`. For example `wasp process-data shift-match /home/user/us20003k7a_product/20150916225432/ffm.0/NP3 cgps /home/user/us20003k7a_product/us20003k7a_cmt_cmt`
+To shift timing use the shift matching script: `wasp process shift-match --help`. For example `wasp process shift-match /home/user/us20003k7a_product/20150916225432/ffm.0/NP3 cgps`
 
 ### Update Plane Orientation
 
@@ -56,11 +56,11 @@ In order for the changes from [4. Make Changes](#4-make-changes) to be accepted 
 
 ### Recalculate Green's Functions
 
-Rerun the greens function for all the data sets you updated: `wasp process greens /home/user/us20003k7a_product/20150916225432/ffm.0/NP3 /home/user/us20003k7a_product/us20003k7a_cmt_cmt -t cgps -t body`
+Rerun the greens function for all the data sets you updated: `wasp process greens /home/user/us20003k7a_product/20150916225432/ffm.0/NP3 /home/user/us20003k7a_product/us20003k7a_cmt_CMT -t cgps -t body`
 
 ## 6. Rerun modelling
 
-Rerun the modelling fortran script with the datatypes specified: `/home/user/neic-finitefault/fortran_code/bin_inversion_gfortran_f95/run_moddelling body surf strong cgps gps insar`
+Rerun the modelling fortran script with the datatypes specified: `/home/user/neic-finitefault/fortran_code/bin_inversion_gfortran_f95/run_modelling body surf strong cgps gps insar`
 
 ## 7. Rerun plots
 

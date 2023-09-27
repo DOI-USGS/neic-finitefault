@@ -21,7 +21,7 @@ The code is based on the approach of Ji et al. (2002). Regional Green's function
 
 - **[Pablo Koch](https://www.cmm.uchile.cl/?cmm_people=pablo-koch)** - [National Seismological Center, University of Chile](https://www.sismologia.cl/)
 - **[Dara Goldberg](https://www.usgs.gov/staff-profiles/dara-e-goldberg)** - [National Earthquake Information Center (NEIC) of the Geologic Hazards Science center](https://www.usgs.gov/centers/geohazards)
-- **[Heather Hunsinger]()** - [Geologic Hazards Science Center](https://www.usgs.gov/centers/geohazards)
+- **Heather Hunsinger** - [Geologic Hazards Science Center](https://www.usgs.gov/centers/geohazards)
 - **[Diego Melgar](https://earthsciences.uoregon.edu/profile/dmelgarm/)** - [Department of Earth Sciences, University of Oregon](https://earthsciences.uoregon.edu)
 - **[Sebastian Riquelme](http://www.dgf.uchile.cl/academicas-y-academicos/profesores-expertos)** - [National Seismological Center, University of Chile](https://www.sismologia.cl/)
 - **[William Yeck](https://www.usgs.gov/staff-profiles/william-l-yeck)** - [National Earthquake Information Center (NEIC) of the Geologic Hazards Science Center](https://www.usgs.gov/centers/geohazards)
@@ -49,8 +49,8 @@ The following dependencies are not handled by any install scripts and/or package
 
 Automated installation of the dependencies and fortran code has been provided in the form of an [install script](./install.sh). Currently this install script only supports installation on linux systems (specifically Ubuntu for the system packages). Installation of Python dependencies and code is managed with the provided Poetry environment setup by pyproject.toml and package-lock.json. To install the dependencies and code run the two commands:
 
-1. `sudo ./install.sh` (with optional configurations)
-   1. > NOTE: The scripts in [./install.d](./install.d/) may be run individually to suite the individuals needs. For example, if GMT is already installed, there may be no need to run [gmt.sh](./install.d/gmt.sh).
+1. `sudo bash install.sh <path to the local neic-finitefault repository> <the os (currently only "ubuntu")> <Python major version (e.g. 3.9 or 3.10)>` (with other optional configurations available, run `sudo bash install.sh -h` for the help information)
+   1. > NOTE: The scripts in [./install.d](./install.d/) may be run individually to suit the individuals needs. For example, if GMT is already installed, there may be no need to run [gmt.sh](./install.d/gmt.sh).
 2. `sudo ./environment.d/<operating_system>.sh`
    1. If you want the configurations in to be loaded automatically consider adding them to your .bashrc or .bash_profile: `echo "source /home/user/neic-finitefault/environment.d/ubuntu.sh" >> ~/.bashrc`
 3. `poetry install`

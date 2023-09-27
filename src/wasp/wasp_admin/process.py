@@ -39,9 +39,6 @@ app = typer.Typer(help="WASP data processing")
 @app.command(help="Recalculate Green's functions")
 def greens(
     directory: pathlib.Path = typer.Argument(..., help="Path to the data directory"),
-    gcmt_tensor_file: pathlib.Path = typer.Argument(
-        ..., help="Path to the GCMT moment tensor file"
-    ),
     config_file: pathlib.Path = typer.Option(
         CONFIG_PATH, "-c", "--config-file", help="Path to config file"
     ),
@@ -61,7 +58,8 @@ def greens(
     # validate files
     files_to_validate = []
     sampling_filtering_file = directory / "sampling_filter.json"
-    files_to_validate += [sampling_filtering_file.resolve(), gcmt_tensor_file]
+    tensor_file = directory / "tensor_info.json"
+    files_to_validate += [sampling_filtering_file.resolve(), tensor_file]
     if "cgps" in chosen_data_types:
         gf_bank_cgps = directory / "GF_cgps"
         files_to_validate += [gf_bank_cgps]
@@ -71,7 +69,8 @@ def greens(
     validate_files(files_to_validate)
 
     # get the tensor information
-    tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
+    with open(tensor_file) as tf:
+        tensor_info = json.load(tf)
 
     # get the sampling filtering properties
     with open(sampling_filtering_file) as sf:
@@ -203,8 +202,8 @@ def shift_match(
         ...,
         help="Type of data being processed",
     ),
-    gcmt_tensor_file: pathlib.Path = typer.Argument(
-        ..., help="Path to the GCMT moment tensor file"
+    gcmt_tensor_file: pathlib.Path = typer.Option(
+        None, "-g", "--gcmt", help="Path to the GCMT moment tensor file"
     ),
     option: str = typer.Option(
         "auto",
@@ -227,9 +226,6 @@ def shift_match(
         help=f"Create plots for multiple events, defined by the specified number",
     ),
 ):
-    # get the tensor information
-    tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
-
     # validate files
     validate_files([directory / DEFAULT_MANAGEMENT_FILES[data_type]])
 
@@ -256,4 +252,8 @@ def shift_match(
                     files += shift_files
         save_waveforms(data_type, files)
     else:
+        if gcmt_tensor_file is None:
+            raise ValueError("No value provided for 'gcmt_tensor_file'. Exiting.")
+        validate_files([gcmt_tensor_file])
+        tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
         print_arrival(tensor_info, directory=directory)
