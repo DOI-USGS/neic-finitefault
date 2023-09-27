@@ -22,7 +22,7 @@ Put all data into a folder that you plan to work within:
 
 1. Put waveform and displacement data in a data folder
    1. Teleseismic and strong motion data can both be retrieved from [IRIS fdsnws](https://service.iris.edu/fdsnws/). The data acquisition script uses obspy to get this data: `wasp manage acquire --help`. Other data types (insar, cgps, gps, etc) are acquired from a contributor.
-2. Get the moment tensor information and save it in a file in the format `<eventid>_cmt_CMT`. QuakeML data with tensor information can be retrieved from a USGS event's origin product page. For example: See the Downloads section at the bottom of the page at https://earthquake.usgs.gov/earthquakes/eventpage/us20003k7a/origin/detail. The CMT file format is described here
+2. Get the moment tensor information and save it in a file in the format `<eventid>_cmt_CMT`. QuakeML data with tensor information can be retrieved from a USGS event's origin product page. For example: See the Downloads section at the bottom of the page at https://earthquake.usgs.gov/earthquakes/eventpage/us20003k7a/origin/detail. The CMT file format is described here: http://eost.u-strasbg.fr/wphase/wiki/doku.php/wphase:documentation#data_formats
 
 ## 2. Inversion
 
@@ -60,7 +60,7 @@ Rerun the greens function for all the data sets you updated: `wasp process green
 
 ## 6. Rerun modelling
 
-Rerun the modelling fortran script with the datatypes specified: `/home/user/neic-finitefault/fortran_code/bin_inversion_gfortran_f95/run_modelling body surf strong cgps gps insar`
+Rerun the modelling fortran script with the datatypes specified: `wasp model run manual_model /home/user/us20003k7a_product/20150916225432/ffm.0/NP3 -t body -t surf -t strong -t cgps -t gps -t insar`
 
 ## 7. Rerun plots
 
