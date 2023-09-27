@@ -41,7 +41,7 @@ def test_run(p1):
             [
                 "run",
                 str(tempdir),
-                "usgs_model",
+                "auto_model",
                 "-d",
                 str(tempdir / "data"),
                 "-c",
@@ -60,26 +60,6 @@ def test_run(p1):
         shutil.copyfile(
             END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
         )
-        result = runner.invoke(
-            app,
-            [
-                "run",
-                str(tempdir),
-                "usgs_model",
-                "-d",
-                str(tempdir / "data"),
-                "-c",
-                str(tempdir / "config.ini"),
-                "-t",
-                "body",
-                "-g",
-                str(tempdir / "20003k7a_cmt_CMT"),
-            ],
-        )
-        assert result.exit_code == 1
-        assert "does not exist!" in str(result.exception)
-
-        # test run
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "segments_data.json", tempdir / "segments_data.json"
         )
@@ -88,7 +68,7 @@ def test_run(p1):
             [
                 "run",
                 str(tempdir),
-                "usgs_model",
+                "auto_model",
                 "-d",
                 str(tempdir / "data"),
                 "-c",

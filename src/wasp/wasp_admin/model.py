@@ -45,7 +45,7 @@ class ModellingRoutine(str, Enum):
     forward_model = "forward_model"
     manual_model = "manual_model"
     manual_model_add_data = "manual_model_add_data"
-    usgs_model = "usgs_model"
+    auto_model = "auto_model"
 
 
 @app.command(help="Run a modelling routine")
@@ -207,7 +207,7 @@ def run(
             st_response=remove_response,
             directory=data_directory,
         )
-    if modelling_routine == ModellingRoutine.usgs_model:
+    if modelling_routine == ModellingRoutine.auto_model:
         solution_folder = set_directory_structure(tensor_info, directory=directory)
         if data_directory:
             for file in os.listdir(data_directory):
