@@ -78,7 +78,7 @@ def modelling_prop(
     # After Blaser et al (2010)
     #
     seismic_moment = moment_mag
-    moment_mag = 2.0 * (np.log10(seismic_moment)) / 3.0 - 10.7  # type:ignore
+    moment_mag = (2./3) * (np.log10(total_moment) - 16.1) # type:ignore
     length = 10 ** (-2.31 + 0.57 * moment_mag - 0.2)  # type:ignore
     width = 10 ** (-1.56 + 0.41 * moment_mag - 0.17)  # type:ignore
     avg_slip = seismic_moment / length / width / (3 * 10**21)  # type:ignore
