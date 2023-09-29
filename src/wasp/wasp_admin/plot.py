@@ -297,9 +297,6 @@ def map(
 @app.command(help="Create the plots used by the NEIC at the USGS")
 def neic(
     directory: pathlib.Path = typer.Argument(..., help="Path to the data directory"),
-    gcmt_tensor_file: pathlib.Path = typer.Argument(
-        ..., help="Path to the GCMT moment tensor file"
-    ),
     auto_size: bool = typer.Option(
         False,
         "-a",
@@ -411,7 +408,8 @@ def neic(
     paths_to_validate = []
     directory = directory.resolve()
     paths_to_validate += [directory]
-    paths_to_validate += [gcmt_tensor_file]
+    tensor_file = directory / "tensor_info.json"
+    paths_to_validate += [tensor_file]
     segments_file = directory / "segments_data.json"
     paths_to_validate += [segments_file]
     paths_to_validate += [directory / "Solucion.txt"]
@@ -423,7 +421,8 @@ def neic(
     default_directories = default_dirs(config_path=config_file)
 
     # get the tensor information
-    tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
+    with open(tensor_file) as tf:
+        tensor_info = json.load(tf)
 
     # get the segments data and connections
     with open(segments_file) as sf:
@@ -516,7 +515,7 @@ def neic(
     if tensor:
         calculate_cumulative_moment_tensor(solution=solution, directory=directory)
     if downloads:
-        write_CMTSOLUTION_file(directory=directory)
+        write_CMTSOLUTION_file(pdefile=tensor_file, directory=directory)
         write_Coulomb_file(directory=directory, eventID=event_id)
         write_Okada_displacements(directory=directory)
         make_waveproperties_json(directory=directory)
@@ -549,7 +548,7 @@ def neic(
                 insar_points = insar_data["ascending"][scene]["points"]
                 PlotInsar(
                     tensor_info=tensor_info,
-                    segments=segments_data,
+                    segments=segments,
                     point_sources=point_sources,
                     solution=solution,
                     insar_points=insar_points,
@@ -562,7 +561,7 @@ def neic(
                 insar_points = insar_data["descending"][scene]["points"]
                 PlotInsar(
                     tensor_info=tensor_info,
-                    segments=segments_data,
+                    segments=segments,
                     point_sources=point_sources,
                     solution=solution,
                     insar_points=insar_points,
@@ -572,7 +571,7 @@ def neic(
                 )
     if polygon:
         shakemap_polygon(
-            segments=segments_data,
+            segments=segments,
             point_sources=point_sources,
             solution=solution,
             tensor_info=tensor_info,
