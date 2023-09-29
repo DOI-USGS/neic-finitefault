@@ -20,7 +20,7 @@ The code is based on the approach of Ji et al. (2002). Regional Green's function
 ## Authors
 
 - **[Pablo Koch](https://www.cmm.uchile.cl/?cmm_people=pablo-koch)** - [National Seismological Center, University of Chile](https://www.sismologia.cl/)
-- **[Dara Goldberg](https://www.usgs.gov/staff-profiles/dara-e-goldberg)** - [National Earthquake Information Center (NEIC) of the Geologic Hazards Science center](https://www.usgs.gov/centers/geohazards)
+- **[Dara Goldberg](https://www.usgs.gov/staff-profiles/dara-e-goldberg)** - [National Earthquake Information Center (NEIC) of the Geologic Hazards Science Center](https://www.usgs.gov/centers/geohazards)
 - **Heather Hunsinger** - [Geologic Hazards Science Center](https://www.usgs.gov/centers/geohazards)
 - **[Diego Melgar](https://earthsciences.uoregon.edu/profile/dmelgarm/)** - [Department of Earth Sciences, University of Oregon](https://earthsciences.uoregon.edu)
 - **[Sebastian Riquelme](http://www.dgf.uchile.cl/academicas-y-academicos/profesores-expertos)** - [National Seismological Center, University of Chile](https://www.sismologia.cl/)
@@ -63,8 +63,8 @@ Automated installation of the dependencies and fortran code has been provided in
 The following documents provide more information about the installation process:
 
 - [Data Dependencies](./docs/data-dependencies.md): Provides a list of data required to run the code
-- [Code Dependencies](./docs/code-dependecies.md): Provides a list of dependencies required to run the code
-- [Manual Installation](./docs/code-dependecies.md): Provides a list of steps to manually install dependencies and code without reference to a specific operating system.
+- [Code Dependencies](./docs/code-dependencies.md): Provides a list of dependencies required to run the code
+- [Manual Installation](./docs/manual-installation.md): Provides a list of steps to manually install dependencies and code without reference to a specific operating system.
 
 ## Using the Poetry Environment
 
