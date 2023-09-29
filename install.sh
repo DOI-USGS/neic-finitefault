@@ -23,8 +23,6 @@ function usage {
     echo "  OPERATING_SYSTEM string the operating system to define install"
     echo "                          (example: ubuntu)"
     echo "                          (note: currently only ubuntu supported)"
-    echo "  PYTHON_VERSION string   the major version of python available"
-    echo "                          (example: 3.10)"
     echo "  -x,--skip-packages bool skip system specific install"
     echo "                          default=false"
     echo "                          (example: -x, skips ubuntu.sh)"
@@ -130,7 +128,6 @@ done
 set -- "${REQUIRED_ARGS[@]}" # restore positional parameters
 FINITEFAULT_DIR=$1
 OPERATING_SYSTEM=$2
-PYTHON_VERSION=$3
 ### set defaults
 SKIP_SYSTEM_INSTALL=${SKIP_SYSTEM_INSTALL:false}
 SKIP_ENV=${SKIP_ENV:false}
@@ -141,19 +138,6 @@ GEOS_VERSION=${GEOS_VERSION:-"3.11.2"}
 PROJ_VERSION=${PROJ_VERSION:-"9.2.0"}
 FD_BANK=${FD_BANK:-"download"}
 LITHO1=${LITHO1:-"download"}
-### validate python version choice (in security status)
-#### See https://devguide.python.org/versions/ for statuses of versions
-case $PYTHON_VERSION in
-  3.8)
-    ;;
-  3.9)
-    ;;
-  3.10)
-    ;;
-  *)
-    echo -n "Invalid option for PYTHON_VERSION: ${PYTHON_VERSION}" && exit
-    ;;
-esac
 ### validate operating system choice
 case $OPERATING_SYSTEM in
   ubuntu)
@@ -176,7 +160,7 @@ if [ "$SKIP_SYSTEM_INSTALL" = true ] ; then
     echo "Skipping running ${INSTALL_DIR}/${OPERATING_SYSTEM}_packages.sh";
 else
     # shellcheck source=./install.d/ubuntu_packages.sh
-    source "${INSTALL_DIR}/${OPERATING_SYSTEM}_packages.sh" "${PYTHON_VERSION}";    
+    source "${INSTALL_DIR}/${OPERATING_SYSTEM}_packages.sh";
 fi
 # shellcheck source=./install.d/gmt.sh
 source "${INSTALL_DIR}/gmt.sh" "${CLEANUP}" "${DCW_VERSION}" "${GMT_VERSION}" "${GSHHG_VERSION}";

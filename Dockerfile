@@ -4,14 +4,12 @@ ARG FROM_IMAGE=code.usgs.gov:5001/devops/images/usgs/python:"${PYTHON_VERSION}"-
 
 # ubuntu packages
 FROM ${FROM_IMAGE} as packages
-ARG PYTHON_VERSION
-ARG PYTHON_VERSION=${PYTHON_VERSION:-3.9}
 
 USER root
 
 COPY install.d/ubuntu_packages.sh ./install.d/
 RUN apt update -y && apt upgrade -y
-RUN bash install.d/ubuntu_packages.sh "${PYTHON_VERSION}"
+RUN bash install.d/ubuntu_packages.sh
 
 USER usgs-user
 
@@ -79,10 +77,5 @@ RUN rm -rf "${FINITEFAULT_DIR}/install.d" src pyproject.toml poetry.lock
 RUN apt remove -y \
     cmake \
     curl \
-    gcc \
-    gfortran \
-    git \
-    libnetcdf-dev \
-    libgdal-dev \
-    libgeos-dev;
+    git
 USER usgs-user
