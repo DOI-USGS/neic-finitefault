@@ -515,7 +515,7 @@ def neic(
     if tensor:
         calculate_cumulative_moment_tensor(solution=solution, directory=directory)
     if downloads:
-        write_CMTSOLUTION_file(directory=directory)
+        write_CMTSOLUTION_file(pdefile=tensor_file, directory=directory)
         write_Coulomb_file(directory=directory, eventID=event_id)
         write_Okada_displacements(directory=directory)
         make_waveproperties_json(directory=directory)
@@ -548,7 +548,7 @@ def neic(
                 insar_points = insar_data["ascending"][scene]["points"]
                 PlotInsar(
                     tensor_info=tensor_info,
-                    segments=segments_data,
+                    segments=segments,
                     point_sources=point_sources,
                     solution=solution,
                     insar_points=insar_points,
@@ -561,7 +561,7 @@ def neic(
                 insar_points = insar_data["descending"][scene]["points"]
                 PlotInsar(
                     tensor_info=tensor_info,
-                    segments=segments_data,
+                    segments=segments,
                     point_sources=point_sources,
                     solution=solution,
                     insar_points=insar_points,
@@ -571,7 +571,7 @@ def neic(
                 )
     if polygon:
         shakemap_polygon(
-            segments=segments_data,
+            segments=segments,
             point_sources=point_sources,
             solution=solution,
             tensor_info=tensor_info,

@@ -358,6 +358,7 @@ def test_neic():
                 str(tempdir / "config.ini"),
             ],
         )
+        print(result.exception)
         assert result.exit_code == 0
         # validate results
         plot_dir = tempdir / "plots"
