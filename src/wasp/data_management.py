@@ -623,8 +623,8 @@ def static_data(
 def insar_data(
     insar_asc: Optional[List[Union[pathlib.Path, str]]] = None,
     insar_desc: Optional[List[Union[pathlib.Path, str]]] = None,
-    ramp_asc: Optional[List[Union[float, None]]] = None,
-    ramp_desc: Optional[List[Union[float, None]]] = None,
+    ramp_asc: Optional[List[Union[str, None]]] = None,
+    ramp_desc: Optional[List[Union[str, None]]] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> dict:
     """Write json dictionary with properties for InSar data
@@ -633,10 +633,10 @@ def insar_data(
     :type insar_asc: Optional[List[Union[pathlib.Path, str]]], optional
     :param insar_desc: The paths to descending InSar files, defaults to None
     :type insar_desc: Optional[List[Union[pathlib.Path, str]]], optional
-    :param ramp_asc: The ascending ramp values, defaults to None
-    :type ramp_asc: Optional[List[Union[float, None]]], optional
-    :param ramp_desc: The descending ramp values, defaults to None
-    :type ramp_desc: Optional[List[Union[float, None]]], optional
+    :param ramp_asc: The ascending ramp options, defaults to None
+    :type ramp_asc: Optional[List[Union[str, None]]], optional
+    :param ramp_desc: The descending ramp options, defaults to None
+    :type ramp_desc: Optional[List[Union[str, None]]], optional
     :param directory: The directory where the data is located, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     :raises ValueError: If the length of ascending ramps and files are different
@@ -871,8 +871,8 @@ def filling_data_dicts(
     data_folder: Union[pathlib.Path, str],
     insar_asc: Optional[List[Union[pathlib.Path, str]]] = None,
     insar_desc: Optional[List[Union[pathlib.Path, str]]] = None,
-    ramp_asc: Optional[List[Union[float, None]]] = None,
-    ramp_desc: Optional[List[Union[float, None]]] = None,
+    ramp_asc: Optional[List[Union[str, None]]] = None,
+    ramp_desc: Optional[List[Union[str, None]]] = None,
     working_directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """Routine to fill JSON dictionaries containing data properties, for all
@@ -891,10 +891,10 @@ def filling_data_dicts(
     :param insar_asc: The paths to ascending InSar files, defaults to None
     :type insar_asc: Optional[List[Union[pathlib.Path, str]]], optional
     :param insar_desc: The paths to descending InSar files, defaults to None
-    :type insar_desc: Optional[List[Union[float, None]]], optional
-    :param ramp_asc: The ascending ramp values, defaults to None
-    :type ramp_asc: Optional[List[Union[float, None]]], optional
-    :param ramp_desc: The descending ramp values, defaults to None
+    :type insar_desc: Optional[List[Union[str, None]]], optional
+    :param ramp_asc: The ascending ramp options, defaults to None
+    :type ramp_asc: Optional[List[Union[str, None]]], optional
+    :param ramp_desc: The descending ramp options, defaults to None
     :param working_directory: The working directory, defaults to pathlib.Path()
     :type working_directory: Union[pathlib.Path, str], optional
 
