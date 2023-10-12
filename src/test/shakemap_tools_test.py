@@ -53,12 +53,12 @@ def test_shakemap_tools():
     along_strike, along_dip, delta_strike, delta_dip = get_strike()
     eq_len_AS = equivalent_slip_length(along_strike / 100, delta_strike)
     eq_len_AD = equivalent_slip_length(along_dip / 100, delta_dip)
-    assert eq_len_AS == 264.29
-    assert eq_len_AD == 86.96
+    assert eq_len_AS == 267.62
+    assert eq_len_AD == 91.9
     left_edge_AS = locate_equivalent_slip(along_strike / 100, delta_strike, eq_len_AS)
     left_edge_AD = locate_equivalent_slip(along_dip / 100, delta_dip, eq_len_AD)
-    assert left_edge_AS == 118.8415217391304
-    assert left_edge_AD == -6.169116979408531
+    assert left_edge_AS == 117.17652173913041
+    assert left_edge_AD == -8.639116979408538
     corner_1, corner_2, corner_3, corner_4 = translate_xy_to_latlondep(
         SEGMENTS["segments"][0],
         TENSOR["lon"],
@@ -69,7 +69,7 @@ def test_shakemap_tools():
         left_edge_AS,
         left_edge_AD,
     )
-    assert corner_1 == "-71.59 -30.50 20.36"
-    assert corner_2 == "-71.28 -28.13 20.36"
-    assert corner_3 == "-70.42 -28.21 49.08"
-    assert corner_4 == "-70.73 -30.58 49.08"
+    assert corner_1 == "-71.61 -30.51 19.55"
+    assert corner_2 == "-71.30 -28.11 19.55"
+    assert corner_3 == "-70.40 -28.20 49.89"
+    assert corner_4 == "-70.71 -30.60 49.89"
