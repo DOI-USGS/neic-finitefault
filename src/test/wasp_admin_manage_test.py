@@ -161,8 +161,8 @@ def test_fill_dicts():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
         shutil.copyfile(
-            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT",
-            tempdir / "20003k7a_cmt_CMT",
+            RESULTS_DIR / "NP1" / "tensor_info.json",
+            tempdir / "tensor_info.json",
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "sampling_filter.json",
@@ -173,7 +173,6 @@ def test_fill_dicts():
             [
                 "fill-dicts",
                 str(tempdir),
-                str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
                 "body",
             ],
@@ -191,15 +190,14 @@ def test_fill_dicts_missing_file():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
         shutil.copyfile(
-            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT",
-            tempdir / "20003k7a_cmt_CMT",
+            RESULTS_DIR / "NP1" / "tensor_info.json",
+            tempdir / "tensor_info.json",
         )
         result = runner.invoke(
             app,
             [
                 "fill-dicts",
                 str(tempdir),
-                str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
                 "body",
             ],

@@ -168,9 +168,6 @@ def eventmult_to_json(
 @app.command(help="Populate data dictionaries used for managing data")
 def fill_dicts(
     directory: pathlib.Path = typer.Argument(..., help="Path to the data directory"),
-    gcmt_tensor_file: pathlib.Path = typer.Argument(
-        ..., help="Path to the GCMT moment tensor file"
-    ),
     data_types: List[ManagedDataTypes] = typer.Option(
         [],
         "-t",
@@ -190,11 +187,6 @@ def fill_dicts(
         None, "-indr", "--descending-ramp", help="Descending insar ramp option"
     ),
 ):
-    # get the tensor information
-    tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
-    event_time = tensor_info["datetime"]
-    event_time = UTCDateTime(event_time)
-
     # set default data type
     chosen_data_types: List[str]
     if data_types == []:
@@ -226,7 +218,15 @@ def fill_dicts(
             files_to_validate += [arg]
     sampling_filtering_file = directory / "sampling_filter.json"
     files_to_validate += [sampling_filtering_file.resolve()]
+    tensor_file = directory / "tensor_info.json"
+    files_to_validate += [tensor_file]
     validate_files(files_to_validate)
+
+    # get the tensor information
+    with open(tensor_file) as tf:
+        tensor_info = json.load(tf)
+    event_time = tensor_info["datetime"]
+    event_time = UTCDateTime(event_time)
 
     # get the sampling filtering properties
     with open(sampling_filtering_file) as sf:
