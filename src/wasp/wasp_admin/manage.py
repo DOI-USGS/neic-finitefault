@@ -2,7 +2,8 @@ import datetime
 import json
 import pathlib
 import time
-from typing import List, Tuple
+from enum import Enum
+from typing import List, Optional, Tuple
 
 import numpy as np
 import typer
@@ -48,6 +49,12 @@ from .datautils import (
 from .fileutils import validate_files
 
 app = typer.Typer(help="Manage WASP data, faults, and property files")
+
+
+class InsarRamp(str, Enum):
+    bilinear = "bilinear"
+    linear = "linear"
+    quadratic = "quadratic"
 
 
 def _get_correction(correction_string: str) -> Tuple[str, List[str], float]:
@@ -173,14 +180,14 @@ def fill_dicts(
     insar_ascending: pathlib.Path = typer.Option(
         None, "-ina", "--insar-ascending", help="Path to an ascending insar file"
     ),
-    insar_ascending_ramp: float = typer.Option(
-        None, "-inda", "--ascending-ramp", help="Ascending insar ramp value"
+    insar_ascending_ramp: InsarRamp = typer.Option(
+        None, "-inar", "--ascending-ramp", help="Ascending insar ramp option"
     ),
     insar_descending: pathlib.Path = typer.Option(
         None, "-ind", "--insar-descending", help="Path to an descending insar file"
     ),
-    insar_descending_ramp: float = typer.Option(
-        None, "-indr", "--descending-ramp", help="Descending insar ramp value"
+    insar_descending_ramp: InsarRamp = typer.Option(
+        None, "-indr", "--descending-ramp", help="Descending insar ramp option"
     ),
 ):
     # get the tensor information
@@ -198,6 +205,16 @@ def fill_dicts(
         insar_ascending is not None or insar_descending is not None
     ) and "insar" not in data_types:
         chosen_data_types += ["insar"]
+    ascending_ramp: Optional[str]
+    descending_ramp: Optional[str]
+    if insar_ascending_ramp is not None:
+        ascending_ramp = insar_ascending_ramp.value
+    else:
+        ascending_ramp = None
+    if insar_descending_ramp is not None:
+        descending_ramp = insar_descending_ramp.value
+    else:
+        descending_ramp = None
 
     # validate files
     files_to_validate = []
@@ -223,8 +240,8 @@ def fill_dicts(
         directory,
         insar_asc=[insar_ascending],
         insar_desc=[insar_descending],
-        ramp_asc=[insar_ascending_ramp],
-        ramp_desc=[insar_descending_ramp],
+        ramp_asc=[ascending_ramp],
+        ramp_desc=[descending_ramp],
         working_directory=directory,
     )
 
