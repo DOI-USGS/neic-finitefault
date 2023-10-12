@@ -2,7 +2,6 @@ import json
 import logging
 import os
 import pathlib
-from enum import Enum
 from glob import glob
 from shutil import move
 from typing import List, Tuple
