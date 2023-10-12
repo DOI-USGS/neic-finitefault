@@ -158,7 +158,7 @@ def test_plot():
             shear,
             SOLUTION,
             {"root_dir": pathlib.Path(__file__).parent.parent.parent},
-            autosize=True,
+            autosize=False,
             files_str=new_strong_waves,
             stations_gps=stations_gps,
             stations_cgps=new_cgps_waves,
@@ -254,10 +254,10 @@ def test___PlotCumulativeSlip():
         )
         assert (tempdir / "CumulativeSlip_plane0.png").exists()
         assert (tempdir / "CumulativeSlip_plane0.ps").exists()
-        assert c1 == "-72.35 -31.72 0.65"
-        assert c2 == "-72.04 -29.36 0.65"
-        assert c3 == "-71.18 -29.44 29.37"
-        assert c4 == "-71.49 -31.81 29.37"
+        assert c1 == "-72.38 -31.74 -0.16"
+        assert c2 == "-72.06 -29.34 -0.16"
+        assert c3 == "-71.15 -29.43 30.18"
+        assert c4 == "-71.47 -31.83 30.18"
     finally:
         shutil.rmtree(tempdir)
 

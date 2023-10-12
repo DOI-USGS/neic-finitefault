@@ -76,7 +76,7 @@ def static_to_srf(
     event_lat = tensor_info["lat"]
     event_lon = tensor_info["lon"]
     depth = tensor_info["depth"]
-    moment_mag = 2 * np.log10(total_moment) / 3 - 10.7
+    moment_mag = (2.0 / 3) * (np.log10(total_moment) - 16.1)
     location = locator.get_region(event_lon, event_lat)
     date = tensor_info["datetime"]
     tag = date

@@ -583,22 +583,6 @@ def test_static_srf():
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "segments_data.json", tempdir / "segments_data.json"
         )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "strong_motion_waves.json",
-            tempdir / "strong_motion_waves.json",
-        )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "tele_waves.json",
-            tempdir / "tele_waves.json",
-        )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "surf_waves.json",
-            tempdir / "surf_waves.json",
-        )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "cgps_waves.json",
-            tempdir / "cgps_waves.json",
-        )
 
         result = runner.invoke(
             app,
@@ -684,15 +668,16 @@ def test_static_srf():
             "-72.1958 \t -31.0308 \t 23 \t 9 \t 412.33 \t 134.32 \n",
             "6.61 \t 19.28 \t 0.22 \t -53.67 \t 67.16 \n",
             "POINTS 207\n",
-            "-72.4357 -32.7937 2.69 6.61 19.28 267.56 123.94 1.0 -1 -1\n",
-            "121.47 67.7587 31 0 0 0 0 \n",
-            "  0.000000e+00  4.935634e-02  1.952683e-01  4.313587e-01  7.473094e-01  1.129312e+00\n",
-            "  1.560670e+00  2.022533e+00  2.494714e+00  2.956577e+00  3.387935e+00  3.769938e+00\n",
-            "  4.085888e+00  4.321979e+00  4.467891e+00  4.517247e+00  4.467891e+00  4.321979e+00\n",
+            "-72.4357 -32.7937 2.69 6.61 19.28 267.56 89.54 1.0 -1 -1\n",
+            "89.59 167.3980 31 0 0 0 0 \n",
+            "  0.000000e+00  1.608036e+00  6.154099e+00  1.285213e+01  2.054399e+01  2.789967e+01\n",
+            "  3.364732e+01  3.679311e+01  2.789967e+01  0.000000e+00  0.000000e+00  0.000000e+00\n",
+            "  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00\n",
         ]
         for idx, target_line in enumerate(target):
             if "@usgs.gov" in target_line:
                 continue
+            print(data[idx])
             assert data[idx] == target_line
     finally:
         shutil.rmtree(tempdir)

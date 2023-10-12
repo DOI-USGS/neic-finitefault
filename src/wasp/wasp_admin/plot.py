@@ -1,7 +1,7 @@
 import json
+import logging
 import os
 import pathlib
-from enum import Enum
 from glob import glob
 from shutil import move
 from typing import List, Tuple
@@ -312,6 +312,9 @@ def neic(
     config_file: pathlib.Path = typer.Option(
         CONFIG_PATH, "-c", "--config-file", help="Path to config file"
     ),
+    gcmt_tensor_file: pathlib.Path = typer.Option(
+        None, "-g", "--gcmt", help="Path to the GCMT moment tensor file"
+    ),
     data_types: List[ManagedDataTypes] = typer.Option(
         [],
         "-t",
@@ -515,7 +518,12 @@ def neic(
     if tensor:
         calculate_cumulative_moment_tensor(solution=solution, directory=directory)
     if downloads:
-        write_CMTSOLUTION_file(pdefile=tensor_file, directory=directory)
+        if gcmt_tensor_file:
+            write_CMTSOLUTION_file(pdefile=gcmt_tensor_file, directory=directory)
+        else:
+            logging.warn(
+                "No gcmt_tensor_file specified. Skipping writing CMTSOLUTION file."
+            )
         write_Coulomb_file(directory=directory, eventID=event_id)
         write_Okada_displacements(directory=directory)
         make_waveproperties_json(directory=directory)
