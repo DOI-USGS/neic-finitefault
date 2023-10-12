@@ -137,7 +137,7 @@ def run(
     # Set and validate files
     paths_to_validate = []
     directory = directory.resolve()
-    data_directory = (data_directory or directory / "data").resolve()
+    data_directory = (data_directory or directory.parent / "data").resolve()
     paths_to_validate += [directory, data_directory]
     if modelling_routine != ModellingRoutine.auto_model:
         tensor_file = directory / "tensor_info.json"
