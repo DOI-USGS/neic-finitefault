@@ -39,12 +39,12 @@ def plot_waveforms(
         min_time, max_time = ax.get_xlim()
         min_time = np.minimum(np.min(time), min_time)
         max_time = np.maximum(np.max(time), max_time)
-        ax.set_xlim([min_time, max_time])
+        ax.set_xlim((min_time, max_time))
         if custom == "fill":
             min_val, max_val = ax.get_ylim()
             min_val = np.minimum(np.min(waveform), min_val)
             max_val = np.maximum(np.max(waveform), max_val)
-            ax.set_ylim([min_val, max_val])
+            ax.set_ylim((min_val, max_val))
             ax.vlines(0, min_val, max_val)
         ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=3, min_n_ticks=3))
         ax.yaxis.set_major_locator(ticker.MaxNLocator(nbins=3, min_n_ticks=3))
@@ -57,7 +57,7 @@ def add_metadata(
     distances: Optional[List[float]] = None,
     names: Optional[List[str]] = None,
     weights: Optional[List[float]] = None,
-) -> plt.Axes:
+) -> List[plt.Axes]:
     """Add metadata to axes
 
     :param axes: The axes to add the metadata to
@@ -71,7 +71,7 @@ def add_metadata(
     :param weights: A list of weight values, defaults to None
     :type weights: Optional[List[float]], optional
     :return: The updated axes
-    :rtype: plt.Axes
+    :rtype: List[plt.Axes]
     """
     if names is not None:
         for ax, name in zip(axes, names):

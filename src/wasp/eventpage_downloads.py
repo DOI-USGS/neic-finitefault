@@ -359,7 +359,7 @@ def write_Okada_displacements(directory: Union[pathlib.Path, str] = pathlib.Path
         gridLon,
         gridLat,
         marker="s",
-        c=horizontal * 100,
+        c=horizontal * 100,  # type:ignore
         lw=0,
         s=100,
         vmin=0.0,
@@ -400,7 +400,7 @@ def write_Okada_displacements(directory: Union[pathlib.Path, str] = pathlib.Path
         gridLon,
         gridLat,
         marker="s",
-        c=uz * 100,
+        c=uz * 100,  # type:ignore
         lw=0,
         s=100,
         vmin=-minmax * 100,

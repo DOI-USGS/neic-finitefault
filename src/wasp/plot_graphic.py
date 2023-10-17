@@ -408,9 +408,9 @@ def _PlotRuptTime(
         if i_segment == 0:
             ax.plot(0, 0, "w*", ms=20)
         ax, im = __several_axes(
-            rupt_time_seg, segment, ps_seg, ax, max_val=max_rupt_time
+            rupt_time_seg, segment, ps_seg, ax, max_val=max_rupt_time  # type: ignore
         )
-        cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+        cbar_ax = fig.add_axes((0.85, 0.15, 0.05, 0.7))
         cb = fig.colorbar(im, cax=cbar_ax)
         cb.set_label("Rupt_time (s)")
         plt.savefig(
@@ -465,16 +465,26 @@ def _PlotRiseTime(
         if i_segment == 0:
             axes[0].plot(0, 0, "w*", ms=20)
         axes[0], im = __several_axes(
-            trise_seg, segment, ps_seg, axes[0], max_val=max_trise, autosize=False
+            trise_seg,
+            segment,
+            ps_seg,
+            axes[0],
+            max_val=max_trise,  # type:ignore
+            autosize=False,
         )
         axes[1].set_ylabel(y_label)
         axes[1].set_xlabel(x_label)
         if i_segment == 0:
             axes[1].plot(0, 0, "w*", ms=20)
         axes[1], im = __several_axes(
-            tfall_seg, segment, ps_seg, axes[1], max_val=max_tfall, autosize=False
+            tfall_seg,
+            segment,
+            ps_seg,
+            axes[1],
+            max_val=max_tfall,  # type:ignore
+            autosize=False,
         )
-        cbar_ax = fig.add_axes([0.1, 0.05, 0.8, 0.05])
+        cbar_ax = fig.add_axes((0.1, 0.05, 0.8, 0.05))
         cb = fig.colorbar(im, cax=cbar_ax, orientation="horizontal")
         cb.set_label("Rise_time (s)")
         plt.savefig(
@@ -535,8 +545,10 @@ def PlotSlipDistribution(
         ax.quiver(x, y, u, v, scale=15.0, width=0.003)
         if i_segment == 0:
             ax.plot(0, 0, "w*", ms=20)
-        ax, im = __several_axes(slip_seg, segment, ps_seg, ax, max_val=max_slip)
-        cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+        ax, im = __several_axes(
+            slip_seg, segment, ps_seg, ax, max_val=max_slip  # type:ignore
+        )
+        cbar_ax = fig.add_axes((0.85, 0.15, 0.05, 0.7))
         cb = fig.colorbar(im, cax=cbar_ax)
         cb.set_label("Slip (cm)")
         plt.savefig(
@@ -620,14 +632,24 @@ def PlotSlipDist_Compare(
             ax0.plot(0, 0, "w*", ms=20)
             ax1.plot(0, 0, "w*", ms=20)
         ax0, im = __several_axes(
-            slip_seg, segment, ps_seg, ax0, max_val=max_slip, autosize=False
+            slip_seg,
+            segment,
+            ps_seg,
+            ax0,
+            max_val=max_slip,  # type:ignore
+            autosize=False,
         )
         ax1, im = __several_axes(
-            slip_seg2, segment, ps_seg, ax1, max_val=max_slip, autosize=False
+            slip_seg2,
+            segment,
+            ps_seg,
+            ax1,
+            max_val=max_slip,  # type:ignore
+            autosize=False,
         )
         ax0.set_title("Inverted model", fontsize=20)
         ax1.set_title("Original model", fontsize=20)
-        cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+        cbar_ax = fig.add_axes((0.85, 0.15, 0.05, 0.7))
         cb = fig.colorbar(im, cax=cbar_ax)
         cb.set_label("Slip (cm)")
         plt.savefig(
@@ -789,8 +811,8 @@ def PlotMap(
             plt.arrow(
                 sta_lon,
                 sta_lat,
-                east_west,
-                north_south,
+                east_west,  # type:ignore
+                north_south,  # type:ignore
                 color="r",
                 zorder=3,
                 linewidth=2,
@@ -803,7 +825,7 @@ def PlotMap(
                 sta_lon,
                 sta_lat,
                 0.0,
-                up_down,
+                up_down,  # type:ignore
                 color="r",
                 zorder=3,
                 linewidth=2,
@@ -817,8 +839,8 @@ def PlotMap(
             plt.arrow(
                 sta_lon,
                 sta_lat,
-                east_west,
-                north_south,
+                east_west,  # type:ignore
+                north_south,  # type:ignore
                 zorder=3,
                 linewidth=2,
                 head_width=0.05,
@@ -830,7 +852,7 @@ def PlotMap(
                 sta_lon,
                 sta_lat,
                 0.0,
-                up_down,
+                up_down,  # type:ignore
                 zorder=3,
                 linewidth=2,
                 head_width=0.05,
@@ -848,8 +870,8 @@ def PlotMap(
             height = float(err_n) / max_obs  # / 100
             ellipse = patches.Ellipse(
                 (sta_lon + east_west, sta_lat + north_south),
-                width,
-                height,
+                width,  # type:ignore
+                height,  # type:ignore
                 zorder=4,
                 color="k",
                 linewidth=10,
@@ -897,7 +919,7 @@ def PlotMap(
         max_val=max_slip,
         transform=dictn["projection"],
     )
-    cbar_ax = fig.add_axes([0.85, 0.1, 0.05, 0.8])
+    cbar_ax = fig.add_axes((0.85, 0.1, 0.05, 0.8))
     cbar = plt.colorbar(cs, cax=cbar_ax)
     cbar.set_label("Slip (cm)", size=15)
     cbar.ax.yaxis.set_ticks_position("left")
@@ -1140,7 +1162,7 @@ def PlotComparisonMap(
         transform=dictn["projection"],
     )
     fig.subplots_adjust(bottom=0.15)
-    cbar_ax = fig.add_axes([0.1, 0.05, 0.8, 0.05])
+    cbar_ax = fig.add_axes((0.1, 0.05, 0.8, 0.05))
     cb = fig.colorbar(cs2, cax=cbar_ax, orientation="horizontal")
     cb.set_label("Slip (cm)")
     plt.savefig(directory / "Comparison.png", bbox_inches="tight")
@@ -1326,7 +1348,7 @@ def plot_moment_rate_function(
         0.85 * max(mr),
         "$M_w$: {:.2f}".format(magnitude),
     )
-    plt.grid("on")
+    plt.grid(visible=True)
     plt.fill_between(time, mr)
     plot_name = "MomentRate"
     if event is not None:
@@ -1406,7 +1428,7 @@ def _PlotSnapshotSlip(
         i = i + 1
 
     fig.subplots_adjust(right=0.8)
-    cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+    cbar_ax = fig.add_axes((0.85, 0.15, 0.05, 0.7))
     cb = fig.colorbar(im, cax=cbar_ax)
     cb.set_label("Slip (cm)")
     fig.text(
@@ -1517,7 +1539,7 @@ def __several_axes(
     segment: dict,
     point_source_seg: np.ndarray,
     ax: plt.Axes,
-    max_val: Optional[Union[list, float]] = None,
+    max_val: Optional[float] = None,
     autosize: bool = True,
 ) -> Tuple[plt.Axes, AxesImage]:
     """Setup several axes
@@ -1564,18 +1586,18 @@ def __several_axes(
         origin="lower",
         vmax=max_val,
         aspect="auto",
-        extent=[min_strike, max_strike, min_dist, max_dist],
+        extent=(min_strike, max_strike, min_dist, max_dist),
     )
     ax2 = ax.twinx()
-    ax2.set_xlim([min_strike, max_strike])
-    ax2.set_ylim([min_depth, max_depth])
+    ax2.set_xlim((min_strike, max_strike))
+    ax2.set_ylim((min_depth, max_depth))
     ax.set(adjustable="datalim")
     ax2.set(adjustable="datalim")
     if autosize:
-        ax.figure.set_size_inches(
+        ax.figure.set_size_inches(  # type:ignore
             4 * stk_subfaults * delta_strike / dip_subfaults / delta_dip, 4
         )
-        ax2.figure.set_size_inches(
+        ax2.figure.set_size_inches(  # type:ignore
             4 * stk_subfaults * delta_strike / dip_subfaults / delta_dip, 4
         )
     ax2.set_ylabel("Depth $(km)$")
