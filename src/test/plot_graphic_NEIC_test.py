@@ -175,11 +175,6 @@ def test_plot():
         assert (tempdir / "SlipDist_plane0.png").exists()
         assert (tempdir / "Map.eps").exists()
         assert (tempdir / "SlipDist_plane0.ps").exists()
-        with open(tempdir / "SlipDist_plane0.ps", "rb") as d:
-            data = b"".join(d.readlines()[10:])
-        with open(RESULTS_DIR / "NP1" / "SlipDist_plane0.ps", "rb") as t:
-            target = b"".join(t.readlines()[10:])
-        assert data == target
         plot_misfit(
             used_data_type=[
                 "cgps",

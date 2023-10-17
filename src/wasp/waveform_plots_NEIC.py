@@ -59,7 +59,7 @@ def plot_waveforms(
             min_val, max_val = ax.get_ylim()
             min_val = np.minimum(np.min(waveform), min_val)
             max_val = np.maximum(np.max(waveform), max_val)
-            ax.set_ylim([-(max(abs(min_val), max_val)), max(abs(min_val), max_val)])
+            ax.set_ylim((-(max(abs(min_val), max_val)), max(abs(min_val), max_val)))
             min_val, max_val = ax.get_ylim()
             ax.vlines(0, min_val, max_val, "k", lw=1)
             if type_str == "body":
@@ -71,7 +71,7 @@ def plot_waveforms(
                     va="center",
                 )
                 ax.hlines(0, -20, np.max(time), "k", lw=1)
-                ax.set_xlim([-20, np.max(time)])
+                ax.set_xlim((-20, np.max(time)))
             elif type_str == "surf":
                 ax.text(
                     np.max(time),
@@ -81,7 +81,7 @@ def plot_waveforms(
                     va="center",
                 )
                 ax.hlines(0, -350, np.max(time), "k", lw=1)
-                ax.set_xlim([-350, np.max(time)])
+                ax.set_xlim((-350, np.max(time)))
             elif type_str == "cgps" or type_str == "strong":
                 min_wval = np.min(waveform)
                 max_wval = np.max(waveform)
@@ -102,7 +102,7 @@ def plot_waveforms(
                         va="center",
                     )
                 ax.hlines(0, -15, np.max(time), "k", lw=1)
-                ax.set_xlim([-15, np.max(time)])
+                ax.set_xlim((-15, np.max(time)))
             min_time, max_time = ax.get_xlim()
             if type_str == "body" and comp == "BHZ":
                 ax.text(
@@ -176,7 +176,7 @@ def plot_waveforms(
             ax.yaxis.set_major_locator(ticker.NullLocator())
         elif type_str == "cgps" or type_str == "strong":
             ax.xaxis.set_major_locator(ticker.MultipleLocator(40))
-            ax.yaxis.get_major_locator().set_params(integer=True)
+            ax.yaxis.get_major_locator().set_params(integer=True)  # type:ignore
         if nPlot > len(weights) - 3:
             ax.set_xlabel("Time After OT (s)")
         ax.grid(axis="x", which="both", linestyle="dotted", color="0.5")
@@ -191,7 +191,7 @@ def add_metadata(
     names: Optional[List[str]] = None,
     type_str: Optional[List[float]] = None,
     weights: Optional[List[float]] = None,
-) -> plt.Axes:
+) -> List[plt.Axes]:
     """Add metadata to axes
 
     :param axes: The axes to add the metadata to
@@ -209,7 +209,7 @@ def add_metadata(
     :param weights: A list of weight values, defaults to None
     :type weights: Optional[List[float]], optional
     :return: The updated axes
-    :rtype: plt.Axes
+    :rtype: List[plt.Axes]
     """
     if type_str is not None:
         if type_str == "cgps" or type_str == "strong":

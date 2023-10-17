@@ -337,7 +337,7 @@ def PlotMap_KML(
         111, projection=dictn["projection"], facecolor=dictn["facecolor"], frameon=False
     )
     ax.spines["geo"].set_linewidth(2)
-    gl = ax.gridlines()
+    gl = ax.gridlines()  # type:ignore
     gl.top_labels = False
     gl.bottom_labels = False
     gl.left_labels = False
@@ -518,7 +518,7 @@ def PlotMap_KML(
             zorder=3,
         )
     )
-    ax.set_extent(margins)
+    ax.set_extent(margins)  # type:ignore
     ax = set_KML_map_cartopy(
         ax,
         margins,
@@ -643,9 +643,9 @@ def PlotMap_KML(
         cmap=slipcpt, norm=plt.Normalize(vmin=0.0, vmax=max_slip / 100.0)
     )
 
-    cb_ax = ax.inset_axes([0.06, 0.03, 0.3, 0.02])
+    cb_ax = ax.inset_axes((0.06, 0.03, 0.3, 0.02))
     cbar = plt.colorbar(sm, cax=cb_ax, orientation="horizontal")
-    cbar.outline.set_linewidth(3)
+    cbar.outline.set_linewidth(3)  # type:ignore
     cbar.set_label("Slip (m)")
     cbar.ax.xaxis.set_ticks_position("top")
     cbar.ax.xaxis.set_label_position("top")
