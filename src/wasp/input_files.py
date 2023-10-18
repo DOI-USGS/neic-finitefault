@@ -12,7 +12,7 @@ import pathlib
 from typing import Any, List, Literal, Optional, Union
 
 import numpy as np
-from obspy import read  # type: ignore
+from obspy import UTCDateTime, read  # type: ignore
 from obspy.core.stream import Stream  # type: ignore
 from obspy.geodetics import kilometers2degrees  # type: ignore
 from obspy.io.sac.util import SacIOError  # type: ignore
@@ -320,7 +320,7 @@ def input_chen_tele_body(
     with open(directory / "tele_waves.json", "r") as t:
         traces_info = json.load(t)
 
-    date_origin = tensor_info["date_origin"]
+    date_origin = UTCDateTime(tensor_info["datetime"])
     dt = traces_info[0]["dt"]
     dt = round(dt, 1)
     filtro = data_prop["tele_filter"]
@@ -461,7 +461,7 @@ def input_chen_tele_surf(
     freq4 = filtro["freq4"]
     with open(directory / "surf_filter.txt", "w") as outfile:
         outfile.write("{} {} {} {}".format(freq1, freq2, freq3, freq4))
-    date_origin = tensor_info["date_origin"]
+    date_origin = UTCDateTime(tensor_info["datetime"])
     string = (
         "{:3d} {:>6} {:>8.3f} {:>9.3f} 31"
         + 3 * "  {:>1}"
@@ -575,7 +575,7 @@ def input_chen_near_field(
 
     with open(dict1, "r") as t:
         traces_info = json.load(t)
-    date_origin = tensor_info["date_origin"]
+    date_origin = UTCDateTime(tensor_info["datetime"])
     moment_mag = tensor_info["moment_mag"]
     event_lat = tensor_info["lat"]
     event_lon = tensor_info["lon"]
@@ -691,7 +691,7 @@ def input_chen_dart(
         return None
     with open(directory / "dart_waves.json", "r") as t:
         traces_info = json.load(t)
-    date_origin = tensor_info["date_origin"]
+    date_origin = UTCDateTime(tensor_info["datetime"])
     moment_mag = tensor_info["moment_mag"]
     event_lat = tensor_info["lat"]
     event_lon = tensor_info["lon"]
