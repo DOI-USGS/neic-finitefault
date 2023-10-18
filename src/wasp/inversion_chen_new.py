@@ -26,7 +26,7 @@ import wasp.green_functions as gf
 import wasp.management as mng
 import wasp.modelling_parameters as mp
 import wasp.modulo_logs as ml
-import wasp.plot_graphic as plot
+import wasp.plot_graphic_NEIC as plot
 import wasp.seismic_tensor as tensor
 import wasp.traces_properties as tp
 import wasp.velocity_models as mv
@@ -214,6 +214,42 @@ def automatic_usgs(
     [p.join() for p in [p1, p2]]  # type:ignore
     logger.info("Time spent: {}".format(time.time() - time0))
     ml.close_log(logger)
+    ### Make NP1 plots ###
+    logger.info("Plot data in folder {}/NP1".format(directory))
+    with open(directory / "NP1/segments_data.json") as s:
+        segments_data = json.load(s)
+    execute_plot(
+        tensor_info,
+        data_type,
+        segments_data,
+        default_dirs,
+        velmodel=velmodel,
+        directory=directory / "NP1",
+    )
+    for file in glob.glob(str(directory) + "NP1/*png"):
+        if os.path.isfile(os.path.join(directory, file)):
+            copy2(
+                os.path.join(directory, "NP1", file),
+                os.path.join(directory, "NP1", "plots"),
+            )
+    ### Make NP2 plots ###
+    logger.info("Plot data in folder {}/NP2".format(directory))
+    with open(directory / "NP2/segments_data.json") as s:
+        segments_data = json.load(s)
+    execute_plot(
+        tensor_info,
+        data_type,
+        segments_data,
+        default_dirs,
+        velmodel=velmodel,
+        directory=directory / "NP2",
+    )
+    for file in glob.glob(str(directory) + "NP2/*png"):
+        if os.path.isfile(os.path.join(directory, file)):
+            copy2(
+                os.path.join(directory, "NP2", file),
+                os.path.join(directory, "NP2", "plots"),
+            )
     return
 
 
@@ -298,18 +334,9 @@ def _automatic2(
         tensor_info, data_type, segments_data, min_vel, max_vel, directory=directory
     )
     #
-    # Modelling and plotting results
+    # Modelling and Inversion Output
     #
     inversion(data_type, default_dirs, logger, directory=directory)
-    logger.info("Plot data in folder {}".format(directory))
-    execute_plot(
-        tensor_info,
-        data_type,
-        segments_data,
-        default_dirs,
-        velmodel=velmodel,
-        directory=directory,
-    )
     #
     # write solution in FSP format
     #
@@ -318,9 +345,6 @@ def _automatic2(
     static_to_fsp(
         tensor_info, segments_data, data_type, velmodel, solution, directory=directory
     )
-    for file in glob.glob(str(directory) + "/*png"):
-        if os.path.isfile(os.path.join(directory, file)):
-            copy2(os.path.join(directory, file), os.path.join(directory, "plots"))
 
 
 def _check_surf_GF(
@@ -1065,9 +1089,7 @@ def execute_plot(
         point_sources,
         shear,
         solution,
-        velmodel,
         default_dirs,
-        use_waveforms=use_waveforms,
         directory=directory,
     )
     plot.plot_misfit(data_type, directory=directory)
@@ -1095,28 +1117,30 @@ def execute_plot(
         insar_data = get_outputs.get_insar(data_dir=directory)
         if "ascending" in insar_data:
             asc_properties = insar_data["ascending"]
-            for i, asc_property in enumerate(asc_properties):
+            for scene, asc_property in enumerate(asc_properties):
                 insar_points = asc_property["points"]
                 plot.PlotInsar(
                     tensor_info,
                     segments,
                     point_sources,
-                    default_dirs,
+                    solution,
                     insar_points,
-                    los="ascending{}".format(i),
+                    str(scene),
+                    los="ascending",
                     directory=directory,
                 )
         if "descending" in insar_data:
             desc_properties = insar_data["descending"]
-            for i, desc_property in enumerate(desc_properties):
+            for scene, desc_property in enumerate(desc_properties):
                 insar_points = desc_property["points"]
                 plot.PlotInsar(
                     tensor_info,
                     segments,
                     point_sources,
-                    default_dirs,
+                    solution,
                     insar_points,
-                    los="descending{}".format(i),
+                    str(scene),
+                    los="descending",
                     directory=directory,
                 )
     if plot_input:
