@@ -216,7 +216,7 @@ def run(
             data_folder=data_directory,
             segments_data=segments_data,
             st_response=remove_response,
-            directory=data_directory,
+            directory=directory,
         )
     if modelling_routine == ModellingRoutine.auto_model:
         solution_folder = set_directory_structure(tensor_info, directory=directory)
