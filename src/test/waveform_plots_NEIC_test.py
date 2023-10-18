@@ -1,4 +1,5 @@
 import json
+import os
 import pathlib
 import shutil
 import tempfile
@@ -6,6 +7,7 @@ from copy import deepcopy
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pytest
 
 from wasp.waveform_plots_NEIC import (
     add_metadata,
@@ -233,6 +235,10 @@ def test_filt_waveform():
         shutil.rmtree(tempdir)
 
 
+@pytest.mark.skipif(
+    os.getenv("CI_REGISTRY") is not None,
+    reason="Build runner does not have the resources to run",
+)
 def test_plot_spectra():
     file = deepcopy(TELE_WAVES[0])
 

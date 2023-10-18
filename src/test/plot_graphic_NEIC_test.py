@@ -157,7 +157,13 @@ def test_plot():
             POINT_SOURCES,
             shear,
             SOLUTION,
-            {"root_dir": pathlib.Path(__file__).parent.parent.parent},
+            {
+                "root_dir": pathlib.Path(__file__).parent.parent.parent,
+                "litho_model": pathlib.Path(__file__).parent.parent.parent
+                / "fortran_code"
+                / "info"
+                / "LITHO1.0.nc",
+            },
             autosize=False,
             files_str=new_strong_waves,
             stations_gps=stations_gps,
@@ -302,9 +308,7 @@ def test_PlotInsar():
             directory=tempdir,
         )
         assert (tempdir / "InSAR_ascending_fit_0.png").exists()
-        assert (tempdir / "InSAR_ascending_fit_0.ps").exists()
         assert (tempdir / "InSAR_descending_fit_0.png").exists()
-        assert (tempdir / "InSAR_descending_fit_0.ps").exists()
     finally:
         shutil.rmtree(tempdir)
 

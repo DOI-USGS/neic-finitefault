@@ -129,6 +129,8 @@ def plot_ffm_sol(
     """
     directory = pathlib.Path(directory)
     segments = segments_data["segments"]
+    vel_model = mv.select_velmodel(tensor_info, default_dirs, directory=directory)
+    _plot_vel_model(vel_model, directory=directory)
     plot_moment_rate_function(
         segments_data,
         shear,
@@ -1431,6 +1433,11 @@ def PlotMap(
         region = [min_lon - 0.5, max_lon + 0.5, min_lat - 0.5, max_lat + 0.5]
     else:
         region = [limits[0], limits[1], limits[2], limits[3]]
+    ### Fix region to nearest tenth of a degree ###
+    region[0] = np.floor(region[0] * 10) / 10.0
+    region[1] = np.ceil(region[1] * 10) / 10.0
+    region[2] = np.floor(region[2] * 10) / 10.0
+    region[3] = np.ceil(region[3] * 10) / 10.0
 
     ################################
     ### PLOT BASEMAP/ COASTLINES ###
@@ -1979,7 +1986,7 @@ def PlotInsar(
     los: str = "ascending",
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Plot slip map
+    """Plot InSAR observation and model fits
 
     :param tensor_info: The tensor information
     :type tensor_info: dict
@@ -1991,7 +1998,7 @@ def PlotInsar(
     :type solution: dict
     :param insar_points: List of insar data
     :type insar_points: List[dict]
-    :param scene: The scene name
+    :param scene: The scene name or number
     :type scene: str
     :param los: The direction of the path, defaults to "ascending"
     :type los: str, optional
@@ -2009,10 +2016,6 @@ def PlotInsar(
         hyp_stk,
         hyp_dip,
     ) = pl_mng.__unpack_plane_data(plane_info)
-    slip = solution["slip"]
-    #
-    # accurate plot coordinates
-    #
     segments_lats, segments_lons, segments_deps = __redefine_lat_lon(
         segments, point_sources
     )
@@ -2025,11 +2028,6 @@ def PlotInsar(
     min_lon = np.min(min_lons)  # - 0.5
     max_lon = np.max(max_lons)  # + 0.5
 
-    margin = 1.3 * (stk_subfaults * delta_strike) / 111.19
-    lat0 = tensor_info["lat"]
-    lon0 = tensor_info["lon"]
-
-    fig, axes = plt.subplots(2, 3, figsize=(30, 15))  # , subplot_kw=dictn)
     max_diff = -1
     min_diff = 1
     lats = [point["lat"] for point in insar_points]
@@ -2048,9 +2046,56 @@ def PlotInsar(
     max_obs_abs = np.max(np.abs(observed))
     min_obs_abs = -max_obs_abs
 
-    margins = [min_lon - 0.5, max_lon + 0.5, min_lat - 0.5, max_lat + 0.5]
+    fig = pygmt.Figure()
+    pygmt.config(
+        PS_MEDIA="50ix50i",
+        MAP_FRAME_TYPE="plain",
+        MAP_FRAME_AXES="WSen",
+        FORMAT_GEO_OUT="F",
+        FORMAT_GEO_MAP="ddd:mm:ss",
+        FONT_ANNOT_PRIMARY="10p,Helvetica,black",
+        FONT_ANNOT_SECONDARY="6p,Helvetica,black",
+        FONT_HEADING="30p,Helvetica,black",
+        FONT_LABEL="12p,Helvetica,black",
+        FONT_LOGO="6p,Helvetica,black",
+        FONT_SUBTITLE="16p,Helvetica,black",
+        FONT_TAG="18p,Helvetica,black",
+        FONT_TITLE="16p,Helvetica,black",
+        MAP_ANNOT_OFFSET_PRIMARY="3p",
+    )
 
-    values = [observed, synthetic, diffs, obs_no_ramp, syn_no_ramp, ramp]
+    region = [min_lon - 0.2, max_lon + 0.2, min_lat - 0.2, max_lat + 0.2]
+    region[0] = np.floor(region[0] * 10) / 10.0
+    region[1] = np.ceil(region[1] * 10) / 10.0
+    region[2] = np.floor(region[2] * 10) / 10.0
+    region[3] = np.ceil(region[3] * 10) / 10.0
+    print(region)
+    resolution = "03s"
+    map_scale_len = "50k"
+    if region[1] - region[0] > 5 or region[3] - region[2] > 5:
+        resolution = "30s"
+        map_scale_len = "100k"
+    if region[1] - region[0] > 10 or region[3] - region[2] > 10:
+        resolution = "01m"
+        map_scale_len = "200k"
+    grid = pygmt.datasets.load_earth_relief(resolution=resolution, region=region)
+
+    map_width = 7
+    map_height = int(
+        np.ceil(map_width / ((region[1] - region[0]) / (region[3] - region[2])))
+    )
+
+    projection = "M" + str(map_width) + "c"
+    map_scale = (
+        "g"
+        + str(region[0])
+        + "/"
+        + str(region[2])
+        + "+c17.40+w"
+        + map_scale_len
+        + "+ar+l+jBL+o0.5/0.5+f"
+    )
+
     titles = [
         "Observed",
         "Synthetic",
@@ -2059,7 +2104,7 @@ def PlotInsar(
         "Synthetic - Ramp",
         "Ramp",
     ]
-    labels = [
+    legends = [
         "Observed LOS (cm)",
         "Modeled LOS (cm)",
         "Residual (cm)",
@@ -2067,27 +2112,51 @@ def PlotInsar(
         "Modeled LOS (cm)",
         "Modeled Ramp LOS (cm)",
     ]
-    rows = [0, 0, 0, 1, 1, 1]
-    cols = [0, 1, 2, 0, 1, 2]
-    zipped = zip(values, titles, labels, rows, cols)
-    i = 0
-    for value, title, label, row, col in zipped:
-        print(axes[row][col])
-        axes[row][col].set_title(title, fontdict={"fontsize": 20})
-        max_abs = np.max(np.abs(value))
-        norm = colors.TwoSlopeNorm(vmin=min_obs_abs, vcenter=0, vmax=max_obs_abs)
-        cs = axes[row][col].scatter(
-            lons, lats, zorder=4, c=value, cmap="bwr", norm=norm
+    values = [observed, synthetic, diffs, obs_no_ramp, syn_no_ramp, ramp]
+    xshift = [
+        0,
+        map_width + 2,
+        map_width + 2,
+        -2 * (map_width + 2),
+        map_width + 2,
+        map_width + 2,
+    ]
+    yshift = [20, 0, 0, -(map_height + 5), 0, 0]
+
+    sub = 0
+    for subplot in range(6):
+        title = '+t"' + titles[subplot] + '"'
+        print(f"Subplot {title}")
+        fig.shift_origin(xshift=xshift[sub], yshift=yshift[sub])
+        fig.basemap(
+            region=region,
+            projection=projection,
+            frame=["a", title],
+            map_scale=map_scale,
         )
-        ax = axes[row][col]
-        ax.plot(lon0, lat0, "k*", markersize=10)  # ,
-        cbar = fig.colorbar(cs, ax=ax, orientation="horizontal")
-        cbar.outline.set_linewidth(2)  # type:ignore
-        cbar.set_label(label, fontsize=20)
-        cbar.ax.xaxis.set_ticks_position("top")
-        cbar.ax.xaxis.set_label_position("top")
-        ax.set_aspect("auto", adjustable=None)
-        i += 1
+        fig.coast(resolution="h", shorelines=True)
+        fig.grdimage(grid=grid, cmap="oleron", shading=True, transparency=80)
+
+        ##################################
+        ### PLOT FAULT TRACES OVER TOP ###
+        ##################################
+        faults = glob.glob(str(directory) + "/*.fault")
+        if len(faults) > 0:
+            for kfault in range(len(faults)):
+                print("...Adding fault trace from: " + str(faults[kfault]))
+                fault_trace = np.genfromtxt(faults[kfault])
+                fig.plot(x=fault_trace[:, 0], y=fault_trace[:, 1], pen="1p,black")
+
+        pygmt.makecpt(cmap="roma", series=[min_obs_abs, max_obs_abs])
+        fig.plot(
+            x=lons, y=lats, style="c0.1c", cmap=True, fill=values[sub], pen="0.5p,black"
+        )
+
+        fig.colorbar(
+            position="JBC",
+            frame='x+l"' + legends[subplot] + '"',
+            # box="+p2p,black+ggray80"
+        )
 
         #################################
         # outline the segments in black #
@@ -2102,8 +2171,6 @@ def PlotInsar(
                 hyp_stk,
                 hyp_dip,
             ) = pl_mng.__unpack_plane_data(plane_info)
-            strike = plane_info["strike"]
-            dip = plane_info["dip"]
             depths = segments_deps[segment].flatten()
             min_lats_idx = np.where(
                 segments_lats[segment].flatten() == min_lats[segment]
@@ -2153,18 +2220,13 @@ def PlotInsar(
                     corners[:, i]
                 ) != collections.Counter(min1):
                     min2 = corners[:, i]
-
             updip = np.c_[min1, min2]
             corners = np.c_[corners, cornerA]
-
-            ax.plot(corners[0, :], corners[1, :], "k", zorder=10)
-            ax.plot(updip[0, :], updip[1, :], "r", zorder=10)
-
-    fig.tight_layout()
-    plt.savefig(
-        directory / "InSAR_{}_fit_{}.png".format(los, scene), bbox_inches="tight"
-    )
-    plt.savefig(directory / "InSAR_{}_fit_{}.ps".format(los, scene))
+            fig.plot(x=corners[0, :], y=corners[1, :], pen="1p,black")
+            fig.plot(x=updip[0, :], y=updip[1, :], pen="1p,red")
+        sub += 1
+    fig.savefig(directory / "InSAR_{}_fit_{}.png".format(los, scene))
+    fig.savefig(directory / "InSAR_{}_fit_{}.pdf".format(los, scene))
     plt.close()
     return
 
