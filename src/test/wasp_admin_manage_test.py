@@ -862,7 +862,7 @@ def test_update_inputs():
             shutil.copyfile(e["file"], f["file"])
             shutil.copyfile(g["file"], h["file"])
         shutil.copyfile(
-            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
+            RESULTS_DIR / "NP1" / "tensor_info.json", tempdir / "tensor_info.json"
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "velmodel_data.json", tempdir / "velmodel_data.json"
@@ -882,7 +882,6 @@ def test_update_inputs():
             app,
             [
                 "update-inputs",
-                str(tempdir / "20003k7a_cmt_CMT"),
                 "-d",
                 str(tempdir),
                 "-t",

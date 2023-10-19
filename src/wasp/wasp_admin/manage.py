@@ -737,9 +737,6 @@ def tensor_from_gcmt(
 
 @app.command(help="Update the input data dict after changes")
 def update_inputs(
-    gcmt_tensor_file: str = typer.Argument(
-        ..., help="Path to the GCMT moment tensor file"
-    ),
     annealing: bool = typer.Option(
         False, "-a", "--annealing", help="Compute files for annealing"
     ),
@@ -768,14 +765,16 @@ def update_inputs(
     # set data types
     chosen_data_types = [d.value for d in data_types]
 
-    # get tensor information
-    tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
-
     # get sampling filtering data
     sampling_file = directory / "sampling_filter.json"
-    validate_files([sampling_file])
+    tensor_file = directory / "tensor_info.json"
+    validate_files([sampling_file, tensor_file])
     with open(sampling_file) as sf:
         data_prop = json.load(sf)
+
+    # get tensor information
+    with open(tensor_file) as tf:
+        tensor_info = json.load(tf)
 
     if plane:
         # validate files
