@@ -1176,9 +1176,13 @@ def delete_binaries(directory: Union[pathlib.Path, str] = pathlib.Path()):
     :type directory: Union[pathlib.Path,str], optional
     """
     directory = pathlib.Path(directory)
-    deletables = glob.glob("*.GRE") + glob.glob("*.TDE") + glob.glob("*[1-2-3]")
-    deletables = deletables + glob.glob("*.H[LN][E-N-Z]")
-    deletables = deletables + glob.glob("*.L[HXY][E-N-Z]")
+    deletables = (
+        glob.glob(str(directory) + "/*.GRE")
+        + glob.glob(str(directory) + "/*.TDE")
+        + glob.glob(str(directory) + "/*[1-2-3]")
+    )
+    deletables = deletables + glob.glob(str(directory) + "/*.H[LN][E-N-Z]")
+    deletables = deletables + glob.glob(str(directory) + "/*.L[HXY][E-N-Z]")
     for file in deletables:
         if os.path.isfile(file):
             os.remove(file)
