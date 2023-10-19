@@ -25,7 +25,7 @@ function usage {
     echo "                          (note: currently only ubuntu supported)"
     echo "  -x,--skip-packages bool skip system specific install"
     echo "                          default=false"
-    echo "                          (example: -x, skips ubuntu.sh)"
+    echo "                          (example: -x, skips ubuntu_packages.sh)"
     echo "  -s,--skip-env bool      skips sourcing environment files"
     echo "                          default=false"
     echo "                          (example: -s, skips environment.d/*)"
