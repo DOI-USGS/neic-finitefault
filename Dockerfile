@@ -1,5 +1,5 @@
 ARG PYTHON_VERSION
-ARG PYTHON_VERSION=${PYTHON_VERSION:-3.9}
+ARG PYTHON_VERSION=${PYTHON_VERSION:-3.10}
 ARG FROM_IMAGE=code.usgs.gov:5001/devops/images/usgs/python:"${PYTHON_VERSION}"-pygmt
 
 # ubuntu packages

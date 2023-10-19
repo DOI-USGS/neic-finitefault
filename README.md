@@ -54,6 +54,7 @@ Automated installation of the dependencies and fortran code has been provided in
 2. `sudo ./environment.d/<operating_system>.sh`
    1. If you want the configurations in to be loaded automatically consider adding them to your .bashrc or .bash_profile: `echo "source /home/user/neic-finitefault/environment.d/ubuntu.sh" >> ~/.bashrc`
 3. `poetry install`
+   1. To run the example notebook, use `poetry install --with examples` to install the dependencies required for running the example.
 4. Manually install okada_wrapper after other Python dependencies: `pip install okada_wrapper`
 
 > Note 1: the installation of system packages, GEOS, GMT, and PROJ, requires that the install script be run as root. A full list of configurations can be found by running `sudo ./install.sh --help`

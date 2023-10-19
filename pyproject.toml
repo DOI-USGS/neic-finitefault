@@ -29,7 +29,6 @@ ipykernel = "^6.15.2"
 matplotlib = "^3.7.2"
 netCDF4 = "^1.6.4"
 numpy = "^1.25.0"
-notebook = "^6.4"
 obspy = "^1.4.0"
 pygmt = "^0.9.0"
 pyproj = "^3.3.0"
@@ -46,6 +45,14 @@ poethepoet = "^0.20.0"
 pytest = "^7.4.0"
 pytest-cov = "^4.1.0"
 mypy = "^1.4.1"
+
+[tool.poetry.group.examples]
+optional = true
+
+[tool.poetry.group.examples.dependencies]
+ipykernel = "^6.15.2"
+notebook = "^6.4"
+traitlets = "5.9.0"
 
 [tool.poetry.scripts]
 "wasp" = "wasp.wasp_admin.wasp:app"

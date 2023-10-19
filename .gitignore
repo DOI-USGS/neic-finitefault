@@ -23,3 +23,12 @@ green_tele
 get_strong_motion
 gf_static_f95
 green_bank_openmp_f95
+config.ini
+
+# tutorial
+examples/*
+examples/.ipynb_checkpoints
+!examples/Tutorial_Figures
+!examples/WASP_Tutorial.ipynb
+!examples/Multisegment_Example
+
