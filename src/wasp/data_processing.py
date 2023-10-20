@@ -131,7 +131,7 @@ def __pre_select_tele(
     :return: List of selected waveform files
     :rtype: List[str]
     """
-    date_origin = tensor_info["date_origin"]
+    date_origin = tensor_info["datetime"]
     sacheaders = (SACTrace.read(sac) for sac in tele_files0)
     zipped = zip(tele_files0, sacheaders)
     fun1 = lambda header: header.stla and header.stlo
@@ -425,7 +425,7 @@ def process_body_waves(
     """
     directory = pathlib.Path(directory)
     dt = data_prop["sampling"]["dt_tele"]
-    date_origin = tensor_info["date_origin"]
+    date_origin = UTCDateTime(tensor_info["datetime"])
     filtro = data_prop["tele_filter"]
     low_freq = filtro["low_freq"]
     high_freq = filtro["high_freq"]
@@ -822,7 +822,7 @@ def __select_cgps_files(
     time_shift = tensor_info["time_shift"]
     centroid_lat = tensor_info["centroid_lat"]
     event_lon = tensor_info["lon"]
-    date_origin = tensor_info["date_origin"]
+    date_origin = tensor_info["datetime"]
     depth = tensor_info["depth"]
     distance = 2 if time_shift < 50 else 4
 
@@ -916,13 +916,13 @@ def __change_start(stations_str: List[str], tensor_info: dict, cgps: bool = Fals
         begin = sacheader.b
         reftime = sacheader.reftime
         st[0].stats.starttime = UTCDateTime(reftime) + begin
-        diff = st[0].stats.starttime - tensor_info["date_origin"]
+        diff = st[0].stats.starttime - tensor_info["datetime"]
         if diff > est_arrival:
             continue
         if cgps:
-            st[0].trim(endtime=tensor_info["date_origin"] + 1100)  # - 60 * 10)
+            st[0].trim(endtime=tensor_info["datetime"] + 1100)  # - 60 * 10)
             st[0].data = st[0].data - np.mean(st[0].data[:10])
-        st[0].trim(starttime=tensor_info["date_origin"] - 20, pad=True, fill_value=0)
+        st[0].trim(starttime=tensor_info["datetime"] - 20, pad=True, fill_value=0)
         st.write(sac, format="SAC", byteorder=0)
 
 
@@ -947,7 +947,7 @@ def new_process_cgps(
     :type directory: Union[pathlib.Path, str], optional
     """
     directory = pathlib.Path(directory)
-    start = tensor_info["date_origin"]
+    start = tensor_info["datetime"]
     filtro_cgps = data_prop["strong_filter"]
     if "cgps_filter" in data_prop:
         filtro_cgps = data_prop["cgps_filter"]

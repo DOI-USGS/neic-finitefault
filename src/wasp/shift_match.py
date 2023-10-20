@@ -12,7 +12,7 @@ from typing import List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt  # type:ignore
 import numpy as np
-from obspy import read  # type:ignore
+from obspy import UTCDateTime, read  # type:ignore
 
 import wasp.seismic_tensor as tensor
 from wasp import get_outputs
@@ -452,7 +452,7 @@ def print_arrival(
     :type directory: Union[pathlib.Path, str], optional
     """
     directory = pathlib.Path(directory)
-    date_origin = tensor_info["date_origin"]
+    date_origin = UTCDateTime(tensor_info["datetime"])
     other_files = glob.glob(str(directory) + "/data/*BHZ*sac")
     with open(directory / "tele_waves.json") as tf:
         files = json.load(tf)
