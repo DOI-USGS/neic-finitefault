@@ -64,6 +64,8 @@ def test_force_plane_above_ground():
             "neighbours": [],
             "rake": 109.27817171619564,
             "rupture_vel": 2.5,
+            "min_vel": 1,
+            "max_vel": 3.125,
             "stk_subfaults": 23,
             "strike": 6.613912311529926,
         }

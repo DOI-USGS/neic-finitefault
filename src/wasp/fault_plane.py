@@ -675,7 +675,14 @@ def __plane_tensor_def(
     :return: The formatted properties
     :rtype: Dict[str, float]
     """
-    values = {"strike": strike, "dip": dip, "rake": rake, "rupture_vel": rupture_vel}
+    values = {
+        "strike": strike,
+        "dip": dip,
+        "rake": rake,
+        "rupture_vel": rupture_vel,
+        "min_vel": 0.4 * rupture_vel,
+        "max_vel": 1.25 * rupture_vel,
+    }
     return values
 
 
@@ -882,6 +889,8 @@ def event_mult_in_to_json(directory: Union[pathlib.Path, str] = pathlib.Path()):
             "strike": strike,
             "rake": rake,
             "rupture_vel": rupt_vel,
+            "min_vel": 0.4 * rupt_vel,
+            "max_vel": 1.25 * rupt_vel,
             "stk_subfaults": stk_subfaults,
             "dip_subfaults": dip_subfaults,
             "hyp_stk": hyp_stk,
