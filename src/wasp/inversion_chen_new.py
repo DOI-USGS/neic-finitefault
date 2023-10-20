@@ -325,10 +325,8 @@ def _automatic2(
     #
     # write text files from JSONs
     #
-    rupt_vel = segments[0]["rupture_vel"]
-    lambda_min = 0.4
-    lambda_max = 1.25
-    min_vel, max_vel = [lambda_min * rupt_vel, lambda_max * rupt_vel]
+    min_vel = segments[0]["min_vel"]
+    max_vel = segments[0]["max_vel"]
     logger.info("Write input files")
     writing_inputs(
         tensor_info, data_type, segments_data, min_vel, max_vel, directory=directory

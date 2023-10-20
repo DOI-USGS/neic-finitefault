@@ -90,6 +90,8 @@ def test__fault_plane_properties():
             "rupture_vel",
             "strike",
             "dip",
+            "min_vel",
+            "max_vel",
         ]
     }
     assert fault_dimensions == segments_target
@@ -128,16 +130,22 @@ def test__lat_lon():
 
 
 def test_plane_tensor_def():
-    assert __plane_tensor_def(20, 15, 30, 2) == {
+    assert __plane_tensor_def(20, 15, 30, 2.5) == {
         "strike": 20,
         "dip": 15,
         "rake": 30,
-        "rupture_vel": 2,
+        "rupture_vel": 2.5,
+        "min_vel": 1,
+        "max_vel": 3.125,
     }
 
 
 def test_point_sources_def():
-    assert _point_sources_def(SEGMENTS["rise_time"], 2.5, SEGMENTS["segments"][0],) == {
+    assert _point_sources_def(
+        SEGMENTS["rise_time"],
+        2.5,
+        SEGMENTS["segments"][0],
+    ) == {
         "dip_ps": 5,
         "dx": 3.585521739130434,
         "dy": 2.9848706416473174,
