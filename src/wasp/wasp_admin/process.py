@@ -109,9 +109,6 @@ def process_all(
         ...,
         help="Type to add to the data_types list, default is []",
     ),
-    gcmt_tensor_file: pathlib.Path = typer.Option(
-        None, "-g", "--gcmt", help="Path to the GCMT moment tensor file"
-    ),
     qcmt_tensor_file: pathlib.Path = typer.Option(
         None, "-q", "--qcmt", help="Path to the QuakeML moment tensor file"
     ),
@@ -122,21 +119,19 @@ def process_all(
         help="Whether to remove response for processing strong motion data",
     ),
 ):
-    # get tensor information
-    if (gcmt_tensor_file is None and qcmt_tensor_file is None) or (
-        gcmt_tensor_file is not None and qcmt_tensor_file is not None
-    ):
-        raise ValueError("Either gcmt_tensor_file or qcmt_tensor_file must be defined.")
-    tensor_info = get_tensor(cmt_file=gcmt_tensor_file or qcmt_tensor_file)
-
     # validate files
     management_file = directory / DEFAULT_MANAGEMENT_FILES[data_type]
     sampling_filtering_file = directory / "sampling_filter.json"
-    validate_files([management_file, sampling_filtering_file])
+    tensor_file = directory / "tensor_info.json"
+    validate_files([management_file, sampling_filtering_file, tensor_file])
 
     # get the sampling filtering properties
     with open(sampling_filtering_file) as sf:
         data_prop = json.load(sf)
+
+    # get the tensor information
+    with open(tensor_file) as tf:
+        tensor_info = json.load(tf)
 
     dir_str = str(directory.resolve())
     if data_type == "body":
@@ -202,9 +197,6 @@ def shift_match(
         ...,
         help="Type of data being processed",
     ),
-    gcmt_tensor_file: pathlib.Path = typer.Option(
-        None, "-g", "--gcmt", help="Path to the GCMT moment tensor file"
-    ),
     option: str = typer.Option(
         "auto",
         "-o",
@@ -252,8 +244,8 @@ def shift_match(
                     files += shift_files
         save_waveforms(data_type, files)
     else:
-        if gcmt_tensor_file is None:
-            raise ValueError("No value provided for 'gcmt_tensor_file'. Exiting.")
-        validate_files([gcmt_tensor_file])
-        tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
+        tensor_file = directory / "tensor_info.json"
+        validate_files([tensor_file])
+        with open(tensor_file) as tf:
+            tensor_info = json.load(tf)
         print_arrival(tensor_info, directory=directory)

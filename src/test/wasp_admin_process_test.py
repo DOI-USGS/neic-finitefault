@@ -29,11 +29,12 @@ def test_greens(p1):
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
         shutil.copyfile(
-            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
-        )
-        shutil.copyfile(
             RESULTS_DIR / "NP1" / "sampling_filter.json",
             tempdir / "sampling_filter.json",
+        )
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "tensor_info.json",
+            tempdir / "tensor_info.json",
         )
         with open(DATA_DIR / "config.ini") as f:
             config = f.read().replace("/home/user/neic-finitefault", str(HOME))
@@ -107,7 +108,8 @@ def test_process_tele():
             tele_waves, tempdir, replace_dir=str(RESULTS_DIR / "data")
         )
         shutil.copyfile(
-            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
+            RESULTS_DIR / "NP1" / "tensor_info.json",
+            tempdir / "tensor_info.json",
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "sampling_filter.json",
@@ -126,8 +128,6 @@ def test_process_tele():
                 "process-all",
                 str(tempdir),
                 "body",
-                "-g",
-                str(tempdir / "20003k7a_cmt_CMT"),
             ],
         )
         assert result.exit_code == 0
@@ -178,8 +178,6 @@ def test_process_missing_file():
             "process-all",
             ".",
             "body",
-            "-g",
-            str(END_TO_END_DIR / "info" / "20003k7a_cmt_CMT"),
         ],
     )
     assert result.exit_code == 1
@@ -195,9 +193,6 @@ def test_remove_baseline():
         strong_motion = get_strong_motion_json()
         new_strong_motion = update_manager_file_locations(
             strong_motion, tempdir, replace_dir=str(RESULTS_DIR)
-        )
-        shutil.copyfile(
-            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "sampling_filter.json",
@@ -241,7 +236,8 @@ def test_shift_match():
             tempdir / "sampling_filter.json",
         )
         shutil.copyfile(
-            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
+            RESULTS_DIR / "NP1" / "tensor_info.json",
+            tempdir / "tensor_info.json",
         )
         os.mkdir(pathlib.Path(tempdir) / "data")
         os.mkdir(pathlib.Path(tempdir) / "data" / "P")
@@ -265,8 +261,6 @@ def test_shift_match():
             [
                 "shift-match",
                 str(tempdir),
-                "-g",
-                str(tempdir / "20003k7a_cmt_CMT"),
                 "body",
                 "-o",
                 "manual",
