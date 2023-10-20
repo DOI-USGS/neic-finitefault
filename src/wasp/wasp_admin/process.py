@@ -123,12 +123,12 @@ def process_all(
     management_file = directory / DEFAULT_MANAGEMENT_FILES[data_type]
     sampling_filtering_file = directory / "sampling_filter.json"
     tensor_file = directory / "tensor_info.json"
-    validate_files([management_file, sampling_filtering_file,tensor_file])
+    validate_files([management_file, sampling_filtering_file, tensor_file])
 
     # get the sampling filtering properties
     with open(sampling_filtering_file) as sf:
         data_prop = json.load(sf)
-    
+
     # get the tensor information
     with open(tensor_file) as tf:
         tensor_info = json.load(tf)
