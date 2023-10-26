@@ -14,8 +14,8 @@ program gf_static
    use geodesics, only : distaz
    implicit none
    character(len=10) sta_name(9000), input
-   character(len=200) :: directory,risetimefile,pointsourcefile
-   character(len=100) vel_model, filename, filename2
+   character(len=500) :: directory,risetimefile,pointsourcefile
+   character(len=500) vel_model, filename, filename2
    real*8 :: ang_d(ndis), dip, theta, azi(ndis)
    real lat_s(9000),lon_s(9000), area
    real dist(ndis),lat_sta,lon_sta,lat_p,lon_p

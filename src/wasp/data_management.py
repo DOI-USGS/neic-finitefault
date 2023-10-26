@@ -18,7 +18,7 @@ from glob import glob
 from typing import Dict, List, Literal, Optional, Tuple, Union
 
 import numpy as np
-from obspy import read  # type: ignore
+from obspy import UTCDateTime, read  # type: ignore
 from obspy.geodetics import kilometers2degrees  # type: ignore
 from obspy.io.sac import SACTrace  # type: ignore
 from obspy.taup import TauPyModel  # type: ignore
@@ -126,7 +126,7 @@ def tele_body_traces(
     p_files = select_tele_stations(p_files, "P", tensor_info)
     sh_files = select_tele_stations(sh_files, "SH", tensor_info)
     files = p_files + sh_files
-    origin_time = tensor_info["date_origin"]
+    origin_time = UTCDateTime(tensor_info["datetime"])
     headers = [SACTrace.read(file) for file in files]
     dt = headers[0].delta
     dt = round(dt, 1)
@@ -220,7 +220,7 @@ def tele_surf_traces(
     p_files = select_tele_stations(p_files, "Rayleigh", tensor_info)
     sh_files = select_tele_stations(sh_files, "Love", tensor_info)
     files = p_files + sh_files
-    origin_time = tensor_info["date_origin"]
+    origin_time = UTCDateTime(tensor_info["datetime"])
     n0, n1 = data_prop["wavelet_scales"]
     surf_filter = data_prop["surf_filter"]
     wavelet_weight = wavelets_surf_tele(surf_filter, n0, n1)
@@ -303,7 +303,7 @@ def strong_motion_traces(
     event_lat = tensor_info["lat"]
     event_lon = tensor_info["lon"]
     depth = tensor_info["depth"]
-    origin_time = tensor_info["date_origin"]
+    origin_time = UTCDateTime(tensor_info["datetime"])
     headers = [SACTrace.read(file) for file in files]
     dt_strong = headers[0].delta
     dt_strong = round(dt_strong, 2)
@@ -404,7 +404,7 @@ def cgps_traces(
     event_lat = tensor_info["lat"]
     event_lon = tensor_info["lon"]
     depth = tensor_info["depth"]
-    origin_time = tensor_info["date_origin"]
+    origin_time = UTCDateTime(tensor_info["datetime"])
     headers = [SACTrace.read(file) for file in files]
     dt_cgps = headers[0].delta
     dt_cgps = round(dt_cgps, 2)
@@ -487,7 +487,9 @@ def static_data(
     if not os.path.isfile(directory / "cgps_waves.json") and not os.path.isfile(
         directory / "gps_data"
     ):
-        return []
+        raise FileNotFoundError(
+            "Static data specified but neither cgps_waves.json nor gps_data exists"
+        )
 
     if os.path.isfile(directory / "cgps_waves.json") and not os.path.isfile(
         directory / "gps_data"
@@ -554,7 +556,6 @@ def static_data(
             raise ValueError(f"Unsupport unit '{unit}' specified!")
         with open(directory / "gps_data", "r") as infile:
             lines = [line.split() for line in infile]
-
         for line in lines[2:]:
             if len(line) < 9:
                 continue
@@ -607,7 +608,6 @@ def static_data(
         new_zipped = sorted(zipped, key=lambda val: val[1], reverse=True)
         info_traces = [a for a, b in new_zipped]
         info_traces = info_traces[:250]
-
     with open(directory / "static_data.json", "w") as f:
         json.dump(
             info_traces,
@@ -663,7 +663,11 @@ def insar_data(
         zipped = zip(insar_asc, ramp_asc)
         properties: List[dict] = []
         for track, ramp in zipped:
-            new_dict = {"name": track, "weight": 1.0, "ramp": ramp}
+            new_dict = {
+                "name": str(pathlib.Path(track).resolve()),
+                "weight": 1.0,
+                "ramp": ramp,
+            }
             properties = properties + [new_dict]
         insar_dict["ascending"] = properties
 
@@ -678,10 +682,13 @@ def insar_data(
         zipped = zip(insar_desc, ramp_desc)
         properties = []
         for track, ramp in zipped:
-            new_dict = {"name": track, "weight": 1.0, "ramp": ramp}
+            new_dict = {
+                "name": str(pathlib.Path(track).resolve()),
+                "weight": 1.0,
+                "ramp": ramp,
+            }
             properties = properties + [new_dict]
         insar_dict["descending"] = properties
-
     with open(directory / "insar_data.json", "w") as f:
         json.dump(
             insar_dict,
