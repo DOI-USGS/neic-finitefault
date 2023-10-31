@@ -156,7 +156,6 @@ def run(
         paths_to_validate += [insar_descending]
     if velocity_model_file is not None:
         paths_to_validate += [velocity_model_file]
-    tensor_info = get_tensor(cmt_file=gcmt_tensor_file or qcmt_tensor_file)
     if modelling_routine != ModellingRoutine.auto_model:
         segments_file = directory / "segments_data.json"
         paths_to_validate += [segments_file]
@@ -167,7 +166,7 @@ def run(
 
     # get the tensor information
     if modelling_routine != ModellingRoutine.auto_model:
-        with open(tensor_file) as tf:
+        with open(directory / tensor_file) as tf:
             tensor_info = json.load(tf)
     else:
         tensor_info = get_tensor(cmt_file=gcmt_tensor_file, quake_file=qcmt_tensor_file)

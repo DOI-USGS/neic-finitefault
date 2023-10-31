@@ -412,7 +412,11 @@ def modelling_new_data(
         data_prop = json.load(sf)
     time2 = time.time()
     processing(
-        tensor_info, data_type, data_prop, st_response=st_response, directory=directory
+        tensor_info,
+        data_type,
+        data_prop,
+        st_response=st_response,
+        directory=data_folder,
     )
     dm.filling_data_dicts(
         tensor_info,
@@ -804,23 +808,23 @@ def processing(
     """
     directory = pathlib.Path(directory)
     tele_files = (
-        glob.glob(str(directory) + "/*.BH*SAC")
-        + glob.glob(str(directory) + "/*.BH*sac")
-        + glob.glob(str(directory) + "/*_BH*sac")
-        + glob.glob(str(directory) + "/*_BH*sac")
+        glob.glob(os.path.join(directory, "*.BH*SAC"))
+        + glob.glob(os.path.join(directory, "*.BH*sac"))
+        + glob.glob(os.path.join(directory, "*_BH*sac"))
+        + glob.glob(os.path.join(directory, "*_BH*sac"))
     )
     strong_files = (
-        glob.glob(str(directory) + "/*.HN*SAC")
-        + glob.glob(str(directory) + "/*.HL*SAC")
-        + glob.glob(str(directory) + "/*.HN*sac")
-        + glob.glob(str(directory) + "/*.HL*sac")
-        + glob.glob(str(directory) + "/*.AH?.*")
-        + glob.glob(str(directory) + "/*_HN*sac")
-        + glob.glob(str(directory) + "/*_HL*sac")
-        + glob.glob(str(directory) + "/*HG*sac")
+        glob.glob(os.path.join(directory, "*.HN*SAC*"))
+        + glob.glob(os.path.join(directory, "*.HL*SAC*"))
+        + glob.glob(os.path.join(directory, "*.HN*sac*"))
+        + glob.glob(os.path.join(directory, "*.HL*sac*"))
+        + glob.glob(os.path.join(directory, "*.AH?.*"))
+        + glob.glob(os.path.join(directory, "*_HN*sac*"))
+        + glob.glob(os.path.join(directory, "*_HL*sac*"))
+        + glob.glob(os.path.join(directory, "*HG*sac*"))
     )
-    cgps_files = glob.glob(str(directory) + "/*L[HXY]*sac") + glob.glob(
-        str(directory) + "/*L[HXY]*SAC"
+    cgps_files = glob.glob(os.path.join(directory, "*L[HXY]*sac")) + glob.glob(
+        os.path.join(directory, "*L[HXY]*SAC")
     )
     if "body" in data_type:
         proc.select_process_tele_body(

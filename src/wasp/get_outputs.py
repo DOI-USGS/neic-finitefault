@@ -463,7 +463,7 @@ def get_insar(data_dir: Union[str, pathlib.Path] = pathlib.Path()) -> dict:
         ramps = ramps + [desc_property["ramp"] for desc_property in desc_properties]
     lines_ramp = []
     if any(ramps):
-        with open("insar_ramp.txt", "r") as ramp_file:
+        with open(data_dir / "insar_ramp.txt", "r") as ramp_file:
             lines_ramp = [line.split() for line in ramp_file]
     if "ascending" in insar_data:
         asc_properties = insar_data["ascending"]
