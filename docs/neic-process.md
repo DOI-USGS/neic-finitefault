@@ -42,7 +42,7 @@ Bad channels can be removed or downweighted using the provided management script
 
 ### Shift Timing for Autocorrelation
 
-To shift timing use the shift matching script: `wasp process shift-match --help`. For example `wasp process shift-match /home/user/us20003k7a_product/20150916225432/ffm.0/NP3 cgps`
+To shift timing use the shift matching script: `wasp process shift-match --help`. For example `wasp process shift-match /home/user/us20003k7a_product/20150916225432/ffm.0/NP3 cgps -o auto`
 
 ### Update Plane Orientation
 

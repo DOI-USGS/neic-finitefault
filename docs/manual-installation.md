@@ -49,7 +49,7 @@ Download the [required data dependencies](./data-dependecies.md) and put them in
 2. Add a line at the bottom of [./fortran_code/gfs_nm/long/low.in](../fortran_code/gfs_nm/long/low.in) that points to the location of the fd_bank file. Example: `/home/user/neic-finitefault/fortran_code/gfs_nm/long/fd_bank`
 
 # Compile the Fortran Code
-The code in each Fortran directory must be compiles. In Linux (Ubuntu), for example:
+The code in each Fortran directory must be compiled. In Linux (Ubuntu), for example:
 
 ```
 cd "/home/user/neic-finitefault/fortran_code" \
