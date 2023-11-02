@@ -4,7 +4,7 @@
     "organization": "U.S. Geological Survey",
     "description": "Wavelet based inversion for slip on a fault, used to generate Finite Fault products",
     "version": "0.1.0",
-    "status": "development",
+    "status": "Release Candidate",
 
     "permissions": {
       "usageType": "openSource",
@@ -21,7 +21,7 @@
     "disclaimerURL": "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault/-/raw/DISCLAIMER.md",
     "repositoryURL": "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault.git",
     "vcs": "git",
-    "laborHours": 50,
+    "laborHours": 200,
 
     "tags": ["usgs", "neic", "earthquake", "slip", "finitefault"],
 
@@ -33,7 +33,7 @@
     },
 
     "date": {
-      "metadataLastUpdated": "2023-06-26"
+      "metadataLastUpdated": "2023-11-1"
     }
   }
 ]
