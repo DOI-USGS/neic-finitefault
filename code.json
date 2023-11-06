@@ -11,14 +11,14 @@
       "licenses": [
         {
           "name": "Public Domain, CC0-1.0",
-          "URL": "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault/-/raw/LICENSE.md"
+          "URL": "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault/-/raw/0.1.0/LICENSE.md"
         }
       ]
     },
 
     "homepageURL": "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault",
-    "downloadURL": "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault/-/archive/main/neic-finitefault-main.zip",
-    "disclaimerURL": "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault/-/raw/DISCLAIMER.md",
+    "downloadURL": "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault/-/archive/0.1.0/neic-finitefault-0.1.0.zip",
+    "disclaimerURL": "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault/-/raw/0.1.0/DISCLAIMER.md",
     "repositoryURL": "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault.git",
     "vcs": "git",
     "laborHours": 200,
@@ -33,7 +33,7 @@
     },
 
     "date": {
-      "metadataLastUpdated": "2023-11-1"
+      "metadataLastUpdated": "2023-11-6"
     }
   }
 ]
