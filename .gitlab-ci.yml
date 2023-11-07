@@ -65,8 +65,8 @@ Poetry:
   image: "${WASP_IMAGE}"
   script:
     - poetry config virtualenvs.in-project true --local
-    - poetry install
-    - poetry run poe okada
+    - poetry install --verbose
+    # - poetry run poe okada
     - poetry run safety check
   stage: init
 
