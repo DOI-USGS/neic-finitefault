@@ -7,6 +7,7 @@ module save_forward
    use get_stations_data, only : get_properties, llove, io_up
    use retrieve_gf, only : green_stk, green_dip
    use rise_time, only : source, fourier_asym_cosine, realtr, fft
+   use wavelets, only : wavelet_syn
    implicit none
    integer, parameter :: nnsta_tele = 80
    integer :: nxs_sub(max_seg), nys_sub(max_seg), windows, segments, subfaults
@@ -108,7 +109,7 @@ contains
 !
    implicit none
    integer first, last, channel, channel_max, i, j, k, n_chan
-   real slip(:), rake(:), rupt_time(:), &
+   real slip(:), rake(:), rupt_time(:), synthetic(wave_pts2), &
    &  tfall(:), trise(:), real1(wave_pts2), imag1(wave_pts2), dt
    real*8 t1, t2, df
    complex forward(wave_pts2), z0, z
@@ -170,7 +171,24 @@ contains
       channel = i+first
       call create_waveform(slip, rake, rupt_time, trise, tfall, forward, source2, channel)
       comp = component(channel)
+      synthetic(:) = 0.0 
 
+      write(*,*)sta_name(channel)
+      do j = 1, nlen
+         if (j .le. max_freq) then
+            real1(j) = real(forward(j))
+            imag1(j) = aimag(forward(j))
+         else
+            real1(j) = 0.0 
+            imag1(j) = 0.0 
+         end if
+      end do
+
+      call wavelet_syn(real1, imag1, synthetic)
+      do j=1,nlen
+         write(*,*)j, forward(j), synthetic(j)
+      enddo
+    
       do j = 1, nlen
          if (j .le. max_freq) then
             real1(j) = real(forward(j))
