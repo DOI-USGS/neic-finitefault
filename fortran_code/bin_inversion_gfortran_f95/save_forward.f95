@@ -173,7 +173,6 @@ contains
       comp = component(channel)
       synthetic(:) = 0.0 
 
-      write(*,*)sta_name(channel)
       do j = 1, nlen
          if (j .le. max_freq) then
             real1(j) = real(forward(j))
@@ -184,21 +183,6 @@ contains
          end if
       end do
 
-      call wavelet_syn(real1, imag1, synthetic)
-      do j=1,nlen
-         write(*,*)j, forward(j), synthetic(j)
-      enddo
-    
-      do j = 1, nlen
-         if (j .le. max_freq) then
-            real1(j) = real(forward(j))
-            imag1(j) = aimag(forward(j))
-         else
-            real1(j) = 0.0
-            imag1(j) = 0.0
-         end if
-      end do
-       
       call realtr(real1, imag1, lnpt)
       call fft(real1, imag1, lnpt, 1.)
     

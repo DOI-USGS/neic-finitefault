@@ -582,7 +582,6 @@ contains
 ! TODO : how to implement this in a more elegant way?
 !
    do channel = 1, channels
-      write(*,*)sta_name(channel)
       start1 = start(channel)
       cgps = cgps_channels(channel)
       dart = dart_channels(channel)
@@ -609,24 +608,6 @@ contains
 
       call cfft(real1, imag1, lnpt)
       call wavelet_syn(real1, imag1, coeffs_obs)
-    
-      do i = 1,nlen
-         if (i .lt. index0) then
-            observed2(i) = observed(i, channel)
-         else
-            observed2(i) = 0.0 
-!            if (cgps) observed2(i) = mean
-            if (cgps) then
-               if (i .le. nlen - 80) observed2(i) = mean
-               if (i .gt. nlen - 80) observed2(i) = 0.0 
-            endif
-         endif
-      enddo
-      do i = 1,nlen
-         real1(i) = observed2(i)*nlen
-         imag1(i) = 0.0
-      enddo
-      call cfft(real1, imag1, lnpt)
 
       observed2(max_freq:) = 0.0
       max_coeff0 = 0.0
@@ -636,7 +617,6 @@ contains
             max_coeff0 = abs(coeffs_obs(i))
             atom_max0 = i
          end if
-         write(*,*)i, real1(i), imag1(i), coeffs_obs(i), atom_max0, max_coeff0
       end do
       if (dart .or. cgps) then
          max_coeff0 = 0.0
