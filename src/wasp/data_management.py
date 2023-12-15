@@ -1113,7 +1113,7 @@ def wavelets_strong_motion(
     high_freq = filtro_strong["high_freq"]
     min_wavelet = int(np.log2(3 * 2**8 * dt_strong * low_freq)) + 1
     if cgps:
-        min_wavelet = 3  # 4
+        min_wavelet = 1  # 4
     min_index = int(duration / dt_strong)
     min_wavelet = max(min_wavelet, 10 - int(np.log2(min_index)))
     max_wavelet = max(int(np.log2(3 * 2**10 * dt_strong * high_freq)), 1)
