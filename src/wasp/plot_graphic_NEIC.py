@@ -1482,13 +1482,13 @@ def PlotMap(
     )
     fig.basemap(region=region, projection=projection, frame=["WSne", "afg"])
     fig.grdimage(grid=grid, cmap="oleron", shading=True, transparency=20)
-    fig.shift_origin(xshift="-0.45c",yshift="0.75c")
+    fig.shift_origin(xshift="-0.45c", yshift="0.75c")
     fig.colorbar(
         position="n0.05/-0.1+jBL+w3c/8%+h",
         frame="x+lElevation (km)",
         scale=0.001,
     )
-    fig.shift_origin(xshift="0.45c",yshift="-0.75c")
+    fig.shift_origin(xshift="0.45c", yshift="-0.75c")
     fig.plot(
         str(default_dirs["root_dir"]) + "/pb2002_boundaries.gmt",
         style="f10/3p",
@@ -1572,12 +1572,12 @@ def PlotMap(
             cmap=True,
             fill=slips / 100.0,
         )
-    fig.shift_origin(xshift="3c",yshift="0.75c")
+    fig.shift_origin(xshift="3c", yshift="0.75c")
     fig.colorbar(
         position="n0.05/-0.1+jBL+w3c/8%+h",
         frame="x+lSlip (m)",
     )
-    fig.shift_origin(xshift="-3c",yshift="-0.75c")
+    fig.shift_origin(xshift="-3c", yshift="-0.75c")
     # Just in case fault plane is going under coastline, plot that coast again #
     fig.coast(resolution="h", shorelines=True)
 
@@ -1704,15 +1704,13 @@ def PlotMap(
             comp = file["component"]
             if comp[-1] == "E":
                 if weight == 0:
-                    fig.plot(
-                        x=lonp, y=latp, style="i7p", fill="lightgrey", pen="black"
-                    )
+                    fig.plot(x=lonp, y=latp, style="i7p", fill="lightgrey", pen="black")
                 else:
                     fig.plot(x=lonp, y=latp, style="i10p", fill="white", pen="black")
                 if label_stations == True:
                     fig.text(x=lonp, y=latp, text=name, justify="ML", font="7p")
         ### ADD TO LEGEND ###
-        fig.shift_origin(xshift="-2.7c",yshift="-2.3c")
+        fig.shift_origin(xshift="-2.7c", yshift="-2.3c")
         fig.plot(
             x=region[1],
             y=region[2],
@@ -1721,8 +1719,8 @@ def PlotMap(
             fill="white",
             pen="black",
         )
-        fig.shift_origin(xshift="2.7c",yshift="2.3c")
-        fig.shift_origin(xshift="-2.5c",yshift="-2.3c")
+        fig.shift_origin(xshift="2.7c", yshift="2.3c")
+        fig.shift_origin(xshift="-2.5c", yshift="-2.3c")
         fig.text(
             x=region[1],
             y=region[2],
@@ -1730,7 +1728,7 @@ def PlotMap(
             no_clip=True,
             justify="ML",
         )
-        fig.shift_origin(xshift="2.5c",yshift="2.3c")
+        fig.shift_origin(xshift="2.5c", yshift="2.3c")
 
     ### HIGH-RATE GNSS ###
     if stations_cgps is not None:
@@ -1750,7 +1748,7 @@ def PlotMap(
                 if label_stations == True:
                     fig.text(x=lonp, y=latp, text=name, justify="TR", font="7p")
         ### ADD TO LEGEND ###
-        fig.shift_origin(xshift="0.2c",yshift="-2.3c")
+        fig.shift_origin(xshift="0.2c", yshift="-2.3c")
         fig.plot(
             x=region[1],
             y=region[2],
@@ -1759,8 +1757,8 @@ def PlotMap(
             fill="navy",
             pen="black",
         )
-        fig.shift_origin(xshift="-0.2c",yshift="2.3c")
-        fig.shift_origin(xshift="0.4c",yshift="-2.3c")
+        fig.shift_origin(xshift="-0.2c", yshift="2.3c")
+        fig.shift_origin(xshift="0.4c", yshift="-2.3c")
         fig.text(
             x=region[1],
             y=region[2],
@@ -1769,7 +1767,7 @@ def PlotMap(
             justify="ML",
             offset=0 / 10,
         )
-        fig.shift_origin(xshift="-0.4c",yshift="2.3c")
+        fig.shift_origin(xshift="-0.4c", yshift="2.3c")
 
     ### STATIC GNSS ####
     if stations_gps is not None:
@@ -1841,7 +1839,7 @@ def PlotMap(
                 vector=v_syn,
             )
         ### ADD TO LEGEND ###
-        fig.shift_origin(xshift="-2.9c",yshift="-1.45c")
+        fig.shift_origin(xshift="-2.9c", yshift="-1.45c")
         fig.text(
             x=region[1],
             y=region[2],
@@ -1850,8 +1848,8 @@ def PlotMap(
             no_clip=True,
             justify="ML",
         )
-        fig.shift_origin(xshift="2.9c",yshift="1.45c")
-        fig.shift_origin(xshift="-2.9c",yshift="-1.8c")
+        fig.shift_origin(xshift="2.9c", yshift="1.45c")
+        fig.shift_origin(xshift="-2.9c", yshift="-1.8c")
         fig.text(
             x=region[1],
             y=region[2],
@@ -1860,7 +1858,7 @@ def PlotMap(
             no_clip=True,
             justify="ML",
         )
-        fig.shift_origin(xshift="2.9c",yshift="1.8c")
+        fig.shift_origin(xshift="2.9c", yshift="1.8c")
         static_legend = pd.DataFrame(
             data={
                 "x": [region[1]],
@@ -1873,7 +1871,7 @@ def PlotMap(
             }
         )
         # Plot thick white arrow behind, to get white outline on black arrow
-        fig.shift_origin(xshift="0c",yshift="-1.45c")
+        fig.shift_origin(xshift="0c", yshift="-1.45c")
         fig.velo(
             data=static_legend,
             pen="0.07c,grey",
@@ -1892,9 +1890,9 @@ def PlotMap(
             vector=v_obs,
             no_clip=True,
         )
-        fig.shift_origin(xshift="0c",yshift="1.45c")
+        fig.shift_origin(xshift="0c", yshift="1.45c")
         # Plot thick black arrow behind, to get black outline on red arrow
-        fig.shift_origin(xshift="0c",yshift="-1.8c")
+        fig.shift_origin(xshift="0c", yshift="-1.8c")
         fig.velo(
             data=static_legend,
             pen=".05c,black",
@@ -1914,8 +1912,8 @@ def PlotMap(
             vector=v_syn,
             no_clip=True,
         )
-        fig.shift_origin(xshift="0c",yshift="1.8c")
-        fig.shift_origin(xshift="-0.2c",yshift="-1.1c")
+        fig.shift_origin(xshift="0c", yshift="1.8c")
+        fig.shift_origin(xshift="-0.2c", yshift="-1.1c")
         if legend_len <= 10:  # type:ignore
             fig.text(
                 x=region[1],
@@ -1938,7 +1936,7 @@ def PlotMap(
                 no_clip=True,
                 justify="ML",
             )
-        fig.shift_origin(xshift="0.2c",yshift="1.1c")
+        fig.shift_origin(xshift="0.2c", yshift="1.1c")
     ##################################
     ### PLOT FAULT TRACES OVER TOP ###
     ##################################
@@ -2113,7 +2111,7 @@ def PlotInsar(
         map_width + 2,
         map_width + 2,
     ]
-    yshift = [23, 0, 0, -(3.5 +  map_height), 0, 0]
+    yshift = [23, 0, 0, -(3.5 + map_height), 0, 0]
 
     sub = 0
     for subplot in range(6):
