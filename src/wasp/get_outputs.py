@@ -76,7 +76,6 @@ def read_solution_static_format(
         #
         # load FFM solution model and coordinates
         #
-        print(jk[12])
         lat_fault = np.array([float(line[0]) for line in jk[start:end]])
         lon_fault = np.array([float(line[1]) for line in jk[start:end]])
         depth_fault = np.array([float(line[2]) for line in jk[start:end]])
