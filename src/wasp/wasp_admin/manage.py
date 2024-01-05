@@ -199,6 +199,7 @@ def fill_dicts(
         chosen_data_types += ["insar"]
     ascending_ramp: Optional[str]
     descending_ramp: Optional[str]
+    # get value of ramp
     if insar_ascending_ramp is not None:
         ascending_ramp = insar_ascending_ramp.value
     else:
@@ -207,6 +208,13 @@ def fill_dicts(
         descending_ramp = insar_descending_ramp.value
     else:
         descending_ramp = None
+    # get insar file as list of files
+    insar_ascending_files: Optional[List[pathlib.Path]] = None
+    insar_descending_files: Optional[List[pathlib.Path]] = None
+    if insar_ascending is not None:
+        insar_ascending_files = [insar_ascending]
+    if insar_descending is not None:
+        insar_descending_files = [insar_descending]
 
     # validate files
     files_to_validate = []
@@ -238,8 +246,8 @@ def fill_dicts(
         chosen_data_types,
         data_prop,
         directory,
-        insar_asc=[insar_ascending],
-        insar_desc=[insar_descending],
+        insar_asc=insar_ascending_files,
+        insar_desc=insar_descending_files,
         ramp_asc=[ascending_ramp],
         ramp_desc=[descending_ramp],
         working_directory=directory,
