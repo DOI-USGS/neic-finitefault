@@ -210,6 +210,8 @@ def fill_dicts(
         chosen_data_types += ["insar"]
 
     # Parse files and ramps
+    insar_ascending_files: Optional[List[Union[str, pathlib.Path]]]
+    insar_descending_files: Optional[List[Union[str, pathlib.Path]]]
     if not len(insar_ascending):
         insar_ascending_files = None
         insar_ascending_ramps = None
