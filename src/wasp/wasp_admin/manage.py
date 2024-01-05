@@ -3,7 +3,7 @@ import json
 import pathlib
 import time
 from enum import Enum
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import typer
@@ -209,8 +209,8 @@ def fill_dicts(
     else:
         descending_ramp = None
     # get insar file as list of files
-    insar_ascending_files: Optional[List[pathlib.Path]] = None
-    insar_descending_files: Optional[List[pathlib.Path]] = None
+    insar_ascending_files: Optional[List[Union[pathlib.Path, str]]] = None
+    insar_descending_files: Optional[List[Union[pathlib.Path, str]]] = None
     if insar_ascending is not None:
         insar_ascending_files = [insar_ascending]
     if insar_descending is not None:
