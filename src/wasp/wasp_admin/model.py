@@ -262,7 +262,7 @@ def run_multiple(
         "--list",
         help="The dips corresponding to the solutions in each solution folder",
     ),
-    solution_folders: List[ManagedDataTypes] = typer.Option(
+    solution_folders: List[pathlib.Path] = typer.Option(
         [],
         "-sf",
         "--solution-folder",
