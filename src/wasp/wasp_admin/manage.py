@@ -51,10 +51,7 @@ from .fileutils import validate_files
 app = typer.Typer(help="Manage WASP data, faults, and property files")
 
 
-class InsarRamp(str, Enum):
-    bilinear = "bilinear"
-    linear = "linear"
-    quadratic = "quadratic"
+VALID_INSAR_RAMPS = ["bilinear", "linear", "quadratic"]
 
 
 def _get_correction(correction_string: str) -> Tuple[str, List[str], float]:
@@ -65,6 +62,23 @@ def _get_correction(correction_string: str) -> Tuple[str, List[str], float]:
     correction = float(correct_split[-1])
     channels = correct_split[0].split(",")
     return station, channels, correction
+
+
+def _parse_insar(value: str) -> Tuple[pathlib.Path, Optional[str]]:
+    """Parse an insar file string in format <path>:<ramp>"""
+    if ":" not in value:
+        return pathlib.Path(value), None
+    else:
+        parts = value.split(":")
+        filepath = pathlib.Path(parts[0])
+        validate_files([filepath])
+        ramp = parts[-1]
+        if ramp not in VALID_INSAR_RAMPS:
+            raise ValueError(
+                f"The insar ramp provided ({ramp}) is not valid. "
+                f"Must be one of {VALID_INSAR_RAMPS}."
+            )
+        return filepath, ramp
 
 
 @app.command(help="Acquire strong motion and teleseismic bodywave data")
@@ -174,56 +188,53 @@ def fill_dicts(
         "--data-type",
         help=f"Type to add to the data_types list, default is []",
     ),
-    insar_ascending: pathlib.Path = typer.Option(
-        None, "-ina", "--insar-ascending", help="Path to an ascending insar file"
+    insar_ascending: List[str] = typer.Option(
+        [],
+        "-ina",
+        "--insar-ascending",
+        help=("Path and ramp ascending insar file. " "Example: -ina <path>:<ramp>"),
     ),
-    insar_ascending_ramp: InsarRamp = typer.Option(
-        None, "-inar", "--ascending-ramp", help="Ascending insar ramp option"
-    ),
-    insar_descending: pathlib.Path = typer.Option(
-        None, "-ind", "--insar-descending", help="Path to an descending insar file"
-    ),
-    insar_descending_ramp: InsarRamp = typer.Option(
-        None, "-indr", "--descending-ramp", help="Descending insar ramp option"
+    insar_descending: List[str] = typer.Option(
+        [],
+        "-ind",
+        "--insar-descending",
+        help=("Path and ramp descending insar file. " "Example: -ind <path>:<ramp>"),
     ),
 ):
     # set default data type
     chosen_data_types: List[str]
-    if data_types == []:
-        chosen_data_types = [d.value for d in ManagedDataTypes]
-    else:
-        chosen_data_types = [d.value for d in data_types]
+    chosen_data_types = [d.value for d in data_types]
     if (
         insar_ascending is not None or insar_descending is not None
     ) and "insar" not in data_types:
         chosen_data_types += ["insar"]
-    ascending_ramp: Optional[str]
-    descending_ramp: Optional[str]
-    # get value of ramp
-    if insar_ascending_ramp is not None:
-        ascending_ramp = insar_ascending_ramp.value
+
+    # Parse files and ramps
+    insar_ascending_files: Optional[List[Union[str, pathlib.Path]]]
+    insar_descending_files: Optional[List[Union[str, pathlib.Path]]]
+    if not len(insar_ascending):
+        insar_ascending_files = None
+        insar_ascending_ramps = None
     else:
-        ascending_ramp = None
-    if insar_descending_ramp is not None:
-        descending_ramp = insar_descending_ramp.value
+        insar_ascending_files = []
+        insar_ascending_ramps = []
+        for ia in insar_ascending:
+            filepath, ramp = _parse_insar(ia)
+            insar_ascending_files += [filepath]
+            insar_ascending_ramps += [ramp]
+    if not len(insar_descending):
+        insar_descending_files = None
+        insar_descending_ramps = None
     else:
-        descending_ramp = None
-    # get insar file as list of files
-    insar_ascending_files: Optional[List[Union[pathlib.Path, str]]] = None
-    insar_descending_files: Optional[List[Union[pathlib.Path, str]]] = None
-    if insar_ascending is not None:
-        insar_ascending_files = [insar_ascending]
-    if insar_descending is not None:
-        insar_descending_files = [insar_descending]
+        insar_descending_files = []
+        insar_descending_ramps = []
+        for id in insar_descending:
+            filepath, ramp = _parse_insar(id)
+            insar_descending_files += [filepath]
+            insar_descending_ramps += [ramp]
 
     # validate files
     files_to_validate = []
-    for arg in [
-        insar_ascending,
-        insar_descending,
-    ]:
-        if arg is not None:
-            files_to_validate += [arg]
     sampling_filtering_file = directory / "sampling_filter.json"
     files_to_validate += [sampling_filtering_file.resolve()]
     tensor_file = directory / "tensor_info.json"
@@ -248,8 +259,8 @@ def fill_dicts(
         directory,
         insar_asc=insar_ascending_files,
         insar_desc=insar_descending_files,
-        ramp_asc=[ascending_ramp],
-        ramp_desc=[descending_ramp],
+        ramp_asc=insar_ascending_ramps,
+        ramp_desc=insar_descending_ramps,
         working_directory=directory,
     )
 
