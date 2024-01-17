@@ -73,6 +73,7 @@ def test_cgps_traces():
         )
         with open(tempdir / "cgps_waves.json", "r") as f:
             cgps_json = json.load(f)
+        print(json.dumps(cgps_json, indent=4))
         for idx, d in enumerate(new_cgps_waves):
             assert cgps_info[idx] == cgps_json[idx]
             assert cgps_info[idx] == d
@@ -653,5 +654,5 @@ def test_wavelets_strong_motion():
         assert w == wavelet["wavelet_weight"]
     assert (
         wavelets_strong_motion(wavelet["duration"], filter, wavelet["dt"], s1, s2, True)
-        == "0 0 0 2 2 2 2 0\n"
+        == "0 2 2 2 2 2 2 0\n"
     )

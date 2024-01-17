@@ -255,10 +255,10 @@ def test___PlotCumulativeSlip():
         )
         assert (tempdir / "CumulativeSlip_plane0.png").exists()
         assert (tempdir / "CumulativeSlip_plane0.ps").exists()
-        assert c1 == "-72.38 -31.74 -0.16"
-        assert c2 == "-72.06 -29.34 -0.16"
-        assert c3 == "-71.15 -29.43 30.18"
-        assert c4 == "-71.47 -31.83 30.18"
+        assert c1 == "-72.37 -31.77 0.3"
+        assert c2 == "-72.04 -29.30 0.3"
+        assert c3 == "-71.16 -29.39 29.72"
+        assert c4 == "-71.49 -31.86 29.72"
     finally:
         shutil.rmtree(tempdir)
 

@@ -61,6 +61,7 @@ def test_static_to_fsp():
             data = f.readlines()[41:]
         with open(RESULTS_DIR / "NP1" / "fsp_sol_file.txt") as f:
             target = f.readlines()[41:]
+
         for l, t in zip(data, target):
             assert l == t
     finally:
