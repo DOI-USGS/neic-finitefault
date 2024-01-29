@@ -109,7 +109,7 @@ def _wang_baselines(
     disp_trace.data = disp_trace.data - disp_trace.data[time_p]  # - 1 * int(1 / delta)]
     time_d0, time_pgd = _time_d0_pgd(disp_trace, time_p, time_pga, time_end)
     disp_tail = disp_trace.data[time_end:]
-    print("TAIL", disp_tail)
+    # print("TAIL", disp_tail)
     if len(disp_tail) < 5:
         return trace, trace, trace, None
     a0, a1, a2, aic3 = _polinomial_fit(disp_tail, delta, 2)
