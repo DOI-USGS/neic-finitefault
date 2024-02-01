@@ -2,13 +2,13 @@
 
 # ==============================================================================
 # Define usage
-#     Sets up usage function and parses arguments
+#     
 # ==============================================================================
 ## define usage
 function usage {
     echo "----------------------------------------------------------------"
-    echo "Install package with Ubuntu package manager 'apt'. "
-    echo "apt update/upgrade may be required if packages can't be found."
+    echo "Install pip installable dependencies with poetry. "
+    echo "NOTE: ff-env must be created with conda.sh first."
     echo "----------------------------------------------------------------"
 }
 ## parse arguments
@@ -32,24 +32,13 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# ==============================================================================
-# Download and install packages with apt
-# ==============================================================================
-# install packages
-echo "Installing packages with apt"
-apt install -y \
-  build-essential \
-  cmake \
-  curl \
-  gcc \
-  gfortran \
-  ghostscript \
-  git \
-  libssl-dev \
-  libffi-dev \
-  libnetcdf-dev \
-  libgdal-dev \
-  libgeos-dev \
-  python3-dev \
-  sqlite3 \
-  && apt clean;
+### activate ff-env
+conda activate ff-env;
+conda env list
+
+### install the main dependencies
+poetry install;
+source $(poetry env info --path)/bin/activate;
+
+### install okada separately since it depends on numpy
+poetry run poe okada;

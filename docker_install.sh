@@ -1,4 +1,4 @@
-#! /bin/bash -ex
+#!/bin/bash
 
 # must run as root or use sudo
 if [ "${USER}" != "root" ]; then
@@ -168,8 +168,10 @@ source "${INSTALL_DIR}/gmt.sh" "${CLEANUP}" "${DCW_VERSION}" "${GMT_VERSION}" "$
 source "${INSTALL_DIR}/libgeos.sh" "${CLEANUP}"  "${GEOS_VERSION}";
 # shellcheck source=./install.d/proj.sh
 source "${INSTALL_DIR}/proj.sh" "${CLEANUP}"  "${PROJ_VERSION}";
+# shellcheck source=./install.d/data_dependencies.sh
+source "${INSTALL_DIR}/data_dependencies.sh" "${FINITEFAULT_DIR}" --fd-bank "${FD_BANK}" --lith "${LITHO1}";
 # shellcheck source=./install.d/wasp.sh
-source "${INSTALL_DIR}/wasp.sh" "${FINITEFAULT_DIR}" --fd-bank "${FD_BANK}" --lith "${LITHO1}";
+source "${INSTALL_DIR}/wasp.sh" "${FINITEFAULT_DIR}"
 
 # Source environment.d file for environment variables
 ENV_DIR="${FINITEFAULT_DIR}/environment.d"

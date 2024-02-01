@@ -110,7 +110,8 @@ Shell Check:
   image: usgs/ubuntu:latest
   script:
     - apt install -y shellcheck
-    - shellcheck install.sh -x
+    - shellcheck docker_install.sh -x
+    - shellcheck user_install.sh -x
     - shellcheck install.d/*
     - shellcheck environment.d/*
   stage: test

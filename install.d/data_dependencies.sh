@@ -1,4 +1,4 @@
-#! /bin/bash -ex
+#!/bin/bash
 
 # ==============================================================================
 # Define usage
@@ -73,9 +73,13 @@ FORTRAN_DIR="${FINITEFAULT_DIR}/fortran_code"
 ## fd_bank
 FD_FILE="${FORTRAN_DIR}/gfs_nm/long/fd_bank"
 if [[ "$FD_BANK" == *"download" ]]; then
-    echo "Downloading the fd_bank file"
-    curl -o "${FD_FILE}" -L \
-      "https://zenodo.org/record/7236739/files/fd_bank?download=1"
+    if [ -f $FD_FILE ]; then
+        echo "fd_bank already exists at ${FD_FILE}. Skipping download.";
+    else
+        echo "Downloading the fd_bank file"
+        curl -o "${FD_FILE}" -L \
+            "https://zenodo.org/record/7236739/files/fd_bank?download=1"
+    fi
 else
     echo "Copying the provided fd_bank file to the required location"
     cp "${FD_BANK}" "${FD_FILE}"
@@ -91,9 +95,13 @@ fi
 ## LITHO1.0.nc
 LITHO1_FILE="${FORTRAN_DIR}/info/LITHO1.0.nc"
 if [[ "$LITHO1" == *"download" ]]; then
-    echo "Downloading the LITHO1.0.nc file"
-    curl -o "${LITHO1_FILE}" -L \
-        "https://ds.iris.edu/files/products/emc/emc-files/LITHO1.0.nc"; 
+    if [ -f $LITHO1_FILE ]; then
+        echo "LITHO1.0.nc already exists at ${LITHO1_FILE}. Skipping download.";
+    else
+        echo "Downloading the LITHO1.0.nc file"
+        curl -o "${LITHO1_FILE}" -L \
+            "https://ds.iris.edu/files/products/emc/emc-files/LITHO1.0.nc"; 
+    fi
 else
     echo "Copying the provided LITHO1.0.nc file to the required location"
     cp "${LITHO1}" "${LITHO1_FILE}"
