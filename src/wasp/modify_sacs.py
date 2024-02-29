@@ -47,7 +47,14 @@ def _modify_by_dict(
                 time_shift = int(modifications["time_correction"] / delta)
                 channels[idx]["start_signal"] = channel["start_signal"] - time_shift
     with open(json_file, "w") as f:
-        json.dump(channels, f)
+        json.dump(
+            channels,
+            f,
+            sort_keys=True,
+            indent=4,
+            separators=(",", ": "),
+            ensure_ascii=False,
+        )
 
 
 def _modify_by_input(
