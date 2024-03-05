@@ -1,4 +1,4 @@
-#! /bin/bash -ex
+#!/bin/bash
 
 # must run as root or use sudo
 if [ "${USER}" != "root" ]; then
@@ -48,10 +48,10 @@ function usage {
     echo "                          if not specified it will be downloaded"
     echo "                          default=download"
     echo "                          (example: --fd-bank /home/user/fd_bank)"
-    echo "  --lith string        the location of the fd_bank file"
+    echo "  --lith string        the location of the lith file"
     echo "                          if not specified it will be downloaded"
     echo "                          default=download"
-    echo "                          (example: --lith /home/user/fd_bank)"
+    echo "                          (example: --lith /home/user/LITHO1.0.nc)"
     echo "  -c,--cleanup bool       remove gmt, proj, and geos source code"
     echo "                             from /opt after they're installed"
     echo "                          default=false"
@@ -168,8 +168,10 @@ source "${INSTALL_DIR}/gmt.sh" "${CLEANUP}" "${DCW_VERSION}" "${GMT_VERSION}" "$
 source "${INSTALL_DIR}/libgeos.sh" "${CLEANUP}"  "${GEOS_VERSION}";
 # shellcheck source=./install.d/proj.sh
 source "${INSTALL_DIR}/proj.sh" "${CLEANUP}"  "${PROJ_VERSION}";
+# shellcheck source=./install.d/data_dependencies.sh
+source "${INSTALL_DIR}/data_dependencies.sh" "${FINITEFAULT_DIR}" --fd-bank "${FD_BANK}" --lith "${LITHO1}";
 # shellcheck source=./install.d/wasp.sh
-source "${INSTALL_DIR}/wasp.sh" "${FINITEFAULT_DIR}" --fd-bank "${FD_BANK}" --lith "${LITHO1}";
+source "${INSTALL_DIR}/wasp.sh" "${FINITEFAULT_DIR}"
 
 # Source environment.d file for environment variables
 ENV_DIR="${FINITEFAULT_DIR}/environment.d"

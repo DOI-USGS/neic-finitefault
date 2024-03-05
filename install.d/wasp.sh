@@ -1,4 +1,4 @@
-#! /bin/bash -ex
+#!/bin/bash
 
 # ==============================================================================
 # Define usage
@@ -67,7 +67,7 @@ cd "${FORTRAN_DIR}" \
 # update configuration for fd_bank location
 LOWIN_FILE="${FORTRAN_DIR}/gfs_nm/long/low.in"
 echo "Updating the location of the fd_bank file in ${LOWIN_FILE}"
-grep -qF -- "$FD_FILE" "$LOWIN_FILE" || echo "$FD_FILE" >> "$LOWIN_FILE"
+grep -qF -- "$FD_FILE" "$LOWIN_FILE" || echo -e "\n$FD_FILE" >> "$LOWIN_FILE"
 
 # write the config file
 echo "Writing the config file"
