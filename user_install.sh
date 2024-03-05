@@ -63,7 +63,7 @@ while [[ $# -gt 0 ]]; do
 done
 ### set positional arguments
 set -- "${REQUIRED_ARGS[@]}" # restore positional parameters
-FINITEFAULT_DIR=$1
+FINITEFAULT_DIR=${1%%/}
 ### set defaults
 PYTHON_VERSION=${PYTHON_VERSION:-"3.10.13"}
 FD_BANK=${FD_BANK:-"download"}
