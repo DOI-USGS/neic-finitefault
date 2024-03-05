@@ -73,7 +73,7 @@ FORTRAN_DIR="${FINITEFAULT_DIR}/fortran_code"
 ## fd_bank
 FD_FILE="${FORTRAN_DIR}/gfs_nm/long/fd_bank"
 if [[ "$FD_BANK" == *"download" ]]; then
-    if [ -f $FD_FILE ]; then
+    if [ -f "${FD_FILE}" ]; then
         echo "fd_bank already exists at ${FD_FILE}. Skipping download.";
     else
         echo "Downloading the fd_bank file"
@@ -95,7 +95,7 @@ fi
 ## LITHO1.0.nc
 LITHO1_FILE="${FORTRAN_DIR}/info/LITHO1.0.nc"
 if [[ "$LITHO1" == *"download" ]]; then
-    if [ -f $LITHO1_FILE ]; then
+    if [ -f "${LITHO1_FILE}" ]; then
         echo "LITHO1.0.nc already exists at ${LITHO1_FILE}. Skipping download.";
     else
         echo "Downloading the LITHO1.0.nc file"

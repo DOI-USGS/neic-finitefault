@@ -38,7 +38,8 @@ conda env list
 
 ### install the main dependencies
 poetry install;
-source $(poetry env info --path)/bin/activate;
+# shellcheck disable=SC1090
+source "$(poetry env info --path)"/bin/activate;
 
 ### install okada separately since it depends on numpy
 poetry run poe okada;
