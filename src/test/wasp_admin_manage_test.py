@@ -177,8 +177,75 @@ def test_fill_dicts():
                 "body",
             ],
         )
-        print(result.stdout)
         assert result.exit_code == 0
+
+        # test insar values (invalid ramp)
+        dummy_insar = tempdir / "insar_ascending.txt"
+        with open(dummy_insar, "w"):
+            pass
+        dummy_insard = tempdir / "insar_descending.txt"
+        with open(dummy_insard, "w"):
+            pass
+        result1 = runner.invoke(
+            app,
+            [
+                "fill-dicts",
+                str(tempdir),
+                "-ina",
+                f"{str(dummy_insar)}:invalid",
+            ],
+        )
+        assert result1.exit_code == 1
+        assert (
+            "The insar ramp provided (invalid) is not valid. "
+            "Must be one of ['bilinear', 'linear', 'quadratic']."
+        ) in str(result1.exception)
+
+        # test insar values (invalid ramp)
+        result2 = runner.invoke(
+            app,
+            [
+                "fill-dicts",
+                str(tempdir),
+                "-ina",
+                f"{str(dummy_insar)}:linear",
+                "-ind",
+                f"{str(dummy_insard)}",
+                "-ina",
+                f"{str(dummy_insar)}:quadratic",
+                "-ind",
+                f"{str(dummy_insard)}:quadratic",
+            ],
+        )
+        with open(tempdir / "insar_data.json") as f:
+            insar_dict = json.load(f)
+        assert insar_dict == {
+            "ascending": [
+                {
+                    "name": f"{str(tempdir)}/insar_ascending.txt",
+                    "ramp": "linear",
+                    "weight": 1.0,
+                },
+                {
+                    "name": f"{str(tempdir)}/insar_ascending.txt",
+                    "ramp": "quadratic",
+                    "weight": 1.0,
+                },
+            ],
+            "descending": [
+                {
+                    "name": f"{str(tempdir)}/insar_descending.txt",
+                    "ramp": None,
+                    "weight": 1.0,
+                },
+                {
+                    "name": f"{str(tempdir)}/insar_descending.txt",
+                    "ramp": "quadratic",
+                    "weight": 1.0,
+                },
+            ],
+        }
+        assert result2.exit_code == 0
     finally:
         print("Cleaning up test directory.")
         shutil.rmtree(tempdir)
