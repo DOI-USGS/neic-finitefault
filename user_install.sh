@@ -20,10 +20,10 @@ function usage {
     echo "                          if not specified it will be downloaded"
     echo "                          default=download"
     echo "                          (example: --fd-bank /home/user/fd_bank)"
-    echo "  --lith string        the location of the fd_bank file"
+    echo "  --lith string        the location of the lith file"
     echo "                          if not specified it will be downloaded"
     echo "                          default=download"
-    echo "                          (example: --lith /home/user/fd_bank)"
+    echo "                          (example: --lith /home/user/LITHO1.0.nc)"
 }
 
 ## parse arguments
