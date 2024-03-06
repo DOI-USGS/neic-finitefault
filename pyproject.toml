@@ -45,14 +45,10 @@ poethepoet = "^0.20.0"
 pytest = "^7.4.0"
 pytest-cov = "^4.1.0"
 mypy = "^1.4.1"
-
-[tool.poetry.group.examples]
-optional = true
-
-[tool.poetry.group.examples.dependencies]
 ipykernel = "^6.15.2"
 notebook = "^6.4"
 traitlets = "5.9.0"
+
 
 [tool.poetry.scripts]
 "wasp" = "wasp.wasp_admin.wasp:app"
