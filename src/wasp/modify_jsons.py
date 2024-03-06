@@ -41,7 +41,14 @@ def _modify_by_dict(
             if not len(channels_to_search):
                 break
     with open(json_file, "w") as f:
-        json.dump(channels, f)
+        json.dump(
+            channels,
+            f,
+            sort_keys=True,
+            indent=4,
+            separators=(",", ": "),
+            ensure_ascii=False,
+        )
 
 
 def _modify_by_input(
