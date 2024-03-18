@@ -500,6 +500,7 @@ def manual_modelling(
     default_dirs: dict,
     segments_data: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
+    plot_sol: bool = True,
 ):
     """Routine for manual finite fault modelling
 
@@ -513,6 +514,8 @@ def manual_modelling(
     :type segments_data: dict
     :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
+    :param plot_sol: Whether to plot model results, defaults to True
+    :type plot_sol: bool
     """
     directory = pathlib.Path(directory)
     if not os.path.isdir(directory / "logs"):
@@ -531,9 +534,10 @@ def manual_modelling(
     writing_inputs0(tensor_info, data_type, directory=directory)
     inversion(data_type, default_dirs, logger, directory=directory)
     logger.info("Plot data in folder {}".format(directory))
-    execute_plot(
-        tensor_info, data_type, segments_data, default_dirs, directory=directory
-    )
+    if plot_sol == True:
+        execute_plot(
+            tensor_info, data_type, segments_data, default_dirs, directory=directory
+        )
     ml.close_log(logger)
 
 

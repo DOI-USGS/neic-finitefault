@@ -101,6 +101,12 @@ def multiple_solutions(
                 for subfolder in subfolders
             ],
         )
+    print("Plotting multiple solutions")
+    for subfolder in subfolders:
+        inv.execute_plot(
+            tensor_info, data_type, segments_data, default_dirs, directory=subfolder
+        )
+    df = get_summary_all_models(subfolders)
 
 
 def __worker(
@@ -120,7 +126,9 @@ def __worker(
     os.chdir(subfolder)
     with open("segments_data.json") as s:
         segments_data = json.load(s)
-    inv.manual_modelling(tensor_info, data_type, default_dirs, segments_data)
+    inv.manual_modelling(
+        tensor_info, data_type, default_dirs, segments_data, plot_sol=False
+    )
     return
 
 
@@ -160,8 +168,10 @@ def get_summary_all_models(subfolders: list) -> pd.DataFrame:
     rupt_vel: list[float] = []
     objective_error: list[float] = []
     misfit_error: list[float] = []
+    short_subfolder: list[str] = []
     for subfolder in subfolders:
         subfolder = pathlib.Path(subfolder)
+        short_subfolder = short_subfolder + [str(subfolder).split("/")[-1]]
         with open(subfolder / "segments_data.json") as f:
             segments_data = json.load(f)
         segments = segments_data["segments"]
@@ -173,7 +183,7 @@ def get_summary_all_models(subfolders: list) -> pd.DataFrame:
         misfit_error = misfit_error + [errors["misfit_error"]]
     df = pd.DataFrame(
         {
-            "subfolders": subfolders,
+            "subfolders": short_subfolder,
             "strike": strike,
             "dip": dip,
             "rupt_vel": rupt_vel,
