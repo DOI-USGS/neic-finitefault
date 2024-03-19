@@ -51,9 +51,8 @@ def multiple_solutions(
     if not len(folders):
         print("No folders defined. Exiting.")
         return
-    directory = pathlib.Path(directory)
-    this_folder = os.path.abspath(os.getcwd())
-    event_folder = os.path.dirname(this_folder)
+    directory = pathlib.Path(directory).resolve()
+    event_folder = pathlib.Path(os.path.dirname(directory)).resolve()
     with open(directory / "segments_data.json") as s:
         segments_data = json.load(s)
     segments = segments_data["segments"]
@@ -62,14 +61,12 @@ def multiple_solutions(
     rupt_vel = (
         rupt_vel if len(rupt_vel) > 0 else [segments[0]["rupture_vel"]]  # type:ignore
     )
-    os.chdir(event_folder)
-
     new_iter = product(strike, dip, rupt_vel)  # type:ignore
     subfolders: list = []
     for i, (strike1, dip1, rupt_vel1) in enumerate(new_iter):
-        shutil.copytree(this_folder, "{}.{}".format(folders, i))
-        os.chdir("{}.{}".format(folders, i))
-        subfolders = subfolders + [os.path.abspath(os.getcwd())]
+        subfolder = event_folder / f"{folders}.{i}"
+        shutil.copytree(directory, subfolder)
+        subfolders += [subfolder]
         new_segments_data = segments_data.copy()
         new_segments_data["segments"][0]["strike"] = strike1
         new_segments_data["segments"][0]["dip"] = dip1
@@ -77,7 +74,7 @@ def multiple_solutions(
         segments2 = new_segments_data["segments"]
         rise_time = new_segments_data["rise_time"]
         force_plane_above_ground(tensor_info, segments2)
-        with open("segments_data.json", "w") as f:
+        with open(subfolder / "segments_data.json", "w") as f:
             json.dump(
                 new_segments_data,
                 f,
@@ -86,11 +83,8 @@ def multiple_solutions(
                 separators=(",", ": "),
                 ensure_ascii=False,
             )
-        os.chdir(event_folder)
-
     cpus = cpu_count()
     processes = int(cpus / 3)
-    print(processes)
     if test:
         return
     with Pool(processes=processes) as pool:
@@ -101,7 +95,6 @@ def multiple_solutions(
                 for subfolder in subfolders
             ],
         )
-    print("Plotting multiple solutions")
     for subfolder in subfolders:
         inv.execute_plot(
             tensor_info, data_type, segments_data, default_dirs, directory=subfolder
@@ -123,11 +116,10 @@ def __worker(
     :param subfolder: The subfolder for the specific solution
     :type subfolder: str
     """
-    os.chdir(subfolder)
-    with open("segments_data.json") as s:
+    with open(pathlib.Path(subfolder) / "segments_data.json") as s:
         segments_data = json.load(s)
     inv.manual_modelling(
-        tensor_info, data_type, default_dirs, segments_data, plot_sol=False
+        tensor_info, data_type, default_dirs, segments_data, subfolder, plot_sol=False
     )
     return
 
