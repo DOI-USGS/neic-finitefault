@@ -589,15 +589,19 @@ contains
       index0 = min(start1, nlen - 80)
       do i = 1, wave_pts2
          real1(i) = 0.0 
-         imag1(i) = 0.0 
-         if (i .lt. index0) then
-            observed2(i) = observed(i, channel) 
-         else
-            observed2(i) = 0.0 
-!            if (cgps) observed2(i) = mean
-            if (cgps) then
+         imag1(i) = 0.0
+         if (cgps) then
+            if (i .lt. index0) then
+               observed2(i) = observed(i, channel) 
+            else
                if (i .le. nlen - 80) observed2(i) = mean
-               if (i .gt. nlen - 80) observed2(i) = 0.0 
+               if (i .gt. nlen - 80) observed2(i) = 0.0
+            endif
+         else
+            if (i .lt. start1) then
+               observed2(i) = observed(i, channel) 
+            else
+               observed2(i) = 0.0 
             endif
          endif
       end do
