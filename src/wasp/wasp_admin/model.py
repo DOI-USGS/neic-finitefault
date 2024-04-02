@@ -242,7 +242,7 @@ def run(
         )
 
 
-@app.command(help="Run a modelling routine for multiple solutions")
+@app.command(help="Run multiple models varying strike, dip, and/or rupture velocity")
 def run_multiple(
     directory: pathlib.Path = typer.Argument(
         ..., help="Path to the modelling directory"
@@ -258,15 +258,9 @@ def run_multiple(
     ),
     dips: List[float] = typer.Option(
         [],
-        "-l",
-        "--list",
-        help="The dips corresponding to the solutions in each solution folder",
-    ),
-    solution_folders: List[pathlib.Path] = typer.Option(
-        [],
-        "-sf",
-        "--solution-folder",
-        help="The solution folders where the modelling is run, default is []",
+        "-d",
+        "--dips",
+        help="Dip values to model (use flag repeatedly for multiple dips)",
     ),
     gcmt_tensor_file: pathlib.Path = typer.Option(
         None, "-g", "--gcmt", help="Path to the GCMT moment tensor file"
@@ -280,28 +274,28 @@ def run_multiple(
     insar_descending: pathlib.Path = typer.Option(
         None, "-ind", "--insar-descending", help="Path to an descending insar file"
     ),
-    rupture_velocity: List[float] = typer.Option(
+    rupture_velocities: List[float] = typer.Option(
         [],
-        "-v",
-        "--rupture-velocity",
-        help="The rupture velocity to use in the finite fault creation",
+        "-vr",
+        "--rupture_velocities",
+        help="Rupture velocity values to model (use flag repeatedly for multiple rupture velocities)",
+    ),
+    solution_folders: str = typer.Option(
+        "NP3",
+        "-sf",
+        "--solution-folder",
+        help="The general directory name for output (e.g., NP3). Each solution will be appended by solution number (e.g., NP3.0, NP3.1,... NP3.n)",
     ),
     strikes: List[float] = typer.Option(
         [],
         "-s",
-        "--strike",
-        help="The strikes corresponding to the solutions in each solution folder",
+        "--strikes",
+        help="Strike values to model (use flag repeatedly for multiple strikes)",
     ),
     velocity_model_file: pathlib.Path = typer.Option(
         None, "-v", "--velocity-model", help="Path to the velocity model file"
     ),
 ):
-    # validate that the number of strikes, dips, and folders match
-    if not len(strikes) == len(dips) == len(solution_folders) == len(rupture_velocity):
-        raise ValueError(
-            "The number of strikes, dips, rupture_velocity, and solution folders "
-            "must match and be in a matching order."
-        )
 
     # set default data type
     chosen_data_types: List[str]
@@ -342,6 +336,6 @@ def run_multiple(
         folders=solution_folders,
         strike=strikes,
         dip=dips,
-        rupt_vel=rupture_velocity,
+        rupt_vel=rupture_velocities,
         directory=directory,
     )
