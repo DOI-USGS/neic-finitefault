@@ -1,3 +1,4 @@
+from copy import deepcopy
 import json
 import os
 import pathlib
@@ -148,6 +149,16 @@ def test_run_multiple():
 
         # test run
         shutil.copytree(RESULTS_DIR / "NP1", tempdir / "data" / "NP1")
+        # need to update the paths in the surf_waves.json
+        with open(tempdir / "data" / "NP1"/"surf_waves.json") as f:
+            surfs = json.load(f)
+        updated_surfs = []
+        for surf_dict in surfs:
+            new_surf = deepcopy(surf_dict)
+            new_surf['file'] = surf_dict['file'].replace('LONG',str((tempdir / "LONG").resolve()))
+        updated_surfs += [new_surf]
+        with open(tempdir / "data" / "NP1"/"surf_waves.json",'w') as fw:
+            json.dump(updated_surfs, fw)
         shutil.copytree(RESULTS_DIR / "data" / "LONG", tempdir / "LONG")
         result = runner.invoke(
             app,
