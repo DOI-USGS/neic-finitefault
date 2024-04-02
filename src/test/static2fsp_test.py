@@ -59,6 +59,7 @@ def test_static_to_fsp():
         )
         with open(tempdir / "fsp_sol_file.txt") as f:
             data = f.readlines()[41:]
+            dstr = f.read()
         with open(RESULTS_DIR / "NP1" / "fsp_sol_file.txt") as f:
             target = f.readlines()[41:]
 
