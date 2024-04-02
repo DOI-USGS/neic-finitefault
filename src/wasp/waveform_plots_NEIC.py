@@ -314,6 +314,12 @@ def plot_waveform_fits(
     if type_str == "cgps" or type_str == "strong":
         files = [file for file in files]
         print("Creating Waveform Fit Plot: " + str(type_str))
+    if not len(files):
+        print(
+            f"No files found matching components ({components}). "
+            "Not plotting waveform fits."
+        )
+        return
     files = sorted(files, key=lambda k: (k["azimuth"], k["component"]))
     sampling = [file["dt"] for file in files]
     names = [file["name"] for file in files]
