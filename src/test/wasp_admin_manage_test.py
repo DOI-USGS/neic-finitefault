@@ -699,7 +699,7 @@ def test_static_srf():
         assert result.exit_code == 0
         with open(tempdir / "srf_sol_file.txt") as f:
             data = f.readlines()[:40]
-        target =[
+        target = [
             "2.0\n",
             "#\n",
             "# Data :\tBODY\tSURF\tSTRONG\tcGPS\tGPS\tInSAR\tDART\tTRIL\tLEVEL\tOTHER\n",

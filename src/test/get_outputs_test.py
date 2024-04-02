@@ -152,7 +152,7 @@ def test_read_solution_static_format():
                 -29.326191,
                 -70.841278,
                 40.1408,
-                6.50101e+26,
+                6.50101e26,
             ],
         ):
             assert np.max([np.max(seg.flatten()) for seg in solution[key]]) == target

@@ -180,7 +180,7 @@ def test_input_chen_near_field():
             with open(tempdir / f, "r") as nd:
                 new_data = nd.read()
             with open(RESULTS_DIR / f, "r") as t:
-                target=t.read()
+                target = t.read()
             assert new_data == target
 
     finally:
