@@ -20,7 +20,7 @@ def plot_waveforms(
     waveforms: List[Union[list, np.ndarray]],
     weights: List[float],
     type_str: Optional[str] = None,
-    comp: Optional[str] = None,
+    comp: Optional[List[str]] = None,
     color: str = "blue",
     custom: Optional[Literal["fill", "syn"]] = None,
 ) -> List[plt.Axes]:
@@ -37,7 +37,7 @@ def plot_waveforms(
     :param type_str: The data type, defaults to None
     :type type_str: Optional[str], optional
     :param comp: The component, defaults to None
-    :type comp: Optional[str], optional
+    :type comp: Optional[List[str]], optional
     :param color: The color of the plot line, defaults to "blue"
     :type color: str, optional
     :param custom: The custom option (fill), defaults to None
@@ -371,6 +371,14 @@ def plot_waveform_fits(
             color="red",
             custom="syn",
         )
+        dict = {
+            "weights": weights,
+            "azimuths": azimuths,
+            "names": names,
+            "distances": distances,
+            "type_str": type_str,
+            "comps": comp[0],
+        }
     if type_str == "cgps" or type_str == "strong":
         axes2 = plot_waveforms(
             axes2,
@@ -378,7 +386,7 @@ def plot_waveform_fits(
             obs_waveforms,
             weights,
             type_str=type_str,
-            comp=comp[0],
+            comp=comp,
             color="black",
             custom="fill",
         )
@@ -388,19 +396,19 @@ def plot_waveform_fits(
             syn_waveforms,
             weights,
             type_str=type_str,
-            comp=comp[0],
+            comp=comp,
             color="red",
             custom="syn",
         )
 
-    dict = {
-        "weights": weights,
-        "azimuths": azimuths,
-        "names": names,
-        "distances": distances,
-        "type_str": type_str,
-        "comps": comp[0],
-    }
+        dict = {
+            "weights": weights,
+            "azimuths": azimuths,
+            "names": names,
+            "distances": distances,
+            "type_str": type_str,
+            "comps": comp,
+        }
     axes2 = add_metadata(axes2, **dict)
 
     if type_str == "body":

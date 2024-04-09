@@ -1103,12 +1103,15 @@ def execute_plot(
     if "strong" in data_type:
         with open(directory / "strong_motion_waves.json") as smw:
             traces_info = json.load(smw)
+    if "cgps" in data_type:
+        with open(directory / "cgps_waves.json") as cgpsw:
+            traces_info_cgps = json.load(cgpsw)
     if "gps" in data_type:
         names, lats, lons, observed, synthetic, error = get_outputs.retrieve_gps(
             directory=directory
         )
         stations_gps = zip(names, lats, lons, observed, synthetic, error)
-    if "strong" in data_type or "gps" in data_type:
+    if "strong" in data_type or "cgps" in data_type or "gps" in data_type:
         plot.PlotMap(
             tensor_info,
             segments,
@@ -1117,6 +1120,7 @@ def execute_plot(
             default_dirs,
             files_str=traces_info,
             stations_gps=stations_gps,
+            stations_cgps=traces_info_cgps,
             directory=directory,
         )
     if "insar" in data_type:
