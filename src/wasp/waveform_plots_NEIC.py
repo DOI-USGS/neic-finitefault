@@ -378,7 +378,7 @@ def plot_waveform_fits(
             obs_waveforms,
             weights,
             type_str=type_str,
-            comp=comp[0],
+            comp=comp,
             color="black",
             custom="fill",
         )
@@ -388,7 +388,7 @@ def plot_waveform_fits(
             syn_waveforms,
             weights,
             type_str=type_str,
-            comp=comp[0],
+            comp=comp,
             color="red",
             custom="syn",
         )
@@ -399,7 +399,7 @@ def plot_waveform_fits(
         "names": names,
         "distances": distances,
         "type_str": type_str,
-        "comps": comp[0],
+        "comps": comp,
     }
     axes2 = add_metadata(axes2, **dict)
 
