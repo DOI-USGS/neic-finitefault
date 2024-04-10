@@ -181,10 +181,8 @@ def test_input_chen_near_field():
                 new_data = nd.read()
             with open(RESULTS_DIR / f, "r") as t:
                 target = t.read()
-            if f == "channels_cgps.txt":
-                new_data = "\n".join(new_data.split("\n")[6:])
-                target = "\n".join(target.split("\n")[6:])
             assert new_data == target
+
     finally:
         shutil.rmtree(tempdir)
 

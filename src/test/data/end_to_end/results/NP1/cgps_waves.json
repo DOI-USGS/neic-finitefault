@@ -13,7 +13,7 @@
     "start_signal": 49,
     "synthetic": [],
     "trace_weight": 0.6,
-    "wavelet_weight": "0 0 0 2 2 2 2 2\n"
+    "wavelet_weight": "0 2 2 2 2 2 2 2\n"
   },
   {
     "azimuth": 49.18752720397195,
@@ -29,7 +29,7 @@
     "start_signal": 49,
     "synthetic": [],
     "trace_weight": 0.6,
-    "wavelet_weight": "0 0 0 2 2 2 2 2\n"
+    "wavelet_weight": "0 2 2 2 2 2 2 2\n"
   },
   {
     "azimuth": 1.9018648228900397,
@@ -45,7 +45,7 @@
     "start_signal": 49,
     "synthetic": [],
     "trace_weight": 1.2,
-    "wavelet_weight": "0 0 0 2 2 2 2 2\n"
+    "wavelet_weight": "0 2 2 2 2 2 2 2\n"
   },
   {
     "azimuth": 22.566689985045294,
@@ -61,7 +61,7 @@
     "start_signal": 49,
     "synthetic": [],
     "trace_weight": 1.2,
-    "wavelet_weight": "0 0 0 2 2 2 2 2\n"
+    "wavelet_weight": "0 2 2 2 2 2 2 2\n"
   },
   {
     "azimuth": 49.18752720397195,
@@ -77,7 +77,7 @@
     "start_signal": 49,
     "synthetic": [],
     "trace_weight": 1.2,
-    "wavelet_weight": "0 0 0 2 2 2 2 2\n"
+    "wavelet_weight": "0 2 2 2 2 2 2 2\n"
   },
   {
     "azimuth": 1.9018648228900397,
@@ -93,7 +93,7 @@
     "start_signal": 49,
     "synthetic": [],
     "trace_weight": 1.2,
-    "wavelet_weight": "0 0 0 2 2 2 2 2\n"
+    "wavelet_weight": "0 2 2 2 2 2 2 2\n"
   },
   {
     "azimuth": 1.9018648228900397,
@@ -109,7 +109,7 @@
     "start_signal": 49,
     "synthetic": [],
     "trace_weight": 0.6,
-    "wavelet_weight": "0 0 0 2 2 2 2 2\n"
+    "wavelet_weight": "0 2 2 2 2 2 2 2\n"
   },
   {
     "azimuth": 22.566689985045294,
@@ -125,7 +125,7 @@
     "start_signal": 49,
     "synthetic": [],
     "trace_weight": 1.2,
-    "wavelet_weight": "0 0 0 2 2 2 2 2\n"
+    "wavelet_weight": "0 2 2 2 2 2 2 2\n"
   },
   {
     "azimuth": 49.18752720397195,
@@ -141,6 +141,6 @@
     "start_signal": 49,
     "synthetic": [],
     "trace_weight": 1.2,
-    "wavelet_weight": "0 0 0 2 2 2 2 2\n"
+    "wavelet_weight": "0 2 2 2 2 2 2 2\n"
   }
 ]

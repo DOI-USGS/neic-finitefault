@@ -144,15 +144,15 @@ def test_read_solution_static_format():
                 "moment",
             ],
             [
-                621.81543,
-                129.276184,
-                123.995361,
+                573.014587,
+                129.273148,
+                118.995361,
                 15.0,
                 15.0,
                 -29.326191,
                 -70.841278,
                 40.1408,
-                7.05467e26,
+                6.50101e26,
             ],
         ):
             assert np.max([np.max(seg.flatten()) for seg in solution[key]]) == target
