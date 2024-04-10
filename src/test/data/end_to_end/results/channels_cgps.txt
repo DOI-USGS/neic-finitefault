@@ -3,7 +3,7 @@
 10 0.4 3.2291872286240194e+28
 0
 9 9
-No STA Lat Lon M V H1 H2 Weight
+No STA Lat Lon M Comp Weight
   1  ovll  -30.604   -71.204 31  LXZ 0.6 0
   2  pedr  -30.839   -70.689 31  LXZ 0.6 0
   3  pfrj  -30.675   -71.635 31  LXE 1.2 0

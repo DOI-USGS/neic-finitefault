@@ -573,7 +573,7 @@ contains
    implicit none
    real, intent(out) :: wave_obs(wave_pts2, max_stations), max_coeff(max_stations)
    integer, intent(out) :: t_max_val(max_stations)
-   integer atom_max0, i, j, channel, start1, length, n_begin, n_delt
+   integer atom_max0, i, j, channel, start1, length, n_begin, n_delt, index0
    real real1(wave_pts2), imag1(wave_pts2), observed2(n_data), &
    &  max_coeff0, mean
    real :: coeffs_obs(n_data)
@@ -586,16 +586,24 @@ contains
       cgps = cgps_channels(channel)
       dart = dart_channels(channel)
       mean = sum(observed(start1 - 20:start1, channel)) / 20.0
+      index0 = min(start1, nlen - 80)
       do i = 1, wave_pts2
-         real1(i) = 0.0
+         real1(i) = 0.0 
          imag1(i) = 0.0
-         if (i .lt. start1) then
-            observed2(i) = observed(i, channel)
+         if (cgps) then
+            if (i .lt. index0) then
+               observed2(i) = observed(i, channel) 
+            else
+               if (i .le. nlen - 80) observed2(i) = mean
+               if (i .gt. nlen - 80) observed2(i) = 0.0
+            endif
          else
-            observed2(i) = 0.0
-            if (cgps) observed2(i) = mean 
+            if (i .lt. start1) then
+               observed2(i) = observed(i, channel) 
+            else
+               observed2(i) = 0.0 
+            endif
          endif
-         
       end do
       do i = 1,nlen
          real1(i) = observed2(i)*nlen
@@ -604,6 +612,8 @@ contains
 
       call cfft(real1, imag1, lnpt)
       call wavelet_syn(real1, imag1, coeffs_obs)
+
+      observed2(max_freq:) = 0.0
       max_coeff0 = 0.0
       atom_max0 = 1
       do i = 1, nlen
@@ -612,7 +622,7 @@ contains
             atom_max0 = i
          end if
       end do
-      if (dart) then
+      if (dart .or. cgps) then
          max_coeff0 = 0.0
          do j = jmin, jmax
             n_begin = 2**(j-1)
