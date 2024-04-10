@@ -26,7 +26,21 @@ def _modify_by_dict(
     """
     with open(json_file, "r") as f:
         channels = json.load(f)
+    stations = [channel["name"] for channel in channels]
+    stations = list(set(stations))
+
     for station, chosen_channels in station_dict.items():
+        if station not in stations:  # Make sure station is in json
+            raise ValueError(
+                f"Selected station {station} does not belong to list of available stations"
+            )
+        channels2 = [channel for channel in channels if channel["name"] == station]
+        channels_station = [channel["component"] for channel in channels2]
+        for channel_mod in chosen_channels:
+            if channel_mod not in channels_station:
+                raise ValueError(
+                    f"Selected component {channel_mod} does not belong to list of available components: {channels_station}"
+                )
         channels_to_search = copy(chosen_channels)
         for idx in range(len(channels) - 1, -1, -1):
             channel = channels[idx]
