@@ -7,21 +7,35 @@ import json
 import os
 import pathlib
 import shutil
+import warnings
 from collections import Counter
 from glob import glob
 from typing import List, Optional, Union
-import warnings
 
 import cutde.halfspace as half_space
 import matplotlib.pyplot as plt  # type: ignore
 import pandas as pd
 import pygmt
 import pyproj  # type: ignore
-import numpy as np
-from numpy import array, c_, cos, deg2rad, linspace, meshgrid, ones, shape, sin, zeros
+from numpy import (
+    array,
+    c_,
+    ceil,
+    cos,
+    deg2rad,
+    floor,
+    int64,
+    linspace,
+    meshgrid,
+    ones,
+    shape,
+    sin,
+    zeros,
+)
 from obspy.imaging.scripts import mopad  # type: ignore
 
 import wasp.management as mng
+
 
 def temporary_file_reorganization_for_publishing(
     evID: str, directory: Union[pathlib.Path, str] = pathlib.Path()
@@ -189,6 +203,7 @@ def make_waveproperties_json(directory: Union[pathlib.Path, str] = pathlib.Path(
             },
             f,
         )
+
 
 def write_CMTSOLUTION_file(
     pdefile: Optional[Union[pathlib.Path, str]] = None,
@@ -651,8 +666,8 @@ def write_Okada_displacements(directory: Union[pathlib.Path, str] = pathlib.Path
     ##########################
     #### FAULT INFORMATION ###
     ##########################
-    with open(directory / "fsp_sol_file.txt", "r") as fsp: 
-        for line in fsp: 
+    with open(directory / "fsp_sol_file.txt", "r") as fsp:
+        for line in fsp:
             if line.startswith("% Loc"):
                 hypo_lat = float(line.split()[5])
                 hypo_lon = float(line.split()[8])
@@ -665,15 +680,15 @@ def write_Okada_displacements(directory: Union[pathlib.Path, str] = pathlib.Path
     fault_strike: List[float] = []
     fault_dip: List[float] = []
     with open("Solucion.txt", "r") as sol:
-        for line in sol: 
+        for line in sol:
             if line.startswith("#Fault_segment"):
                 sf_length = float(line.split()[7].split("km")[0])
                 sf_width = float(line.split()[12].split("km")[0])
                 fault_half_length = sf_length / 2
-                fault_half_width = sf_width /2
+                fault_half_width = sf_width / 2
             elif "#" in line:  # HEADER LINES
                 continue
-            elif len(np.array(line.split())) < 4:  # FAULT BOUNDARY LINES
+            elif len(array(line.split())) < 4:  # FAULT BOUNDARY LINES
                 continue
             else:  # ACTUAL SUBFAULT DETAILS
                 (
@@ -698,26 +713,34 @@ def write_Okada_displacements(directory: Union[pathlib.Path, str] = pathlib.Path
                 fault_lat.append(float(lat))
                 fault_lon.append(float(lon))
                 fault_depth.append(float(dep))
-                fault_strike_slip.append(float(slip)/100. * np.cos(np.deg2rad(rake)))
-                fault_dip_slip.append(float(slip)/100. * np.sin(np.deg2rad(rake)))
+                fault_strike_slip.append(float(slip) / 100.0 * cos(deg2rad(rake)))
+                fault_dip_slip.append(float(slip) / 100.0 * sin(deg2rad(rake)))
                 fault_tensile_slip.append(0.0)
                 fault_strike.append(float(strike))
                 fault_dip.append(float(dip))
     Nsubfaults = len(fault_lon)
     obs_n = 50
-    obs_x_vec = np.linspace(-250, 250, obs_n)
-    obs_y_vec = np.linspace(-250, 250, obs_n)
-    obs_z_vec = np.zeros(obs_n)
-    obs_x_mat, obs_y_mat = np.meshgrid(obs_x_vec, obs_y_vec)
-    obs_z_mat = np.zeros((obs_n, obs_n))  # performing calculation at the surface, z = 0
+    obs_x_vec = linspace(-250, 250, obs_n)
+    obs_y_vec = linspace(-250, 250, obs_n)
+    obs_z_vec = zeros(obs_n)
+    obs_x_mat, obs_y_mat = meshgrid(obs_x_vec, obs_y_vec)
+    obs_z_mat = zeros((obs_n, obs_n))  # performing calculation at the surface, z = 0
 
     # Make lon lat grid
     g = pyproj.Geod(ellps="WGS84")  # Use WGS84 Ellipsoid
     _, xLats, _ = pyproj.Geod.fwd(
-        g, hypo_lon * np.ones(len(obs_x_vec)), hypo_lat * np.ones(len(obs_x_vec)), 0 * np.ones(len(obs_x_vec)), obs_x_vec * 1000
+        g,
+        hypo_lon * ones(len(obs_x_vec)),
+        hypo_lat * ones(len(obs_x_vec)),
+        0 * ones(len(obs_x_vec)),
+        obs_x_vec * 1000,
     )
     xLons, _, _ = pyproj.Geod.fwd(
-        g, hypo_lon * np.ones(len(obs_y_vec)), hypo_lat * np.ones(len(obs_y_vec)), 90 * np.ones(len(obs_y_vec)), obs_y_vec * 1000
+        g,
+        hypo_lon * ones(len(obs_y_vec)),
+        hypo_lat * ones(len(obs_y_vec)),
+        90 * ones(len(obs_y_vec)),
+        obs_y_vec * 1000,
     )
 
     # Make Lon 0 to 360 (not -180 to 180) to avoid plotting issues
@@ -725,16 +748,16 @@ def write_Okada_displacements(directory: Union[pathlib.Path, str] = pathlib.Path
         if xLons[kLon] < 0:
             xLons[kLon] = 360 + xLons[kLon]
 
-    gridLon, gridLat = np.meshgrid(xLons, xLats)
+    gridLon, gridLat = meshgrid(xLons, xLats)
     fault_mu = 1.0
     fault_poisson_ratio = 0.25
     fault_lmbda = 2 * fault_mu * fault_poisson_ratio / (1 - 2 * fault_poisson_ratio)
     fault_alpha = (fault_lmbda + fault_mu) / (fault_lmbda + 2 * fault_mu)
 
     # Initialize total
-    ux_cutde_total = np.zeros((obs_n, obs_n))
-    uy_cutde_total = np.zeros((obs_n, obs_n))
-    uz_cutde_total = np.zeros((obs_n, obs_n))
+    ux_cutde_total = zeros((obs_n, obs_n))
+    uy_cutde_total = zeros((obs_n, obs_n))
+    uz_cutde_total = zeros((obs_n, obs_n))
 
     for ksub in range(Nsubfaults):
         if ksub % 10 == 0:
@@ -758,33 +781,49 @@ def write_Okada_displacements(directory: Union[pathlib.Path, str] = pathlib.Path
         ###from current subfault (rather than hypocenter) to lon/lat grid defined earlier ###
         fwd_az, b_az, distance_m = pyproj.Geod.inv(
             g,
-            fault_lon[ksub] * np.ones(np.shape(xLons)),
-            fault_lat[ksub] * np.ones(np.shape(xLats)),
+            fault_lon[ksub] * ones(shape(xLons)),
+            fault_lat[ksub] * ones(shape(xLats)),
             xLons,
             xLats,
         )
         distance_km = distance_m / 1000.0
-        obs_x_vec_ll = distance_km * np.sin(np.deg2rad(fwd_az))
-        obs_y_vec_ll = distance_km * np.cos(np.deg2rad(fwd_az))
+        obs_x_vec_ll = distance_km * sin(deg2rad(fwd_az))
+        obs_y_vec_ll = distance_km * cos(deg2rad(fwd_az))
 
-        obs_x_mat, obs_y_mat = np.meshgrid(obs_x_vec_ll, obs_y_vec_ll)
+        obs_x_mat, obs_y_mat = meshgrid(obs_x_vec_ll, obs_y_vec_ll)
 
         # cutde displacement calculation
-        ux_okada_cutde = np.zeros((obs_n, obs_n))
-        uy_okada_cutde = np.zeros((obs_n, obs_n))
-        uz_okada_cutde = np.zeros((obs_n, obs_n))
+        ux_okada_cutde = zeros((obs_n, obs_n))
+        uy_okada_cutde = zeros((obs_n, obs_n))
+        uz_okada_cutde = zeros((obs_n, obs_n))
 
-
-        rot_x_mat, rot_y_mat = strike_rotation(fault_strike[ksub], obs_x_mat, obs_y_mat, direction="fwd")
+        rot_x_mat, rot_y_mat = strike_rotation(
+            fault_strike[ksub], obs_x_mat, obs_y_mat, direction="fwd"
+        )
 
         # Call the displacement calculation
-        ux_okada_cutde, uy_okada_cutde, uz_okada_cutde = get_gridded_okada_displacements_cutde(
-            rot_x_mat, rot_y_mat, obs_z_mat, fault_depth[ksub], fault_dip[ksub], fault_half_length, fault_half_width, 
-            fault_strike_slip[ksub], fault_dip_slip[ksub], fault_tensile_slip[ksub], fault_alpha
+        (
+            ux_okada_cutde,
+            uy_okada_cutde,
+            uz_okada_cutde,
+        ) = get_gridded_okada_displacements_cutde(
+            rot_x_mat,
+            rot_y_mat,
+            obs_z_mat,
+            fault_depth[ksub],
+            fault_dip[ksub],
+            fault_half_length,
+            fault_half_width,
+            fault_strike_slip[ksub],
+            fault_dip_slip[ksub],
+            fault_tensile_slip[ksub],
+            fault_alpha,
         )
 
         # un rotate
-        unrot_ux_okada_cutde, unrot_uy_okada_cutde = strike_rotation(fault_strike[ksub], ux_okada_cutde, uy_okada_cutde, direction="inv")
+        unrot_ux_okada_cutde, unrot_uy_okada_cutde = strike_rotation(
+            fault_strike[ksub], ux_okada_cutde, uy_okada_cutde, direction="inv"
+        )
 
         ux_cutde_total += unrot_ux_okada_cutde
         uy_cutde_total += unrot_uy_okada_cutde
@@ -793,14 +832,24 @@ def write_Okada_displacements(directory: Union[pathlib.Path, str] = pathlib.Path
     with open(directory / "surface_deformation.disp", "w") as DISPout:
         DISPout.write(
             "#Longitude, Latitude, Elevation, Easting Displacement (m), Northing Displacement (m), Vertical Displacement (m)\n"
-        )       
+        )
         for kpt in range(len(gridLon.flatten())):
             DISPout.write(
                 "%10.4f \t %10.4f \t %10.4f \t %10.4f \t %10.4f \t %10.4f \n"
-                % (gridLon.flatten()[kpt], gridLat.flatten()[kpt], 0, ux_cutde_total.flatten()[kpt], uy_cutde_total.flatten()[kpt], uz_cutde_total.flatten()[kpt]) 
-            )       
+                % (
+                    gridLon.flatten()[kpt],
+                    gridLat.flatten()[kpt],
+                    0,
+                    ux_cutde_total.flatten()[kpt],
+                    uy_cutde_total.flatten()[kpt],
+                    uz_cutde_total.flatten()[kpt],
+                )
+            )
 
-    plot_okada_map(directory, gridLon, gridLat, ux_cutde_total, uy_cutde_total, uz_cutde_total)
+    plot_okada_map(
+        directory, gridLon, gridLat, ux_cutde_total, uy_cutde_total, uz_cutde_total
+    )
+
 
 def get_top_bottom_from_center(center_depth, width, dip):
     """
@@ -815,8 +864,8 @@ def get_top_bottom_from_center(center_depth, width, dip):
     :returns: top and bottom of fault plane, in km
     :rtype: float, float
     """
-    top = center_depth - (width / 2.0 * np.sin(np.deg2rad(dip)))
-    bottom = center_depth + (width / 2.0 * np.sin(np.deg2rad(dip)))
+    top = center_depth - (width / 2.0 * sin(deg2rad(dip)))
+    bottom = center_depth + (width / 2.0 * sin(deg2rad(dip)))
     return top, bottom
 
 
@@ -828,14 +877,14 @@ def get_four_corners_eastwest_fault(fault_depth, dip, half_length, half_width):
     """
     top, bottom = get_top_bottom_from_center(fault_depth, half_width * 2, dip)
     west_point, east_point = -half_length, half_length
-    north_point, south_point = half_width * np.cos(
-        np.deg2rad(dip)
-    ), -half_width * np.cos(np.deg2rad(dip))
+    north_point, south_point = half_width * cos(deg2rad(dip)), -half_width * cos(
+        deg2rad(dip)
+    )
     c1 = (west_point, north_point, top)
     c2 = (east_point, north_point, top)
     c3 = (east_point, south_point, bottom)
     c4 = (west_point, south_point, bottom)
-    cutde_fault_pts = np.array(
+    cutde_fault_pts = array(
         [
             [west_point, north_point, -top],
             [east_point, north_point, -top],
@@ -855,9 +904,10 @@ def okada_wrapper_to_cutde(half_length, half_width, depth, dip, ss, ds, ts):
     cutde_fault_pts = get_four_corners_eastwest_fault(
         depth, dip, half_length, half_width
     )
-    cutde_fault_tris = np.array([[0, 1, 2], [0, 2, 3]], dtype=np.int64)
-    cutde_slip = np.array([[ss, ds, ts], [ss, ds, ts]])
+    cutde_fault_tris = array([[0, 1, 2], [0, 2, 3]], dtype=int64)
+    cutde_slip = array([[ss, ds, ts], [ss, ds, ts]])
     return cutde_fault_pts, cutde_fault_tris, cutde_slip
+
 
 def dc3dwrapper_cutde(
     fault_alpha,
@@ -882,7 +932,9 @@ def dc3dwrapper_cutde(
         slip[2],
     )
 
-    obs_pts = np.array([coords[0], coords[1], -coords[2]]).reshape((3, -1)).T.copy()    # negative sign for depth in cutde
+    obs_pts = (
+        array([coords[0], coords[1], -coords[2]]).reshape((3, -1)).T.copy()
+    )  # negative sign for depth in cutde
 
     # Calculate cutde displacements partial derivatives
     u_mat_cutde = half_space.disp_matrix(
@@ -899,42 +951,62 @@ def dc3dwrapper_cutde(
         obs_pts=obs_pts,
         tris=cutde_fault_pts[cutde_fault_tris],
         nu=fault_nu,
-    )    
-    strain = strain_mat_cutde.reshape((-1, np.size(cutde_slip))).dot(cutde_slip.flatten())  # reshape by len total slip vector
+    )
+    strain = strain_mat_cutde.reshape((-1, size(cutde_slip))).dot(
+        cutde_slip.flatten()
+    )  # reshape by len total slip vector
     # strain[:,0] is the xx component of strain, 1 is yy, 2 is zz, 3 is xy, 4 is xz, and 5 is yz.
-    strain_tensor = np.array([[strain[0], strain[3], strain[4]],
-                              [strain[3], strain[1], strain[5]],
-                              [strain[4], strain[5], strain[2]]])
+    strain_tensor = array(
+        [
+            [strain[0], strain[3], strain[4]],
+            [strain[3], strain[1], strain[5]],
+            [strain[4], strain[5], strain[2]],
+        ]
+    )
 
     success = 1
     grad_u_cutde = 0  # cutde produces the strain tensor directly, not the displacement gradient tensor which must be converted to strain
     return success, u_cutde, strain_tensor
 
-def get_gridded_okada_displacements_cutde(obs_x_mat, obs_y_mat, obs_z_mat, fault_depth, fault_dip, fault_half_length, fault_half_width, fault_strike_slip, fault_dip_slip, fault_tensile_slip, fault_alpha):
-    ux_okada_cutde = np.zeros(len(obs_x_mat.flatten()))
-    uy_okada_cutde = np.zeros(len(obs_x_mat.flatten()))
-    uz_okada_cutde = np.zeros(len(obs_x_mat.flatten()))
+
+def get_gridded_okada_displacements_cutde(
+    obs_x_mat,
+    obs_y_mat,
+    obs_z_mat,
+    fault_depth,
+    fault_dip,
+    fault_half_length,
+    fault_half_width,
+    fault_strike_slip,
+    fault_dip_slip,
+    fault_tensile_slip,
+    fault_alpha,
+):
+    ux_okada_cutde = zeros(len(obs_x_mat.flatten()))
+    uy_okada_cutde = zeros(len(obs_x_mat.flatten()))
+    uz_okada_cutde = zeros(len(obs_x_mat.flatten()))
     for kpt in range(len(obs_x_mat.flatten())):
         _, u, strain_tensor = dc3dwrapper_cutde(
-                fault_alpha,
-                [
-                    obs_x_mat.flatten()[kpt],
-                    obs_y_mat.flatten()[kpt],
-                    obs_z_mat.flatten()[kpt],
-                ],  # variable depths
-                fault_depth,
-                fault_dip,
-                [-fault_half_length, fault_half_length],
-                [-fault_half_width, fault_half_width],
-                [fault_strike_slip, fault_dip_slip, fault_tensile_slip],
-            )
+            fault_alpha,
+            [
+                obs_x_mat.flatten()[kpt],
+                obs_y_mat.flatten()[kpt],
+                obs_z_mat.flatten()[kpt],
+            ],  # variable depths
+            fault_depth,
+            fault_dip,
+            [-fault_half_length, fault_half_length],
+            [-fault_half_width, fault_half_width],
+            [fault_strike_slip, fault_dip_slip, fault_tensile_slip],
+        )
         ux_okada_cutde[kpt] = u[0]
         uy_okada_cutde[kpt] = u[1]
-        uz_okada_cutde[kpt] = u[2]    
-    ux_okada_cutde = ux_okada_cutde.reshape(np.shape(obs_x_mat))
-    uy_okada_cutde = uy_okada_cutde.reshape(np.shape(obs_x_mat))
-    uz_okada_cutde = uz_okada_cutde.reshape(np.shape(obs_x_mat))
+        uz_okada_cutde[kpt] = u[2]
+    ux_okada_cutde = ux_okada_cutde.reshape(shape(obs_x_mat))
+    uy_okada_cutde = uy_okada_cutde.reshape(shape(obs_x_mat))
+    uz_okada_cutde = uz_okada_cutde.reshape(shape(obs_x_mat))
     return ux_okada_cutde, uy_okada_cutde, uz_okada_cutde
+
 
 def strike_rotation(fault_strike, x_matrix_in, y_matrix_in, direction="fwd"):
     # Rotate for strike:
@@ -946,22 +1018,26 @@ def strike_rotation(fault_strike, x_matrix_in, y_matrix_in, direction="fwd"):
     else:
         print("Invalid direction, choose either 'fwd' or 'inv'")
         return
-    theta = np.deg2rad(theta)
-    rotation_matrix = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
+    theta = deg2rad(theta)
+    rotation_matrix = array([[cos(theta), -sin(theta)], [sin(theta), cos(theta)]])
 
-    rot_x_mat = np.zeros(len(x_matrix_in.flatten()))
-    rot_y_mat = np.zeros(len(y_matrix_in.flatten()))
-
+    rot_x_mat = zeros(len(x_matrix_in.flatten()))
+    rot_y_mat = zeros(len(y_matrix_in.flatten()))
 
     for kxy in range(len(rot_x_mat)):
-        xy = rotation_matrix.dot(np.array([[x_matrix_in.flatten()[kxy]], [y_matrix_in.flatten()[kxy]]]))
+        xy = rotation_matrix.dot(
+            array([[x_matrix_in.flatten()[kxy]], [y_matrix_in.flatten()[kxy]]])
+        )
         rot_x_mat[kxy] = xy[0][0]
         rot_y_mat[kxy] = xy[1][0]
-    rot_x_mat = rot_x_mat.reshape(np.shape(x_matrix_in))
-    rot_y_mat = rot_y_mat.reshape(np.shape(y_matrix_in))
+    rot_x_mat = rot_x_mat.reshape(shape(x_matrix_in))
+    rot_y_mat = rot_y_mat.reshape(shape(y_matrix_in))
     return rot_x_mat, rot_y_mat
 
-def plot_okada_map(directory, gridx, gridy, ux_okada_cutde, uy_okada_cutde, uz_okada_cutde):
+
+def plot_okada_map(
+    directory, gridx, gridy, ux_okada_cutde, uy_okada_cutde, uz_okada_cutde
+):
     default_dirs = mng.default_dirs()
     min_lon = min(gridx.flatten())
     max_lon = max(gridx.flatten())
@@ -969,10 +1045,10 @@ def plot_okada_map(directory, gridx, gridy, ux_okada_cutde, uy_okada_cutde, uz_o
     max_lat = max(gridy.flatten())
     region = [min_lon, max_lon, min_lat, max_lat]
     ### Fix region to nearest tenth of a degree ###
-    region[0] = np.floor(region[0] * 10) / 10.0
-    region[1] = np.ceil(region[1] * 10) / 10.0
-    region[2] = np.floor(region[2] * 10) / 10.0
-    region[3] = np.ceil(region[3] * 10) / 10.0
+    region[0] = floor(region[0] * 10) / 10.0
+    region[1] = ceil(region[1] * 10) / 10.0
+    region[2] = floor(region[2] * 10) / 10.0
+    region[3] = ceil(region[3] * 10) / 10.0
 
     ################################
     ### PLOT BASEMAP/ COASTLINES ###
@@ -998,7 +1074,7 @@ def plot_okada_map(directory, gridx, gridy, ux_okada_cutde, uy_okada_cutde, uz_o
         + map_scale_len
         + "+ar+l+jBL+o0.5/0.5+f"
     )
-    frame=["WSen", "xa1f0.5", "ya1f0.5"]
+    frame = ["WSen", "xa1f0.5", "ya1f0.5"]
 
     pygmt.config(
         PS_MEDIA="A0",
@@ -1016,18 +1092,25 @@ def plot_okada_map(directory, gridx, gridy, ux_okada_cutde, uy_okada_cutde, uz_o
         FONT_TITLE="18p,Helvetica,black",
         MAP_ANNOT_OFFSET_PRIMARY="3p",
     )
-    
+
     ### Horizontal Displacement ###
-    fig.basemap(region=region, projection=projection, frame=["WSen+tHorizontal Surface Displacement", "xa1f0.5", "ya1f0.5"], map_scale=map_scale)
+    fig.basemap(
+        region=region,
+        projection=projection,
+        frame=["WSen+tHorizontal Surface Displacement", "xa1f0.5", "ya1f0.5"],
+        map_scale=map_scale,
+    )
     horizontal_cutde = (ux_okada_cutde**2 + uy_okada_cutde**2) ** 0.5
     max_horiz = max(horizontal_cutde.flatten())
     xx, yy, zz = gridx.flatten(), gridy.flatten(), horizontal_cutde.flatten()
-    grid = pygmt.xyz2grd(
-        x=xx, y=yy, z=zz, spacing=(0.12), region=region
+    grid = pygmt.xyz2grd(x=xx, y=yy, z=zz, spacing=(0.12), region=region)
+    minmax_horiz = (ceil(max_horiz * 10)) / 10.0  # ceil to the nearest 0.1
+    annotation = (floor(minmax_horiz * 10 / 2)) / 10  # contour annotation
+    pygmt.makecpt(
+        cmap=str(default_dirs["root_dir"]) + "/src/wasp/lajolla_white.cpt",
+        reverse=True,
+        series=[0, minmax_horiz],
     )
-    minmax_horiz = (np.ceil(max_horiz*10)) / 10. #ceil to the nearest 0.1
-    annotation = (np.floor(minmax_horiz*10 / 2)) / 10 #contour annotation
-    pygmt.makecpt(cmap=str(default_dirs["root_dir"]) + "/src/wasp/lajolla_white.cpt", reverse=True, series=[0, minmax_horiz])
     fig.grdimage(grid=grid, projection=projection, frame=frame)
     fig.grdcontour(
         # Pass in the grid made above
@@ -1035,7 +1118,7 @@ def plot_okada_map(directory, gridx, gridy, ux_okada_cutde, uy_okada_cutde, uz_o
         # Set the interval for annotated contour lines at 0.5m
         annotation=annotation,
         projection=projection,
-        pen="1p,gray40"
+        pen="1p,gray40",
     )
     fig.colorbar(frame=["x+lDisplacement (m)"])
     nth = 31
@@ -1043,23 +1126,23 @@ def plot_okada_map(directory, gridx, gridy, ux_okada_cutde, uy_okada_cutde, uz_o
         data={
             "x": gridx.flatten()[::nth],
             "y": gridy.flatten()[::nth],
-            "east_velocity": ux_okada_cutde.flatten()[::nth]/(max_horiz/3),
-            "north_velocity": uy_okada_cutde.flatten()[::nth]/(max_horiz/3),
+            "east_velocity": ux_okada_cutde.flatten()[::nth] / (max_horiz / 3),
+            "north_velocity": uy_okada_cutde.flatten()[::nth] / (max_horiz / 3),
         }
     )
-    
+
     fig.coast(resolution="h", shorelines="1p,black")
     fig.plot(
-    str(default_dirs["root_dir"]) + "/pb2002_boundaries.gmt",
-    style="f10/3p",
-    region=region,
-    pen="2p,white",
+        str(default_dirs["root_dir"]) + "/pb2002_boundaries.gmt",
+        style="f10/3p",
+        region=region,
+        pen="2p,white",
     )
     fig.plot(
-    str(default_dirs["root_dir"]) + "/pb2002_boundaries.gmt",
-    style="f10/3p",
-    region=region,
-    pen="1p,black",
+        str(default_dirs["root_dir"]) + "/pb2002_boundaries.gmt",
+        style="f10/3p",
+        region=region,
+        pen="1p,black",
     )
 
     fig.velo(
@@ -1072,16 +1155,20 @@ def plot_okada_map(directory, gridx, gridy, ux_okada_cutde, uy_okada_cutde, uz_o
         vector="0.2c+p2p,gray30+e+ggray30+a55+n",
     )
 
-    
     ### Vertical Displacement ###
     fig.shift_origin(xshift="13c")
-    fig.basemap(region=region, projection=projection, frame=["WSen+tVertical Surface Displacement", "xa1f0.5", "ya1f0.5"], map_scale=map_scale)
-    xx, yy, zz = gridx.flatten(), gridy.flatten(), uz_okada_cutde.flatten()
-    grid = pygmt.xyz2grd(
-        x=xx, y=yy, z=zz, spacing=(0.13), region=region
+    fig.basemap(
+        region=region,
+        projection=projection,
+        frame=["WSen+tVertical Surface Displacement", "xa1f0.5", "ya1f0.5"],
+        map_scale=map_scale,
     )
-    minmax_uz = (np.ceil(max(abs(uz_okada_cutde.flatten())) * 10)) / 10. # ceil to the nearest 0.1
-    annotation = (np.floor(minmax_uz*10 / 2)) / 10 # contour annotation
+    xx, yy, zz = gridx.flatten(), gridy.flatten(), uz_okada_cutde.flatten()
+    grid = pygmt.xyz2grd(x=xx, y=yy, z=zz, spacing=(0.13), region=region)
+    minmax_uz = (
+        ceil(max(abs(uz_okada_cutde.flatten())) * 10)
+    ) / 10.0  # ceil to the nearest 0.1
+    annotation = (floor(minmax_uz * 10 / 2)) / 10  # contour annotation
 
     pygmt.makecpt(cmap="polar", series=[-minmax_uz, minmax_uz])
     fig.grdimage(grid=grid, projection=projection, frame=frame)
@@ -1091,23 +1178,21 @@ def plot_okada_map(directory, gridx, gridy, ux_okada_cutde, uy_okada_cutde, uz_o
         # Set the interval for annotated contour lines at 0.5m
         annotation=annotation,
         projection=projection,
-        pen="1p,gray40"
+        pen="1p,gray40",
     )
     fig.colorbar(frame=["x+lDisplacement (m)"])
     fig.coast(resolution="h", shorelines="1p,black")
     fig.plot(
-    str(default_dirs["root_dir"]) + "/pb2002_boundaries.gmt",
-    style="f10/3p",
-    region=region,
-    pen="2p,white",
+        str(default_dirs["root_dir"]) + "/pb2002_boundaries.gmt",
+        style="f10/3p",
+        region=region,
+        pen="2p,white",
     )
     fig.plot(
-    str(default_dirs["root_dir"]) + "/pb2002_boundaries.gmt",
-    style="f10/3p",
-    region=region,
-    pen="1p,black",
+        str(default_dirs["root_dir"]) + "/pb2002_boundaries.gmt",
+        style="f10/3p",
+        region=region,
+        pen="1p,black",
     )
 
     fig.savefig(directory / "Okada_Displacement.png")
-
-
