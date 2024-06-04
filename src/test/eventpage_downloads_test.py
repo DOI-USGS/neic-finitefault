@@ -134,13 +134,13 @@ def test_write_Okada_displacements():
         tempdir = pathlib.Path(tempdir)
         for f in ["fsp_sol_file.txt", "Solucion.txt"]:
             shutil.copyfile(RESULTS_DIR / "NP1" / f, tempdir / f)
-        write_Okada_displacements(tempdir)
+        write_Okada_displacements(END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir)
         with open(tempdir / "surface_deformation.disp", "r") as f:
             disp = f.read()
         with open(RESULTS_DIR / "NP1" / "surface_deformation.disp") as f:
             disp_target = f.read()
         assert disp == disp_target
-        assert (tempdir / "Horizontal_Surface_Displacement.png").exists()
-        assert (tempdir / "Vertical_Surface_Displacement.png").exists()
+        assert (tempdir / "Okada_Displacement.png").exists()
+        #assert (tempdir / "Vertical_Surface_Displacement.png").exists()
     finally:
         shutil.rmtree(tempdir)

@@ -12,10 +12,10 @@ from collections import Counter
 from glob import glob
 from typing import List, Optional, Union
 
-import cutde.halfspace as half_space
+import cutde.halfspace as half_space  # type:ignore
 import matplotlib.pyplot as plt  # type: ignore
-import pandas as pd
-import pygmt
+import pandas as pd  # type:ignore
+import pygmt  # type:ignore
 import pyproj  # type: ignore
 from numpy import (
     array,
@@ -626,7 +626,6 @@ def write_Coulomb_file(
                 sf_length_ad = float(line.split()[9])  # Subfault length along dip
             if line.startswith("% Nsbfs"):
                 nft += int(line.split()[3])  # number of subfaults
-    print(nft)
     ##########################################################################
     ########################### WRITE HEADER INFO ############################
     ##########################################################################
@@ -923,7 +922,10 @@ def write_Coulomb_file(
 
 
 ### OKADA FUNCTIONS ###
-def write_Okada_displacements(directory: Union[pathlib.Path, str] = pathlib.Path()):
+def write_Okada_displacements(
+    pdefile: Optional[Union[pathlib.Path, str]] = None, 
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+):
     """Write out the Okada displacements
 
     :param directory: The directory where to write the file(s), defaults to pathlib.Path()
@@ -935,11 +937,15 @@ def write_Okada_displacements(directory: Union[pathlib.Path, str] = pathlib.Path
     ##########################
     #### FAULT INFORMATION ###
     ##########################
-    with open(directory / "fsp_sol_file.txt", "r") as fsp:
-        for line in fsp:
-            if line.startswith("% Loc"):
-                hypo_lat = float(line.split()[5])
-                hypo_lon = float(line.split()[8])
+    if pdefile is None:
+        pdefile = pathlib.Path(glob("../../../info/*_cmt_CMT")[0])
+    else:
+        pdefile = pathlib.Path(pdefile)
+    with open(pdefile, "r") as pdef:
+        lines = pdef.readlines()
+        pde = lines[0]
+        hypo_lat = float(pde.split()[8])
+        hypo_lon = float(pde.split()[9])
     fault_lat: List[float] = []
     fault_lon: List[float] = []
     fault_depth: List[float] = []
@@ -948,7 +954,7 @@ def write_Okada_displacements(directory: Union[pathlib.Path, str] = pathlib.Path
     fault_tensile_slip: List[float] = []
     fault_strike: List[float] = []
     fault_dip: List[float] = []
-    with open("Solucion.txt", "r") as sol:
+    with open(directory / "Solucion.txt", "r") as sol:
         for line in sol:
             if line.startswith("#Fault_segment"):
                 sf_length = float(line.split()[7].split("km")[0])
@@ -988,9 +994,9 @@ def write_Okada_displacements(directory: Union[pathlib.Path, str] = pathlib.Path
                 fault_strike.append(float(strike))
                 fault_dip.append(float(dip))
     Nsubfaults = len(fault_lon)
-    obs_n = 50
-    obs_x_vec = linspace(-250, 250, obs_n)
-    obs_y_vec = linspace(-250, 250, obs_n)
+    obs_n = 40
+    obs_x_vec = linspace(-400, 400, obs_n)
+    obs_y_vec = linspace(-400, 400, obs_n)
     obs_z_vec = zeros(obs_n)
     obs_x_mat, obs_y_mat = meshgrid(obs_x_vec, obs_y_vec)
     obs_z_mat = zeros((obs_n, obs_n))  # performing calculation at the surface, z = 0
@@ -1375,6 +1381,8 @@ def plot_okada_map(
     grid = pygmt.xyz2grd(x=xx, y=yy, z=zz, spacing=(0.12), region=region)
     minmax_horiz = (ceil(max_horiz * 10)) / 10.0  # ceil to the nearest 0.1
     annotation = (floor(minmax_horiz * 10 / 2)) / 10  # contour annotation
+    if annotation == 0:
+        annotation = 0.1
     pygmt.makecpt(
         cmap=str(default_dirs["root_dir"]) + "/src/wasp/lajolla_white.cpt",
         reverse=True,
@@ -1438,7 +1446,8 @@ def plot_okada_map(
         ceil(max(abs(uz_okada_cutde.flatten())) * 10)
     ) / 10.0  # ceil to the nearest 0.1
     annotation = (floor(minmax_uz * 10 / 2)) / 10  # contour annotation
-
+    if annotation == 0:
+        annotation = 0.1
     pygmt.makecpt(cmap="polar", series=[-minmax_uz, minmax_uz])
     fig.grdimage(grid=grid, projection=projection, frame=frame)
     fig.grdcontour(
