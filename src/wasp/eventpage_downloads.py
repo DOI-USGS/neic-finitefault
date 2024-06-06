@@ -923,7 +923,7 @@ def write_Coulomb_file(
 
 ### OKADA FUNCTIONS ###
 def write_Okada_displacements(
-    pdefile: Optional[Union[pathlib.Path, str]] = None, 
+    pdefile: Optional[Union[pathlib.Path, str]] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """Write out the Okada displacements

@@ -141,6 +141,6 @@ def test_write_Okada_displacements():
             disp_target = f.read()
         assert disp == disp_target
         assert (tempdir / "Okada_Displacement.png").exists()
-        #assert (tempdir / "Vertical_Surface_Displacement.png").exists()
+        # assert (tempdir / "Vertical_Surface_Displacement.png").exists()
     finally:
         shutil.rmtree(tempdir)
