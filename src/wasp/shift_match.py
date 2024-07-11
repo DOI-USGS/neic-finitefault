@@ -58,22 +58,22 @@ def shift_match2(
     synthetics_file = (
         "synthetics_body.txt"
         if data_type == "body"
-        else "synthetics_strong.txt"
-        if data_type == "strong"
-        else "synthetics_surf.txt"
-        if data_type == "surf"
-        else "synm.cgps"
+        else (
+            "synthetics_strong.txt"
+            if data_type == "strong"
+            else "synthetics_surf.txt" if data_type == "surf" else "synm.cgps"
+        )
     )
 
     dt = float(files[0]["dt"])
     plot_folder: Union[pathlib.Path, str] = (
         "tele_shift"
         if data_type == "body"
-        else "strong_shift"
-        if data_type == "strong"
-        else "surf_shift"
-        if data_type == "surf"
-        else "cgps_shift"
+        else (
+            "strong_shift"
+            if data_type == "strong"
+            else "surf_shift" if data_type == "surf" else "cgps_shift"
+        )
     )
     files = get_outputs.get_data_dict(
         files, syn_file=synthetics_file, directory=directory
@@ -108,11 +108,11 @@ def shift_match2(
         nshift = (
             int(5 / dt)
             if data_type == "body"
-            else int(5 / dt)
-            if data_type == "strong"
-            else int(12 / dt)
-            if data_type == "surf"
-            else int(4 / dt)
+            else (
+                int(5 / dt)
+                if data_type == "strong"
+                else int(12 / dt) if data_type == "surf" else int(4 / dt)
+            )
         )
         lengths = [int(float(file["duration"])) for file in files2]
         length = np.min(np.array(lengths))

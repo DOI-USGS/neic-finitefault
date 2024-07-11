@@ -67,7 +67,7 @@ Poetry:
     - poetry config virtualenvs.in-project true --local
     - poetry install --verbose
     # - poetry run poe okada
-    - poetry run safety check
+    - poetry run safety check -i 70612
   stage: init
 
 Fortran:

@@ -141,7 +141,11 @@ def test_plane_tensor_def():
 
 
 def test_point_sources_def():
-    assert _point_sources_def(SEGMENTS["rise_time"], 2.5, SEGMENTS["segments"][0],) == {
+    assert _point_sources_def(
+        SEGMENTS["rise_time"],
+        2.5,
+        SEGMENTS["segments"][0],
+    ) == {
         "dip_ps": 5,
         "dx": 3.585521739130434,
         "dy": 2.9848706416473174,
