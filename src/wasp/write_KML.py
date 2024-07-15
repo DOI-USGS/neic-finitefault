@@ -500,10 +500,10 @@ def PlotMap_KML(
         margins = [min_lon - 0.5, max_lon + 0.5, min_lat - 0.5, max_lat + 0.5]
     else:
         margins = [
-            min_lon - limits[0],
-            max_lon + limits[1],
-            min_lat - limits[2],
-            max_lat + limits[3],
+            limits[0],
+            limits[1],
+            limits[2],
+            limits[3],
         ]
 
     ax.add_patch(
