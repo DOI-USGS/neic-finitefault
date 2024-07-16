@@ -74,9 +74,7 @@ def kml(
         "-ml",
         "--map-limits",
         help=(
-            "Specify map limits [W,E,N,S] from edges of plotted features. "
-            "eg: 0.5 0.5 0.5 0.5 gives a 0.5 degree buffer on each side. "
-            "Negative numbers will cut off plotted features."
+            "Specify map limits [W,E,N,S] in latitude and longitude (decimal degrees)"
         ),
     ),
     max_slip: float = typer.Option(
@@ -203,9 +201,7 @@ def map(
         "-ml",
         "--map-limits",
         help=(
-            "Specify map limits [W,E,N,S] from edges of plotted features. "
-            "eg: 0.5 0.5 0.5 0.5 gives a 0.5 degree buffer on each side. "
-            "Negative numbers will cut off plotted features."
+            "Specify map limits [W,E,N,S] in latitude and longitude (decimal degrees)"
         ),
     ),
     max_slip: float = typer.Option(
@@ -356,9 +352,7 @@ def neic(
         "-ml",
         "--map-limits",
         help=(
-            "Specify map limits [W,E,N,S] from edges of plotted features. "
-            "eg: 0.5 0.5 0.5 0.5 gives a 0.5 degree buffer on each side. "
-            "Negative numbers will cut off plotted features."
+            "Specify map limits [W,E,N,S] in latitude and longitude (decimal degrees)"
         ),
     ),
     max_slip: float = typer.Option(
