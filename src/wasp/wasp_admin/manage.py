@@ -756,6 +756,9 @@ def tensor_from_gcmt(
 
 @app.command(help="Update the input data dict after changes")
 def update_inputs(
+    directory: pathlib.Path = typer.Argument(
+        ..., help="Path to the directory to read/write from"
+    ),
     annealing: bool = typer.Option(
         False, "-a", "--annealing", help="Compute files for annealing"
     ),
@@ -767,12 +770,6 @@ def update_inputs(
         "-t",
         "--data-type",
         help="Type to add to the data_types list, default is []",
-    ),
-    directory: pathlib.Path = typer.Option(
-        pathlib.Path(),
-        "-d",
-        "--directory",
-        help="Directory where to write the tensor file. Default is working directory",
     ),
     model_space: bool = typer.Option(
         False, "-m", "--model_space", help="compute files for model space"
