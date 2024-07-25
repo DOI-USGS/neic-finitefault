@@ -368,9 +368,7 @@ def shear_modulous(point_sources: list, velmodel: Optional[dict] = None) -> list
                 dep_p = depth_sources[i, j, dip_ps // 2, strike_ps // 2]
                 source_layer = __source_layer(thick, dep_p)
                 niu = (
-                    float(vel_s[source_layer]) ** 2
-                    * float(dens[source_layer])
-                    * 10**10
+                    float(vel_s[source_layer]) ** 2 * float(dens[source_layer]) * 10**10
                 )
                 matrix[i, j] = niu
         shear[segment] = matrix

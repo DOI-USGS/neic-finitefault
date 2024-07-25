@@ -59,11 +59,11 @@ def manual_shift(
     synthetics_file = (
         "synthetics_body.txt"
         if data_type == "body"
-        else "synthetics_strong.txt"
-        if data_type == "strong"
-        else "synthetics_surf.txt"
-        if data_type == "surf"
-        else "synm.cgps"
+        else (
+            "synthetics_strong.txt"
+            if data_type == "strong"
+            else "synthetics_surf.txt" if data_type == "surf" else "synm.cgps"
+        )
     )
     files = get_outputs.get_data_dict(
         files, syn_file=synthetics_file, directory=directory
@@ -183,11 +183,11 @@ def plot_shift(
     plot_folder: Union[pathlib.Path, str] = (
         "tele_shift"
         if data_type == "body"
-        else "strong_shift"
-        if data_type == "strong"
-        else "surf_shift"
-        if data_type == "surf"
-        else "cgps_shift"
+        else (
+            "strong_shift"
+            if data_type == "strong"
+            else "surf_shift" if data_type == "surf" else "cgps_shift"
+        )
     )
     if not os.path.isdir(plot_folder):
         os.mkdir(plot_folder)
@@ -265,9 +265,7 @@ def shift_match2(
         else (
             "synthetics_strong.txt"
             if data_type == "strong"
-            else "synthetics_surf.txt"
-            if data_type == "surf"
-            else "synm.cgps"
+            else "synthetics_surf.txt" if data_type == "surf" else "synm.cgps"
         )
     )
 
@@ -278,9 +276,7 @@ def shift_match2(
         else (
             "strong_shift"
             if data_type == "strong"
-            else "surf_shift"
-            if data_type == "surf"
-            else "cgps_shift"
+            else "surf_shift" if data_type == "surf" else "cgps_shift"
         )
     )
     files = get_outputs.get_data_dict(
@@ -319,9 +315,7 @@ def shift_match2(
             else (
                 int(5 / dt)
                 if data_type == "strong"
-                else int(12 / dt)
-                if data_type == "surf"
-                else int(4 / dt)
+                else int(12 / dt) if data_type == "surf" else int(4 / dt)
             )
         )
         lengths = [int(float(file["duration"])) for file in files2]
