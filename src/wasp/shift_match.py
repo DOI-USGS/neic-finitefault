@@ -8,7 +8,8 @@ import glob
 import json
 import os
 import pathlib
-from typing import List, Optional, Tuple, Union
+from copy import copy
+from typing import Any, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt  # type:ignore
 import numpy as np
@@ -19,6 +20,208 @@ import wasp.seismic_tensor as tensor
 from wasp import get_outputs
 from wasp.many_events import select_waveforms_event
 from wasp.waveform_plots import plot_waveforms
+
+
+def manual_shift(
+    data_type: str,
+    station_dict: dict[Any, Any] = {},
+    plot: bool = False,
+    zero_start: bool = True,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+) -> list:
+    """Shift observed waveform in time by user-entered amount to better match synthetics.
+
+    :param data_type: The data type
+    :type data_type: str
+    :param plot: Whether to plot, defaults to False
+    :type plot: bool, optional
+    :param zero_start: Whether a zero start, defaults to True
+    :type zero_start: bool, optional
+    :param tr_shift: Amount of shift, in seconds
+    :type tr_shift: int
+    :param directory: Where the files should be read from, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
+    :return: The updated file properties
+    :rtype: list
+    """
+    directory = pathlib.Path(directory)
+    if data_type == "body":
+        json_file = "tele_waves.json"
+    if data_type == "strong":
+        json_file = "strong_motion_waves.json"
+    if data_type == "cgps":
+        json_file = "cgps_waves.json"
+    if data_type == "surf":
+        json_file = "surf_waves.json"
+    with open(directory / json_file) as f:
+        files = json.load(f)
+
+    synthetics_file = (
+        "synthetics_body.txt"
+        if data_type == "body"
+        else "synthetics_strong.txt"
+        if data_type == "strong"
+        else "synthetics_surf.txt"
+        if data_type == "surf"
+        else "synm.cgps"
+    )
+    files = get_outputs.get_data_dict(
+        files, syn_file=synthetics_file, directory=directory
+    )
+
+    stations = [channel["name"] for channel in files]
+    stations = list(set(stations))
+
+    for station, channel_shift in station_dict.items():
+        if station not in stations:  # Make sure station is in json
+            raise ValueError(
+                f"Selected station {station} does not belong to list of available stations"
+            )
+        if data_type in ["body", "surf"]:
+            for chosen_channels, tr_shift in channel_shift.items():
+                channels2 = [channel for channel in files if channel["name"] == station]
+                channels_station = [channel["component"] for channel in channels2]
+                synthetics = [channel["synthetic"] for channel in channels2]
+
+                if chosen_channels not in channels_station:
+                    raise ValueError(
+                        f"Selected component {chosen_channels} does not belong to list of available components: {channels_station}"
+                    )
+                channels_to_search = copy(chosen_channels)
+                for idx in range(len(files) - 1, -1, -1):
+                    channel = files[idx]
+                    if (
+                        channel["name"] == station
+                        and channel["component"] in chosen_channels
+                    ):
+                        dt = channel["dt"]
+                        waveform_start_signal = channel["start_signal"]
+                        sample_shift = int(
+                            -tr_shift / dt
+                        )  # negative tr_shift so that positive entry moves forward in time and negative moves backwards
+                        channel["start_signal"] = waveform_start_signal + sample_shift
+                        if plot:
+                            length = int(float(channel["duration"]))
+                            synthetic = channel["synthetic"]
+                            plot_shift(
+                                directory,
+                                data_type,
+                                dt,
+                                synthetic,
+                                channel,
+                                length,
+                                channel["name"],
+                                channel["component"],
+                                waveform_start_signal,
+                                sample_shift,
+                                zero_start=zero_start,
+                            )
+                        if zero_start:
+                            stream = read(channel["file"])
+                            new_baseline = stream[0].data[
+                                int(waveform_start_signal + tr_shift)
+                            ]
+                            stream[0].data = stream[0].data - new_baseline
+                            stream.write(channel["file"], format="SAC", byteorder=0)
+        else:  # strong and cgps data_type
+            tr_shift = channel_shift
+            for idx in range(len(files) - 1, -1, -1):
+                channel = files[idx]
+                if channel["name"] == station:
+                    dt = channel["dt"]
+                    waveform_start_signal = channel["start_signal"]
+                    sample_shift = int(
+                        -tr_shift / dt
+                    )  # neg tr_shift: positive entry moves fwd in time, negative entry moves bkwd
+                    channel["start_signal"] = waveform_start_signal + sample_shift
+                    if plot:
+                        length = int(float(channel["duration"]))
+                        synthetic = channel["synthetic"]
+                        plot_shift(
+                            directory,
+                            data_type,
+                            dt,
+                            synthetic,
+                            channel,
+                            length,
+                            channel["name"],
+                            channel["component"],
+                            waveform_start_signal,
+                            sample_shift,
+                            zero_start=zero_start,
+                        )
+                    if zero_start:
+                        stream = read(channel["file"])
+                        new_baseline = stream[0].data[
+                            int(waveform_start_signal + tr_shift)
+                        ]
+                        stream[0].data = stream[0].data - new_baseline
+                        stream.write(channel["file"], format="SAC", byteorder=0)
+
+    # reset synthetic and observed fields in json
+    for file in files:
+        file["synthetic"] = []
+        file["observed"] = []
+
+    return files
+
+
+def plot_shift(
+    directory,
+    data_type,
+    dt,
+    synthetic,
+    observed_file,
+    length,
+    station,
+    channel,
+    start,
+    sample_shift,
+    zero_start=True,
+):
+
+    plot_folder: Union[pathlib.Path, str] = (
+        "tele_shift"
+        if data_type == "body"
+        else "strong_shift"
+        if data_type == "strong"
+        else "surf_shift"
+        if data_type == "surf"
+        else "cgps_shift"
+    )
+    if not os.path.isdir(plot_folder):
+        os.mkdir(plot_folder)
+    fig, axes = plt.subplots(2, 1, figsize=(10, 5))
+    fig.text(0.04, 0.6, "Before Shift", va="center", rotation="vertical")
+    fig.text(0.04, 0.3, "After Shift", va="center", rotation="vertical")
+    fig.suptitle("{} {}".format(station, channel))
+    obs_times: list = []
+    syn_times: list = []
+    obs_waveforms: list = []
+    syn_waveforms: list = []
+
+    synthetic = synthetic[:length]
+    time1, observed0 = get_observed(observed_file, start, length, margin=10)
+    time0 = np.arange(len(synthetic)) * dt
+    min_val = np.minimum(np.min(observed0), np.min(synthetic))
+    max_val = np.maximum(np.max(observed0), np.max(synthetic))
+    start4 = int(start + sample_shift)
+    time2, observed1 = get_observed(
+        observed_file, start4, length, margin=10, zero_start=zero_start
+    )
+    time0 = np.arange(len(synthetic)) * dt
+    obs_times = [time1, time2]
+    syn_times = [time0, time0]
+    obs_waveforms = [observed0, observed1]
+    syn_waveforms = [synthetic, synthetic]
+    axes[1].axvline(0)
+    axes2 = axes.ravel()
+    axes2 = plot_waveforms(axes2, obs_times, obs_waveforms, color="black")
+    axes2 = plot_waveforms(axes2, syn_times, syn_waveforms, color="red", custom="fill")
+    name_file = os.path.join(plot_folder, "{}_{}.png".format(station, channel))
+    plt.savefig(directory / name_file)
+    print(f"Saved to {directory / name_file}")
+    plt.close(fig)
 
 
 def shift_match2(
@@ -62,7 +265,9 @@ def shift_match2(
         else (
             "synthetics_strong.txt"
             if data_type == "strong"
-            else "synthetics_surf.txt" if data_type == "surf" else "synm.cgps"
+            else "synthetics_surf.txt"
+            if data_type == "surf"
+            else "synm.cgps"
         )
     )
 
@@ -73,7 +278,9 @@ def shift_match2(
         else (
             "strong_shift"
             if data_type == "strong"
-            else "surf_shift" if data_type == "surf" else "cgps_shift"
+            else "surf_shift"
+            if data_type == "surf"
+            else "cgps_shift"
         )
     )
     files = get_outputs.get_data_dict(
@@ -112,7 +319,9 @@ def shift_match2(
             else (
                 int(5 / dt)
                 if data_type == "strong"
-                else int(12 / dt) if data_type == "surf" else int(4 / dt)
+                else int(12 / dt)
+                if data_type == "surf"
+                else int(4 / dt)
             )
         )
         lengths = [int(float(file["duration"])) for file in files2]

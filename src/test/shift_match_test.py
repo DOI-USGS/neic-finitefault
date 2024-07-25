@@ -49,12 +49,7 @@ def test_shift_match2():
         os.mkdir(tempdir / "data" / "SH")
         os.mkdir(tempdir / "data" / "P")
         os.mkdir(tempdir / "data" / "LONG")
-        for (
-            a,
-            b,
-            c,
-            d,
-        ) in zip(
+        for (a, b, c, d,) in zip(
             get_surf_waves_json(),
             new_surf_waves,
             get_tele_waves_json(),
@@ -105,12 +100,7 @@ def test_shift_match_regional():
         os.mkdir(tempdir / "data")
         os.mkdir(tempdir / "data" / "STR")
         os.mkdir(tempdir / "data" / "cGPS")
-        for (
-            a,
-            b,
-            c,
-            d,
-        ) in zip(
+        for (a, b, c, d,) in zip(
             get_strong_motion_json(),
             new_strong,
             get_cgps_json(),
@@ -155,10 +145,7 @@ def test__print_arrival():
                 json.dump(d, w)
         print(new_tele_waves)
         os.mkdir(tempdir / "data")
-        for (
-            a,
-            b,
-        ) in zip(
+        for (a, b,) in zip(
             get_tele_waves_json(),
             new_tele_waves,
         ):
