@@ -29,6 +29,7 @@ from wasp.eventpage_downloads import (
 )
 from wasp.static2fsp import static_to_fsp
 
+
 def test_make_waveproperties_json():
     tempdir = tempfile.mkdtemp()
     try:
@@ -98,56 +99,57 @@ def test_temporary_file_reorganization_for_publishing():
         shutil.rmtree(tempdir)
 
 
-#def test_write_CMTSOLUTION_file():
-#    tempdir = tempfile.mkdtemp()
-#    try:
-#        tempdir = pathlib.Path(tempdir)
-#        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
-#        write_CMTSOLUTION_file(END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir)
-#        with open(tempdir / "CMTSOLUTION", "r") as f:
-#            cmt = f.read()
-#        with open(RESULTS_DIR / "NP1" / "CMTSOLUTION") as f:
-#            cmt_target = f.read()
-#        assert cmt == cmt_target
-#    finally:
-#        shutil.rmtree(tempdir)
+def test_write_CMTSOLUTION_file():
+    tempdir = tempfile.mkdtemp()
+    try:
+        tempdir = pathlib.Path(tempdir)
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        write_CMTSOLUTION_file(END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir)
+        with open(tempdir / "CMTSOLUTION", "r") as f:
+            cmt = f.read()
+        with open(RESULTS_DIR / "NP1" / "CMTSOLUTION") as f:
+            cmt_target = f.read()
+        assert cmt == cmt_target
+    finally:
+        shutil.rmtree(tempdir)
 
 
-#def test_write_Coulomb_file():
-#    tempdir = tempfile.mkdtemp()
-#    try:
-#        tempdir = pathlib.Path(tempdir)
-#        for f in ["Solucion.txt"]:
-#            shutil.copyfile(RESULTS_DIR / "NP1" / f, tempdir / f)
-#        shutil.copyfile(
-#            RESULTS_DIR / "NP1" / "static_data.json",
-#            tempdir / "static_data.json",
-#        )
-#        segments = get_segments_data()
-#        solution = get_outputs.read_solution_static_format(
-#            segments["segments"], tempdir
-#        )
-#        static_to_fsp(
-#            get_tensor_info(),
-#            segments,
-#            ["gps"],
-#            get_velmodel_data(),
-#            solution,
-#            tempdir,
-#        )
-#        write_Coulomb_file(tempdir, "us20003k7a")
-#        with open(tempdir / "Coulomb.inp", "r") as f:
-#            cmt = f.read()
-#        with open(RESULTS_DIR / "NP1" / "Coulomb.inp") as f:
-#            cmt_target = f.read()
-#        assert cmt == cmt_target
-#    finally:
-#        shutil.rmtree(tempdir)
+def test_write_Coulomb_file():
+    tempdir = tempfile.mkdtemp()
+    try:
+        tempdir = pathlib.Path(tempdir)
+        for f in ["Solucion.txt"]:
+            shutil.copyfile(RESULTS_DIR / "NP1" / f, tempdir / f)
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "static_data.json",
+            tempdir / "static_data.json",
+        )
+        segments = get_segments_data()
+        solution = get_outputs.read_solution_static_format(
+            segments["segments"], tempdir
+        )
+        static_to_fsp(
+            get_tensor_info(),
+            segments,
+            ["gps"],
+            get_velmodel_data(),
+            solution,
+            tempdir,
+        )
+        write_Coulomb_file(tempdir, "us20003k7a")
+        with open(tempdir / "Coulomb.inp", "r") as f:
+            cmt = f.read()
+        with open(RESULTS_DIR / "NP1" / "Coulomb.inp") as f:
+            cmt_target = f.read()
+        assert cmt == cmt_target
+    finally:
+        shutil.rmtree(tempdir)
 
-#@pytest.mark.skipif(
-#    os.getenv("CI_REGISTRY") is not None,
-#    reason="Build runner does not have the resources to run",
-#)
+
+@pytest.mark.skipif(
+    os.getenv("CI_REGISTRY") is not None,
+    reason="Build runner does not have the resources to run",
+)
 def test_write_Okada_displacements():
     tempdir = tempfile.mkdtemp()
     try:
