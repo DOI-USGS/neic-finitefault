@@ -30,6 +30,7 @@ from numpy import (
     ones,
     shape,
     sin,
+    size,
     zeros,
 )
 from obspy.imaging.scripts import mopad  # type: ignore
@@ -675,8 +676,8 @@ def write_Okada_displacements(
     with open(pdefile, "r") as pdef:
         lines = pdef.readlines()
         pde = lines[0]
-        hypo_lat = float(pde.split()[8])
-        hypo_lon = float(pde.split()[9])
+        hypo_lat = float(pde.split()[7])
+        hypo_lon = float(pde.split()[8])
     fault_lat: List[float] = []
     fault_lon: List[float] = []
     fault_depth: List[float] = []
@@ -733,6 +734,7 @@ def write_Okada_displacements(
     obs_z_mat = zeros((obs_n, obs_n))  # performing calculation at the surface, z = 0
 
     # Make lon lat grid
+
     g = pyproj.Geod(ellps="WGS84")  # Use WGS84 Ellipsoid
     _, xLats, _ = pyproj.Geod.fwd(
         g,
@@ -1109,7 +1111,7 @@ def plot_okada_map(
     horizontal_cutde = (ux_okada_cutde**2 + uy_okada_cutde**2) ** 0.5
     max_horiz = max(horizontal_cutde.flatten())
     xx, yy, zz = gridx.flatten(), gridy.flatten(), horizontal_cutde.flatten()
-    grid = pygmt.xyz2grd(x=xx, y=yy, z=zz, spacing=(0.12), region=region)
+    grid = pygmt.xyz2grd(x=xx, y=yy, z=zz, spacing=(0.3), region=region)
     minmax_horiz = (ceil(max_horiz * 10)) / 10.0  # ceil to the nearest 0.1
     annotation = (floor(minmax_horiz * 10 / 2)) / 10  # contour annotation
     if annotation == 0:
@@ -1172,7 +1174,7 @@ def plot_okada_map(
         map_scale=map_scale,
     )
     xx, yy, zz = gridx.flatten(), gridy.flatten(), uz_okada_cutde.flatten()
-    grid = pygmt.xyz2grd(x=xx, y=yy, z=zz, spacing=(0.13), region=region)
+    grid = pygmt.xyz2grd(x=xx, y=yy, z=zz, spacing=(0.3), region=region)
     minmax_uz = (
         ceil(max(abs(uz_okada_cutde.flatten())) * 10)
     ) / 10.0  # ceil to the nearest 0.1

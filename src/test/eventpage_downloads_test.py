@@ -98,7 +98,6 @@ def test_temporary_file_reorganization_for_publishing():
     finally:
         shutil.rmtree(tempdir)
 
-
 def test_write_CMTSOLUTION_file():
     tempdir = tempfile.mkdtemp()
     try:
@@ -112,7 +111,6 @@ def test_write_CMTSOLUTION_file():
         assert cmt == cmt_target
     finally:
         shutil.rmtree(tempdir)
-
 
 def test_write_Coulomb_file():
     tempdir = tempfile.mkdtemp()
@@ -145,7 +143,6 @@ def test_write_Coulomb_file():
     finally:
         shutil.rmtree(tempdir)
 
-
 @pytest.mark.skipif(
     os.getenv("CI_REGISTRY") is not None,
     reason="Build runner does not have the resources to run",
@@ -163,6 +160,6 @@ def test_write_Okada_displacements():
             disp_target = f.read()
         assert disp == disp_target
         assert (tempdir / "Okada_Displacement.png").exists()
-        # assert (tempdir / "Vertical_Surface_Displacement.png").exists()
     finally:
-        shutil.rmtree(tempdir)
+        print(tempdir)
+        #shutil.rmtree(tempdir)
