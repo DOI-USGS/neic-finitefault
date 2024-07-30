@@ -168,7 +168,7 @@ def plot_waveform_fits(
     obs_waveforms = [waveform for waveform in obs_waveforms]
     syn_waveforms = [waveform for waveform in syn_waveforms]
 
-    axes2 = plot_waveforms(axes2, obs_times, obs_waveforms, color="black")
+    axes2 = plot_waveforms(list(axes2), obs_times, obs_waveforms, color="black")
     axes2 = plot_waveforms(axes2, syn_times, syn_waveforms, color="red", custom="fill")
     dict = {
         "weights": weights,

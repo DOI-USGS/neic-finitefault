@@ -353,7 +353,7 @@ def plot_waveform_fits(
 
     if type_str == "body" or type_str == "surf":
         axes2 = plot_waveforms(
-            axes2,
+            list(axes2),
             obs_times,
             obs_waveforms,
             weights,
@@ -363,7 +363,7 @@ def plot_waveform_fits(
             custom="fill",
         )
         axes2 = plot_waveforms(
-            axes2,
+            list(axes2),
             syn_times,
             syn_waveforms,
             weights,
@@ -382,7 +382,7 @@ def plot_waveform_fits(
         }
     if type_str == "cgps" or type_str == "strong":
         axes2 = plot_waveforms(
-            axes2,
+            list(axes2),
             obs_times,
             obs_waveforms,
             weights,
@@ -410,7 +410,7 @@ def plot_waveform_fits(
             "type_str": type_str,
             "comps": comp,
         }
-    axes2 = add_metadata(axes2, **dict)
+    axes2 = add_metadata(list(axes2), **dict)
 
     if type_str == "body":
         if "BHZ" in components:
