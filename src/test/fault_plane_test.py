@@ -45,7 +45,7 @@ def test_create_finite_fault():
             TENSOR,
             info_np1["plane_info"],
             ["cgps", "gps", "insar", "strong", "body", "surf_waves"],
-        directory=tempdir,
+            directory=tempdir,
         )
         assert data == SEGMENTS
     finally:
