@@ -19,10 +19,8 @@ from wasp.fault_plane import (
     __save_plane_data,
     __source_layer,
     __subfaults_properties,
-    __write_event_mult_in,
     _point_sources_def,
     create_finite_fault,
-    event_mult_in_to_json,
     is_fault_correct,
     point_sources_param,
     shear_modulous,
@@ -40,13 +38,18 @@ SEGMENTS = get_segments_data()
 
 
 def test_create_finite_fault():
-    info_np1, info_np2 = tensor.planes_from_tensor(TENSOR)
-    data = create_finite_fault(
-        TENSOR,
-        info_np1["plane_info"],
-        ["cgps", "gps", "insar", "strong", "body", "surf_waves"],
-    )
-    assert data == SEGMENTS
+    tempdir = tempfile.mkdtemp()
+    try:
+        info_np1, info_np2 = tensor.planes_from_tensor(TENSOR)
+        data = create_finite_fault(
+            TENSOR,
+            info_np1["plane_info"],
+            ["cgps", "gps", "insar", "strong", "body", "surf_waves"],
+        directory=tempdir,
+        )
+        assert data == SEGMENTS
+    finally:
+        shutil.rmtree(tempdir)
 
 
 def test_epicenter_location():
@@ -54,23 +57,6 @@ def test_epicenter_location():
         "hyp_stk": 100,
         "hyp_dip": 50,
     }
-
-
-def test_event_mult_in_to_json():
-    tempdir = tempfile.mkdtemp()
-    try:
-        event_file = pathlib.Path(tempdir) / "Event_mult.in"
-        with open(RESULTS_DIR / "NP1" / "Event_mult.in") as i:
-            test_mult_in = i.read()
-        with open(event_file, "w") as f:
-            f.write(test_mult_in)
-
-        event_mult_in_to_json(tempdir)
-        with open(pathlib.Path(tempdir) / "segments_data.json", "r") as f:
-            fault_data = json.load(f)
-        assert fault_data == SEGMENTS
-    finally:
-        shutil.rmtree(tempdir)
 
 
 def test__fault_plane_properties():
@@ -350,34 +336,3 @@ def test_subfaults_properties():
         "stk_subfaults": 4,
         "dip_subfaults": 5,
     }
-
-
-def test_write_event_mult_in():
-    tempdir = tempfile.mkdtemp()
-    try:
-        info_np1, info_np2 = tensor.planes_from_tensor(TENSOR)
-        pinfo = info_np1["plane_info"]
-        plane_info = __plane_tensor_def(
-            pinfo["strike"], pinfo["dip"], pinfo["rake"], 2.5
-        )
-
-        __write_event_mult_in(
-            TENSOR,
-            plane_info,
-            SEGMENTS["segments"][0],
-            {"hyp_dip": 5, "hyp_stk": 9},
-            SEGMENTS["rise_time"],
-            tempdir,
-        )
-        with open(pathlib.Path(tempdir) / "Event_mult.in", "r") as f:
-            event_mult_in = f.readlines()
-        with open(RESULTS_DIR / "NP1" / "Event_mult.in") as t:
-            test_mult_in = t.read()
-        target = test_mult_in.split("\n")
-        for i in range(len(target)):
-            np.testing.assert_allclose(
-                np.array(event_mult_in[i].split(), dtype=np.float64),
-                np.array(target[i].split(), dtype=np.float64),
-            )
-    finally:
-        shutil.rmtree(tempdir)
