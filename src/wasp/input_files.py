@@ -390,9 +390,10 @@ def input_chen_tele_body(
             )
             i = i + 1
 
-    with open(directory / "wavelets_body.txt", "w") as file1, open(
-        directory / "waveforms_body.txt", "w"
-    ) as file2:
+    with (
+        open(directory / "wavelets_body.txt", "w") as file1,
+        open(directory / "waveforms_body.txt", "w") as file2,
+    ):
         write_files_wavelet_observed(file1, file2, dt, data_prop, traces_info)
     #
     # instrumental response common to all body waves
@@ -515,9 +516,10 @@ def input_chen_tele_surf(
                 outfile.write(string_fun(i + 1, name, lat, lon, 0, 1, 0, 90, 0, weight))
             i = i + 1
 
-    with open(directory / "wavelets_surf.txt", "w") as file1, open(
-        directory / "waveforms_surf.txt", "w"
-    ) as file2:
+    with (
+        open(directory / "wavelets_surf.txt", "w") as file1,
+        open(directory / "waveforms_surf.txt", "w") as file2,
+    ):
         write_files_wavelet_observed(
             file1, file2, 4.0, data_prop, traces_info, gf_bank=gf_bank
         )
@@ -731,9 +733,10 @@ def input_chen_dart(
             weight = file["trace_weight"]
             outfile.write(string_fun(i, name, lat, lon, channel, weight))
 
-    with open(directory / "wavelets_dart.txt", "w") as file1, open(
-        directory / "waveforms_dart.txt", "w"
-    ) as file2:
+    with (
+        open(directory / "wavelets_dart.txt", "w") as file1,
+        open(directory / "waveforms_dart.txt", "w") as file2,
+    ):
         write_files_wavelet_observed(
             file1, file2, dt_dart, data_prop, traces_info, dart=True, zero_start=True
         )
