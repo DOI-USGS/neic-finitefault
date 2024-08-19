@@ -58,25 +58,6 @@ stages:
 ## -------------------------------------
 #  Init Stage
 ## -------------------------------------
-Python Safety:
-  artifacts:
-    paths:
-      - poetry.toml
-      - .venv
-      - dist/lambda
-    expire_in: 1 week
-  image: "${PYTHON_IMAGE}"
-  before_script:
-    - conda init
-    - export PATH=/root/miniconda/bin:$PATH
-    - source activate base
-  script:
-    - conda env remove -n ff-env -y
-    - conda env create -f ./install.d/environment.yml -y
-    - conda activate ff-env
-    - safety check -i 70612
-  stage: init
-
 Fortran:
   artifacts:
     paths:
@@ -91,26 +72,24 @@ Fortran:
 #  Test Stage
 ## -------------------------------------
 
-Python Lint:
-  image: "${PYTHON_IMAGE}"
-  script:
-    - poe lint
-  stage: test
-
 Python Test:
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage.xml
-      junit: junit.xml
   image: "${DEPENDENCIES_IMAGE}"
+  before_script:
+    - conda init
+    - export PATH=/root/miniconda/bin:$PATH
+    - source activate base
+    - conda env remove -n ff-env -y
+    - conda env create -f ./install.d/environment.yml -y
+    - conda activate ff-env
   script:
+    - safety check -i 70612
+    - poe lint
     - cp -r "/neic-finitefault/tectonicplates" ./fortran_code/
     - cp "/neic-finitefault/fortran_code/gfs_nm/long/fd_bank" ./fortran_code/gfs_nm/long/fd_bank
     - cp "/neic-finitefault/fortran_code/info/LITHO1.0.nc" ./fortran_code/info/LITHO1.0.nc
     - poe test
   stage: test
+
 
 Shell Check:
   image: usgs/ubuntu:latest
