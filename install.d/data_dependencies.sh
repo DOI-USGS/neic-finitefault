@@ -115,7 +115,7 @@ else
     exit 1;
 fi
 # tectonicsplates master branch
-TECTONICS_DIR="${FINITEFAULT_DIR}/tectonicplates"
+TECTONICS_DIR="${FINITEFAULT_DIR}/fortran_code/tectonicplates"
 TECTONICS_URL="https://github.com/fraxen/tectonicplates.git"
 echo "Getting a copy of the tectonicplates data from master branch"
 git clone --single-branch --branch master "${TECTONICS_URL}" "${TECTONICS_DIR}"

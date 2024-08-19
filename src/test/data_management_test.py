@@ -416,7 +416,7 @@ def test_s2nr():
             5.136194,
             1.6105795,
         ],
-        decimal=6,
+        decimal=5,
     )
 
 

@@ -24,7 +24,7 @@ from obspy.io.sac import SACTrace  # type: ignore
 from obspy.signal import rotate  # type: ignore
 from obspy.signal.invsim import simulate_seismometer  # type: ignore
 from obspy.taup import TauPyModel  # type: ignore
-from scipy.integrate import cumtrapz  # type: ignore
+from scipy.integrate import cumulative_trapezoid  # type: ignore
 from scipy.signal import butter, filtfilt  # type: ignore
 
 import wasp.management as mng
@@ -1470,7 +1470,7 @@ def small_events(
             continue
         data = stream[0].data
         data = np.pad(data, t_pad, "constant")
-        data = cumtrapz(data, dx=delta, initial=0)
+        data = cumulative_trapezoid(data, dx=delta, initial=0)
         st_vel = stream.copy()
         nyq = 0.5 * fs
         low = 0.02 / nyq

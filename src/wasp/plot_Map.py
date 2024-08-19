@@ -163,12 +163,14 @@ def PlotMap(
     fig.basemap(region=region, projection=projection, frame=["WSne", "afg"])
     fig.grdimage(grid=grid, cmap="oleron", shading=True, transparency=20)
     fig.colorbar(
-        yshift="a-10p",
-        xshift="a-5p",
         position="n0.05/-0.1+jTL+w100p/8%+h",
         frame="x+lTopography (km)",
         # box="+p2p,black+ggray80",
         scale=0.001,
+    )
+    fig.shift_origin(
+        yshift="a-10p",
+        xshift="a-5p",
     )
     fig.plot(
         str(default_dirs["root_dir"]) + "/pb2002_boundaries.gmt",
@@ -262,17 +264,18 @@ def PlotMap(
             + "/"
             + str(delta_dip * np.cos(np.radians(dip))),
             cmap=True,
-            color=slips / 100.0,
+            fill=slips / 100.0,
         )
 
     fig.colorbar(
-        yshift="a-10p",
-        xshift="a135p",
         position="n0.05/-0.1+jTL+w100p/8%+h",
         frame="x+lSlip (m)",
         # box="+p2p,black+ggray80"
     )
-
+    fig.shift_origin(
+        yshift="a-10p",
+        xshift="a135p",
+    )
     ### PLOT AFTERSHOCKS OVER TOP ###
     aftershocks = glob(str(directory) + "/*aftershock*")
     if len(aftershocks) > 0:
@@ -289,7 +292,7 @@ def PlotMap(
                 y=aftershock_lat,
                 style="cp",
                 size=aftershock_mag,
-                color="grey",
+                fill="grey",
                 pen="black",
                 transparency=60,
             )
@@ -355,12 +358,10 @@ def PlotMap(
         fig.plot(x=updip[0, :], y=updip[1, :], pen="1p,red")
 
         # plot multiple segment hypocenters if any
-        fig.plot(x=lon0, y=lat0, style="a7p", color="white", pen="black")
+        fig.plot(x=lon0, y=lat0, style="a7p", fill="white", pen="black")
         if "hypocenter" in segments[segment]:
             hyp = segments[segment]["hypocenter"]
-            fig.plot(
-                x=hyp["lon"], y=hyp["lat"], style="a7p", color="white", pen="black"
-            )
+            fig.plot(x=hyp["lon"], y=hyp["lat"], style="a7p", fill="white", pen="black")
 
     ###########################
     ### PLOT LOCAL STATIONS ###
@@ -372,27 +373,31 @@ def PlotMap(
         for file in files_str:
             name = file["name"]
             latp, lonp = file["location"]
-            fig.plot(x=lonp, y=latp, style="i10p", color="white", pen="black")
+            fig.plot(x=lonp, y=latp, style="i10p", fill="white", pen="black")
             fig.text(x=lonp, y=latp, text=name)
         ### ADD TO LEGEND ###
         fig.plot(
             x=region[1],
             y=region[2],
-            xshift="a-130p",
-            yshift="a-54p",
             no_clip=True,
             style="i10p",
-            color="white",
+            fill="white",
             pen="black",
+        )
+        fig.shift_origin(
+            xshift="a-130p",
+            yshift="a-54p",
         )
         fig.text(
             x=region[1],
             y=region[2],
             text="Accelerometer",
-            xshift="a-123p",
-            yshift="a-55p",
             no_clip=True,
             justify="ML",
+        )
+        fig.shift_origin(
+            xshift="a-123p",
+            yshift="a-55p",
         )
 
     ### HIGH-RATE GNSS ###
@@ -401,27 +406,31 @@ def PlotMap(
         for file in stations_cgps:
             name = file["name"]
             latp, lonp = file["location"]
-            fig.plot(x=lonp, y=latp, style="t10p", color="navy", pen="black")
+            fig.plot(x=lonp, y=latp, style="t10p", fill="navy", pen="black")
         ### ADD TO LEGEND ###
         fig.plot(
             x=region[1],
             y=region[2],
-            xshift="a-55p",
-            yshift="a-56p",
             no_clip=True,
             style="t10p",
-            color="navy",
+            fill="navy",
             pen="black",
+        )
+        fig.shift_origin(
+            xshift="a-55p",
+            yshift="a-56p",
         )
         fig.text(
             x=region[1],
             y=region[2],
             text="HR GNSS",
-            xshift="a-48p",
-            yshift="a-55p",
             no_clip=True,
             justify="ML",
             offset=0 / 10,
+        )
+        fig.shift_origin(
+            xshift="a-48p",
+            yshift="a-55p",
         )
 
     ### STATIC GNSS ####

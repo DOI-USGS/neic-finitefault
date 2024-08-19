@@ -279,7 +279,7 @@ def _integral_arias(trace: Trace, delta: float) -> np.ndarray:
     :rtype: np.ndarray
     """
     trace = trace**2
-    integral = integrate.cumtrapz(trace, dx=delta, initial=0)
+    integral = integrate.cumulative_trapezoid(trace, dx=delta, initial=0)
     return integral
 
 

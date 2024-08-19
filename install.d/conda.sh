@@ -2,17 +2,13 @@
 
 # ==============================================================================
 # Define usage
-#     Install conda (if needed) and create the conda environment
+#     Install conda (if needed)
 # ==============================================================================
 ## define usage
 function usage {
     echo "----------------------------------------------------------------"
-    echo "Runs install scripts in install.d and sets the "
-    echo "environment with an environment.d file"
+    echo "Install Conda"
     echo "----------------------------------------------------------------"
-    echo "  -p,--python string      The python version to install"
-    echo "                          default=3.10.13"
-    echo "                          (example: -p 3.11)"
 }
 
 ## parse arguments
@@ -20,11 +16,6 @@ REQUIRED_ARGS=()
 while [[ $# -gt 0 ]]; do
     # shellcheck disable=SC2221,SC2222
     case $1 in
-        -p|--python)
-            PYTHON_VERSION="$2"
-            shift
-            shift
-            ;;
         -h|--help)
             usage
             exit 0
@@ -40,8 +31,6 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
-### set defaults
-PYTHON_VERSION=${PYTHON_VERSION:-"3.10.13"}
 
 # Get system information and conda install url
 system="$(uname)"
@@ -81,10 +70,5 @@ else
     echo "Conda already installed. No need to download/install."
 fi
 
-# Create finite fault env
-echo "Creating a finite fault environment called 'ff-env'"
-conda create -n ff-env python="${PYTHON_VERSION}" geos poetry pygmt;
-echo "Environment created. Use 'conda activate ff-env' to start the environment"
-conda init;
-# shellcheck disable=SC1090
 source $profile;
+conda init;

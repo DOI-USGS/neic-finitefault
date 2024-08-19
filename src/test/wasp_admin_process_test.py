@@ -145,8 +145,7 @@ def test_process_tele():
                 -38.27213,
                 -38.30074,
                 -38.320812,
-            ],
-            5,
+            ], decimal=5
         )
         np.testing.assert_array_almost_equal(
             read(new_tele_waves[1]["file"])[0].data[:10],
@@ -161,8 +160,7 @@ def test_process_tele():
                 -5.6468496,
                 -5.599341,
                 -5.537252,
-            ],
-            5,
+            ], decimal=5
         )
     finally:
         print("Cleaning up test directory.")

@@ -2,8 +2,8 @@
   - [Authors](#authors)
   - [References](#references)
 - [Installation](#installation)
-  - [Install Scripts](#install-scripts)
-  - [Using the Poetry Environment](#using-the-poetry-environment)
+  - [Prerequisites](#prerequisites)
+  - [Wasp Installation Scripts](#wasp-installation-scripts)
 - [Local Testing](#local-testing)
 
 # Wavelet and simulated Annealing SliP inversion (WASP)
@@ -37,15 +37,22 @@ Users of this code should consider citing the following relevant publications:
 
 # Installation
 
-## Install Scripts
+## Prerequisites
 
-Automated installation of the dependencies and fortran code has been provided in the form of an [install script](./user_install.sh). Currently this install script only supports installation on linux systems (specifically Ubuntu for the system packages). Installation of Python, Poetry, GEOS, and PyGMT is handled by Miniconda. Pip installable python dependencies and code is managed with the provided Poetry environment setup by pyproject.toml and package-lock.json. To install the dependencies and code run the two commands:
+In order to compile and/or install the source code there are a number of prerequisite requirements:
 
-1. `source user_install.sh <path to the local neic-finitefault repository> <Python major version to install (e.g. 3.11)>` (with other optional configurations available, run `sudo bash user_install.sh -h` for the help information)
+1. gfortran: To compile the code in [fortran_code](./fortran_code/)
+2. cmake: To compile the code in [fortran_code](./fortran_code/)
+3. gcc: To provide support to miniconda for compiling c code
+4. miniconda/anaconda: To install python dependencies. Conda can be installed using the provided script: [conda_install.sh](./conda_install.sh)
+
+## Wasp Installation Scripts
+
+Automated installation of the dependencies and fortran code has been provided in the form of the install script [install.sh](./install.sh). Currently this install script only supports installation on linux systems as the fortran code cannot be compiled on MacOS. To instal the code please ensure that all of the [prerequisites](#prerequisites) are available and miniconda/anaconda has been initialized
+
+1. `source install.sh <path to the local neic-finitefault repository>` (with other optional configurations available, run `sudo bash user_install.sh -h` for the help information)
    1. > NOTE: The scripts in [./install.d](./install.d/) may be run individually to suit the individuals needs. For example, to only rerun compilation of the fortran you can singularly run [wap.sh](./install.d/wasp.sh).
 2. `conda activate ff-env`
-
-- NOTE: Multiple versions of Poetry installed may cause conflicts. This installation assumes that poetry is only installed within the conda environment `ff-env`
 
 The following documents provide more information about the installation process:
 
@@ -53,26 +60,12 @@ The following documents provide more information about the installation process:
 - [Code Dependencies](./docs/code-dependencies.md): Provides a list of dependencies required to run the code
 - [Manual Installation](./docs/manual-installation.md): Provides a list of steps to manually install dependencies and code without reference to a specific operating system.
 
-## Using the Poetry Environment
-
-After running `poetry install`, you will need to activate your environment. This can be done a number of ways:
-
-- `poetry shell` (from within the project at the same location of the pyproject.toml)
-- `source <path to poetry virtual environments>/<environment name>/bin/activate`
-
-The following commands may also be useful:
-
-- `poetry config --list`: shows your poetry configuration including the path to poetry virtual environments
-- `poetry env list`: Shows the virtual environments associated with the project you are in
-- `poetry env info`: Shows the information about the currently activated virtual environment
-
-You can also skip activating the environment by prefixing commands run with `poetry run` (Example: `poetry run wasp --help`). These commands must be run from within the project at the same location of the pyproject.toml.
-
-See official [Poetry documentation](https://python-poetry.org/docs/managing-environments/) for a full description of managing environments.
-
 # Local Testing
 
 Tests and linting can both be run locally:
 
-1. To run all python unit tests: `poetry run poe test`
-2. To run python linting: `poetry run poe lint`
+1. To run all python unit tests: `poe test`
+   1. The full end to end inversion tests take a consideral amount of time to run. As a result, they are skipped by default and can be enabled by setting the following environment variables to "True"
+       - RUN_ALL
+       - RUN_END_TO_END
+2. To run python linting: `poe lint`

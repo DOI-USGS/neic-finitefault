@@ -13,9 +13,6 @@ function usage {
     echo ""
     echo "  FINITEFAULT_DIR string  full path to the local repository"
     echo "                          (example: /home/user/neic-finitefault)"
-    echo "  -p,--python number      The python version to install"
-    echo "                          default=3.10.13"
-    echo "                          (example: -p 3.11)"
     echo "  --fd-bank string        the location of the fd_bank file"
     echo "                          if not specified it will be downloaded"
     echo "                          default=download"
@@ -31,11 +28,6 @@ REQUIRED_ARGS=()
 while [[ $# -gt 0 ]]; do
     # shellcheck disable=SC2221,SC2222
     case $1 in
-        -p|--python)
-            PYTHON_VERSION="$2"
-            shift
-            shift
-            ;;
         --fd-bank)
             FD_BANK="$2"
             shift
@@ -64,23 +56,27 @@ done
 ### set positional arguments
 set -- "${REQUIRED_ARGS[@]}" # restore positional parameters
 FINITEFAULT_DIR=${1%%/}
+if [ -z ${1+x} ]
+then 
+    echo "Argument FINITEFAULT_DIR must be set";
+    exit 1;
+fi
+
 ### set defaults
-PYTHON_VERSION=${PYTHON_VERSION:-"3.10.13"}
 FD_BANK=${FD_BANK:-"download"}
 LITHO1=${LITHO1:-"download"}
 
 # Running install scripts in install.d/
 INSTALL_DIR="${FINITEFAULT_DIR}/install.d"
 # shellcheck source=./install.d/conda.sh
-source "${INSTALL_DIR}/conda.sh" -p "${PYTHON_VERSION}";
-# shellcheck source=./install.d/poetry.sh
-source "${INSTALL_DIR}/poetry.sh";
-# shellcheck source=./install.d/data_dependencies.sh
-source "${INSTALL_DIR}/data_dependencies.sh" "${FINITEFAULT_DIR}" --fd-bank "${FD_BANK}" --lith "${LITHO1}";
+source "${INSTALL_DIR}/conda.sh" "${FINITEFAULT_DIR}";
+conda env list
+pip install -e "${FINITEFAULT_DIR}";
 # shellcheck source=./install.d/wasp.sh
 source "${INSTALL_DIR}/wasp.sh" "${FINITEFAULT_DIR}";
+# shellcheck source=./install.d/data_dependencies.sh
+source "${INSTALL_DIR}/data_dependencies.sh" "${FINITEFAULT_DIR}" --fd-bank "${FD_BANK}" --lith "${LITHO1}";
 
 # get back to top level directly and message completion of installation
 cd "${FINITEFAULT_DIR}" || echo "Failed to return to finite fault top level directly";
 echo "Wasp installation completed!";
-exit 0;

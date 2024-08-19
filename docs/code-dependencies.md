@@ -14,19 +14,14 @@ This document outlines the dependencies required to run the code. This may be he
 8. [SciPy](https://scipy.org/): For fundamental algorithms
 9. [shapely](https://shapely.readthedocs.io/en/stable/manual.html): For spatial analysis (in ObsPy)
 
-> Some of these dependencies may have their own secondary dependencies. A package/environment manager such as [Poetry](https://python-poetry.org/) or [Anaconda](https://www.anaconda.com/) will help resolve installing all dependencies.
+> A list of dependencies and versions are available in conda environment file [environment.yml](../install.d/environment.yml)
 
 ## Fortran Dependencies
 
 1. [GFortran](https://fortran-lang.org/en/learn/os_setup/install_gfortran/): For compiling the FORTRAN code
+2. make
 
 ## C Dependencies
 
-1. build-essential
-2. gcc
+1. gcc
 
-## Other dependencies
-
-1. [GMT](https://github.com/GenericMappingTools/gmt/blob/master/INSTALL.md): Must be installed separately if PyGMT is installed with pip
-2. [GEOS](https://geos.readthedocs.io/en/latest/users.html): Must be installed separately if Cartopy is installed with pip
-3. [PROJ](https://proj.org/en/9.2/install.html): Must be installed separately if Cartopy is installed with pip

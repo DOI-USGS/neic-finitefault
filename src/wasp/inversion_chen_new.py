@@ -1099,7 +1099,7 @@ def execute_plot(
         directory=directory,
     )
     plot.plot_misfit(data_type, directory=directory)
-    traces_info, stations_gps = [None, None]
+    traces_info, stations_gps,traces_info_cgps = [None, None,None]
     if "strong" in data_type:
         with open(directory / "strong_motion_waves.json") as smw:
             traces_info = json.load(smw)

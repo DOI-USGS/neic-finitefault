@@ -1,11 +1,11 @@
 # Since this is at the top level ignore everything
 *
-# Except for the python code, poetry files, fortran_code, and install scripts
+# Except for the python code, conda files, fortran_code, and install scripts
 !install.d
 !fortran_code
 !src
-!poetry*
 !pyproject.toml
 !fd_bank
 !LITHO1.0.nc
 !pb2002_boundaries.gmt
+!examples
