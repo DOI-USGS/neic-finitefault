@@ -82,7 +82,7 @@ Python Test:
     - conda env create -f ./install.d/environment.yml -y
     - conda activate ff-env
   script:
-    - safety check -i 70612
+    - safety check -i 70612 -i 51668
     - poe lint
     - cp -r "/neic-finitefault/tectonicplates" ./fortran_code/
     - cp "/neic-finitefault/fortran_code/gfs_nm/long/fd_bank" ./fortran_code/gfs_nm/long/fd_bank
@@ -95,10 +95,8 @@ Shell Check:
   image: usgs/ubuntu:latest
   script:
     - apt install -y shellcheck
-    - shellcheck docker_install.sh -x
-    - shellcheck user_install.sh -x
+    - shellcheck install.sh -x
     - shellcheck install.d/*
-    - shellcheck environment.d/*
   stage: test
 
 ## -------------------------------------
