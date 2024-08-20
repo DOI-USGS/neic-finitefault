@@ -50,6 +50,7 @@ fi
 # Create finite fault env
 if conda env list | grep "ff-env"; then
     echo "The conda environment 'ff-env' already exists. Delete and recreate it? [y/n]"
+    # shellcheck disable=SC2162
     read response;
     if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
         conda env remove -n ff-env -y;

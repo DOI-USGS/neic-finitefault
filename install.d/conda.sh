@@ -70,5 +70,6 @@ else
     echo "Conda already installed. No need to download/install."
 fi
 
+# shellcheck disable=SC1090
 source $profile;
 conda init;

@@ -96,7 +96,7 @@ Shell Check:
   script:
     - apt install -y shellcheck
     - shellcheck install.sh -x
-    - shellcheck install.d/*
+    - shellcheck install.d/*.sh
   stage: test
 
 ## -------------------------------------
