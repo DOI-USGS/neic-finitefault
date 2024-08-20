@@ -10,6 +10,7 @@ import os
 import pathlib
 from typing import List, Optional, Tuple, Union
 
+from matplotlib.axes import Axes
 import matplotlib.pyplot as plt  # type:ignore
 import numpy as np
 from obspy import UTCDateTime, read  # type:ignore
@@ -138,7 +139,7 @@ def shift_match2(
             obs_waveforms: list = []
             syn_waveforms: list = []
             if len(files2) > 1:
-                zipped = zip(files2, synthetics, axes[0, :], titles)
+                zipped = zip(files2, synthetics, axes[0, :], titles)  # type: ignore
                 for file, synthetic, ax, title in zipped:
                     time1, observed0 = get_observed(file, start, length, margin=10)
                     time0 = np.arange(len(synthetic)) * dt
@@ -148,7 +149,7 @@ def shift_match2(
                     syn_waveforms = syn_waveforms + [synthetic]
                     ax.axvline(0)
                     ax.set_title(title)
-                for file, synthetic, ax in zip(files2, synthetics, axes[1, :]):
+                for file, synthetic, ax in zip(files2, synthetics, axes[1, :]):  # type: ignore
                     start4 = start + tr_shift
                     time2, observed1 = get_observed(
                         file, start4, length, margin=10, zero_start=zero_start
@@ -166,7 +167,7 @@ def shift_match2(
                 time0 = np.arange(len(synthetic)) * dt
                 min_val = np.minimum(np.min(observed0), np.min(synthetic))
                 max_val = np.maximum(np.max(observed0), np.max(synthetic))
-                axes[0].set_title(file["component"])
+                axes[0].set_title(file["component"])  # type: ignore
                 start4 = start + tr_shift
                 time2, observed1 = get_observed(
                     file, start4, length, margin=10, zero_start=zero_start
@@ -176,10 +177,10 @@ def shift_match2(
                 syn_times = [time0, time0]
                 obs_waveforms = [observed0, observed1]
                 syn_waveforms = [synthetic, synthetic]
-                axes[1].axvline(0)
-                axes[1].set_title(file["component"])
-            axes2 = axes.ravel()
-            axes2 = plot_waveforms(axes2, obs_times, obs_waveforms, color="black")
+                axes[1].axvline(0)  # type: ignore
+                axes[1].set_title(file["component"])  # type: ignore
+            axes2: List[Axes] = axes.ravel()  # type: ignore
+            axes2 = plot_waveforms(axes2, obs_times, obs_waveforms, color="black")  # type: ignore
             axes2 = plot_waveforms(
                 axes2, syn_times, syn_waveforms, color="red", custom="fill"
             )
@@ -270,7 +271,7 @@ def shift_match_regional(
             fig.text(0.04, 0.3, "After Shift", va="center", rotation="vertical")
             fig.suptitle(station)
             if len(files2) > 1:
-                zipped = zip(files2, synthetics, axes[0, :])
+                zipped = zip(files2, synthetics, axes[0, :])  # type: ignore
                 for file, synthetic, ax in zipped:
                     time1, observed0 = get_observed(file, start, length, margin=10)
                     time0 = np.arange(len(synthetic)) * dt
@@ -278,7 +279,7 @@ def shift_match_regional(
                     ax.plot(time0, synthetic, "r")
                     ax.axvline(0)
                     ax.set_title(file["component"])
-                zipped = zip(files2, synthetics, axes[1, :])
+                zipped = zip(files2, synthetics, axes[1, :])  # type: ignore
                 for file, synthetic, ax in zipped:
                     start4 = start + tr_shift
                     time2, observed1 = get_observed(
@@ -295,19 +296,21 @@ def shift_match_regional(
                 time0 = np.arange(len(synthetic)) * dt
                 min_val = np.minimum(np.min(observed0), np.min(synthetic))
                 max_val = np.maximum(np.max(observed0), np.max(synthetic))
-                axes[0].plot(time1, observed0)
-                axes[0].plot(time0, synthetic, "r")
-                axes[0].vlines(0, min_val, max_val)
-                axes[0].set_title(file["component"])
+                a1 = axes[0]  # type: ignore
+                a2 = axes[1]  # type: ignore
+                a1.plot(time1, observed0)
+                a1.plot(time0, synthetic, "r")
+                a1.vlines(0, min_val, max_val)
+                a1.set_title(file["component"])
                 start4 = start + tr_shift
                 time2, observed1 = get_observed(
                     file, start4, length, margin=10, zero_start=zero_start
                 )
                 time0 = np.arange(len(synthetic)) * dt
-                axes[1].plot(time2, observed1)
-                axes[1].plot(time0, synthetic, "r")
-                axes[1].axvline(0)
-                axes[1].set_title(file["component"])
+                a2.plot(time2, observed1)
+                a2.plot(time0, synthetic, "r")
+                a2.axvline(0)
+                a2.set_title(file["component"])
             name_file = os.path.join(plot_folder, "{}.png".format(station))
             plt.savefig(name_file)
             plt.close(fig)

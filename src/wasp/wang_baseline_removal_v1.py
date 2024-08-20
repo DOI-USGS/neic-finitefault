@@ -15,8 +15,9 @@ import glob
 import os
 import pathlib
 import time
-from typing import Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
+from matplotlib.axes import Axes
 import matplotlib.pyplot as plt  # type:ignore
 import numpy as np
 import scipy.integrate as integrate  # type:ignore
@@ -574,7 +575,7 @@ def _opt_plots2(
     delta = disp_trace.stats.delta
     time = np.arange(len(disp_trace.data[:tp])) * delta
     fig, axes = plt.subplots(3, 1, figsize=(6, 8))
-    ax1, ax2, ax3 = axes
+    ax1, ax2, ax3 = axes  # type: ignore
     ax1.set_title("Trend of accelerometer before signal")
     ax1.plot(time, trace.data[:tp])
     ax2.set_title("Trend of velocity before signal")

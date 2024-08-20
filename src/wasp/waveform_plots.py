@@ -1,6 +1,7 @@
 import pathlib
 from typing import List, Literal, Optional, Union
 
+from matplotlib.axes import Axes
 import numpy as np
 from matplotlib import pyplot as plt  # type: ignore
 from matplotlib import ticker
@@ -161,7 +162,7 @@ def plot_waveform_fits(
     ]  # type: ignore
     numrows_phase = len(files) // 4 + 1
     fig, axes = plt.subplots(max(4, numrows_phase), 4, figsize=(13, 9))
-    axes2 = axes.ravel()
+    axes2: List[Axes] = axes.ravel()  # type: ignore
     for ax in axes2[len(files) :]:
         ax.axis("off")
     obs_waveforms = [waveform for waveform in obs_waveforms]
