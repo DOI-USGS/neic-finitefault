@@ -1,10 +1,10 @@
 import pathlib
 from typing import List, Literal, Optional, Union
 
-from matplotlib.axes import Axes
 import numpy as np
 from matplotlib import pyplot as plt  # type: ignore
 from matplotlib import ticker  # type: ignore
+from matplotlib.axes import Axes
 from obspy import read  # type: ignore
 from scipy.signal import butter, filtfilt  # type: ignore
 

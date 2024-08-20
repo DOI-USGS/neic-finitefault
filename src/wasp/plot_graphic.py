@@ -16,10 +16,10 @@ from typing import List, Optional, Tuple, Union
 import cartopy.crs as ccrs  # type: ignore
 import cartopy.feature as cf  # type: ignore
 import cartopy.io.shapereader as shpreader  # type: ignore
-from matplotlib.axes import Axes
 import numpy as np  # type: ignore
 from matplotlib import colors, patches  # type: ignore
 from matplotlib import pyplot as plt  # type: ignore
+from matplotlib.axes import Axes
 from matplotlib.image import AxesImage  # type: ignore
 from obspy.imaging.beachball import beach  # type: ignore
 

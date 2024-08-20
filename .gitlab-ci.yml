@@ -73,7 +73,7 @@ Fortran:
 ## -------------------------------------
 
 Python Test:
-  image: "${DEPENDENCIES_IMAGE}"
+  image: "${WASP_IMAGE}"
   before_script:
     - conda init
     - export PATH=/root/miniconda/bin:$PATH
@@ -82,9 +82,10 @@ Python Test:
     - conda env create -f ./install.d/environment.yml -y
     - conda activate ff-env
   script:
+    - ls /neic-finitefault
     - safety check -i 70612 -i 51668
     - poe lint
-    - cp -r "/neic-finitefault/tectonicplates" ./fortran_code/
+    - cp -r "/neic-finitefault/fortran_code/tectonicplates" ./fortran_code/
     - cp "/neic-finitefault/fortran_code/gfs_nm/long/fd_bank" ./fortran_code/gfs_nm/long/fd_bank
     - cp "/neic-finitefault/fortran_code/info/LITHO1.0.nc" ./fortran_code/info/LITHO1.0.nc
     - poe test

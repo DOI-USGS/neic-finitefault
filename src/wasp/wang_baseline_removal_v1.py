@@ -17,10 +17,10 @@ import pathlib
 import time
 from typing import List, Optional, Tuple, Union
 
-from matplotlib.axes import Axes
 import matplotlib.pyplot as plt  # type:ignore
 import numpy as np
 import scipy.integrate as integrate  # type:ignore
+from matplotlib.axes import Axes
 from obspy import read  # type:ignore
 from obspy.core.trace import Trace  # type:ignore
 from scipy.optimize import shgo  # type:ignore

@@ -18,13 +18,13 @@ import cartopy.crs as ccrs  # type: ignore
 import cartopy.feature as cf  # type: ignore
 import cartopy.io.shapereader as shpreader  # type: ignore
 import matplotlib  # type: ignore
-from matplotlib.axes import Axes
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
 import pygmt  # type: ignore
 from matplotlib import ticker  # type: ignore
 from matplotlib import colormaps, colors, gridspec  # type: ignore
 from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
 from matplotlib.colors import ListedColormap  # type: ignore
 from matplotlib.image import AxesImage  # type: ignore
 from obspy.imaging.beachball import beach, beachball  # type: ignore

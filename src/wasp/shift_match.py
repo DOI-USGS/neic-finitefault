@@ -10,9 +10,9 @@ import os
 import pathlib
 from typing import List, Optional, Tuple, Union
 
-from matplotlib.axes import Axes
 import matplotlib.pyplot as plt  # type:ignore
 import numpy as np
+from matplotlib.axes import Axes
 from obspy import UTCDateTime, read  # type:ignore
 
 import wasp.seismic_tensor as tensor
