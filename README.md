@@ -51,7 +51,7 @@ In order to compile and/or install the source code there are a number of prerequ
 Automated installation of the dependencies and fortran code has been provided in the form of the install script [install.sh](./install.sh). Currently this install script only supports installation on linux systems as the fortran code cannot be compiled on MacOS. To instal the code please ensure that all of the [prerequisites](#prerequisites) are available and miniconda/anaconda has been initialized
 
 1. `source install.sh <path to the local neic-finitefault repository>` (with other optional configurations available, run `sudo bash user_install.sh -h` for the help information)
-   1. > NOTE: The scripts in [./install.d](./install.d/) may be run individually to suit the individuals needs. For example, to only rerun compilation of the fortran you can singularly run [wap.sh](./install.d/wasp.sh).
+   1. > NOTE: The scripts in [./install.d](./install.d/) may be run individually to suit the individuals needs. For example, to only rerun compilation of the fortran you can singularly run [wasp.sh](./install.d/wasp.sh).
 2. `conda activate ff-env`
 
 The following documents provide more information about the installation process:

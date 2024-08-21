@@ -70,6 +70,8 @@ LITHO1=${LITHO1:-"download"}
 INSTALL_DIR="${FINITEFAULT_DIR}/install.d"
 # shellcheck source=./install.d/conda.sh
 source "${INSTALL_DIR}/conda.sh" "${FINITEFAULT_DIR}";
+# shellcheck source=./install.d/ff-env.sh
+source "${INSTALL_DIR}/ff-env.sh" "${FINITEFAULT_DIR}";
 conda env list
 pip install -e "${FINITEFAULT_DIR}";
 # shellcheck source=./install.d/wasp.sh
