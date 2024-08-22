@@ -72,6 +72,7 @@ INSTALL_DIR="${FINITEFAULT_DIR}/install.d"
 source "${INSTALL_DIR}/conda.sh" "${FINITEFAULT_DIR}";
 # shellcheck source=./install.d/ff-env.sh
 source "${INSTALL_DIR}/ff-env.sh" "${FINITEFAULT_DIR}";
+conda activate ff-env;
 conda env list
 pip install -e "${FINITEFAULT_DIR}";
 # shellcheck source=./install.d/wasp.sh
