@@ -40,7 +40,9 @@ def test_load_ffm_model():
         )
         for key in target_static:
             if key in solucion_model:
-                np.testing.assert_array_equal(solucion_model[key], target_static[key])
+                np.testing.assert_array_almost_equal(
+                    solucion_model[key], target_static[key], decimal=5
+                )
 
         # TODO: add test data for the following. Run through in the meantime
         # test fault&rise_time

@@ -54,7 +54,12 @@ while [[ $# -gt 0 ]]; do
 done
 ### set positional arguments
 set -- "${REQUIRED_ARGS[@]}" # restore positional parameters
-FINITEFAULT_DIR=$1
+FINITEFAULT_DIR=${1%%/}
+if [ -z ${1+x} ]
+then 
+    echo "Argument FINITEFAULT_DIR must be set";
+    exit 1;
+fi
 ### set defaults
 FD_BANK=${FD_BANK:-"download"}
 LITHO1=${LITHO1:-"download"}
@@ -115,7 +120,7 @@ else
     exit 1;
 fi
 # tectonicsplates master branch
-TECTONICS_DIR="${FINITEFAULT_DIR}/tectonicplates"
+TECTONICS_DIR="${FINITEFAULT_DIR}/fortran_code/tectonicplates"
 TECTONICS_URL="https://github.com/fraxen/tectonicplates.git"
 echo "Getting a copy of the tectonicplates data from master branch"
 git clone --single-branch --branch master "${TECTONICS_URL}" "${TECTONICS_DIR}"

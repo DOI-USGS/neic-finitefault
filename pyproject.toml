@@ -1,57 +1,34 @@
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools >= 72.2.0"]
+build-backend = "setuptools.build_meta"
 
 [tool.isort]
 profile = "black"
 
-[tool.poetry]
+[project]
 authors = [
-    "Koch, Pablo <pkoch@csn.uchile.cl>", 
-    "Goldberg, Dara <degoldberg@usgs.gov>",
-    "Hunsinger, Heather <hhunsinger@usgs.gov>",
-    "Haynie, Kirstie <khaynie@usgs.gov>"
+  {name = "Pablo Koch",  email = "pkoch@csn.uchile.cl"}, 
+  {name = "Dara Goldberg", email = "degoldberg@usgs.gov"},
+  {name = "Heather Hunsinger", email = "hhunsinger@usgs.gov"},
+  {name = "Kirstie Haynie", email = "khaynie@usgs.gov"}
+]
+maintainers = [
+  {name = "Dara Goldberg", email = "degoldberg@usgs.gov"},
 ]
 description = "Wavelet based inversion for slip on a fault, used to generate Finite Fault products"
 keywords = ["usgs", "neic", "earthquake", "slip", "finitefault"]
-license = "CC0-1.0"
+license = {file = "LICENSE.md"}
 name = "neic-finitefault"
-packages = [
-  {include = "wasp", from = "src"},
-]
-repository = "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault"
+requires-python = ">=3.10"
 version = "0.1.0"
 
-[tool.poetry.dependencies]
-python = "^3.9,<3.13"
-Cartopy = "^0.21.1"
-idna = "^3.7"
-matplotlib = "^3.8.3"
-netCDF4 = "^1.6.4"
-numpy = "^1.25.0"
-obspy = "^1.4.0"
-pygmt = "^0.9.0"
-pyproj = "^3.3.0"
-scipy = "^1.11.1"
-shapely = "1.7.1"
-sqlalchemy = "^2.0.0b1"
-pyrocko = "^2023.6.29"
-typer = "^0.9.0"
+[project.urls]
+Repository = "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault"
 
-[tool.poetry.group.dev.dependencies]
-black = "^24.3.0"
-isort = "^5.12.0"
-safety = "^2.1.1"
-poethepoet = "^0.20.0"
-pytest = "^7.4.0"
-pytest-cov = "^4.1.0"
-mypy = "^1.4.1"
-ipykernel = "^6.15.2"
-notebook = "^6.4"
-traitlets = "5.9.0"
+[tool.setuptools.packages.find]
+where = ["src"]
 
-
-[tool.poetry.scripts]
+[project.scripts]
 "wasp" = "wasp.wasp_admin.wasp:app"
 
 [tool.poe.tasks]
@@ -59,9 +36,6 @@ lint = [
   { shell = "black --check src" },
   { shell = "isort --check src/wasp" },
   { shell = "mypy src/wasp" }
-]
-okada = [
-  { shell = "pip install okada-wrapper==18.12.07.3" }
 ]
 test = [
   { shell = "pytest src/test --cov=src/wasp" },

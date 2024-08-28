@@ -19,6 +19,7 @@ import cartopy.io.shapereader as shpreader  # type: ignore
 import numpy as np  # type: ignore
 from matplotlib import colors, patches  # type: ignore
 from matplotlib import pyplot as plt  # type: ignore
+from matplotlib.axes import Axes
 from matplotlib.image import AxesImage  # type: ignore
 from obspy.imaging.beachball import beach  # type: ignore
 
@@ -460,27 +461,29 @@ def _PlotRiseTime(
         tfall_seg[indexes] = 0
         fig, axes = plt.subplots(1, 2, figsize=(20, 10), sharex=True, sharey=True)
         fig.subplots_adjust(bottom=0.15)
-        axes[0].set_ylabel(y_label)
-        axes[0].set_xlabel(x_label)
+        a1: Axes = axes[0]  # type: ignore
+        a2: Axes = axes[1]  # type: ignore
+        a1.set_ylabel(y_label)
+        a1.set_xlabel(x_label)
         if i_segment == 0:
-            axes[0].plot(0, 0, "w*", ms=20)
-        axes[0], im = __several_axes(
+            a1.plot(0, 0, "w*", ms=20)
+        a1, im = __several_axes(
             trise_seg,
             segment,
             ps_seg,
-            axes[0],
+            a1,
             max_val=max_trise,  # type:ignore
             autosize=False,
         )
-        axes[1].set_ylabel(y_label)
-        axes[1].set_xlabel(x_label)
+        a2.set_ylabel(y_label)
+        a2.set_xlabel(x_label)
         if i_segment == 0:
-            axes[1].plot(0, 0, "w*", ms=20)
-        axes[1], im = __several_axes(
+            a2.plot(0, 0, "w*", ms=20)
+        a2, im = __several_axes(
             tfall_seg,
             segment,
             ps_seg,
-            axes[1],
+            a2,
             max_val=max_tfall,  # type:ignore
             autosize=False,
         )
@@ -610,7 +613,9 @@ def PlotSlipDist_Compare(
         #
         # Plot the slip distribution
         #
-        fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(30, 8))
+        fig, axes = plt.subplots(1, 2, figsize=(30, 8))
+        ax0: Axes = axes[0]  # type: ignore
+        ax1: Axes = axes[1]  # type: ignore
         ax0.set_ylabel(y_label)
         ax0.set_xlabel(x_label)
         ax1.set_ylabel(y_label)
@@ -1042,12 +1047,12 @@ def PlotInsar(
     cols = [0, 1, 2, 0, 1, 2]
     zipped = zip(values, titles, labels, rows, cols)
     for value, title, label, row, col in zipped:
-        axes[row][col].set_title(title, fontdict={"fontsize": 20})
+        axes[row][col].set_title(title, fontdict={"fontsize": 20})  # type: ignore
         max_abs = np.max(np.abs(value))
         vmin = -max_abs - 0.001  # if not title == 'Misfit' else -40
         vmax = max_abs + 0.001  # if not title == 'Misfit' else 40
         norm = colors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
-        cs = axes[row][col].scatter(
+        cs = axes[row][col].scatter(  # type: ignore
             lons,
             lats,
             zorder=4,
@@ -1057,7 +1062,7 @@ def PlotInsar(
             transform=ccrs.PlateCarree(),
         )
         ax = set_map_cartopy(
-            axes[row][col], margins, tectonic=tectonic, countries=countries
+            axes[row][col], margins, tectonic=tectonic, countries=countries  # type: ignore
         )
         ax.plot(lon0, lat0, "y*", markersize=15, transform=ccrs.PlateCarree(), zorder=4)
         ax = plot_borders(
@@ -1132,7 +1137,9 @@ def PlotComparisonMap(
         facecolor="lightgray",
     )
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(30, 15), subplot_kw=dictn)
+    fig, axes = plt.subplots(1, 2, figsize=(30, 15), subplot_kw=dictn)
+    ax1: Axes = axes[0]  # type: ignore
+    ax2: Axes = axes[1]  # type: ignore
     ax1.set_title("Inverted model", fontsize=22)
     ax2.set_title("Original model", fontsize=22)
     fig.subplots_adjust(hspace=0, wspace=0.1, top=0.9, bottom=0.3)
@@ -1407,7 +1414,7 @@ def _PlotSnapshotSlip(
     fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(9, 9))
     i = 1
 
-    for ax in axes.flat:
+    for ax in axes.flat:  # type: ignore
         time = i * step * dt
         srate, cslip, broken = __rupture_process(  # type:ignore
             time, slip, srmax, trup, tl, tr, tmid, tstop  # type:ignore

@@ -460,7 +460,7 @@ def build_source_time_function(
     :rtype: Tuple[np.ndarray, np.ndarray]
     """
     from numpy import arange, cos, exp, isnan, pi, roll, sin, where, zeros
-    from scipy.integrate import trapz  # type:ignore
+    from scipy.integrate import trapezoid  # type:ignore
 
     # Initialize outputs
     t = arange(0, total_time + dt, dt)
@@ -488,7 +488,7 @@ def build_source_time_function(
         else:
             target = scale_value
 
-        area = trapz(Mdot, t)
+        area = trapezoid(Mdot, t)
         Mdot = Mdot * (scale_value / area)
     # Check for errors
     if isnan(Mdot[0]) == True:
