@@ -203,7 +203,7 @@ def shift_match(
         "-o",
         "--option",
         help=(
-            "whether to shift by cross-correlation or plot to pick manually (auto or manual)"
+            "whether to shift by cross-correlation or plot to pick manually (auto or manual). Auto applies to all stations, manual requires user to specify stations (see -ss option)."
         ),
     ),
     plot: bool = typer.Option(
