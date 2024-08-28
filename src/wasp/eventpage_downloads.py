@@ -655,11 +655,12 @@ def write_Coulomb_file(
 
 ### OKADA FUNCTIONS ###
 def write_Okada_displacements(
-    pdefile: Optional[Union[pathlib.Path, str]] = None,
+    pdefile: Union[pathlib.Path, str],
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """Write out the Okada displacements
-
+    :param pdefile: The path to the CMT file
+    :type pdefile: Union[pathlib.Path, str], optional
     :param directory: The directory where to write the file(s), defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     """
@@ -669,10 +670,7 @@ def write_Okada_displacements(
     ##########################
     #### FAULT INFORMATION ###
     ##########################
-    if pdefile is None:
-        pdefile = pathlib.Path(glob("../../../info/*_cmt_CMT")[0])
-    else:
-        pdefile = pathlib.Path(pdefile)
+    pdefile = pathlib.Path(pdefile)
     with open(pdefile, "r") as pdef:
         lines = pdef.readlines()
         pde = lines[0]
@@ -869,7 +867,7 @@ def get_top_bottom_from_center(center_depth, width, dip):
     :type width: float
     :param dip: dip of fault plane, in degrees (range 0 to 90)
     :type dip: float
-    :returns: top and bottom of fault plane, in km
+    :return: top and bottom of fault plane, in km
     :rtype: float, float
     """
     top = center_depth - (width / 2.0 * sin(deg2rad(dip)))
@@ -882,6 +880,17 @@ def get_four_corners_eastwest_fault(fault_depth, dip, half_length, half_width):
     Assuming a rectangular fault strikes east-west in a 3D cartesian space,
     and the coordinate (0, 0, depth) is located at its geometric center,
     what are the coordinates of the four corners?
+
+    :param fault_depth: center depth of fault, in km (positive down)
+    :type fault_depth: float
+    :param dip: dip of fault plane, in degrees (range 0 to 90)
+    :type dip: float
+    :param half_length: half the along-strike subfault length (in km)
+    :type half_length: float
+    :param half_width: half the along-dip subfault width (in km)
+    :type half_width: float
+    :return: corners of subfault
+    :rtype: array
     """
     top, bottom = get_top_bottom_from_center(fault_depth, half_width * 2, dip)
     west_point, east_point = -half_length, half_length
@@ -908,6 +917,26 @@ def get_four_corners_eastwest_fault(fault_depth, dip, half_length, half_width):
 
 
 def okada_wrapper_to_cutde(half_length, half_width, depth, dip, ss, ds, ts):
+    """
+    Organize info needed to treat cutde like former okada-wrapper
+
+    :param half_length: half the along-strike subfault length (in km)
+    :type half_length: float
+    :param half_width: half the along-dip subfault width (in km)
+    :type half_width: float
+    :param depth: center depth of fault, in km (positive down)
+    :type depth: float
+    :param dip: dip of fault plane, in degrees (range 0 to 90)
+    :type dip: float
+    :param ss: strike-slip component
+    :type ss: float
+    :param ds: dip-slip component
+    :type ds: float
+    :param ts: tensile-slip component
+    :type ts: float
+    :return: fault corners, indices of fault triangles, slip vector
+    :rtype: array, array, array
+    """
     # Dip is now implemented
     cutde_fault_pts = get_four_corners_eastwest_fault(
         depth, dip, half_length, half_width
@@ -926,6 +955,26 @@ def dc3dwrapper_cutde(
     fault_half_widths,
     slip,
 ):
+    """
+    Estimate displacement from subfault
+
+    :param fault_alpha: fault property
+    :type fault_alpha: float
+    :param coords: subfault corner coordinates
+    :type coords: array
+    :param fault_depth: center depth of subfault, in km (positive down)
+    :type fault_depth: float
+    :param fault_dip: dip of fault plane, in degrees (range 0 to 90)
+    :type fault_dip: float
+    :param fault_half_lengths: half the along-strike subfault length (in km)
+    :type fault_half_lengths: float
+    :param fault_half_widths: half the along-dip subfault width (in km)
+    :type fault_half_widths: flat
+    :param slip: strike-slip, dip-slip, tensile-slip components of slip (m)
+    :type slip: array
+    :return: success flag, displacement array, strain array
+    :rtype: int, array, array
+    """
     # Material property conversion
     fault_nu = (1 - 2 * fault_alpha) / (-2 * fault_alpha)
 
@@ -990,6 +1039,33 @@ def get_gridded_okada_displacements_cutde(
     fault_tensile_slip,
     fault_alpha,
 ):
+    """
+    Calculate displacement across area of interest from single subfault
+    :param obs_x_mat: matrix of observation points, x-direction
+    :type obs_x_mat: array
+    :param obs_y_mat: matrix of observation points, y-direction
+    :type obs_y_mat: array
+    :param obs_z_mat: matrix of observation points, z-directory
+    :type obs_z_mat: array
+    :param fault_depth: center depth of subfault, in km (positive down)
+    :type fault_depth: float
+    :param fault_dip: dip of fault plane, in degrees (range 0 to 90)
+    :type fault_dip: float
+    :param fault_half_length: half the along-strike subfault length (in km)
+    :type fault_half_length: float
+    :param fault_half_width: half the along-dip subfault width (in km)
+    :type fault_half_width: float
+    :param fault_strike_slip: slip in the strike-direction
+    :type fault_strike_slip: float
+    :param fault_dip_slip: slip in the dip-direction
+    :type fault_dip_slip: float
+    :param fault_tensile_slip: slip in the tensile direction
+    :type fault_tensile_slip: float
+    :param fault_alpha: fault property
+    :type fault_alpha: float
+    :return: displacements across observation grid
+    :rtype: array, array, array
+    """
     ux_okada_cutde = zeros(len(obs_x_mat.flatten()))
     uy_okada_cutde = zeros(len(obs_x_mat.flatten()))
     uz_okada_cutde = zeros(len(obs_x_mat.flatten()))
@@ -1017,6 +1093,20 @@ def get_gridded_okada_displacements_cutde(
 
 
 def strike_rotation(fault_strike, x_matrix_in, y_matrix_in, direction="fwd"):
+    """
+    Code assumes E-W fault, this function rotates observation positions by strike angle
+
+    :param fault_strike: strike of fault (degrees, 0-360)
+    :type fault_strike: float
+    :param x_matrix_in: original observation matrix, x-coordinates
+    :type x_matrix_in: array
+    :param y_matrix_in: original observation matrix, y-coordinates
+    :type y_matrix_in: array
+    :param direction: rotate into strike direction (fwd, default) or out of strike direction (inv)
+    :type direction: str
+    :return: rotated observation matrix, x-coordinates and rotated observation matrix, y-coordinates
+    :rtype: array, array
+    """
     # Rotate for strike:
     ### Rotation matrices (code assumes E-W fault, must rotate positions by strike angle and then rotate back) ###
     if direction == "fwd":
@@ -1046,6 +1136,23 @@ def strike_rotation(fault_strike, x_matrix_in, y_matrix_in, direction="fwd"):
 def plot_okada_map(
     directory, gridx, gridy, ux_okada_cutde, uy_okada_cutde, uz_okada_cutde
 ):
+    """
+    Plot map of Okada displacements
+
+    :param directory: The directory where to write the file(s), defaults to pathlib.Path() within write_Okada_displacements
+    :type directory: Union[pathlib.Path, str], optional
+    :param gridx: observation grid, x-coordinate
+    :type gridx: array
+    :param gridy: observation grid, y-coordinate
+    :type gridy: array
+    :param ux_okada_cutde: x-coordinate displacement
+    :type ux_okada_cutde: array
+    :param uy_okada_cutde: y-coordinate displacement
+    :type uy_okada_cutde: array
+    :param uz_okada_cutde: z-coordinate displacement
+    :type uz_okada_cutde: array
+    """
+
     default_dirs = mng.default_dirs()
     min_lon = min(gridx.flatten())
     max_lon = max(gridx.flatten())
@@ -1162,7 +1269,7 @@ def plot_okada_map(
         spec="e1/0",
         pen="1,gray30",
         line=True,
-        vector="0.2c+p2p,gray30+e+ggray30+a55+n",
+        vector="0.2c+p1p,gray30+eA+a55+n",
     )
 
     ### Vertical Displacement ###
