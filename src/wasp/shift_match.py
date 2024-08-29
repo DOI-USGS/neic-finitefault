@@ -150,8 +150,6 @@ def manual_shift(
                                 directory,
                                 data_type,
                                 dt,
-                                length,
-                                channel,
                                 channel["name"],
                                 waveform_start_signal,
                                 sample_shift,
@@ -170,14 +168,29 @@ def plot_3comp_shift(
     directory,
     data_type,
     dt,
-    length,
-    files,
     station_name,
     start,
     sample_shift,
     zero_start=True,
 ):
+    """
+    For regional observations, plot shift of all three components in one plot
 
+    :param directory: Where the files should be read from (default from manual_shift)
+    :type directory: Union[pathlib.Path, str]
+    :param data_type: The data type
+    :type data_type: str
+    :param dt: The sampling rate
+    :type dt: float
+    :param station_name: The station ID
+    :type station_name: str
+    :param start: The event start sample
+    :type start: int
+    :param sample_shift: The shift amount
+    :type sample_shift: int
+    :param zero_start: Whether a zero start, defaults to True
+    :type zero_start: bool
+    """
     plot_folder: Union[pathlib.Path, str] = (
         "strong_shift" if data_type == "strong" else "cgps_shift"
     )
@@ -267,7 +280,31 @@ def plot_shift(
     sample_shift,
     zero_start=True,
 ):
-
+    """
+    Plot observed and synthetic waveforms before and after shift
+    :param directory: Where the files should be read from (default from manual_shift)
+    :type directory: Union[pathlib.Path, str]
+    :param data_type: The data type
+    :type data_type: str
+    :param dt: Sampling rate
+    :type dt: float
+    :param synthetic: Synthetic waveform
+    :type synthetic: array
+    :param observed_file: Observation file properties
+    :type observed_file: dict
+    :param length: Considered waveform length
+    :type length: int
+    :param station: Station ID
+    :type station: str
+    :param channel: Channel/component
+    :type channel: str
+    :param start: Index of event start time
+    :type start: int
+    :param sample_shift: The shift amount
+    :type sample_shift: int
+    :param zero_start: Whether a zero start, defaults to True
+    :type zero_start: bool
+    """
     plot_folder: Union[pathlib.Path, str] = (
         "tele_shift"
         if data_type == "body"
