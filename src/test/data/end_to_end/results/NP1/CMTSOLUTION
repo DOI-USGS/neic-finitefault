@@ -1792,10 +1792,10 @@ Mpp:        8.178272e+25
 Mrt:        9.811846e+24 
 Mrp:       -1.314298e+25 
 Mtp:        1.017516e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH        
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
 time shift:      74.4149 
-half duration:    6.0000  
+half duration:    6.0000 
 latitude:       -30.1713 
 longitude:      -71.6894 
 depth:           15.5008 
