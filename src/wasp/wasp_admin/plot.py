@@ -309,7 +309,10 @@ def neic(
         CONFIG_PATH, "-c", "--config-file", help="Path to config file"
     ),
     gcmt_tensor_file: pathlib.Path = typer.Option(
-        None, "-g", "--gcmt", help="Path to the GCMT moment tensor file (Required for certain downloads, see -d)"
+        None,
+        "-g",
+        "--gcmt",
+        help="Path to the GCMT moment tensor file (Required for certain downloads, see -d)",
     ),
     data_types: List[ManagedDataTypes] = typer.Option(
         [],
