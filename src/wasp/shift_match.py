@@ -62,7 +62,7 @@ def manual_shift(
         else (
             "synthetics_strong.txt"
             if data_type == "strong"
-            else "synthetics_surf.txt" if data_type == "surf" else "synm.cgps"
+            else "synthetics_surf.txt" if data_type == "surf" else "synthetics_cgps.txt"
         )
     )
     files = get_outputs.get_data_dict(
@@ -197,9 +197,6 @@ def plot_3comp_shift(
     if not os.path.isdir(plot_folder):
         os.mkdir(plot_folder)
     fig, axes = plt.subplots(2, 3, figsize=(30, 5))
-    fig.text(0.04, 0.6, "Before Shift", va="center", rotation="vertical")
-    fig.text(0.04, 0.3, "After Shift", va="center", rotation="vertical")
-    # fig.suptitle("{}".format(station))
     obs_times: list = []
     syn_times: list = []
     obs_waveforms: list = []
@@ -208,8 +205,10 @@ def plot_3comp_shift(
     directory = pathlib.Path(directory)
     if data_type == "strong":
         json_file = "strong_motion_waves.json"
+        units = "Velocity (cm/s)"
     if data_type == "cgps":
         json_file = "cgps_waves.json"
+        units = "Displacement (cm)"
     with open(directory / json_file) as fs:
         files = json.load(fs)
 
@@ -240,8 +239,6 @@ def plot_3comp_shift(
             start0 = 0
             start00 = 0
             fig, axes = plt.subplots(2, len(synthetics), figsize=(30, 10))
-            fig.text(0.04, 0.6, "Before Shift", va="center", rotation="vertical")
-            fig.text(0.04, 0.3, "After Shift", va="center", rotation="vertical")
             fig.suptitle(station)
             zipped = zip(files2, synthetics, axes[0, :])  # type: ignore
             for file, synthetic, ax in zipped:
@@ -249,6 +246,8 @@ def plot_3comp_shift(
                 time0 = np.arange(len(synthetic)) * dt
                 ax.plot(time1, observed0, "k")
                 ax.plot(time0, synthetic, "r")
+                ax.set_xlim([min(time1), max(time1)])
+                ax.set_ylabel("Before Shift \n" + units)
                 ax.axvline(0)
                 ax.set_title(file["component"])
             zipped = zip(files2, synthetics, axes[1, :])  # type: ignore
@@ -260,6 +259,8 @@ def plot_3comp_shift(
                 time0 = np.arange(len(synthetic)) * dt
                 ax.plot(time2, observed1, "k")
                 ax.plot(time0, synthetic, "r")
+                ax.set_xlim([min(time1), max(time1)])
+                ax.set_ylabel("After Shift \n" + units)
                 ax.axvline(0)
                 ax.set_xlabel("Time (s)")
             name_file = os.path.join(plot_folder, "{}.png".format(station))
@@ -306,19 +307,17 @@ def plot_shift(
     :type zero_start: bool
     """
     plot_folder: Union[pathlib.Path, str] = (
-        "tele_shift"
-        if data_type == "body"
-        else (
-            "strong_shift"
-            if data_type == "strong"
-            else "surf_shift" if data_type == "surf" else "cgps_shift"
-        )
+        "tele_shift" if data_type == "body" else "surf_shift"
     )
+
+    if data_type == "body":
+        units = "Displacement (nm)"
+    else:  # surf
+        units = "Displacement (mm)"
+
     if not os.path.isdir(plot_folder):
         os.mkdir(plot_folder)
     fig, axes = plt.subplots(2, 1, figsize=(10, 5))
-    fig.text(0.04, 0.6, "Before Shift", va="center", rotation="vertical")
-    fig.text(0.04, 0.3, "After Shift", va="center", rotation="vertical")
     fig.suptitle("{} {}".format(station, channel))
     obs_times: list = []
     syn_times: list = []
@@ -344,6 +343,8 @@ def plot_shift(
     axes2 = plot_waveforms(axes2, obs_times, obs_waveforms, color="black")
     axes2 = plot_waveforms(axes2, syn_times, syn_waveforms, color="red", custom="fill")
     axes[1].set_xlabel("Time (s)")
+    axes[0].set_ylabel("Before Shift \n" + units)
+    axes[1].set_ylabel("After Shift \n" + units)
     name_file = os.path.join(plot_folder, "{}_{}.png".format(station, channel))
     plt.savefig(directory / name_file)
     plt.close(fig)
@@ -376,34 +377,22 @@ def shift_match2(
     directory = pathlib.Path(directory)
     if data_type == "body":
         json_file = "tele_waves.json"
-    if data_type == "strong":
-        json_file = "strong_motion_waves.json"
-    if data_type == "cgps":
-        json_file = "cgps_waves.json"
     if data_type == "surf":
         json_file = "surf_waves.json"
     with open(directory / json_file) as f:
         files = json.load(f)
     synthetics_file = (
-        "synthetics_body.txt"
-        if data_type == "body"
-        else (
-            "synthetics_strong.txt"
-            if data_type == "strong"
-            else "synthetics_surf.txt" if data_type == "surf" else "synm.cgps"
-        )
+        "synthetics_body.txt" if data_type == "body" else "synthetics_surf.txt"
     )
 
     dt = float(files[0]["dt"])
     plot_folder: Union[pathlib.Path, str] = (
-        "tele_shift"
-        if data_type == "body"
-        else (
-            "strong_shift"
-            if data_type == "strong"
-            else "surf_shift" if data_type == "surf" else "cgps_shift"
-        )
+        "tele_shift" if data_type == "body" else ("surf_shift")
     )
+    if data_type == "body":
+        units = "Displacement (nm)"
+    elif data_type == "surf":
+        units = "Displacement (mm)"
     files = get_outputs.get_data_dict(
         files, syn_file=synthetics_file, directory=directory
     )
@@ -459,8 +448,6 @@ def shift_match2(
             start00 = 0
             synthetics = [synthetic[:length] for synthetic in synthetics]
             fig, axes = plt.subplots(2, len(synthetics), figsize=(10, 5))
-            fig.text(0.04, 0.6, "Before Shift", va="center", rotation="vertical")
-            fig.text(0.04, 0.3, "After Shift", va="center", rotation="vertical")
             fig.suptitle("{} {}".format(station, channel))
             obs_times: list = []
             syn_times: list = []
@@ -510,7 +497,9 @@ def shift_match2(
             axes2 = plot_waveforms(
                 axes2, syn_times, syn_waveforms, color="red", custom="fill"
             )
-            axes[1].set_xlabel("Time (s)")  # type: ignore
+            axes2[1].set_xlabel("Time (s)")  # type: ignore
+            axes2[0].set_ylabel("Before Shift \n" + units)
+            axes2[1].set_ylabel("After Shift \n" + units)
             name_file = os.path.join(plot_folder, "{}_{}.png".format(station, channel))
             plt.savefig(directory / name_file)
             plt.close(fig)
@@ -549,8 +538,10 @@ def shift_match_regional(
     directory = pathlib.Path(directory)
     if data_type == "strong":
         json_file = "strong_motion_waves.json"
+        units = "Velocity (cm/s)"
     if data_type == "cgps":
         json_file = "cgps_waves.json"
+        units = "Displacement (cm)"
     with open(directory / json_file) as fs:
         files = json.load(fs)
     synthetics_file = (
@@ -594,8 +585,8 @@ def shift_match_regional(
             start0 = 0
             start00 = 0
             fig, axes = plt.subplots(2, len(synthetics), figsize=(30, 10))
-            fig.text(0.04, 0.6, "Before Shift", va="center", rotation="vertical")
-            fig.text(0.04, 0.3, "After Shift", va="center", rotation="vertical")
+            # fig.text(0.04, 0.6, "Before Shift", va="center", rotation="vertical")
+            # fig.text(0.04, 0.3, "After Shift", va="center", rotation="vertical")
             fig.suptitle(station)
             if len(files2) > 1:
                 zipped = zip(files2, synthetics, axes[0, :])  # type: ignore
@@ -604,7 +595,9 @@ def shift_match_regional(
                     time0 = np.arange(len(synthetic)) * dt
                     ax.plot(time1, observed0, "k")
                     ax.plot(time0, synthetic, "r")
+                    ax.set_xlim([min(time1), max(time1)])
                     ax.axvline(0)
+                    ax.set_ylabel("Before Shift \n" + units)
                     ax.set_title(file["component"])
                 zipped = zip(files2, synthetics, axes[1, :])  # type: ignore
                 for file, synthetic, ax in zipped:
@@ -615,7 +608,9 @@ def shift_match_regional(
                     time0 = np.arange(len(synthetic)) * dt
                     ax.plot(time2, observed1, "k")
                     ax.plot(time0, synthetic, "r")
+                    ax.set_xlim([min(time1), max(time1)])
                     ax.axvline(0)
+                    ax.set_ylabel("After Shift \n" + units)
                     ax.set_xlabel("Time (s)")
             else:
                 file = files2[0]
@@ -628,7 +623,9 @@ def shift_match_regional(
                 a2 = axes[1]  # type: ignore
                 a1.plot(time1, observed0, "k")
                 a1.plot(time0, synthetic, "r")
+                a1.set_xlim([min(time1), max(time1)])
                 a1.vlines(0, min_val, max_val)
+                a1.set_ylabel("Before Shift \n" + units)
                 a1.set_title(file["component"])
                 start4 = start + tr_shift
                 time2, observed1 = get_observed(
@@ -636,9 +633,11 @@ def shift_match_regional(
                 )
                 time0 = np.arange(len(synthetic)) * dt
                 a2.plot(time2, observed1, "k")
+                a2.set_xlim([min(time1), max(time1)])
                 a2.plot(time0, synthetic, "r")
                 a2.axvline(0)
                 a2.set_title(file["component"])
+                a2.set_ylabel("After Shift \n" + units)
                 a2.set_xlabel("Time (s)")
             name_file = os.path.join(plot_folder, "{}.png".format(station))
             plt.savefig(name_file)
