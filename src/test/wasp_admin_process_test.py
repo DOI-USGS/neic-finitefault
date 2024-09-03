@@ -246,7 +246,9 @@ def test_shift_match():
             shutil.copyfile(o["file"], n["file"])
         with open(pathlib.Path(tempdir) / "tele_waves.json", "w") as f:
             json.dump(new_tele_waves, f)
-
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "synthetics_body.txt", tempdir / "synthetics_body.txt"
+        )
         # test base process tele
         result = runner.invoke(
             app,
