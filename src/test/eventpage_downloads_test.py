@@ -164,5 +164,4 @@ def test_write_Okada_displacements():
         assert disp == disp_target
         assert (tempdir / "Okada_Displacement.png").exists()
     finally:
-        print(tempdir)
-        # shutil.rmtree(tempdir)
+        shutil.rmtree(tempdir)
