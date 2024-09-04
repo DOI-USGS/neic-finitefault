@@ -26,7 +26,6 @@ sudo apt install -y \
 ## Installing Python Dependencies
 The full list of Python dependencies can be found in the provided conda environment file [environment.yml](../install.d/environment.yml). These can be installed individually with your preferred package manager or directly with conda using: `conda env create -f ./install.d/environment.yml`
 
-
 # Get the Data Dependencies
 Download the [required data dependencies](./data-dependecies.md) and put them in the following locations within the source code.
 1. fd_bank: `./fortran_code/gfs_nm/long/fd_bank`

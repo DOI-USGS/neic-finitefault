@@ -309,7 +309,10 @@ def neic(
         CONFIG_PATH, "-c", "--config-file", help="Path to config file"
     ),
     gcmt_tensor_file: pathlib.Path = typer.Option(
-        None, "-g", "--gcmt", help="Path to the GCMT moment tensor file"
+        None,
+        "-g",
+        "--gcmt",
+        help="Path to the GCMT moment tensor file (Required for certain downloads, see -d)",
     ),
     data_types: List[ManagedDataTypes] = typer.Option(
         [],
@@ -514,12 +517,12 @@ def neic(
     if downloads:
         if gcmt_tensor_file:
             write_CMTSOLUTION_file(pdefile=gcmt_tensor_file, directory=directory)
+            write_Okada_displacements(directory=directory, pdefile=gcmt_tensor_file)
         else:
             logging.warn(
-                "No gcmt_tensor_file specified. Skipping writing CMTSOLUTION file."
+                "No gcmt_tensor_file specified. Skipping writing CMTSOLUTION file and Okada Displacements."
             )
         write_Coulomb_file(directory=directory, eventID=event_id)
-        write_Okada_displacements(directory=directory)
         make_waveproperties_json(directory=directory)
     if ffm_solution:
         shear = shear_modulous(point_sources, velmodel=vel_model)
