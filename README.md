@@ -5,6 +5,10 @@
   - [Prerequisites](#prerequisites)
   - [Wasp Installation Scripts](#wasp-installation-scripts)
 - [Local Testing](#local-testing)
+- [Using the Docker Image](#using-the-docker-image)
+  - [Pulling docker images](#pulling-docker-images)
+  - [Building the docker image locally](#building-the-docker-image-locally)
+  - [Run the docker image interactively](#run-the-docker-image-interactively)
 
 # Wavelet and simulated Annealing SliP inversion (WASP)
 
@@ -69,3 +73,33 @@ Tests and linting can both be run locally:
        - RUN_ALL
        - RUN_END_TO_END
 2. To run python linting: `poe lint`
+
+
+# Using the Docker Image
+This repository provides a docker images for the dependencies and source code. Below are some useful commands for interacting with these images.
+
+> While these commands listed are docker commands. The commands should be 1 to 1 with Podman commands. Replace the word "docker" in the command with "podman".
+
+## Pulling docker images
+- `docker pull <image name>`
+  - Names of available images:
+    1.   Image with python dependencies (e.g. conda environment ff-env): code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp-python
+    2.  Image with all of the above (1) and the compiled fortran code: code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp-fortran
+    3. Image with all of the above (1 and 2) and the data dependencies (e.g. fd_bank): code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp-dependencies
+    4. Image with all of the above (1, 2, and 3) and the python sorce code (e.g. fd_bank): code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp
+
+## Building the docker image locally
+1. Go to the top level of your local repository: `cd <path to the local repository>`
+2. Build the image: `docker build .`
+   - Useful Optional Flags (must come before specifying the location of the Dockerfile):
+     - give the image a name: `-t <name>`
+     - build to a specific layer: `--target <layer name>`
+       - Available layers: packages, wasp-python, wasp-fortran, wasp-dependencies, wasp
+     - add a build argument: `--build-arg <KEY>=<VALUE>`
+       - Available argument keys: FROM_IMAGE
+
+## Run the docker image interactively
+- `docker run --rm -i <name> bash`
+  - Useful Optional Flags (must come before the name and specifying a bash shell):
+    - mount the image to a local directory: `-v <path to local directory>:<path to location in the docker container>`
+    - open a port (might be useful for jupyter notebooks that need to display on a web browser): `-p <host port>: <container port`>
