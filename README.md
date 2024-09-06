@@ -76,7 +76,7 @@ Tests and linting can both be run locally:
 
 
 # Using the Docker Image
-This repository provides a docker images for the dependencies and source code. Below are some useful commands for interacting with these images.
+This repository provides docker images for the dependencies and source code. Below are some useful commands for interacting with these images. See the [Dockerfile](./Dockerfile) for the build steps/configuration.
 
 > While these commands listed are docker commands. The commands should be 1 to 1 with Podman commands. Replace the word "docker" in the command with "podman".
 
@@ -86,7 +86,7 @@ This repository provides a docker images for the dependencies and source code. B
     1.   Image with python dependencies (e.g. conda environment ff-env): code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp-python
     2.  Image with all of the above (1) and the compiled fortran code: code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp-fortran
     3. Image with all of the above (1 and 2) and the data dependencies (e.g. fd_bank): code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp-dependencies
-    4. Image with all of the above (1, 2, and 3) and the python sorce code (e.g. fd_bank): code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp
+    4. Image with all of the above (1, 2, and 3) and the python source code: code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp
 
 ## Building the docker image locally
 1. Go to the top level of your local repository: `cd <path to the local repository>`
