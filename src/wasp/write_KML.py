@@ -16,7 +16,7 @@ import numpy as np
 from cartopy.crs import Projection  # type: ignore
 from cartopy.feature import Feature  # type: ignore
 from cartopy.mpl.geoaxes import GeoAxes  # type: ignore
-from matplotlib import cm  # type: ignore
+from matplotlib import colormaps  # type: ignore
 from matplotlib import pyplot as plt  # type: ignore
 from matplotlib.colors import ListedColormap  # type: ignore
 from matplotlib.patches import Rectangle  # type: ignore
@@ -30,7 +30,7 @@ Set colorbar for slip
 """
 rm = 100  # amount of lines to remove on black end of magma_r
 ad = 50  # how much at the zero end should be *just* white before transitioning to meet colors
-magma_cpt = cm.get_cmap("magma_r", 512)  # start with magma_r
+magma_cpt = colormaps.get_cmap("magma_r")  # start with magma_r
 white_bit = np.array([255 / 256, 250 / 256, 250 / 256, 1])  # create array of white
 slip_cpt = magma_cpt(np.linspace(0, 1, 512))  # initialize slip_cpt
 slip_cpt[rm:, :] = slip_cpt[0:-rm, :]  # move beginning up to remove black end
@@ -500,10 +500,10 @@ def PlotMap_KML(
         margins = [min_lon - 0.5, max_lon + 0.5, min_lat - 0.5, max_lat + 0.5]
     else:
         margins = [
-            min_lon - limits[0],
-            max_lon + limits[1],
-            min_lat - limits[2],
-            max_lat + limits[3],
+            limits[0],
+            limits[1],
+            limits[2],
+            limits[3],
         ]
 
     ax.add_patch(

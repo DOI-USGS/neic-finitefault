@@ -11,7 +11,7 @@ from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 
 from wasp.data_acquisition import acquisition
 from wasp.data_management import filling_data_dicts
-from wasp.fault_plane import create_finite_fault, event_mult_in_to_json
+from wasp.fault_plane import create_finite_fault
 from wasp.get_outputs import read_solution_static_format
 from wasp.input_files import (
     input_chen_insar,
@@ -157,7 +157,6 @@ def create_ff(
     # get tensor information
     tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
 
-    event_mult_in_to_json(directory=directory)
     create_finite_fault(
         tensor_info=tensor_info,
         np_plane_info={
@@ -170,13 +169,6 @@ def create_ff(
         rupture_vel=rupture_velocity,
         directory=directory,
     )
-
-
-@app.command(help="Convert Event_mult.in to json")
-def eventmult_to_json(
-    directory: pathlib.Path = typer.Argument(..., help="Path to read/write from"),
-):
-    event_mult_in_to_json(directory=directory)
 
 
 @app.command(help="Populate data dictionaries used for managing data")
@@ -756,6 +748,9 @@ def tensor_from_gcmt(
 
 @app.command(help="Update the input data dict after changes")
 def update_inputs(
+    directory: pathlib.Path = typer.Argument(
+        ..., help="Path to the directory to read/write from"
+    ),
     annealing: bool = typer.Option(
         False, "-a", "--annealing", help="Compute files for annealing"
     ),
@@ -767,12 +762,6 @@ def update_inputs(
         "-t",
         "--data-type",
         help="Type to add to the data_types list, default is []",
-    ),
-    directory: pathlib.Path = typer.Option(
-        pathlib.Path(),
-        "-d",
-        "--directory",
-        help="Directory where to write the tensor file. Default is working directory",
     ),
     model_space: bool = typer.Option(
         False, "-m", "--model_space", help="compute files for model space"

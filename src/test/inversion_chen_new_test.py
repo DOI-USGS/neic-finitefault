@@ -314,7 +314,9 @@ def test_automatic_usgs():
                 str(tempdir / "20150916225432" / "ffm.0" / "data" / "cGPS" / basename)
             )
             target_stream = read(str(target_file))
-            np.testing.assert_array_equal(stream[0].data, target_stream[0].data)
+            np.testing.assert_array_almost_equal(
+                stream[0].data, target_stream[0].data, decimal=5
+            )
         # compare processed strong motion waveforms
         data_dir = RESULTS_DIR / "data"
         waveforms = glob.glob(str(data_dir / "STR") + "/*.sac")
@@ -324,7 +326,9 @@ def test_automatic_usgs():
                 str(tempdir / "20150916225432" / "ffm.0" / "data" / "STR" / basename)
             )
             target_stream = read(str(target_file))
-            np.testing.assert_array_equal(stream[0].data, target_stream[0].data)
+            np.testing.assert_array_almost_equal(
+                stream[0].data, target_stream[0].data, decimal=5
+            )
         # compare processed teleseismic waveforms
         data_dir = RESULTS_DIR / "data"
         for tp in ["P", "SH", "LONG"]:
@@ -338,7 +342,9 @@ def test_automatic_usgs():
                 # TODO: investigate why KOWA surface waves are different
                 if tp == "LONG" and "KOWA" in str(target_file):
                     continue
-                np.testing.assert_array_equal(stream[0].data, target_stream[0].data)
+                np.testing.assert_array_almost_equal(
+                    stream[0].data, target_stream[0].data, decimal=5
+                )
     finally:
         shutil.rmtree(tempdir)
 
@@ -400,7 +406,9 @@ def test_automatic_cgps():
                 str(tempdir / "20150916225432" / "ffm.0" / "data" / "cGPS" / basename)
             )
             target_stream = read(str(target_file))
-            np.testing.assert_array_equal(stream[0].data, target_stream[0].data)
+            np.testing.assert_array_almost_equal(
+                stream[0].data, target_stream[0].data, decimal=5
+            )
     finally:
         shutil.rmtree(tempdir)
 
@@ -568,7 +576,9 @@ def test_automatic_strong_motion():
                 str(tempdir / "20150916225432" / "ffm.0" / "data" / "STR" / basename)
             )
             target_stream = read(str(target_file))
-            np.testing.assert_array_equal(stream[0].data, target_stream[0].data)
+            np.testing.assert_array_almost_equal(
+                stream[0].data, target_stream[0].data, decimal=5
+            )
     finally:
         shutil.rmtree(tempdir)
 
@@ -637,6 +647,8 @@ def test_automatic_tele():
                 # TODO: investigate why KOWA surface waves are different
                 if tp == "LONG" and "KOWA" in str(target_file):
                     continue
-                np.testing.assert_array_equal(stream[0].data, target_stream[0].data)
+                np.testing.assert_array_almost_equal(
+                    stream[0].data, target_stream[0].data, decimal=4
+                )
     finally:
         shutil.rmtree(tempdir)

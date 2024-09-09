@@ -2,15 +2,15 @@
 
 # ==============================================================================
 # Define usage
-#     Sets up usage function and parses arguments
+#     Install conda (if needed)
 # ==============================================================================
 ## define usage
 function usage {
     echo "----------------------------------------------------------------"
-    echo "Install package with Ubuntu package manager 'apt'. "
-    echo "apt update/upgrade may be required if packages can't be found."
+    echo "Install Conda"
     echo "----------------------------------------------------------------"
 }
+
 ## parse arguments
 REQUIRED_ARGS=()
 while [[ $# -gt 0 ]]; do
@@ -32,24 +32,6 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# ==============================================================================
-# Download and install packages with apt
-# ==============================================================================
-# install packages
-echo "Installing packages with apt"
-apt install -y \
-  build-essential \
-  cmake \
-  curl \
-  gcc \
-  gfortran \
-  ghostscript \
-  git \
-  libssl-dev \
-  libffi-dev \
-  libnetcdf-dev \
-  libgdal-dev \
-  libgeos-dev \
-  python3-dev \
-  sqlite3 \
-  && apt clean;
+
+# shellcheck source=./install.d/conda.sh
+source ./install.d/conda.sh;

@@ -8,7 +8,10 @@ default:
 variables:
   REPOSITORY: "ghsc/neic/algorithms/neic-finitefault"
   DOCKER_IMAGE: "code.usgs.gov:5001/devops/images/usgs/docker:20"
-  WASP_IMAGE: "${CI_REGISTRY}/${REPOSITORY}/wasp-ubuntu-dependencies:latest"
+  PYTHON_IMAGE: "${CI_REGISTRY}/${REPOSITORY}/wasp-python:latest"
+  FORTRAN_IMAGE: "${CI_REGISTRY}/${REPOSITORY}/wasp-fortran:latest"
+  DEPENDENCIES_IMAGE: "${CI_REGISTRY}/${REPOSITORY}/wasp-dependencies:latest"
+  WASP_IMAGE: "${CI_REGISTRY}/${REPOSITORY}/wasp:latest"
    
 
 
@@ -55,32 +58,13 @@ stages:
 ## -------------------------------------
 #  Init Stage
 ## -------------------------------------
-Poetry:
-  artifacts:
-    paths:
-      - poetry.toml
-      - .venv
-      - dist/lambda
-    expire_in: 1 week
-  image: "${WASP_IMAGE}"
-  script:
-    - poetry config virtualenvs.in-project true --local
-    - poetry install --verbose
-    # - poetry run poe okada
-    - poetry run safety check
-  stage: init
-
 Fortran:
   artifacts:
     paths:
       - fortran_code
     expire_in: 1 week
-  image: "${WASP_IMAGE}"
+  image: "${PYTHON_IMAGE}"
   script:
-    - source ./environment.d/ubuntu.sh
-    - cp -r "/home/usgs-user/finitefault/tectonicplates" ./fortran_code/
-    - cp "/home/usgs-user/finitefault/fortran_code/gfs_nm/long/fd_bank" ./fortran_code/gfs_nm/long/fd_bank
-    - cp "/home/usgs-user/finitefault/fortran_code/info/LITHO1.0.nc" ./fortran_code/info/LITHO1.0.nc
     - bash install.d/wasp.sh "$(pwd)"
   stage: init
 
@@ -88,32 +72,32 @@ Fortran:
 #  Test Stage
 ## -------------------------------------
 
-Python Lint:
+Python Test:
   image: "${WASP_IMAGE}"
+  before_script:
+    - conda init
+    - export PATH=/root/miniconda/bin:$PATH
+    - source activate base
+    - conda env remove -n ff-env -y
+    - conda env create -f ./install.d/environment.yml -y
+    - conda activate ff-env
   script:
-    - poetry run poe lint
+    - ls /neic-finitefault
+    - safety check -i 70612 -i 51668
+    - poe lint
+    - cp -r "/neic-finitefault/fortran_code/tectonicplates" ./fortran_code/
+    - cp "/neic-finitefault/fortran_code/gfs_nm/long/fd_bank" ./fortran_code/gfs_nm/long/fd_bank
+    - cp "/neic-finitefault/fortran_code/info/LITHO1.0.nc" ./fortran_code/info/LITHO1.0.nc
+    - poe test
   stage: test
 
-Python Test:
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage.xml
-      junit: junit.xml
-  image: "${WASP_IMAGE}"
-  script:
-    - source ./environment.d/ubuntu.sh && poetry run poe test
-  stage: test
 
 Shell Check:
   image: usgs/ubuntu:latest
   script:
     - apt install -y shellcheck
-    - shellcheck docker_install.sh -x
-    - shellcheck user_install.sh -x
-    - shellcheck install.d/*
-    - shellcheck environment.d/*
+    - shellcheck install.sh -x
+    - shellcheck install.d/*.sh
   stage: test
 
 ## -------------------------------------
@@ -146,10 +130,12 @@ Docker Deploy:
     - echo "${ARGS[@]} --tag ${LOCAL_IMAGE}" 
     - docker build "${ARGS[@]}" --tag "wasp-latest" .
     - TAG="${CI_COMMIT_TAG:-latest}"
-    - DEPENDENCY_IMAGE="${CI_REGISTRY}/${REPOSITORY}/"wasp-ubuntu-dependencies":${TAG}"
-    - docker build "${ARGS[@]}" --target dependencies -t "${DEPENDENCY_IMAGE}" .
-    - FF_IMAGE="${CI_REGISTRY}/${REPOSITORY}/"wasp-ubuntu":${TAG}"
-    - docker build "${ARGS[@]}" --target finitefault -t "${FF_IMAGE}" .
+    - FF_FORTRAN="${CI_REGISTRY}/${REPOSITORY}/"wasp":${TAG}"
+    - docker build "${ARGS[@]}" --target wasp-fortran -t "${FF_FORTRAN}" .
+    - DEPENDENCY_IMAGE="${CI_REGISTRY}/${REPOSITORY}/"wasp-dependencies":${TAG}"
+    - docker build "${ARGS[@]}" --target wasp-dependencies -t "${DEPENDENCY_IMAGE}" .
+    - FF_IMAGE="${CI_REGISTRY}/${REPOSITORY}/"wasp":${TAG}"
+    - docker build "${ARGS[@]}" --target wasp -t "${FF_IMAGE}" .
     # remove dependencies that are no longer needed on the runner
     - rm -rf ./*
     # push to registry

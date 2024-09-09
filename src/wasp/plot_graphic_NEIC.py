@@ -22,8 +22,9 @@ import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
 import pygmt  # type: ignore
 from matplotlib import ticker  # type: ignore
-from matplotlib import cm, colors, gridspec  # type: ignore
+from matplotlib import colormaps, colors, gridspec  # type: ignore
 from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
 from matplotlib.colors import ListedColormap  # type: ignore
 from matplotlib.image import AxesImage  # type: ignore
 from obspy.imaging.beachball import beach, beachball  # type: ignore
@@ -52,7 +53,7 @@ Set colorbar for slip
 """
 rm = 100  # amount of lines to remove on black end of magma_r
 ad = 50  # how much at the zero end should be *just* white before transitioning to meet colors
-magma_cpt = cm.get_cmap("magma_r", 512)  # start with magma_r
+magma_cpt = colormaps.get_cmap("magma_r")  # start with magma_r
 white_bit = np.array([255 / 256, 250 / 256, 250 / 256, 1])  # create array of white
 slip_cpt = magma_cpt(np.linspace(0, 1, 512))  # initialize slip_cpt
 slip_cpt[rm:, :] = slip_cpt[0:-rm, :]  # move beginning up to remove black end
@@ -381,20 +382,22 @@ def _PlotRiseTime(
         trise_seg[indexes] = 0
         tfall_seg[indexes] = 0
         fig, axes = plt.subplots(1, 2, figsize=(20, 10), sharex=True, sharey=True)
+        ax1: Axes = axes[0]  # type: ignore
+        ax2: Axes = axes[1]  # type: ignore
         fig.subplots_adjust(bottom=0.15)
-        axes[0].set_ylabel(y_label)
-        axes[0].set_xlabel(x_label)
+        ax1.set_ylabel(y_label)
+        ax1.set_xlabel(x_label)
         if i_segment == 0:
-            axes[0].plot(0, 0, "w*", ms=20)
-        axes[0], im = __several_axes(
-            trise_seg, segment, ps_seg, axes[0], max_val=max_trise, autosize=False
+            ax1.plot(0, 0, "w*", ms=20)
+        ax1, im = __several_axes(
+            trise_seg, segment, ps_seg, ax1, max_val=max_trise, autosize=False
         )
-        axes[1].set_ylabel(y_label)
-        axes[1].set_xlabel(x_label)
+        ax2.set_ylabel(y_label)
+        ax2.set_xlabel(x_label)
         if i_segment == 0:
-            axes[1].plot(0, 0, "w*", ms=20)
-        axes[1], im = __several_axes(
-            tfall_seg, segment, ps_seg, axes[1], max_val=max_tfall, autosize=False
+            ax2.plot(0, 0, "w*", ms=20)
+        ax2, im = __several_axes(
+            tfall_seg, segment, ps_seg, ax2, max_val=max_tfall, autosize=False
         )
         cbar_ax = fig.add_axes((0.1, 0.05, 0.8, 0.05))
         cb = fig.colorbar(im, cax=cbar_ax, orientation="horizontal")
@@ -1277,7 +1280,9 @@ def PlotSlipDist_Compare(
         #
         # Plot the slip distribution
         #
-        fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(30, 8))
+        fig, axes = plt.subplots(1, 2, figsize=(30, 8))
+        ax0: Axes = axes[0]  # type: ignore
+        ax1: Axes = axes[1]  # type: ignore
         ax0.set_ylabel(y_label)
         ax0.set_xlabel(x_label)
         ax1.set_ylabel(y_label)
@@ -2284,7 +2289,9 @@ def PlotComparisonMap(
         facecolor="lightgray",
     )
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(30, 15), subplot_kw=dictn)
+    fig, axes = plt.subplots(1, 2, figsize=(30, 15), subplot_kw=dictn)
+    ax1: Axes = axes[0]  # type: ignore
+    ax2: Axes = axes[1]  # type: ignore
     ax1.set_title("Inverted model", fontsize=22)
     ax2.set_title("Original model", fontsize=22)
     fig.subplots_adjust(hspace=0, wspace=0.1, top=0.9, bottom=0.3)
@@ -2628,7 +2635,7 @@ def _PlotSnapshotSlip(
     fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(9, 9))
     i = 1
 
-    for ax in axes.flat:
+    for ax in axes.flat:  # type: ignore
         time = i * step * dt  # type:ignore
         srate, cslip, broken = __rupture_process(
             time, slip, srmax, trup, tl, tr, tmid, tstop  # type:ignore

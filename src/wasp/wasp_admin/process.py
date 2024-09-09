@@ -3,7 +3,7 @@ import os
 import pathlib
 import time
 from glob import glob
-from typing import List
+from typing import Any, List
 
 import typer
 
@@ -18,6 +18,7 @@ from wasp.management import default_dirs
 from wasp.read_config import CONFIG_PATH
 from wasp.seismic_tensor import get_tensor
 from wasp.shift_match import (
+    manual_shift,
     print_arrival,
     save_waveforms,
     shift_match2,
@@ -190,7 +191,7 @@ def remove_baseline(
     print("Time spent: ", time.time() - time0)
 
 
-@app.command(help="Shift data to match pick")
+@app.command(help="Shift data to match synthetic timing")
 def shift_match(
     directory: pathlib.Path = typer.Argument(..., help="Path to the data directory"),
     data_type: ShiftMatchDataTypes = typer.Argument(
@@ -202,7 +203,7 @@ def shift_match(
         "-o",
         "--option",
         help=(
-            "whether to shift by cross-correlation or plot to pick manually (auto or manual)"
+            "whether to shift by cross-correlation or plot to pick manually (auto or manual). Auto applies to all stations, manual requires user to specify stations (see -ss option)."
         ),
     ),
     plot: bool = typer.Option(
@@ -217,11 +218,17 @@ def shift_match(
         "--multiple-events",
         help=f"Create plots for multiple events, defined by the specified number",
     ),
+    station_shift: List[str] = typer.Option(
+        [],
+        "-ss",
+        "--station-shift",
+        help=f'Station to shift in format "STATION:CHANNEL:SHIFT" for body and surf or format "STATION:SHIFT" for strong or cgps (all strong and cgps station channels must shift the same amount. Shift amount is given in seconds and can be positive or negative.',
+    ),
 ):
     # validate files
     validate_files([directory / DEFAULT_MANAGEMENT_FILES[data_type]])
 
-    if option == "match":
+    if option == "auto":
         if multiple_events is None:
             if data_type in ["body", "surf"]:
                 files = shift_match2(data_type, plot=plot, directory=directory)
@@ -243,7 +250,52 @@ def shift_match(
                     )
                     files += shift_files
         save_waveforms(data_type, files)
+    elif option == "manual":
+        modify_dict: dict = {}
+        if data_type in ["body", "surf"]:
+            files = []
+            # construct dict
+            for station in station_shift:
+                split_station_string = station.split(":")
+                if len(split_station_string) != 3:
+                    print(
+                        f'Incorrect number of inputs. Input for body/surf data must be `-ss "STATION:CHANNEL:SHIFT"'
+                    )
+                    return
+                station = split_station_string[0]
+                channel = split_station_string[1]
+                shift_amount = float(split_station_string[-1])
+                if station not in modify_dict:
+                    modify_dict[station] = {}
+                if channel not in modify_dict[station]:
+                    modify_dict[station][channel] = shift_amount
+                print(f"Move station {station} channel {channel} by {shift_amount} s")
+            shift_files = manual_shift(
+                data_type, station_dict=modify_dict, plot=plot, directory=directory
+            )
+            files += shift_files
+        else:
+            files = []
+            # construct dict
+            for station in station_shift:
+                split_station_string = station.split(":")
+                if len(split_station_string) != 2:
+                    print(
+                        f'Incorrect number of inputs. Input for strong/cgps data must be `-ss "STATION:SHIFT"'
+                    )
+                    return
+                station = split_station_string[0]
+                shift_amount = float(split_station_string[-1])
+                if station not in modify_dict:
+                    modify_dict[station] = shift_amount
+                print(f"Move station {station} by {shift_amount} s")
+            shift_files = manual_shift(
+                data_type, station_dict=modify_dict, plot=plot, directory=directory
+            )
+            files += shift_files
+        save_waveforms(data_type, files)
     else:
+        print("Option unknown. Choose '-o auto' or '-o manual'")
         tensor_file = directory / "tensor_info.json"
         validate_files([tensor_file])
         with open(tensor_file) as tf:

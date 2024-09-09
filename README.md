@@ -2,9 +2,13 @@
   - [Authors](#authors)
   - [References](#references)
 - [Installation](#installation)
-  - [Install Scripts](#install-scripts)
-  - [Using the Poetry Environment](#using-the-poetry-environment)
+  - [Prerequisites](#prerequisites)
+  - [Wasp Installation Scripts](#wasp-installation-scripts)
 - [Local Testing](#local-testing)
+- [Using the Docker Image](#using-the-docker-image)
+  - [Pulling docker images](#pulling-docker-images)
+  - [Building the docker image locally](#building-the-docker-image-locally)
+  - [Run the docker image interactively](#run-the-docker-image-interactively)
 
 # Wavelet and simulated Annealing SliP inversion (WASP)
 
@@ -37,15 +41,22 @@ Users of this code should consider citing the following relevant publications:
 
 # Installation
 
-## Install Scripts
+## Prerequisites
 
-Automated installation of the dependencies and fortran code has been provided in the form of an [install script](./user_install.sh). Currently this install script only supports installation on linux systems (specifically Ubuntu for the system packages). Installation of Python, Poetry, GEOS, and PyGMT is handled by Miniconda. Pip installable python dependencies and code is managed with the provided Poetry environment setup by pyproject.toml and package-lock.json. To install the dependencies and code run the two commands:
+In order to compile and/or install the source code there are a number of prerequisite requirements:
 
-1. `source user_install.sh <path to the local neic-finitefault repository> <Python major version to install (e.g. 3.11)>` (with other optional configurations available, run `sudo bash user_install.sh -h` for the help information)
-   1. > NOTE: The scripts in [./install.d](./install.d/) may be run individually to suit the individuals needs. For example, to only rerun compilation of the fortran you can singularly run [wap.sh](./install.d/wasp.sh).
+1. gfortran: To compile the code in [fortran_code](./fortran_code/)
+2. cmake: To compile the code in [fortran_code](./fortran_code/)
+3. gcc: To provide support to miniconda for compiling c code
+4. miniconda/anaconda: To install python dependencies. Conda can be installed using the provided script: [conda_install.sh](./conda_install.sh)
+
+## Wasp Installation Scripts
+
+Automated installation of the dependencies and fortran code has been provided in the form of the install script [install.sh](./install.sh). Currently this install script only supports installation on linux systems as the fortran code cannot be compiled on MacOS. To instal the code please ensure that all of the [prerequisites](#prerequisites) are available and miniconda/anaconda has been initialized
+
+1. `source install.sh <path to the local neic-finitefault repository>` (with other optional configurations available, run `sudo bash user_install.sh -h` for the help information)
+   1. > NOTE: The scripts in [./install.d](./install.d/) may be run individually to suit the individuals needs. For example, to only rerun compilation of the fortran you can singularly run [wasp.sh](./install.d/wasp.sh).
 2. `conda activate ff-env`
-
-- NOTE: Multiple versions of Poetry installed may cause conflicts. This installation assumes that poetry is only installed within the conda environment `ff-env`
 
 The following documents provide more information about the installation process:
 
@@ -53,26 +64,42 @@ The following documents provide more information about the installation process:
 - [Code Dependencies](./docs/code-dependencies.md): Provides a list of dependencies required to run the code
 - [Manual Installation](./docs/manual-installation.md): Provides a list of steps to manually install dependencies and code without reference to a specific operating system.
 
-## Using the Poetry Environment
-
-After running `poetry install`, you will need to activate your environment. This can be done a number of ways:
-
-- `poetry shell` (from within the project at the same location of the pyproject.toml)
-- `source <path to poetry virtual environments>/<environment name>/bin/activate`
-
-The following commands may also be useful:
-
-- `poetry config --list`: shows your poetry configuration including the path to poetry virtual environments
-- `poetry env list`: Shows the virtual environments associated with the project you are in
-- `poetry env info`: Shows the information about the currently activated virtual environment
-
-You can also skip activating the environment by prefixing commands run with `poetry run` (Example: `poetry run wasp --help`). These commands must be run from within the project at the same location of the pyproject.toml.
-
-See official [Poetry documentation](https://python-poetry.org/docs/managing-environments/) for a full description of managing environments.
-
 # Local Testing
 
 Tests and linting can both be run locally:
 
-1. To run all python unit tests: `poetry run poe test`
-2. To run python linting: `poetry run poe lint`
+1. To run all python unit tests: `poe test`
+   1. The full end to end inversion tests take a consideral amount of time to run. As a result, they are skipped by default and can be enabled by setting the following environment variables to "True"
+       - RUN_ALL
+       - RUN_END_TO_END
+2. To run python linting: `poe lint`
+
+
+# Using the Docker Image
+This repository provides docker images for the dependencies and source code. Below are some useful commands for interacting with these images. See the [Dockerfile](./Dockerfile) for the build steps/configuration.
+
+> While these commands listed are docker commands. The commands should be 1 to 1 with Podman commands. Replace the word "docker" in the command with "podman".
+
+## Pulling docker images
+- `docker pull <image name>`
+  - Names of available images:
+    1.   Image with python dependencies (e.g. conda environment ff-env): code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp-python
+    2.  Image with all of the above (1) and the compiled fortran code: code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp-fortran
+    3. Image with all of the above (1 and 2) and the data dependencies (e.g. fd_bank): code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp-dependencies
+    4. Image with all of the above (1, 2, and 3) and the python source code: code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp
+
+## Building the docker image locally
+1. Go to the top level of your local repository: `cd <path to the local repository>`
+2. Build the image: `docker build .`
+   - Useful Optional Flags (must come before specifying the location of the Dockerfile):
+     - give the image a name: `-t <name>`
+     - build to a specific layer: `--target <layer name>`
+       - Available layers: packages, wasp-python, wasp-fortran, wasp-dependencies, wasp
+     - add a build argument: `--build-arg <KEY>=<VALUE>`
+       - Available argument keys: FROM_IMAGE
+
+## Run the docker image interactively
+- `docker run --rm -i <name> bash`
+  - Useful Optional Flags (must come before the name and specifying a bash shell):
+    - mount the image to a local directory: `-v <path to local directory>:<path to location in the docker container>`
+    - open a port (might be useful for jupyter notebooks that need to display on a web browser): `-p <host port>: <container port`>

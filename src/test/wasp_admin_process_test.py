@@ -146,7 +146,7 @@ def test_process_tele():
                 -38.30074,
                 -38.320812,
             ],
-            5,
+            decimal=5,
         )
         np.testing.assert_array_almost_equal(
             read(new_tele_waves[1]["file"])[0].data[:10],
@@ -162,7 +162,7 @@ def test_process_tele():
                 -5.599341,
                 -5.537252,
             ],
-            5,
+            decimal=5,
         )
     finally:
         print("Cleaning up test directory.")
@@ -246,7 +246,9 @@ def test_shift_match():
             shutil.copyfile(o["file"], n["file"])
         with open(pathlib.Path(tempdir) / "tele_waves.json", "w") as f:
             json.dump(new_tele_waves, f)
-
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "synthetics_body.txt", tempdir / "synthetics_body.txt"
+        )
         # test base process tele
         result = runner.invoke(
             app,

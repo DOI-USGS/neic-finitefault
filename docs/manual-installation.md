@@ -5,9 +5,7 @@ This document provides manual installation instructions for users that do not wi
 - [Manual Installation](#manual-installation)
 - [Install Dependencies](#install-dependencies)
   - [Installing Packages on Your System](#installing-packages-on-your-system)
-  - [Installing Dependencies with C code](#installing-dependencies-with-c-code)
   - [Installing Python Dependencies](#installing-python-dependencies)
-    - [Okada Wrapper](#okada-wrapper)
 - [Get the Data Dependencies](#get-the-data-dependencies)
 - [Add Configurations](#add-configurations)
 - [Compile the Fortran Code](#compile-the-fortran-code)
@@ -18,25 +16,15 @@ In order to add the required dependencies on your system you need to be able to 
 
 ```
 sudo apt install -y \
-  build-essential \
   cmake \
+  curl \
   gcc \
   gfortran \
-  ghostscript \
-  libnetcdf-dev \
-  libgdal-dev \
-  "python3.10-dev" \
-  sqlite3;
+  && apt clean;
 ```
 
-## Installing Dependencies with C code
-GMT, PROJ, and GEOS all include C code and are required for some of the Python dependencies below (Cartopy, PyGMT, etc). If you choose to use a package manager like [Anaconda](https://www.anaconda.com/), these may be install and compiled for you. However, Python dependencies installed with pip and/or Poetry may require installing these dependencies manually. Links to instructions for installing these dependencies are linked in [./docs/code-dependencies](./code-dependecies.md#other-dependencies). The [install scripts](../install.d/) install these from source.
-
 ## Installing Python Dependencies
-The full list of Python dependencies can be found in the [pyproject.toml](../pyproject.toml) file and in [./docs/code-dependencies](./code-dependecies.md#python-dependencies). The provided [Poetry](https://python-poetry.org/) environment (in pyproject.toml) can be used to create a virtual environment with these dependencies: `poetry install`. If you prefer to use [Anaconda](https://www.anaconda.com/) to manage your Python dependencies by creating a finite fault environment (`conda create -n ff-env python=3.10`) and then adding the packages (`conda activate ff-env && conda install <package(s)>`).
-
-### Okada Wrapper
-The Okada wrapper is sometimes difficult to install along with all other dependencies since the install (setup.py) requires that NumPy is already available. This can create a causality dilemma. As a result, it is recommended that Okada wrapper be installed separately. With the provided [poetry](https://python-poetry.org/) environment, Okada can be installed with a [task](../pyproject.toml#L49): `poetry run poe okada`. Otherwise, Okada can be installed with Pip: `pip install okada-wrapper`.
+The full list of Python dependencies can be found in the provided conda environment file [environment.yml](../install.d/environment.yml). These can be installed individually with your preferred package manager or directly with conda using: `conda env create -f ./install.d/environment.yml`
 
 # Get the Data Dependencies
 Download the [required data dependencies](./data-dependecies.md) and put them in the following locations within the source code.

@@ -8,7 +8,7 @@ from cartopy.crs import Projection  # type: ignore
 from cartopy.feature import Feature  # type: ignore
 from cartopy.io.img_tiles import Stamen  # type: ignore
 from cartopy.mpl.geoaxes import GeoAxes  # type: ignore
-from matplotlib import cm, patches  # type: ignore
+from matplotlib import colormaps, patches  # type: ignore
 from matplotlib.colors import Colormap, ListedColormap  # type: ignore
 
 """
@@ -16,7 +16,7 @@ Set colorbar for slip
 """
 
 rm = 100  # amount of lines to remove on black end of magma_r
-magma_cpt = cm.get_cmap("magma_r", 512)  # start with magma_r
+magma_cpt = colormaps.get_cmap("magma_r")  # start with magma_r
 white_bit = np.array([255 / 256, 250 / 256, 250 / 256, 1])  # create array of white
 slip_cpt = magma_cpt(np.linspace(0, 1, 512))  # initialize slip_cpt
 slip_cpt[rm:, :] = slip_cpt[0:-rm, :]  # move beginning up to remove black end

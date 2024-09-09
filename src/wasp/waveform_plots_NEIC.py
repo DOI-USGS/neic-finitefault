@@ -4,6 +4,7 @@ from typing import List, Literal, Optional, Union
 import numpy as np
 from matplotlib import pyplot as plt  # type: ignore
 from matplotlib import ticker  # type: ignore
+from matplotlib.axes import Axes
 from obspy import read  # type: ignore
 from scipy.signal import butter, filtfilt  # type: ignore
 
@@ -346,13 +347,13 @@ def plot_waveform_fits(
     fig, axes = plt.subplots(
         max(3, numrows_phase), 3, figsize=(20, int(2.2 * numrows_phase))
     )
-    axes2 = axes.ravel()
+    axes2: List[Axes] = axes.ravel()  # type: ignore
     for ax in axes2[len(files) :]:
         ax.axis("off")
 
     if type_str == "body" or type_str == "surf":
         axes2 = plot_waveforms(
-            axes2,
+            list(axes2),
             obs_times,
             obs_waveforms,
             weights,
@@ -362,7 +363,7 @@ def plot_waveform_fits(
             custom="fill",
         )
         axes2 = plot_waveforms(
-            axes2,
+            list(axes2),
             syn_times,
             syn_waveforms,
             weights,
@@ -381,7 +382,7 @@ def plot_waveform_fits(
         }
     if type_str == "cgps" or type_str == "strong":
         axes2 = plot_waveforms(
-            axes2,
+            list(axes2),
             obs_times,
             obs_waveforms,
             weights,
@@ -409,7 +410,7 @@ def plot_waveform_fits(
             "type_str": type_str,
             "comps": comp,
         }
-    axes2 = add_metadata(axes2, **dict)
+    axes2 = add_metadata(list(axes2), **dict)
 
     if type_str == "body":
         if "BHZ" in components:

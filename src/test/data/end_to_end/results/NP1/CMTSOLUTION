@@ -1,2691 +1,2691 @@
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
 time shift:       0.0000 
-half duration:    1.5000 
+half duration:    9.0000 
 latitude:       -31.6283 
 longitude:      -71.7378 
 depth:           20.4288 
-Mrr:       -3.132710e+24 
-Mtt:       -2.102513e+26 
-Mpp:        2.133841e+26 
-Mrt:        2.569821e+25 
-Mrp:       -3.457666e+25 
-Mtp:        2.654529e+26 
+Mrr:       -2.665576e+24 
+Mtt:       -1.798689e+26 
+Mpp:        1.825345e+26 
+Mrt:        2.192240e+25 
+Mrp:       -2.940123e+25 
+Mtp:        2.270961e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:       6.3697 
-half duration:    7.5000 
+time shift:       7.3697 
+half duration:   15.0000 
 latitude:       -31.6429 
 longitude:      -71.5900 
 depth:           25.3568 
-Mrr:       -1.410856e+24 
-Mtt:       -1.875591e+26 
-Mpp:        1.889700e+26 
-Mrt:        1.695764e+25 
-Mrp:       -1.370110e+25 
-Mtp:        2.370433e+26 
+Mrr:       -2.418900e+24 
+Mtt:       -1.652307e+26 
+Mpp:        1.676496e+26 
+Mrt:        2.001004e+25 
+Mrp:       -2.663997e+25 
+Mtp:        2.086196e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:       8.3710 
-half duration:    9.0000 
+time shift:       7.9710 
+half duration:    1.5000 
 latitude:       -31.7885 
 longitude:      -71.7597 
 depth:           20.4288 
-Mrr:       -1.806905e+24 
-Mtt:       -1.226246e+26 
-Mpp:        1.244315e+26 
-Mrt:        1.490090e+25 
-Mrp:       -1.991606e+25 
-Mtp:        1.548232e+26 
+Mrr:       -1.022051e+24 
+Mtt:       -7.594813e+25 
+Mpp:        7.697018e+25 
+Mrt:        8.810384e+24 
+Mrp:       -1.113254e+25 
+Mtp:        9.590739e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      11.3307 
+time shift:      10.7697 
+half duration:    7.5000 
+latitude:       -31.6137 
+longitude:      -71.8857 
+depth:           15.5008 
+Mrr:       -3.915477e+23 
+Mtt:       -1.854288e+26 
+Mpp:        1.858203e+26 
+Mrt:        1.243867e+25 
+Mrp:       -1.115421e+24 
+Mtp:        2.345252e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      10.9307 
 half duration:   15.0000 
 latitude:       -31.8031 
 longitude:      -71.6118 
 depth:           25.3568 
-Mrr:       -1.055252e+24 
-Mtt:       -7.110308e+25 
-Mpp:        7.215833e+25 
-Mrt:        8.672664e+24 
-Mrp:       -1.164150e+25 
-Mtp:        8.977195e+25 
+Mrr:       -7.417267e+23 
+Mtt:       -5.178198e+25 
+Mpp:        5.252370e+25 
+Mrt:        6.200536e+24 
+Mrp:       -8.146345e+24 
+Mtp:        6.538254e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      12.7697 
-half duration:    3.0000 
-latitude:       -31.6137 
-longitude:      -71.8857 
-depth:           15.5008 
-Mrr:       -1.571748e+23 
-Mtt:       -2.066165e+26 
-Mpp:        2.067736e+26 
-Mrt:        1.265636e+25 
-Mrp:        2.215158e+24 
-Mtp:        2.613713e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      13.1307 
+time shift:      11.9710 
 half duration:   15.0000 
-latitude:       -31.4826 
-longitude:      -71.5682 
-depth:           25.3568 
-Mrr:        1.316372e+24 
-Mtt:       -2.144330e+26 
-Mpp:        2.131166e+26 
-Mrt:        6.755288e+24 
-Mrp:        2.062896e+25 
-Mtp:        2.715163e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      13.7395 
-half duration:   13.5000 
-latitude:       -31.6575 
-longitude:      -71.4422 
-depth:           30.2848 
-Mrr:       -9.285860e+23 
-Mtt:       -6.250883e+25 
-Mpp:        6.343742e+25 
-Mrt:        7.628201e+24 
-Mrp:       -1.024532e+25 
-Mtp:        7.892104e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      13.7710 
-half duration:   13.5000 
 latitude:       -31.4680 
 longitude:      -71.7160 
 depth:           20.4288 
-Mrr:       -3.400651e+24 
-Mtt:       -2.267927e+26 
-Mpp:        2.301934e+26 
-Mrt:        2.781261e+25 
-Mrp:       -3.756304e+25 
-Mtp:        2.863335e+26 
+Mrr:       -1.852264e+24 
+Mtt:       -1.883828e+26 
+Mpp:        1.902351e+26 
+Mrt:        1.890883e+25 
+Mrp:       -1.915328e+25 
+Mtp:        2.380087e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      14.3307 
+time shift:      13.5307 
 half duration:    1.5000 
 latitude:       -31.7739 
 longitude:      -71.9075 
 depth:           15.5008 
-Mrr:        5.833784e+24 
-Mtt:       -9.854630e+25 
-Mpp:        9.271251e+25 
-Mrt:       -1.944324e+25 
-Mrp:        7.426227e+25 
-Mtp:        1.256884e+26 
+Mrr:        1.619496e+24 
+Mtt:       -8.466855e+25 
+Mpp:        8.304905e+25 
+Mrt:       -2.074936e+24 
+Mrp:        2.177027e+25 
+Mtp:        1.073989e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      16.9275 
-half duration:    6.0000 
+time shift:      14.1307 
+half duration:   15.0000 
+latitude:       -31.4826 
+longitude:      -71.5682 
+depth:           25.3568 
+Mrr:       -2.987910e+24 
+Mtt:       -2.191256e+26 
+Mpp:        2.221135e+26 
+Mrt:        2.558828e+25 
+Mrp:       -3.260390e+25 
+Mtp:        2.767052e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      15.1395 
+half duration:   15.0000 
+latitude:       -31.6575 
+longitude:      -71.4422 
+depth:           30.2848 
+Mrr:       -7.495798e+23 
+Mtt:       -5.096097e+25 
+Mpp:        5.171055e+25 
+Mrt:        6.186803e+24 
+Mrp:       -8.260180e+24 
+Mtp:        6.434249e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      17.1275 
+half duration:    1.5000 
 latitude:       -31.8177 
 longitude:      -71.4640 
 depth:           30.2848 
-Mrr:        6.227830e+22 
-Mtt:       -7.888579e+23 
-Mpp:        7.265796e+23 
-Mrt:       -2.228226e+23 
-Mrp:        7.874818e+23 
-Mtp:        1.008836e+24 
+Mrr:        5.900561e+19 
+Mtt:       -4.523635e+22 
+Mpp:        4.517734e+22 
+Mrt:        2.368133e+21 
+Mrp:        1.642366e+21 
+Mtp:        5.724053e+22 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      17.3275 
-half duration:   15.0000 
-latitude:       -31.4972 
-longitude:      -71.4204 
-depth:           30.2848 
-Mrr:       -6.541395e+23 
-Mtt:       -1.024853e+26 
-Mpp:        1.031395e+26 
-Mrt:        8.762371e+24 
-Mrp:       -6.039733e+24 
-Mtp:        1.295446e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      19.9421 
-half duration:   15.0000 
-latitude:       -31.9488 
-longitude:      -71.7815 
-depth:           20.4288 
-Mrr:       -3.039185e+23 
-Mtt:       -2.854219e+25 
-Mpp:        2.884611e+25 
-Mrt:        2.965292e+24 
-Mrp:       -3.190357e+24 
-Mtp:        3.605704e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      21.3092 
-half duration:   13.5000 
-latitude:       -31.6721 
-longitude:      -71.2944 
-depth:           35.2128 
-Mrr:        4.134504e+22 
-Mtt:       -1.395596e+24 
-Mpp:        1.354251e+24 
-Mrt:       -9.737852e+22 
-Mrp:        5.403549e+23 
-Mtp:        1.772807e+24 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      21.3307 
-half duration:   15.0000 
+time shift:      17.3307 
+half duration:    4.5000 
 latitude:       -31.4534 
 longitude:      -71.8638 
 depth:           15.5008 
-Mrr:       -3.874549e+24 
-Mtt:       -2.637595e+26 
-Mpp:        2.676341e+26 
-Mrt:        3.199930e+25 
-Mrp:       -4.268962e+25 
-Mtp:        3.330194e+26 
+Mrr:        7.282618e+23 
+Mtt:       -2.421816e+26 
+Mpp:        2.414533e+26 
+Mrt:        1.090007e+25 
+Mrp:        1.390166e+25 
+Mtp:        3.065199e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      21.5349 
+time shift:      19.1421 
 half duration:    3.0000 
-latitude:       -31.3223 
-longitude:      -71.5464 
-depth:           25.3568 
-Mrr:        1.434826e+25 
-Mtt:       -1.871380e+26 
-Mpp:        1.727898e+26 
-Mrt:       -5.102329e+25 
-Mrp:        1.815361e+26 
-Mtp:        2.392486e+26 
+latitude:       -31.9488 
+longitude:      -71.7815 
+depth:           20.4288 
+Mrr:        9.440561e+23 
+Mtt:       -1.292762e+25 
+Mpp:        1.198356e+25 
+Mrt:       -3.321483e+24 
+Mrp:        1.195671e+25 
+Mtp:        1.651926e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      21.9349 
-half duration:   12.0000 
+time shift:      19.7275 
+half duration:   13.5000 
+latitude:       -31.4972 
+longitude:      -71.4204 
+depth:           30.2848 
+Mrr:       -1.611506e+24 
+Mtt:       -1.125347e+26 
+Mpp:        1.141462e+26 
+Mrt:        1.347334e+25 
+Mrp:       -1.769846e+25 
+Mtp:        1.420921e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      20.7349 
+half duration:    1.5000 
 latitude:       -31.9634 
 longitude:      -71.6337 
 depth:           25.3568 
-Mrr:       -3.780953e+23 
-Mtt:       -3.039190e+25 
-Mpp:        3.076999e+25 
-Mrt:        3.392394e+24 
-Mrp:       -4.072098e+24 
-Mtp:        3.838429e+25 
+Mrr:        2.041367e+24 
+Mtt:       -3.079718e+25 
+Mpp:        2.875581e+25 
+Mrt:       -7.017323e+24 
+Mrp:        2.591171e+25 
+Mtp:        3.931740e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      22.3349 
-half duration:    6.0000 
+time shift:      22.1349 
+half duration:    1.5000 
 latitude:       -31.9342 
 longitude:      -71.9293 
 depth:           15.5008 
-Mrr:        1.080139e+22 
-Mtt:       -4.613911e+23 
-Mpp:        4.505897e+23 
-Mrt:       -1.982865e+22 
-Mrp:        1.431177e+23 
-Mtp:        5.856007e+23 
+Mrr:        3.009018e+21 
+Mtt:       -1.996853e+23 
+Mpp:        1.966763e+23 
+Mrt:       -1.398742e+21 
+Mrp:        4.130270e+22 
+Mtp:        2.531525e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      22.4614 
-half duration:    1.5000 
-latitude:       -31.3369 
-longitude:      -71.3986 
-depth:           30.2848 
-Mrr:        7.506379e+24 
-Mtt:       -9.750002e+25 
-Mpp:        8.999364e+25 
-Mrt:       -2.671647e+25 
-Mrp:        9.496361e+25 
-Mtp:        1.246553e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      22.6916 
-half duration:   10.5000 
-latitude:       -31.5118 
-longitude:      -71.2726 
-depth:           35.2128 
-Mrr:       -7.328920e+22 
-Mtt:       -7.358117e+24 
-Mpp:        7.431406e+24 
-Mrt:        7.426248e+23 
-Mrp:       -7.597727e+23 
-Mtp:        9.296309e+24 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      23.6916 
-half duration:   10.5000 
-latitude:       -31.8323 
-longitude:      -71.3162 
-depth:           35.2128 
-Mrr:        1.293585e+22 
-Mtt:       -7.812402e+23 
-Mpp:        7.683043e+23 
-Mrt:       -1.048960e+22 
-Mrp:        1.760059e+23 
-Mtp:        9.906251e+23 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      23.7275 
-half duration:    1.5000 
-latitude:       -31.7593 
-longitude:      -72.0553 
-depth:           10.5728 
-Mrr:        1.259534e+25 
-Mtt:       -1.594129e+26 
-Mpp:        1.468176e+26 
-Mrt:       -4.507171e+25 
-Mrp:        1.592600e+26 
-Mtp:        2.038679e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      23.7395 
+time shift:      22.3092 
 half duration:    9.0000 
+latitude:       -31.6721 
+longitude:      -71.2944 
+depth:           35.2128 
+Mrr:        1.762839e+23 
+Mtt:       -7.172194e+24 
+Mpp:        6.995910e+24 
+Mrt:       -3.443641e+23 
+Mrp:        2.328539e+24 
+Mtp:        9.104453e+24 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      22.7395 
+half duration:    7.5000 
 latitude:       -31.5991 
 longitude:      -72.0335 
 depth:           10.5728 
-Mrr:        1.777982e+25 
-Mtt:       -2.446860e+26 
-Mpp:        2.269061e+26 
-Mrt:       -6.248451e+25 
-Mrp:        2.252103e+26 
-Mtp:        3.126510e+26 
+Mrr:        1.531467e+25 
+Mtt:       -2.632615e+26 
+Mpp:        2.479469e+26 
+Mrt:       -5.077737e+25 
+Mrp:        1.950429e+26 
+Mtp:        3.357234e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      24.7421 
+time shift:      23.3421 
 half duration:   15.0000 
 latitude:       -31.3077 
 longitude:      -71.6942 
 depth:           20.4288 
-Mrr:       -3.121679e+24 
-Mtt:       -2.257775e+26 
-Mpp:        2.288991e+26 
-Mrt:        2.655076e+25 
-Mrp:       -3.412720e+25 
-Mtp:        2.850976e+26 
+Mrr:       -2.342742e+24 
+Mtt:       -1.967440e+26 
+Mpp:        1.990867e+26 
+Mrt:        2.150861e+25 
+Mrp:       -2.506156e+25 
+Mtp:        2.485015e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      25.8614 
-half duration:   12.0000 
+time shift:      23.5275 
+half duration:    1.5000 
+latitude:       -31.7593 
+longitude:      -72.0553 
+depth:           10.5728 
+Mrr:        1.270334e+25 
+Mtt:       -1.609120e+26 
+Mpp:        1.482086e+26 
+Mrt:       -4.545052e+25 
+Mrp:        1.606283e+26 
+Mtp:        2.057832e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      23.7349 
+half duration:   15.0000 
+latitude:       -31.3223 
+longitude:      -71.5464 
+depth:           25.3568 
+Mrr:        1.023910e+24 
+Mtt:       -2.043675e+26 
+Mpp:        2.033436e+26 
+Mrt:        7.432900e+24 
+Mrp:        1.680276e+25 
+Mtp:        2.587312e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      23.8916 
+half duration:    1.5000 
+latitude:       -31.8323 
+longitude:      -71.3162 
+depth:           35.2128 
+Mrr:        3.248350e+21 
+Mtt:       -4.270019e+22 
+Mpp:        3.945184e+22 
+Mrt:       -1.153200e+22 
+Mrp:        4.110528e+22 
+Mtp:        5.458608e+22 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      24.8614 
+half duration:    9.0000 
 latitude:       -31.9780 
 longitude:      -71.4859 
 depth:           30.2848 
-Mrr:        3.340214e+22 
-Mtt:       -5.208944e+23 
-Mpp:        4.874923e+23 
-Mrt:       -1.138380e+23 
-Mrp:        4.243258e+23 
-Mtp:        6.648075e+23 
+Mrr:        2.248089e+22 
+Mtt:       -3.906417e+23 
+Mpp:        3.681608e+23 
+Mrt:       -7.429473e+22 
+Mrp:        2.863942e+23 
+Mtp:        4.981221e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      27.1442 
-half duration:    4.5000 
-latitude:       -31.3515 
-longitude:      -71.2508 
+time shift:      25.8916 
+half duration:    6.0000 
+latitude:       -31.5118 
+longitude:      -71.2726 
 depth:           35.2128 
-Mrr:        2.925643e+23 
-Mtt:       -4.739018e+24 
-Mpp:        4.446453e+24 
-Mrt:       -9.868521e+23 
-Mrp:        3.720162e+24 
-Mtp:        6.046349e+24 
+Mrr:       -5.630187e+23 
+Mtt:       -4.646418e+25 
+Mpp:        4.702720e+25 
+Mrt:        5.121612e+24 
+Mrp:       -6.039395e+24 
+Mtp:        5.868583e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      27.8614 
-half duration:    4.5000 
-latitude:       -31.9196 
-longitude:      -72.0771 
-depth:           10.5728 
-Mrr:       -2.095296e+23 
-Mtt:       -3.285790e+25 
-Mpp:        3.306743e+25 
-Mrt:        2.808471e+24 
-Mrp:       -1.933993e+24 
-Mtp:        4.153341e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      28.0790 
-half duration:    6.0000 
-latitude:       -31.6867 
-longitude:      -71.1466 
-depth:           40.1408 
-Mrr:       -3.971351e+23 
-Mtt:       -3.444852e+25 
-Mpp:        3.484566e+25 
-Mrt:        3.709680e+24 
-Mrp:       -4.226264e+24 
-Mtp:        4.351318e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      28.3275 
-half duration:    6.0000 
+time shift:      26.9275 
+half duration:    9.0000 
 latitude:       -31.4388 
 longitude:      -72.0117 
 depth:           10.5728 
-Mrr:        1.116525e+25 
-Mtt:       -3.003974e+26 
-Mpp:        2.892321e+26 
-Mrt:       -3.073126e+25 
-Mrp:        1.443822e+26 
-Mtp:        3.819844e+26 
+Mrr:        1.096034e+25 
+Mtt:       -3.269449e+26 
+Mpp:        3.159846e+26 
+Mrt:       -2.830858e+25 
+Mrp:        1.423784e+26 
+Mtp:        4.155352e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      28.7261 
-half duration:    3.0000 
-latitude:       -31.1621 
-longitude:      -71.5246 
-depth:           25.3568 
-Mrr:        1.346471e+25 
-Mtt:       -2.138439e+26 
-Mpp:        2.003792e+26 
-Mrt:       -4.566494e+25 
-Mrp:        1.711274e+26 
-Mtp:        2.728818e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      28.9325 
-half duration:    3.0000 
-latitude:       -31.5264 
-longitude:      -71.1248 
-depth:           40.1408 
-Mrr:       -4.499424e+23 
-Mtt:       -3.434331e+25 
-Mpp:        3.479326e+25 
-Mrt:        3.931297e+24 
-Mrp:       -4.882634e+24 
-Mtp:        4.337090e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      29.6042 
-half duration:   15.0000 
-latitude:       -31.1767 
-longitude:      -71.3768 
-depth:           30.2848 
-Mrr:        1.129227e+25 
-Mtt:       -1.447774e+26 
-Mpp:        1.334851e+26 
-Mrt:       -4.030110e+25 
-Mrp:        1.428209e+26 
-Mtp:        1.851255e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      30.3325 
-half duration:   10.5000 
-latitude:       -31.8469 
-longitude:      -71.1684 
-depth:           40.1408 
-Mrr:        1.623974e+24 
-Mtt:       -2.073974e+25 
-Mpp:        1.911577e+25 
-Mrt:       -5.800519e+24 
-Mrp:        2.053785e+25 
-Mtp:        2.652082e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      30.3349 
+time shift:      27.5349 
 half duration:   15.0000 
 latitude:       -31.2931 
 longitude:      -71.8420 
 depth:           15.5008 
-Mrr:       -4.520433e+24 
-Mtt:       -3.427245e+26 
-Mpp:        3.472450e+26 
-Mrt:        3.936248e+25 
-Mrp:       -4.910091e+25 
-Mtp:        4.328089e+26 
+Mrr:       -5.018934e+23 
+Mtt:       -3.208999e+26 
+Mpp:        3.214018e+26 
+Mrt:        2.076844e+25 
+Mrp:        2.466401e+23 
+Mtp:        4.058959e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      31.1131 
-half duration:    3.0000 
-latitude:       -31.1475 
-longitude:      -71.6724 
-depth:           20.4288 
-Mrr:       -3.076366e+24 
-Mtt:       -2.083287e+26 
-Mpp:        2.114051e+26 
-Mrt:        2.534377e+25 
-Mrp:       -3.391732e+25 
-Mtp:        2.630303e+26 
+time shift:      27.6614 
+half duration:    1.5000 
+latitude:       -31.3369 
+longitude:      -71.3986 
+depth:           30.2848 
+Mrr:        7.230635e+24 
+Mtt:       -9.579454e+25 
+Mpp:        8.856390e+25 
+Mrt:       -2.562628e+25 
+Mrp:        9.151295e+25 
+Mtp:        1.224497e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      31.3442 
-half duration:    4.5000 
+time shift:      28.2614 
+half duration:    1.5000 
+latitude:       -31.9196 
+longitude:      -72.0771 
+depth:           10.5728 
+Mrr:        3.204751e+24 
+Mtt:       -5.876478e+25 
+Mpp:        5.556003e+25 
+Mrt:       -1.041265e+25 
+Mrp:        4.088874e+25 
+Mtp:        7.490244e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      28.8790 
+half duration:    1.5000 
+latitude:       -31.6867 
+longitude:      -71.1466 
+depth:           40.1408 
+Mrr:       -8.166045e+23 
+Mtt:       -5.735515e+25 
+Mpp:        5.817175e+25 
+Mrt:        6.846530e+24 
+Mrp:       -8.961759e+24 
+Mtp:        7.242037e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      29.7442 
+half duration:    1.5000 
 latitude:       -31.9926 
 longitude:      -71.3380 
 depth:           35.2128 
-Mrr:       -2.434906e+21 
-Mtt:       -3.661130e+23 
-Mpp:        3.685479e+23 
-Mrt:        3.172521e+22 
-Mrp:       -2.279134e+22 
-Mtp:        4.627609e+23 
+Mrr:       -1.074304e+21 
+Mtt:       -2.881250e+23 
+Mpp:        2.891993e+23 
+Mrt:        2.133666e+22 
+Mrp:       -7.505450e+21 
+Mtp:        3.643316e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      32.2550 
-half duration:    3.0000 
-latitude:       -31.3661 
-longitude:      -71.1030 
+time shift:      29.9325 
+half duration:    1.5000 
+latitude:       -31.8469 
+longitude:      -71.1684 
 depth:           40.1408 
-Mrr:        3.197989e+24 
-Mtt:       -4.859435e+25 
-Mpp:        4.539636e+25 
-Mrt:       -1.097312e+25 
-Mrp:        4.060008e+25 
-Mtp:        6.203426e+25 
+Mrr:        9.659279e+21 
+Mtt:       -1.608217e+24 
+Mpp:        1.598558e+24 
+Mrt:        5.158364e+22 
+Mrp:        1.520713e+23 
+Mtp:        2.036297e+24 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      32.9131 
+time shift:      31.1131 
 half duration:    7.5000 
 latitude:       -32.1091 
 longitude:      -71.8033 
 depth:           20.4288 
-Mrr:       -3.602355e+23 
-Mtt:       -2.732022e+25 
-Mpp:        2.768046e+25 
-Mrt:        3.137298e+24 
-Mrp:       -3.912707e+24 
-Mtp:        3.450130e+25 
+Mrr:       -8.945697e+22 
+Mtt:       -6.084818e+24 
+Mpp:        6.174275e+24 
+Mrt:        7.385239e+23 
+Mrp:       -9.857329e+23 
+Mtp:        7.682599e+24 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      33.1261 
+time shift:      31.7325 
 half duration:    1.5000 
+latitude:       -31.5264 
+longitude:      -71.1248 
+depth:           40.1408 
+Mrr:       -1.399418e+24 
+Mtt:       -9.490328e+25 
+Mpp:        9.630270e+25 
+Mrt:        1.153659e+25 
+Mrp:       -1.542602e+25 
+Mtp:        1.198227e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      32.1261 
+half duration:   10.5000 
 latitude:       -32.0944 
 longitude:      -71.9511 
 depth:           15.5008 
-Mrr:       -1.431078e+22 
-Mtt:       -1.185210e+24 
-Mpp:        1.199521e+24 
-Mrt:        1.304235e+23 
-Mrp:       -1.534247e+23 
-Mtp:        1.496969e+24 
+Mrr:        9.755279e+20 
+Mtt:       -9.214794e+22 
+Mpp:        9.117241e+22 
+Mrt:        1.135603e+21 
+Mrp:        1.394258e+22 
+Mtp:        1.167495e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      33.2614 
-half duration:    1.5000 
-latitude:       -31.2785 
-longitude:      -71.9898 
-depth:           10.5728 
-Mrr:        2.870318e+24 
-Mtt:       -3.163270e+26 
-Mpp:        3.134566e+26 
-Mrt:        5.961663e+24 
-Mrp:        4.193413e+25 
-Mtp:        4.006964e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      33.3921 
-half duration:   12.0000 
-latitude:       -31.1913 
-longitude:      -71.2290 
-depth:           35.2128 
-Mrr:       -6.209543e+23 
-Mtt:       -4.719298e+25 
-Mpp:        4.781393e+25 
-Mrt:        5.413694e+24 
-Mrp:       -6.742500e+24 
-Mtp:        5.959780e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      33.5442 
-half duration:    1.5000 
-latitude:       -31.2639 
-longitude:      -72.1376 
-depth:            5.6448 
-Mrr:        1.340264e+25 
-Mtt:       -2.696266e+26 
-Mpp:        2.562239e+26 
-Mrt:       -4.216332e+25 
-Mrp:        1.714823e+26 
-Mtp:        3.434438e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      33.8916 
-half duration:    6.0000 
-latitude:       -31.4242 
-longitude:      -72.1595 
-depth:            5.6448 
-Mrr:        1.710066e+25 
-Mtt:       -2.670039e+26 
-Mpp:        2.499032e+26 
-Mrt:       -5.826198e+25 
-Mrp:        2.172457e+26 
-Mtp:        3.407682e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      34.1261 
-half duration:    6.0000 
+time shift:      32.5261 
+half duration:    7.5000 
 latitude:       -32.1236 
 longitude:      -71.6555 
 depth:           25.3568 
-Mrr:       -1.291426e+24 
-Mtt:       -8.932852e+25 
-Mpp:        9.061994e+25 
-Mrt:        1.074771e+25 
-Mrp:       -1.420037e+25 
-Mtp:        1.127886e+26 
+Mrr:       -1.388285e+24 
+Mtt:       -9.256356e+25 
+Mpp:        9.395184e+25 
+Mrt:        1.135294e+25 
+Mrp:       -1.533522e+25 
+Mtp:        1.168646e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      34.3092 
-half duration:   15.0000 
-latitude:       -31.5845 
-longitude:      -72.1813 
-depth:            5.6448 
-Mrr:        2.112467e+25 
-Mtt:       -2.677533e+26 
-Mpp:        2.466286e+26 
-Mrt:       -7.557088e+25 
-Mrp:        2.671157e+26 
-Mtp:        3.424155e+26 
+time shift:      32.7131 
+half duration:    1.5000 
+latitude:       -31.1475 
+longitude:      -71.6724 
+depth:           20.4288 
+Mrr:       -2.079994e+24 
+Mtt:       -2.173019e+26 
+Mpp:        2.193819e+26 
+Mrt:        2.156743e+25 
+Mrp:       -2.139212e+25 
+Mtp:        2.745557e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      34.4916 
+time shift:      32.9261 
+half duration:    1.5000 
+latitude:       -31.1621 
+longitude:      -71.5246 
+depth:           25.3568 
+Mrr:       -2.245467e+24 
+Mtt:       -2.238669e+26 
+Mpp:        2.261124e+26 
+Mrt:        2.266160e+25 
+Mrp:       -2.330997e+25 
+Mtp:        2.828327e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      33.1442 
+half duration:    1.5000 
+latitude:       -31.3515 
+longitude:      -71.2508 
+depth:           35.2128 
+Mrr:       -3.617048e+23 
+Mtt:       -2.416897e+25 
+Mpp:        2.453068e+25 
+Mrt:        2.960941e+24 
+Mrp:       -3.994395e+24 
+Mtp:        3.051427e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      33.6916 
 half duration:   15.0000 
 latitude:       -31.7447 
 longitude:      -72.2031 
 depth:            5.6448 
-Mrr:        1.767350e+25 
-Mtt:       -2.235159e+26 
-Mpp:        2.058424e+26 
-Mrt:       -6.325336e+25 
-Mrp:        2.234666e+26 
-Mtp:        2.858495e+26 
+Mrr:        1.978696e+25 
+Mtt:       -2.514819e+26 
+Mpp:        2.316950e+26 
+Mrt:       -7.074572e+25 
+Mrp:        2.502145e+26 
+Mtp:        3.215976e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      34.6988 
-half duration:    4.5000 
-latitude:       -31.0018 
-longitude:      -71.5028 
-depth:           25.3568 
-Mrr:        7.144938e+24 
-Mtt:       -1.425641e+26 
-Mpp:        1.354192e+26 
-Mrt:       -2.254527e+25 
-Mrp:        9.139343e+25 
-Mtp:        1.816049e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      34.7442 
+time shift:      33.7092 
 half duration:   15.0000 
-latitude:       -31.9050 
-longitude:      -72.2249 
+latitude:       -31.5845 
+longitude:      -72.1813 
 depth:            5.6448 
-Mrr:        9.965590e+24 
-Mtt:       -1.297105e+26 
-Mpp:        1.197449e+26 
-Mrt:       -3.545368e+25 
-Mrp:        1.260806e+26 
-Mtp:        1.658333e+26 
+Mrr:        2.208860e+25 
+Mtt:       -2.838354e+26 
+Mpp:        2.617468e+26 
+Mrt:       -7.879515e+25 
+Mrp:        2.793821e+26 
+Mtp:        3.629291e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      35.2042 
-half duration:   15.0000 
+time shift:      34.4614 
+half duration:    1.5000 
+latitude:       -31.2785 
+longitude:      -71.9898 
+depth:           10.5728 
+Mrr:        5.780270e+24 
+Mtt:       -3.744619e+26 
+Mpp:        3.686816e+26 
+Mrt:       -3.216268e+24 
+Mrp:        7.915782e+25 
+Mtp:        4.747507e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      35.0042 
+half duration:    7.5000 
 latitude:       -32.0798 
 longitude:      -72.0989 
 depth:           10.5728 
-Mrr:        2.292596e+22 
-Mtt:       -1.659875e+24 
-Mpp:        1.636949e+24 
-Mrt:       -2.630140e+21 
-Mrp:        3.174780e+23 
-Mtp:        2.103956e+24 
+Mrr:        4.415476e+23 
+Mtt:       -5.771213e+24 
+Mpp:        5.329665e+24 
+Mrt:       -1.569457e+24 
+Mrp:        5.586767e+24 
+Mtp:        7.378105e+24 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      36.3261 
+time shift:      35.0550 
+half duration:    7.5000 
+latitude:       -32.0072 
+longitude:      -71.1902 
+depth:           40.1408 
+Mrr:        6.766132e+23 
+Mtt:       -1.032064e+25 
+Mpp:        9.644032e+24 
+Mrt:       -2.319354e+24 
+Mrp:        8.590737e+24 
+Mtp:        1.317461e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      35.1442 
+half duration:    3.0000 
+latitude:       -31.9050 
+longitude:      -72.2249 
+depth:            5.6448 
+Mrr:        1.386653e+25 
+Mtt:       -1.754761e+26 
+Mpp:        1.616096e+26 
+Mrt:       -4.962208e+25 
+Mrp:        1.753329e+26 
+Mtp:        2.244110e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      35.2042 
+half duration:    1.5000 
+latitude:       -32.1383 
+longitude:      -71.5077 
+depth:           30.2848 
+Mrr:        2.419800e+24 
+Mtt:       -3.117885e+25 
+Mpp:        2.875905e+25 
+Mrt:       -8.627073e+24 
+Mrp:        3.060794e+25 
+Mtp:        3.986601e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      35.3261 
 half duration:    7.5000 
 latitude:       -31.1329 
 longitude:      -71.8202 
 depth:           15.5008 
-Mrr:        6.944542e+23 
-Mtt:       -3.958856e+26 
-Mpp:        3.951911e+26 
-Mrt:        1.995684e+25 
-Mrp:        1.657929e+25 
-Mtp:        5.009711e+26 
+Mrr:        8.306123e+24 
+Mtt:       -3.980019e+26 
+Mpp:        3.896958e+26 
+Mrt:       -1.274352e+25 
+Mrp:        1.109258e+26 
+Mtp:        5.049710e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      36.4698 
+time shift:      36.4916 
+half duration:    1.5000 
+latitude:       -31.4242 
+longitude:      -72.1595 
+depth:            5.6448 
+Mrr:        1.544164e+25 
+Mtt:       -3.087760e+26 
+Mpp:        2.933343e+26 
+Mrt:       -4.868618e+25 
+Mrp:        1.975329e+26 
+Mtp:        3.933275e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      37.2042 
 half duration:   15.0000 
-latitude:       -31.0164 
-longitude:      -71.3550 
+latitude:       -31.1767 
+longitude:      -71.3768 
 depth:           30.2848 
-Mrr:       -7.854558e+23 
-Mtt:       -9.804425e+25 
-Mpp:        9.882970e+25 
-Mrt:        9.071161e+24 
-Mrp:       -7.756131e+24 
-Mtp:        1.239032e+26 
+Mrr:        7.624610e+24 
+Mtt:       -1.622846e+26 
+Mpp:        1.546600e+26 
+Mrt:       -2.347041e+25 
+Mrp:        9.773356e+25 
+Mtp:        2.066374e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      36.6842 
-half duration:   12.0000 
-latitude:       -30.9872 
-longitude:      -71.6506 
-depth:           20.4288 
-Mrr:        8.237686e+24 
-Mtt:       -1.062127e+26 
-Mpp:        9.797498e+25 
-Mrt:       -2.936490e+25 
-Mrp:        1.041996e+26 
-Mtp:        1.358051e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      36.8042 
-half duration:   10.5000 
-latitude:       -32.1383 
-longitude:      -71.5077 
-depth:           30.2848 
-Mrr:        2.050282e+23 
-Mtt:       -2.685719e+24 
-Mpp:        2.480691e+24 
-Mrt:       -7.284184e+23 
-Mrp:        2.594278e+24 
-Mtp:        3.433431e+24 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      36.8550 
+time shift:      38.5921 
 half duration:    1.5000 
-latitude:       -32.0072 
-longitude:      -71.1902 
-depth:           40.1408 
-Mrr:        1.808755e+24 
-Mtt:       -2.720929e+25 
-Mpp:        2.540053e+25 
-Mrt:       -6.222260e+24 
-Mrp:        2.295751e+25 
-Mtp:        3.473780e+25 
+latitude:       -32.1529 
+longitude:      -71.3599 
+depth:           35.2128 
+Mrr:        7.082959e+22 
+Mtt:       -9.580014e+23 
+Mpp:        8.871718e+23 
+Mrt:       -2.498914e+23 
+Mrp:        8.968345e+23 
+Mtp:        1.224311e+24 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      37.2550 
-half duration:    1.5000 
-latitude:       -31.2493 
-longitude:      -72.2855 
-depth:            0.7168 
-Mrr:        1.744067e+25 
-Mtt:       -2.270598e+26 
-Mpp:        2.096191e+26 
-Mrt:       -6.204392e+25 
-Mrp:        2.206534e+26 
-Mtp:        2.902925e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      37.5921 
-half duration:    4.5000 
+time shift:      38.7921 
+half duration:   15.0000 
 latitude:       -32.0652 
 longitude:      -72.2467 
 depth:            5.6448 
-Mrr:        4.766393e+24 
-Mtt:       -8.359655e+25 
-Mpp:        7.883016e+25 
-Mrt:       -1.570715e+25 
-Mrp:        6.073679e+25 
-Mtp:        1.065894e+26 
+Mrr:        8.893888e+24 
+Mtt:       -1.173483e+26 
+Mpp:        1.084544e+26 
+Mrt:       -3.154898e+25 
+Mrp:        1.125539e+26 
+Mtp:        1.500072e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      37.7406 
-half duration:    1.5000 
-latitude:       -31.2059 
-longitude:      -71.0812 
+time shift:      38.8550 
+half duration:   13.5000 
+latitude:       -31.3661 
+longitude:      -71.1030 
 depth:           40.1408 
-Mrr:       -1.264569e+24 
-Mtt:       -8.803005e+25 
-Mpp:        8.929462e+25 
-Mrt:        1.055662e+25 
-Mrp:       -1.389380e+25 
-Mtp:        1.111506e+26 
+Mrr:       -7.074023e+23 
+Mtt:       -4.765677e+25 
+Mpp:        4.836418e+25 
+Mrt:        5.813364e+24 
+Mrp:       -7.804193e+24 
+Mtp:        6.016955e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      39.5325 
-half duration:   15.0000 
-latitude:       -31.4096 
-longitude:      -72.3073 
-depth:            0.7168 
-Mrr:        1.815189e+25 
-Mtt:       -2.325973e+26 
-Mpp:        2.144455e+26 
-Mrt:       -6.478980e+25 
-Mrp:        2.295765e+26 
-Mtp:        2.974218e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      39.6042 
-half duration:   15.0000 
+time shift:      40.4042 
+half duration:    4.5000 
 latitude:       -31.1183 
 longitude:      -71.9680 
 depth:           10.5728 
-Mrr:       -5.532661e+24 
-Mtt:       -3.728534e+26 
-Mpp:        3.783861e+26 
-Mrt:        4.547414e+25 
-Mrp:       -6.103481e+25 
-Mtp:        4.707503e+26 
+Mrr:        3.723110e+24 
+Mtt:       -3.880359e+26 
+Mpp:        3.843128e+26 
+Mrt:        6.441577e+24 
+Mrp:        5.394433e+25 
+Mtp:        4.915663e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      40.0160 
-half duration:    1.5000 
-latitude:       -31.0310 
-longitude:      -71.2072 
-depth:           35.2128 
-Mrr:       -9.212167e+23 
-Mtt:       -6.726324e+25 
-Mpp:        6.818446e+25 
-Mrt:        7.872060e+24 
-Mrp:       -1.005823e+25 
-Mtp:        8.493731e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      40.2550 
+time shift:      41.1325 
 half duration:    9.0000 
+latitude:       -31.7301 
+longitude:      -72.3509 
+depth:            0.7168 
+Mrr:        1.821578e+25 
+Mtt:       -2.319890e+26 
+Mpp:        2.137732e+26 
+Mrt:       -6.510059e+25 
+Mrp:        2.303559e+26 
+Mtp:        2.966633e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      41.2550 
+half duration:   15.0000 
 latitude:       -31.8904 
 longitude:      -72.3727 
 depth:            0.7168 
-Mrr:        1.156014e+25 
-Mtt:       -1.466711e+26 
-Mpp:        1.351110e+26 
-Mrt:       -4.134640e+25 
-Mrp:        1.461778e+26 
-Mtp:        1.875679e+26 
+Mrr:        1.513124e+25 
+Mtt:       -1.937622e+26 
+Mpp:        1.786309e+26 
+Mrt:       -5.401561e+25 
+Mrp:        1.913702e+26 
+Mtp:        2.477651e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      40.3406 
+time shift:      41.7442 
+half duration:   15.0000 
+latitude:       -31.2639 
+longitude:      -72.1376 
+depth:            5.6448 
+Mrr:        1.183196e+25 
+Mtt:       -3.106689e+26 
+Mpp:        2.988369e+26 
+Mrt:       -3.301079e+25 
+Mrp:        1.528494e+26 
+Mtp:        3.950951e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      41.7921 
+half duration:    4.5000 
+latitude:       -31.1913 
+longitude:      -71.2290 
+depth:           35.2128 
+Mrr:       -8.817723e+23 
+Mtt:       -6.000674e+25 
+Mpp:        6.088851e+25 
+Mrt:        7.281272e+24 
+Mrp:       -9.715729e+24 
+Mtp:        7.576368e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      42.2842 
+half duration:   10.5000 
+latitude:       -30.9872 
+longitude:      -71.6506 
+depth:           20.4288 
+Mrr:       -1.879881e+24 
+Mtt:       -1.332076e+26 
+Mpp:        1.350875e+26 
+Mrt:        1.582914e+25 
+Mrp:       -2.060698e+25 
+Mtp:        1.681996e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      42.3406 
 half duration:    1.5000 
 latitude:       -32.0506 
 longitude:      -72.3945 
 depth:            0.7168 
-Mrr:        8.368613e+24 
-Mtt:       -1.063181e+26 
-Mpp:        9.794949e+25 
-Mrt:       -2.992337e+25 
-Mrp:        1.058238e+26 
-Mtp:        1.359612e+26 
+Mrr:        1.091302e+25 
+Mtt:       -1.399057e+26 
+Mpp:        1.289927e+26 
+Mrt:       -3.894813e+25 
+Mrp:        1.380241e+26 
+Mtp:        1.788963e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      40.5921 
-half duration:    4.5000 
-latitude:       -32.1529 
-longitude:      -71.3599 
-depth:           35.2128 
-Mrr:        1.885356e+22 
-Mtt:       -2.599480e+23 
-Mpp:        2.410944e+23 
-Mrt:       -6.622989e+22 
-Mrp:        2.388208e+23 
-Mtp:        3.321461e+23 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      40.7488 
-half duration:    1.5000 
-latitude:       -30.8416 
-longitude:      -71.4810 
-depth:           25.3568 
-Mrr:        2.061488e+24 
-Mtt:       -9.108214e+25 
-Mpp:        8.902066e+25 
-Mrt:       -3.609065e+24 
-Mrp:        2.737548e+25 
-Mtp:        1.155898e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      41.2988 
-half duration:   10.5000 
-latitude:       -30.9726 
-longitude:      -71.7984 
-depth:           15.5008 
-Mrr:       -1.366543e+24 
-Mtt:       -3.859740e+26 
-Mpp:        3.873405e+26 
-Mrt:        2.826966e+25 
-Mrp:       -9.154869e+24 
-Mtp:        4.880734e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      41.3921 
-half duration:   15.0000 
-latitude:       -31.1037 
-longitude:      -72.1158 
-depth:            5.6448 
-Mrr:        3.746316e+24 
-Mtt:       -2.933583e+26 
-Mpp:        2.896120e+26 
-Mrt:        8.525728e+23 
-Mrp:        5.232449e+25 
-Mtp:        3.717900e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      41.6790 
+time shift:      42.4790 
 half duration:   15.0000 
 latitude:       -31.5699 
 longitude:      -72.3291 
 depth:            0.7168 
-Mrr:        1.691322e+25 
-Mtt:       -2.201179e+26 
-Mpp:        2.032046e+26 
-Mrt:       -6.017190e+25 
-Mrp:        2.139788e+26 
-Mtp:        2.814183e+26 
+Mrr:        1.895367e+25 
+Mtt:       -2.406841e+26 
+Mpp:        2.217305e+26 
+Mrt:       -6.777841e+25 
+Mrp:        2.396730e+26 
+Mtp:        3.077921e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      42.1325 
-half duration:   15.0000 
-latitude:       -31.7301 
-longitude:      -72.3509 
-depth:            0.7168 
-Mrr:        1.607402e+25 
-Mtt:       -2.035195e+26 
-Mpp:        1.874454e+26 
-Mrt:       -5.751539e+25 
-Mrp:        2.032472e+26 
-Mtp:        2.602733e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      42.9908 
-half duration:   15.0000 
-latitude:       -30.8562 
-longitude:      -71.3332 
-depth:           30.2848 
-Mrr:       -3.928666e+23 
-Mtt:       -2.736957e+25 
-Mpp:        2.776243e+25 
-Mrt:        3.280871e+24 
-Mrp:       -4.315992e+24 
-Mtp:        3.455806e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      43.4552 
-half duration:    3.0000 
-latitude:       -30.8270 
-longitude:      -71.6288 
-depth:           20.4288 
-Mrr:        2.854689e+24 
-Mtt:       -3.798686e+25 
-Mpp:        3.513217e+25 
-Mrt:       -1.010771e+25 
-Mrp:        3.613310e+25 
-Mtp:        4.855466e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      43.9227 
-half duration:    4.5000 
-latitude:       -31.0456 
-longitude:      -71.0594 
-depth:           40.1408 
-Mrr:        3.453444e+24 
-Mtt:       -4.473199e+25 
-Mpp:        4.127854e+25 
-Mrt:       -1.229862e+25 
-Mrp:        4.368720e+25 
-Mtp:        5.719222e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      44.2988 
-half duration:   15.0000 
-latitude:       -32.2547 
-longitude:      -71.9729 
+time shift:      42.6988 
+half duration:    9.0000 
+latitude:       -30.9726 
+longitude:      -71.7984 
 depth:           15.5008 
-Mrr:        2.583438e+22 
-Mtt:       -6.866787e+23 
-Mpp:        6.608443e+23 
-Mrt:       -7.159288e+22 
-Mrp:        3.339057e+23 
-Mtp:        8.732328e+23 
+Mrr:        6.979109e+24 
+Mtt:       -3.940194e+26 
+Mpp:        3.870403e+26 
+Mrt:       -7.252058e+24 
+Mrp:        9.440468e+25 
+Mtp:        4.997020e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      44.3406 
-half duration:   15.0000 
-latitude:       -31.0891 
-longitude:      -72.2636 
-depth:            0.7168 
-Mrr:        1.202528e+25 
-Mtt:       -2.310484e+26 
-Mpp:        2.190231e+26 
-Mrt:       -3.846042e+25 
-Mrp:        1.536404e+26 
-Mtp:        2.943977e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      44.6698 
-half duration:    3.0000 
-latitude:       -32.2401 
-longitude:      -72.1207 
-depth:           10.5728 
-Mrr:       -7.105417e+23 
-Mtt:       -5.644833e+25 
-Mpp:        5.715887e+25 
-Mrt:        6.336592e+24 
-Mrp:       -7.665975e+24 
-Mtp:        7.129154e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      45.0160 
-half duration:   10.5000 
-latitude:       -32.2255 
-longitude:      -72.2685 
-depth:            5.6448 
-Mrr:        7.875250e+24 
-Mtt:       -9.996791e+25 
-Mpp:        9.209266e+25 
-Mrt:       -2.816404e+25 
-Mrp:        9.958341e+25 
-Mtp:        1.278416e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      45.2842 
-half duration:   13.5000 
-latitude:       -32.2693 
-longitude:      -71.8251 
-depth:           20.4288 
-Mrr:       -4.648073e+23 
-Mtt:       -3.683122e+25 
-Mpp:        3.729603e+25 
-Mrt:        4.139634e+24 
-Mrp:       -5.016680e+24 
-Mtp:        4.651587e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      45.3406 
-half duration:   15.0000 
+time shift:      42.7406 
+half duration:    4.5000 
 latitude:       -32.1675 
 longitude:      -71.2121 
 depth:           40.1408 
-Mrr:        1.993936e+24 
-Mtt:       -3.041218e+25 
-Mpp:        2.841824e+25 
-Mrt:       -6.835110e+24 
-Mrp:        2.531631e+25 
-Mtp:        3.882208e+25 
+Mrr:       -1.224825e+23 
+Mtt:       -1.524834e+25 
+Mpp:        1.537082e+25 
+Mrt:        1.412192e+24 
+Mrp:       -1.210293e+24 
+Mtp:        1.926999e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      45.6698 
-half duration:    4.5000 
-latitude:       -30.9580 
-longitude:      -71.9462 
-depth:           10.5728 
-Mrr:       -6.400932e+24 
-Mtt:       -4.333315e+26 
-Mpp:        4.397325e+26 
-Mrt:        5.272452e+25 
-Mrp:       -7.057378e+25 
-Mtp:        5.471126e+26 
+time shift:      43.0988 
+half duration:    1.5000 
+latitude:       -32.2547 
+longitude:      -71.9729 
+depth:           15.5008 
+Mrr:        2.990132e+21 
+Mtt:       -7.240668e+23 
+Mpp:        7.210766e+23 
+Mrt:        2.908372e+22 
+Mrp:        5.163280e+22 
+Mtp:        9.165648e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      46.0791 
+time shift:      43.4842 
 half duration:   15.0000 
-latitude:       -30.8708 
-longitude:      -71.1854 
-depth:           35.2128 
-Mrr:        3.444253e+21 
-Mtt:       -2.945524e+23 
-Mpp:        2.911082e+23 
-Mrt:        2.224364e+21 
-Mrp:        4.860616e+22 
-Mtp:        3.732483e+23 
+latitude:       -32.2693 
+longitude:      -71.8251 
+depth:           20.4288 
+Mrr:       -4.532008e+23 
+Mtt:       -3.321374e+25 
+Mpp:        3.366694e+25 
+Mrt:        3.879860e+24 
+Mrp:       -4.945760e+24 
+Mtp:        4.194126e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      46.6988 
+time shift:      43.6698 
+half duration:    4.5000 
+latitude:       -32.2401 
+longitude:      -72.1207 
+depth:           10.5728 
+Mrr:       -6.424925e+23 
+Mtt:       -4.620941e+25 
+Mpp:        4.685190e+25 
+Mrt:        5.449549e+24 
+Mrp:       -7.029159e+24 
+Mtp:        5.834970e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      43.6988 
+half duration:   10.5000 
+latitude:       -31.0018 
+longitude:      -71.5028 
+depth:           25.3568 
+Mrr:       -1.815094e+24 
+Mtt:       -1.222917e+26 
+Mpp:        1.241068e+26 
+Mrt:        1.491692e+25 
+Mrp:       -2.002422e+25 
+Mtp:        1.544007e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      44.6988 
 half duration:   15.0000 
 latitude:       -32.2839 
 longitude:      -71.6773 
 depth:           25.3568 
-Mrr:       -2.059963e+24 
-Mtt:       -1.427662e+26 
-Mpp:        1.448261e+26 
-Mrt:        1.715985e+25 
-Mrp:       -2.264553e+25 
-Mtp:        1.802612e+26 
+Mrr:       -2.098026e+24 
+Mtt:       -1.425605e+26 
+Mpp:        1.446585e+26 
+Mrt:        1.731206e+25 
+Mrp:       -2.312125e+25 
+Mtp:        1.799944e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      47.3488 
-half duration:    1.5000 
-latitude:       -30.8124 
-longitude:      -71.7766 
-depth:           15.5008 
-Mrr:        1.016543e+25 
-Mtt:       -2.560434e+26 
-Mpp:        2.458779e+26 
-Mrt:       -2.899129e+25 
-Mrp:        1.311016e+26 
-Mtp:        3.256967e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      47.5227 
-half duration:   10.5000 
-latitude:       -32.2109 
-longitude:      -72.4163 
+time shift:      45.3325 
+half duration:   15.0000 
+latitude:       -31.4096 
+longitude:      -72.3073 
 depth:            0.7168 
-Mrr:        1.053562e+25 
-Mtt:       -1.340207e+26 
-Mpp:        1.234850e+26 
-Mrt:       -3.766190e+25 
-Mrp:        1.332298e+26 
-Mtp:        1.713853e+26 
+Mrr:        1.596053e+25 
+Mtt:       -2.596974e+26 
+Mpp:        2.437369e+26 
+Mrt:       -5.376909e+25 
+Mrp:        2.029729e+26 
+Mtp:        3.313264e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      47.6698 
+time shift:      45.4160 
+half duration:   10.5000 
+latitude:       -32.2255 
+longitude:      -72.2685 
+depth:            5.6448 
+Mrr:        8.063149e+24 
+Mtt:       -1.040983e+26 
+Mpp:        9.603516e+25 
+Mrt:       -2.873483e+25 
+Mrp:        1.019946e+26 
+Mtp:        1.330998e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      45.6698 
+half duration:    1.5000 
+latitude:       -30.9580 
+longitude:      -71.9462 
+depth:           10.5728 
+Mrr:       -3.273124e+24 
+Mtt:       -3.968694e+26 
+Mpp:        4.001425e+26 
+Mrt:        3.712288e+25 
+Mrp:       -3.255673e+25 
+Mtp:        5.015264e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      45.7921 
+half duration:   10.5000 
+latitude:       -31.1037 
+longitude:      -72.1158 
+depth:            5.6448 
+Mrr:        9.504541e+24 
+Mtt:       -2.980302e+26 
+Mpp:        2.885256e+26 
+Mrt:       -2.370721e+25 
+Mrp:        1.237595e+26 
+Mtp:        3.787011e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      46.8698 
 half duration:    3.0000 
 latitude:       -32.2985 
 longitude:      -71.5295 
 depth:           30.2848 
-Mrr:       -1.129404e+24 
-Mtt:       -7.792747e+25 
-Mpp:        7.905688e+25 
-Mrt:        9.388066e+24 
-Mrp:       -1.242271e+25 
-Mtp:        9.839288e+25 
+Mrr:       -1.052334e+24 
+Mtt:       -7.147199e+25 
+Mpp:        7.252433e+25 
+Mrt:        8.681466e+24 
+Mrp:       -1.159790e+25 
+Mtp:        9.023919e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      49.2160 
-half duration:    4.5000 
+time shift:      46.8698 
+half duration:   15.0000 
+latitude:       -31.0164 
+longitude:      -71.3550 
+depth:           30.2848 
+Mrr:        1.998701e+24 
+Mtt:       -7.525503e+25 
+Mpp:        7.325633e+25 
+Mrt:       -4.255893e+24 
+Mrp:        2.627874e+25 
+Mtp:        9.555536e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      47.1406 
+half duration:   15.0000 
+latitude:       -31.2059 
+longitude:      -71.0812 
+depth:           40.1408 
+Mrr:        2.796173e+24 
+Mtt:       -4.610248e+25 
+Mpp:        4.330630e+25 
+Mrt:       -9.384873e+24 
+Mrp:        3.557162e+25 
+Mtp:        5.881188e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      48.1227 
+half duration:   10.5000 
+latitude:       -32.2109 
+longitude:      -72.4163 
+depth:            0.7168 
+Mrr:        1.048270e+25 
+Mtt:       -1.332542e+26 
+Mpp:        1.227715e+26 
+Mrt:       -3.747811e+25 
+Mrp:        1.325587e+26 
+Mtp:        1.704065e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      48.4550 
+half duration:   15.0000 
+latitude:       -31.2493 
+longitude:      -72.2855 
+depth:            0.7168 
+Mrr:        1.481180e+25 
+Mtt:       -2.551757e+26 
+Mpp:        2.403639e+26 
+Mrt:       -4.907766e+25 
+Mrp:        1.886497e+26 
+Mtp:        3.254063e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      48.8160 
+half duration:    1.5000 
 latitude:       -30.9434 
 longitude:      -72.0940 
 depth:            5.6448 
-Mrr:        9.190920e+23 
-Mtt:       -3.042765e+26 
-Mpp:        3.033574e+26 
-Mrt:        1.367712e+25 
-Mrp:        1.751688e+25 
-Mtp:        3.851119e+26 
+Mrr:        5.120974e+24 
+Mtt:       -2.783095e+26 
+Mpp:        2.731885e+26 
+Mrt:       -5.947686e+24 
+Mrp:        6.905248e+25 
+Mtp:        3.529900e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      49.6790 
+time shift:      49.2160 
 half duration:   15.0000 
-latitude:       -30.8854 
-longitude:      -71.0376 
-depth:           40.1408 
-Mrr:       -1.784057e+23 
-Mtt:       -1.727711e+25 
-Mpp:        1.745552e+25 
-Mrt:        1.770962e+24 
-Mrp:       -1.862275e+24 
-Mtp:        2.182695e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      50.2160 
-half duration:    9.0000 
 latitude:       -32.3131 
 longitude:      -71.3817 
 depth:           35.2128 
-Mrr:       -6.105489e+20 
-Mtt:       -2.799188e+23 
-Mpp:        2.805294e+23 
-Mrt:        1.886111e+22 
-Mrp:       -1.925132e+21 
-Mtp:        3.540302e+23 
+Mrr:       -4.766378e+20 
+Mtt:       -1.743880e+24 
+Mpp:        1.744357e+24 
+Mrt:        1.031568e+23 
+Mrp:        2.922663e+22 
+Mtp:        2.206168e+24 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      50.2384 
+time shift:      50.4160 
 half duration:   15.0000 
-latitude:       -30.6813 
-longitude:      -71.4592 
-depth:           25.3568 
-Mrr:       -6.527240e+23 
-Mtt:       -4.364197e+25 
-Mpp:        4.429470e+25 
-Mrt:        5.344822e+24 
-Mrp:       -7.207644e+24 
-Mtp:        5.509976e+25 
+latitude:       -31.0310 
+longitude:      -71.2072 
+depth:           35.2128 
+Mrr:       -4.573555e+23 
+Mtt:       -3.243696e+25 
+Mpp:        3.289431e+25 
+Mrt:        3.852743e+24 
+Mrp:       -5.012884e+24 
+Mtp:        4.095781e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      51.0521 
-half duration:    7.5000 
-latitude:       -30.6959 
-longitude:      -71.3114 
-depth:           30.2848 
-Mrr:        1.916038e+22 
-Mtt:       -5.511260e+23 
-Mpp:        5.319657e+23 
-Mrt:       -5.067191e+22 
-Mrp:        2.484881e+23 
-Mtp:        7.005802e+23 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      52.4263 
+time shift:      50.7406 
 half duration:   15.0000 
-latitude:       -30.6667 
-longitude:      -71.6070 
-depth:           20.4288 
-Mrr:       -3.559566e+23 
-Mtt:       -3.050688e+25 
-Mpp:        3.086284e+25 
-Mrt:        3.303594e+24 
-Mrp:       -3.795496e+24 
-Mtp:        3.853361e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      52.7227 
-half duration:   15.0000 
-latitude:       -30.9288 
-longitude:      -72.2418 
+latitude:       -31.0891 
+longitude:      -72.2636 
 depth:            0.7168 
-Mrr:        5.237564e+24 
-Mtt:       -2.263494e+26 
-Mpp:        2.211118e+26 
-Mrt:       -9.462833e+24 
-Mrp:        6.945018e+25 
-Mtp:        2.872735e+26 
+Mrr:        1.468898e+25 
+Mtt:       -2.364300e+26 
+Mpp:        2.217411e+26 
+Mrt:       -4.963481e+25 
+Mrp:        1.867504e+26 
+Mtp:        3.016691e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      53.1227 
+time shift:      51.2552 
 half duration:    1.5000 
+latitude:       -30.8270 
+longitude:      -71.6288 
+depth:           20.4288 
+Mrr:        1.228159e+23 
+Mtt:       -2.538383e+25 
+Mpp:        2.526102e+25 
+Mrt:        9.420211e+23 
+Mrp:        2.032990e+24 
+Mtp:        3.213542e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      52.3227 
+half duration:    3.0000 
 latitude:       -32.3277 
 longitude:      -71.2339 
 depth:           40.1408 
-Mrr:       -8.386248e+23 
-Mtt:       -5.678674e+25 
-Mpp:        5.762537e+25 
-Mrt:        6.908532e+24 
-Mrp:       -9.246028e+24 
-Mtp:        7.169743e+25 
+Mrr:       -3.989231e+23 
+Mtt:       -3.684073e+25 
+Mpp:        3.723965e+25 
+Mrt:        3.856079e+24 
+Mrp:       -4.200224e+24 
+Mtp:        4.653934e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      53.2047 
+time shift:      52.3488 
+half duration:   13.5000 
+latitude:       -30.8124 
+longitude:      -71.7766 
+depth:           15.5008 
+Mrr:        1.116851e+25 
+Mtt:       -2.622942e+26 
+Mpp:        2.511256e+26 
+Mrt:       -3.295437e+25 
+Mrp:        1.436551e+26 
+Mtp:        3.337791e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      52.5488 
 half duration:   15.0000 
-latitude:       -30.7105 
-longitude:      -71.1636 
-depth:           35.2128 
-Mrr:       -5.049143e+21 
-Mtt:       -6.422596e+23 
-Mpp:        6.473087e+23 
-Mrt:        5.900793e+22 
-Mrp:       -4.961692e+22 
-Mtp:        8.116706e+23 
+latitude:       -30.8416 
+longitude:      -71.4810 
+depth:           25.3568 
+Mrr:       -6.429536e+23 
+Mtt:       -4.547910e+25 
+Mpp:        4.612205e+25 
+Mrt:        5.409198e+24 
+Mrp:       -7.049584e+24 
+Mtp:        5.742568e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      53.1908 
+half duration:    7.5000 
+latitude:       -32.4004 
+longitude:      -72.1425 
+depth:           10.5728 
+Mrr:       -2.869543e+23 
+Mtt:       -2.651041e+25 
+Mpp:        2.679736e+25 
+Mrt:        2.774346e+24 
+Mrp:       -3.021112e+24 
+Mtp:        3.348950e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      53.4791 
+half duration:    1.5000 
+latitude:       -32.3858 
+longitude:      -72.2903 
+depth:            5.6448 
+Mrr:        5.876593e+24 
+Mtt:       -7.553813e+25 
+Mpp:        6.966154e+25 
+Mrt:       -2.096174e+25 
+Mrp:        7.432913e+25 
+Mtp:        9.658729e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      53.5227 
+half duration:    1.5000 
+latitude:       -30.9288 
+longitude:      -72.2418 
+depth:            0.7168 
+Mrr:        1.355684e+25 
+Mtt:       -2.125481e+26 
+Mpp:        1.989913e+26 
+Mrt:       -4.613739e+25 
+Mrp:        1.722429e+26 
+Mtp:        2.712584e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
 time shift:      53.9908 
+half duration:   15.0000 
+latitude:       -30.8562 
+longitude:      -71.3332 
+depth:           30.2848 
+Mrr:        3.277993e+23 
+Mtt:       -9.909807e+24 
+Mpp:        9.582008e+24 
+Mrt:       -8.390162e+23 
+Mrp:        4.260872e+24 
+Mtp:        1.259424e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      54.1488 
+half duration:    9.0000 
+latitude:       -32.4150 
+longitude:      -71.9947 
+depth:           15.5008 
+Mrr:        2.341341e+22 
+Mtt:       -3.125270e+23 
+Mpp:        2.891136e+23 
+Mrt:       -8.284464e+22 
+Mrp:        2.963738e+23 
+Mtp:        3.994582e+23 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      54.5908 
 half duration:   12.0000 
 latitude:       -30.7978 
 longitude:      -71.9244 
 depth:           10.5728 
-Mrr:       -4.038820e+24 
-Mtt:       -3.577875e+26 
-Mpp:        3.618264e+26 
-Mrt:        3.815895e+25 
-Mrp:       -4.283056e+25 
-Mtp:        4.519493e+26 
+Mrr:       -3.268262e+24 
+Mtt:       -3.015314e+26 
+Mpp:        3.047997e+26 
+Mrt:        3.157470e+25 
+Mrp:       -3.441715e+25 
+Mtp:        3.809114e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      54.4791 
+time shift:      54.7227 
 half duration:   15.0000 
-latitude:       -32.3858 
-longitude:      -72.2903 
-depth:            5.6448 
-Mrr:        5.331310e+24 
-Mtt:       -7.614182e+25 
-Mpp:        7.081051e+25 
-Mrt:       -1.857537e+25 
-Mrp:        6.758557e+25 
-Mtp:        9.725630e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      54.7908 
-half duration:    4.5000 
-latitude:       -32.4004 
-longitude:      -72.1425 
-depth:           10.5728 
-Mrr:        1.222126e+24 
-Mtt:       -1.918777e+25 
-Mpp:        1.796564e+25 
-Mrt:       -4.157645e+24 
-Mrp:        1.552794e+25 
-Mtp:        2.448754e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      55.3488 
-half duration:    4.5000 
-latitude:       -32.4150 
-longitude:      -71.9947 
-depth:           15.5008 
-Mrr:        2.411404e+20 
-Mtt:       -1.058809e+23 
-Mpp:        1.056398e+23 
-Mrt:        5.098602e+21 
-Mrp:        5.120639e+21 
-Mtp:        1.339960e+23 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      56.0790 
-half duration:    1.5000 
-latitude:       -32.3712 
-longitude:      -72.4381 
-depth:            0.7168 
-Mrr:        9.371140e+24 
-Mtt:       -1.188400e+26 
-Mpp:        1.094689e+26 
-Mrt:       -3.352051e+25 
-Mrp:        1.184968e+26 
-Mtp:        1.519774e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      56.2084 
-half duration:   10.5000 
-latitude:       -30.7251 
-longitude:      -71.0158 
+latitude:       -31.0456 
+longitude:      -71.0594 
 depth:           40.1408 
-Mrr:       -8.295975e+23 
-Mtt:       -5.839439e+25 
-Mpp:        5.922399e+25 
-Mrt:        6.962808e+24 
-Mrp:       -9.101798e+24 
-Mtp:        7.373290e+25 
+Mrr:        4.273773e+24 
+Mtt:       -5.420052e+25 
+Mpp:        4.992674e+25 
+Mrt:       -1.528710e+25 
+Mrp:        5.404132e+25 
+Mtp:        6.931375e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      56.2552 
-half duration:   15.0000 
+time shift:      55.2552 
+half duration:    4.5000 
 latitude:       -32.4296 
 longitude:      -71.8469 
 depth:           20.4288 
-Mrr:        3.571884e+21 
-Mtt:       -1.668032e+23 
-Mpp:        1.632313e+23 
-Mrt:       -5.732273e+21 
-Mrp:        4.761382e+22 
-Mtp:        2.116498e+23 
+Mrr:        3.712701e+22 
+Mtt:       -4.739502e+23 
+Mpp:        4.368232e+23 
+Mrt:       -1.326219e+23 
+Mrp:        4.695288e+23 
+Mtp:        6.060637e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      56.6384 
-half duration:    4.5000 
-latitude:       -30.6521 
-longitude:      -71.7548 
-depth:           15.5008 
-Mrr:        2.224419e+24 
-Mtt:       -1.607155e+26 
-Mpp:        1.584911e+26 
-Mrt:       -2.746620e+23 
-Mrp:        3.079692e+25 
-Mtp:        2.037140e+26 
+time shift:      56.0790 
+half duration:    9.0000 
+latitude:       -32.3712 
+longitude:      -72.4381 
+depth:            0.7168 
+Mrr:        8.140733e+24 
+Mtt:       -1.190406e+26 
+Mpp:        1.108998e+26 
+Mrt:       -2.820311e+25 
+Mrp:        1.032568e+26 
+Mtp:        1.520173e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      57.1488 
-half duration:   13.5000 
+time shift:      56.2791 
+half duration:    9.0000 
+latitude:       -30.8708 
+longitude:      -71.1854 
+depth:           35.2128 
+Mrr:        6.033701e+21 
+Mtt:       -7.775437e+23 
+Mpp:        7.715100e+23 
+Mrt:        1.905956e+22 
+Mrp:        9.041807e+22 
+Mtp:        9.847494e+23 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      56.5488 
+half duration:   15.0000 
 latitude:       -32.4442 
 longitude:      -71.6991 
 depth:           25.3568 
-Mrr:        3.187090e+24 
-Mtt:       -4.396370e+25 
-Mpp:        4.077661e+25 
-Mrt:       -1.119458e+25 
-Mrp:        4.037176e+25 
-Mtp:        5.617394e+25 
+Mrr:        4.164290e+24 
+Mtt:       -5.580866e+25 
+Mpp:        5.164437e+25 
+Mrt:       -1.472176e+25 
+Mrp:        5.271729e+25 
+Mtp:        7.132925e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      57.4791 
+time shift:      56.8791 
 half duration:    3.0000 
 latitude:       -30.7831 
 longitude:      -72.0722 
 depth:            5.6448 
-Mrr:       -3.392234e+24 
-Mtt:       -2.468691e+26 
-Mpp:        2.502613e+26 
-Mrt:        2.894024e+25 
-Mrp:       -3.705431e+25 
-Mtp:        3.117344e+26 
+Mrr:        5.950617e+24 
+Mtt:       -2.229688e+26 
+Mpp:        2.170182e+26 
+Mrt:       -1.273365e+25 
+Mrp:        7.821635e+25 
+Mtp:        2.831204e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
 time shift:      57.7908 
-half duration:    7.5000 
+half duration:   13.5000 
 latitude:       -32.4588 
 longitude:      -71.5513 
 depth:           30.2848 
-Mrr:       -3.952652e+23 
-Mtt:       -2.654389e+25 
-Mpp:        2.693915e+25 
-Mrt:        3.243346e+24 
-Mrp:       -4.362344e+24 
-Mtp:        3.351304e+25 
+Mrr:       -2.696163e+23 
+Mtt:       -2.281815e+25 
+Mpp:        2.308776e+25 
+Mrt:        2.485522e+24 
+Mrp:       -2.880689e+24 
+Mtp:        2.882129e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      58.8791 
-half duration:    1.5000 
+time shift:      59.0263 
+half duration:    3.0000 
+latitude:       -30.6667 
+longitude:      -71.6070 
+depth:           20.4288 
+Mrr:       -7.341810e+23 
+Mtt:       -4.914091e+25 
+Mpp:        4.987509e+25 
+Mrt:        6.014882e+24 
+Mrp:       -8.106065e+24 
+Mtp:        6.204253e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      59.2384 
+half duration:   15.0000 
+latitude:       -30.6813 
+longitude:      -71.4592 
+depth:           25.3568 
+Mrr:       -7.157584e+23 
+Mtt:       -5.084881e+25 
+Mpp:        5.156457e+25 
+Mrt:        6.034455e+24 
+Mrp:       -7.843413e+24 
+Mtp:        6.420646e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      59.2521 
+half duration:    7.5000 
+latitude:       -30.6959 
+longitude:      -71.3114 
+depth:           30.2848 
+Mrr:       -2.706618e+23 
+Mtt:       -1.815142e+25 
+Mpp:        1.842209e+25 
+Mrt:        2.219478e+24 
+Mrp:       -2.987657e+24 
+Mtp:        2.291705e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      59.4791 
+half duration:   10.5000 
 latitude:       -32.4734 
 longitude:      -71.4035 
 depth:           35.2128 
-Mrr:        1.149771e+21 
-Mtt:       -3.522429e+22 
-Mpp:        3.407452e+22 
-Mrt:       -2.915917e+21 
-Mrp:        1.495457e+22 
-Mtp:        4.476340e+22 
+Mrr:        3.407455e+21 
+Mtt:       -2.780532e+23 
+Mpp:        2.746457e+23 
+Mrt:        1.426495e+21 
+Mrp:        4.781787e+22 
+Mtp:        3.523680e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      59.5510 
+time shift:      59.6790 
+half duration:    6.0000 
+latitude:       -30.8854 
+longitude:      -71.0376 
+depth:           40.1408 
+Mrr:       -2.711636e+23 
+Mtt:       -2.215633e+25 
+Mpp:        2.242750e+25 
+Mrt:        2.453826e+24 
+Mrp:       -2.913192e+24 
+Mtp:        2.798373e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      60.2047 
+half duration:    1.5000 
+latitude:       -30.7105 
+longitude:      -71.1636 
+depth:           35.2128 
+Mrr:       -5.588214e+23 
+Mtt:       -4.817704e+25 
+Mpp:        4.873587e+25 
+Mrt:        5.202816e+24 
+Mrp:       -5.952886e+24 
+Mtp:        6.085358e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      60.4790 
 half duration:    4.5000 
-latitude:       -30.5210 
-longitude:      -71.4374 
-depth:           25.3568 
-Mrr:       -5.946863e+23 
-Mtt:       -4.248168e+25 
-Mpp:        4.307637e+25 
-Mrt:        5.027284e+24 
-Mrp:       -6.511968e+24 
-Mtp:        5.364192e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      59.7977 
-half duration:    6.0000 
-latitude:       -30.5356 
-longitude:      -71.2896 
-depth:           30.2848 
-Mrr:       -2.340338e+23 
-Mtt:       -1.729761e+25 
-Mpp:        1.753165e+25 
-Mrt:        2.012031e+24 
-Mrp:       -2.551060e+24 
-Mtp:        2.184323e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      60.6790 
-half duration:    6.0000 
 latitude:       -30.7685 
 longitude:      -72.2200 
 depth:            0.7168 
-Mrr:       -2.301396e+24 
-Mtt:       -1.967447e+26 
-Mpp:        1.990461e+26 
-Mrt:        2.133036e+25 
-Mrp:       -2.454929e+25 
-Mtp:        2.485096e+26 
+Mrr:        1.337136e+25 
+Mtt:       -1.692586e+26 
+Mpp:        1.558872e+26 
+Mrt:       -4.784726e+25 
+Mrp:        1.690728e+26 
+Mtp:        2.164589e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      61.0790 
+time shift:      60.8384 
 half duration:   15.0000 
+latitude:       -30.6521 
+longitude:      -71.7548 
+depth:           15.5008 
+Mrr:       -1.020644e+24 
+Mtt:       -1.622953e+26 
+Mpp:        1.633159e+26 
+Mrt:        1.381029e+25 
+Mrp:       -9.375576e+24 
+Mtp:        2.051488e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      61.8790 
+half duration:    7.5000 
 latitude:       -32.4880 
 longitude:      -71.2557 
 depth:           40.1408 
-Mrr:        8.329085e+22 
-Mtt:       -3.483520e+24 
-Mpp:        3.400230e+24 
-Mrt:       -1.572099e+23 
-Mrp:        1.102101e+24 
-Mtp:        4.421610e+24 
+Mrr:        4.090875e+22 
+Mtt:       -2.160646e+24 
+Mpp:        2.119737e+24 
+Mrt:       -5.114340e+22 
+Mrp:        5.503621e+23 
+Mtp:        2.740625e+24 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      61.0964 
-half duration:    3.0000 
-latitude:       -30.5502 
-longitude:      -71.1418 
-depth:           35.2128 
-Mrr:        3.372736e+22 
-Mtt:       -6.358933e+23 
-Mpp:        6.021660e+23 
-Mrt:       -1.085733e+23 
-Mrp:        4.306717e+23 
-Mtp:        8.103536e+23 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      61.1973 
+time shift:      62.6084 
 half duration:    1.5000 
-latitude:       -30.5064 
-longitude:      -71.5852 
-depth:           20.4288 
-Mrr:        1.691481e+24 
-Mtt:       -2.357909e+25 
-Mpp:        2.188761e+25 
-Mrt:       -5.927010e+24 
-Mrp:        2.143142e+25 
-Mtp:        3.012472e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      62.2521 
-half duration:   13.5000 
-latitude:       -30.6375 
-longitude:      -71.9026 
-depth:           10.5728 
-Mrr:       -2.948667e+24 
-Mtt:       -2.057651e+26 
-Mpp:        2.087138e+26 
-Mrt:        2.464449e+25 
-Mrp:       -3.238686e+25 
-Mtp:        2.598092e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      63.5875 
-half duration:    1.5000 
-latitude:       -30.5648 
-longitude:      -70.9939 
+latitude:       -30.7251 
+longitude:      -71.0158 
 depth:           40.1408 
-Mrr:       -5.280755e+23 
-Mtt:       -3.783364e+25 
-Mpp:        3.836172e+25 
-Mrt:        4.470574e+24 
-Mrp:       -5.780339e+24 
-Mtp:        4.777307e+25 
+Mrr:       -1.259948e+23 
+Mtt:       -1.135163e+25 
+Mpp:        1.147762e+25 
+Mrt:        1.201426e+24 
+Mrp:       -1.332310e+24 
+Mtp:        1.433950e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      64.6047 
-half duration:    1.5000 
+time shift:      63.8047 
+half duration:   10.5000 
 latitude:       -32.5460 
 longitude:      -72.3121 
 depth:            5.6448 
-Mrr:        3.223788e+24 
-Mtt:       -4.089976e+25 
-Mpp:        3.767597e+25 
-Mrt:       -1.153047e+25 
-Mrp:        4.076470e+25 
-Mtp:        5.230401e+25 
+Mrr:        4.284684e+24 
+Mtt:       -5.839401e+25 
+Mpp:        5.410933e+25 
+Mrt:       -1.509103e+25 
+Mrp:        5.426098e+25 
+Mtp:        7.462101e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      64.9510 
-half duration:    4.5000 
-latitude:       -30.4918 
-longitude:      -71.7330 
-depth:           15.5008 
-Mrr:       -1.847887e+24 
-Mtt:       -1.242083e+26 
-Mpp:        1.260562e+26 
-Mrt:        1.516944e+25 
-Mrp:       -2.039190e+25 
-Mtp:        1.568197e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      65.2521 
+time shift:      63.8521 
 half duration:    9.0000 
 latitude:       -32.5606 
 longitude:      -72.1643 
 depth:           10.5728 
-Mrr:        9.947508e+22 
-Mtt:       -2.199084e+24 
-Mpp:        2.099609e+24 
-Mrt:       -3.014648e+23 
-Mrp:        1.276737e+24 
-Mtp:        2.799431e+24 
+Mrr:        7.712589e+22 
+Mtt:       -1.455040e+24 
+Mpp:        1.377914e+24 
+Mrt:       -2.482265e+23 
+Mrp:        9.848550e+23 
+Mtp:        1.854229e+24 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      66.0047 
+time shift:      63.8521 
+half duration:   15.0000 
+latitude:       -30.6375 
+longitude:      -71.9026 
+depth:           10.5728 
+Mrr:       -3.061848e+24 
+Mtt:       -2.056650e+26 
+Mpp:        2.087269e+26 
+Mrt:        2.512674e+25 
+Mrp:       -3.379112e+25 
+Mtp:        2.596629e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      63.9977 
+half duration:    3.0000 
+latitude:       -30.5356 
+longitude:      -71.2896 
+depth:           30.2848 
+Mrr:       -4.781572e+23 
+Mtt:       -3.255872e+25 
+Mpp:        3.303688e+25 
+Mrt:        3.949503e+24 
+Mrp:       -5.268150e+24 
+Mtp:        4.110824e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      64.2964 
 half duration:    7.5000 
-latitude:       -30.6229 
-longitude:      -72.0504 
-depth:            5.6448 
-Mrr:       -3.909799e+23 
-Mtt:       -1.597212e+26 
-Mpp:        1.601121e+26 
-Mrt:        1.094582e+25 
-Mrp:       -1.626287e+24 
-Mtp:        2.020016e+26 
+latitude:       -30.5502 
+longitude:      -71.1418 
+depth:           35.2128 
+Mrr:       -2.098993e+22 
+Mtt:       -2.535659e+24 
+Mpp:        2.556649e+24 
+Mrt:        2.375177e+23 
+Mrp:       -2.089693e+23 
+Mtp:        3.204314e+24 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      66.0384 
+time shift:      64.3510 
+half duration:    1.5000 
+latitude:       -30.5210 
+longitude:      -71.4374 
+depth:           25.3568 
+Mrr:        1.616998e+22 
+Mtt:       -2.619271e+23 
+Mpp:        2.457571e+23 
+Mrt:       -5.454301e+22 
+Mrp:        2.056128e+23 
+Mtp:        3.341837e+23 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      64.8384 
 half duration:    9.0000 
 latitude:       -32.5752 
 longitude:      -72.0165 
 depth:           15.5008 
-Mrr:        2.532285e+21 
-Mtt:       -4.903135e+22 
-Mpp:        4.649907e+22 
-Mrt:       -8.077135e+21 
-Mrp:        3.236122e+22 
-Mtp:        6.247146e+22 
+Mrr:        3.211229e+21 
+Mtt:       -4.589958e+22 
+Mpp:        4.268835e+22 
+Mrt:       -1.118644e+22 
+Mrp:        4.070983e+22 
+Mtp:        5.862730e+22 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      66.4084 
-half duration:    4.5000 
+time shift:      64.9973 
+half duration:    7.5000 
+latitude:       -30.5064 
+longitude:      -71.5852 
+depth:           20.4288 
+Mrr:        6.212215e+21 
+Mtt:       -8.566314e+22 
+Mpp:        7.945092e+22 
+Mrt:       -2.182201e+22 
+Mrp:        7.869126e+22 
+Mtp:        1.094551e+23 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      65.2047 
+half duration:    9.0000 
+latitude:       -30.6229 
+longitude:      -72.0504 
+depth:            5.6448 
+Mrr:        5.428822e+24 
+Mtt:       -1.680239e+26 
+Mpp:        1.625951e+26 
+Mrt:       -1.366899e+25 
+Mrp:        7.064472e+25 
+Mtp:        2.135169e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      65.8084 
+half duration:    3.0000 
 latitude:       -32.5314 
 longitude:      -72.4599 
 depth:            0.7168 
-Mrr:        6.127165e+24 
-Mtt:       -8.444992e+25 
-Mpp:        7.832276e+25 
-Mrt:       -2.152560e+25 
-Mrp:        7.761310e+25 
-Mtp:        1.079055e+26 
+Mrr:        4.980465e+24 
+Mtt:       -1.033746e+26 
+Mpp:        9.839413e+25 
+Mrt:       -1.548363e+25 
+Mrp:        6.378745e+25 
+Mtp:        1.316486e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      66.8263 
-half duration:    4.5000 
+time shift:      66.0263 
+half duration:    1.5000 
 latitude:       -32.5898 
 longitude:      -71.8687 
 depth:           20.4288 
-Mrr:        2.313846e+21 
-Mtt:       -1.915942e+23 
-Mpp:        1.892804e+23 
-Mrt:        1.129904e+21 
-Mrp:        3.252694e+22 
-Mtp:        2.427954e+23 
+Mrr:        1.464911e+20 
+Mtt:       -5.989545e+21 
+Mpp:        5.843054e+21 
+Mrt:       -2.844554e+20 
+Mrp:        1.935598e+21 
+Mtp:        7.603061e+21 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      66.8384 
-half duration:    7.5000 
-latitude:       -32.6044 
-longitude:      -71.7209 
-depth:           25.3568 
-Mrr:        4.802361e+21 
-Mtt:       -3.125157e+23 
-Mpp:        3.077134e+23 
-Mrt:       -2.590653e+21 
-Mrp:        6.579416e+22 
-Mtp:        3.962103e+23 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      66.8521 
-half duration:    7.5000 
-latitude:       -32.6190 
-longitude:      -71.5731 
-depth:           30.2848 
-Mrr:        6.779787e+22 
-Mtt:       -1.875389e+24 
-Mpp:        1.807591e+24 
-Mrt:       -1.836325e+23 
-Mrp:        8.777550e+23 
-Mtp:        2.384408e+24 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      67.0047 
-half duration:    3.0000 
-latitude:       -32.6336 
-longitude:      -71.4253 
-depth:           35.2128 
-Mrr:        4.166614e+22 
-Mtt:       -1.651011e+24 
-Mpp:        1.609345e+24 
-Mrt:       -8.395550e+22 
-Mrp:        5.494787e+23 
-Mtp:        2.095998e+24 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      68.0084 
+time shift:      66.1875 
 half duration:    1.5000 
-latitude:       -32.6482 
-longitude:      -71.2775 
+latitude:       -30.5648 
+longitude:      -70.9939 
 depth:           40.1408 
-Mrr:        2.254453e+23 
-Mtt:       -3.514312e+24 
-Mpp:        3.288867e+24 
-Mrt:       -7.684237e+23 
-Mrp:        2.863927e+24 
-Mtp:        4.485265e+24 
+Mrr:        3.136863e+21 
+Mtt:       -4.725546e+23 
+Mpp:        4.694177e+23 
+Mrt:        1.386957e+22 
+Mrp:        4.838379e+22 
+Mtp:        5.983924e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      68.3976 
-half duration:    4.5000 
-latitude:       -30.3754 
-longitude:      -71.2678 
-depth:           30.2848 
-Mrr:        6.058571e+21 
-Mtt:       -1.132924e+23 
-Mpp:        1.072339e+23 
-Mrt:       -1.955766e+22 
-Mrp:        7.734432e+22 
-Mtp:        1.443834e+23 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      68.4781 
+time shift:      66.5510 
 half duration:   15.0000 
-latitude:       -30.3608 
-longitude:      -71.4156 
-depth:           25.3568 
-Mrr:       -5.487958e+23 
-Mtt:       -3.822175e+25 
-Mpp:        3.877054e+25 
-Mrt:        4.582425e+24 
-Mrp:       -6.029233e+24 
-Mtp:        4.826048e+25 
+latitude:       -30.4918 
+longitude:      -71.7330 
+depth:           15.5008 
+Mrr:       -1.472389e+24 
+Mtt:       -9.875953e+25 
+Mpp:        1.002319e+26 
+Mrt:        1.207482e+25 
+Mrp:       -1.625240e+25 
+Mtp:        1.246887e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      69.2084 
-half duration:    6.0000 
+time shift:      67.0084 
+half duration:    3.0000 
 latitude:       -30.6083 
 longitude:      -72.1982 
 depth:            0.7168 
-Mrr:       -1.535306e+24 
-Mtt:       -1.361538e+26 
-Mpp:        1.376891e+26 
-Mrt:        1.451406e+25 
-Mrp:       -1.627856e+25 
-Mtp:        1.719867e+26 
+Mrr:        9.494942e+24 
+Mtt:       -1.315674e+26 
+Mpp:        1.220725e+26 
+Mrt:       -3.331649e+25 
+Mrp:        1.202870e+26 
+Mtp:        1.681008e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      69.3683 
+time shift:      67.4384 
 half duration:    3.0000 
-latitude:       -30.3462 
-longitude:      -71.5634 
-depth:           20.4288 
-Mrr:       -4.714392e+23 
-Mtt:       -3.204109e+25 
-Mpp:        3.251252e+25 
-Mrt:        3.890524e+24 
-Mrp:       -5.195347e+24 
-Mtp:        4.045452e+25 
+latitude:       -32.6044 
+longitude:      -71.7209 
+depth:           25.3568 
+Mrr:        1.782714e+22 
+Mtt:       -2.613550e+23 
+Mpp:        2.435279e+23 
+Mrt:       -6.172220e+22 
+Mrp:        2.261325e+23 
+Mtp:        3.337479e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      69.3977 
-half duration:   15.0000 
+time shift:      68.2521 
+half duration:    3.0000 
+latitude:       -32.6190 
+longitude:      -71.5731 
+depth:           30.2848 
+Mrr:       -3.859150e+22 
+Mtt:       -3.255092e+24 
+Mpp:        3.293684e+24 
+Mrt:        3.551284e+23 
+Mrp:       -4.125484e+23 
+Mtp:        4.111440e+24 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      68.3977 
+half duration:    1.5000 
 latitude:       -30.4772 
 longitude:      -71.8808 
 depth:           10.5728 
-Mrr:       -1.850399e+24 
-Mtt:       -1.406834e+26 
-Mpp:        1.425338e+26 
-Mrt:        1.613542e+25 
-Mrp:       -2.009112e+25 
-Mtp:        1.776626e+26 
+Mrr:        1.381963e+24 
+Mtt:       -1.251635e+26 
+Mpp:        1.237816e+26 
+Mrt:        1.297050e+24 
+Mrp:        1.964319e+25 
+Mtp:        1.585894e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      69.4988 
+time shift:      68.9976 
+half duration:   13.5000 
+latitude:       -30.3754 
+longitude:      -71.2678 
+depth:           30.2848 
+Mrr:        1.850046e+23 
+Mtt:       -2.959046e+24 
+Mpp:        2.774041e+24 
+Mrt:       -6.262266e+23 
+Mrp:        2.351705e+24 
+Mtp:        3.775749e+24 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      69.0781 
+half duration:   12.0000 
+latitude:       -30.3608 
+longitude:      -71.4156 
+depth:           25.3568 
+Mrr:       -1.737371e+23 
+Mtt:       -1.320464e+25 
+Mpp:        1.337838e+25 
+Mrt:        1.514729e+24 
+Mrp:       -1.886477e+24 
+Mtp:        1.667552e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      69.2047 
+half duration:    7.5000 
+latitude:       -32.6336 
+longitude:      -71.4253 
+depth:           35.2128 
+Mrr:       -1.623491e+21 
+Mtt:       -2.276448e+23 
+Mpp:        2.292683e+23 
+Mrt:        2.019853e+22 
+Mrp:       -1.552796e+22 
+Mtp:        2.877203e+23 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      69.2988 
 half duration:    1.5000 
 latitude:       -30.3900 
 longitude:      -71.1199 
 depth:           35.2128 
-Mrr:        4.642271e+22 
-Mtt:       -5.478338e+24 
-Mpp:        5.431915e+24 
-Mrt:        1.174225e+23 
-Mrp:        6.855142e+23 
-Mtp:        6.938926e+24 
+Mrr:        6.009583e+22 
+Mtt:       -3.637818e+24 
+Mpp:        3.577722e+24 
+Mrt:       -4.824288e+22 
+Mrp:        8.178370e+23 
+Mtp:        4.612788e+24 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      71.5396 
-half duration:    4.5000 
-latitude:       -30.4046 
-longitude:      -70.9721 
-depth:           40.1408 
-Mrr:       -9.296581e+23 
-Mtt:       -6.192713e+25 
-Mpp:        6.285679e+25 
-Mrt:        7.599100e+24 
-Mrp:       -1.027032e+25 
-Mtp:        7.818492e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      72.0781 
-half duration:    7.5000 
-latitude:       -30.3316 
-longitude:      -71.7112 
-depth:           15.5008 
-Mrr:       -1.570770e+24 
-Mtt:       -1.055478e+26 
-Mpp:        1.071186e+26 
-Mrt:        1.289261e+25 
-Mrp:       -1.733453e+25 
-Mtp:        1.332597e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      73.0964 
-half duration:   13.5000 
+time shift:      69.4964 
+half duration:    3.0000 
 latitude:       -30.4626 
 longitude:      -72.0286 
 depth:            5.6448 
-Mrr:        5.493244e+24 
-Mtt:       -7.145089e+25 
-Mpp:        6.595765e+25 
-Mrt:       -1.954562e+25 
-Mrp:        6.949733e+25 
-Mtp:        9.134975e+25 
+Mrr:        7.751761e+24 
+Mtt:       -9.852249e+25 
+Mpp:        9.077073e+25 
+Mrt:       -2.771532e+25 
+Mrp:        9.802434e+25 
+Mtp:        1.259915e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      74.7875 
+time shift:      69.7683 
+half duration:    1.5000 
+latitude:       -30.3462 
+longitude:      -71.5634 
+depth:           20.4288 
+Mrr:       -3.335379e+23 
+Mtt:       -2.228719e+25 
+Mpp:        2.262073e+25 
+Mrt:        2.730383e+24 
+Mrp:       -3.683334e+24 
+Mtp:        2.813845e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      70.7396 
 half duration:    6.0000 
-latitude:       -32.8085 
-longitude:      -71.2993 
+latitude:       -30.4046 
+longitude:      -70.9721 
 depth:           40.1408 
-Mrr:       -2.312093e+23 
-Mtt:       -1.599054e+25 
-Mpp:        1.622175e+25 
-Mrt:        1.924073e+24 
-Mrp:       -2.542398e+24 
-Mtp:        2.019009e+25 
+Mrr:       -4.616537e+23 
+Mtt:       -3.399036e+25 
+Mpp:        3.445202e+25 
+Mrt:        3.961336e+24 
+Mrp:       -5.034840e+24 
+Mtp:        4.292233e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      74.8964 
-half duration:    6.0000 
-latitude:       -32.7939 
-longitude:      -71.4471 
-depth:           35.2128 
-Mrr:       -5.027509e+21 
-Mtt:       -4.301428e+23 
-Mpp:        4.351703e+23 
-Mrt:        4.661717e+22 
-Mrp:       -5.362216e+22 
-Mtp:        5.433170e+23 
+time shift:      70.8781 
+half duration:   15.0000 
+latitude:       -30.3316 
+longitude:      -71.7112 
+depth:           15.5008 
+Mrr:       -1.096836e+24 
+Mtt:       -7.311045e+25 
+Mpp:        7.420728e+25 
+Mrt:        8.968358e+24 
+Mrp:       -1.211625e+25 
+Mtp:        9.230433e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      75.1976 
-half duration:    6.0000 
-latitude:       -30.3170 
-longitude:      -71.8590 
-depth:           10.5728 
-Mrr:       -1.440463e+24 
-Mtt:       -9.662982e+25 
-Mpp:        9.807028e+25 
-Mrt:        1.181368e+25 
-Mrp:       -1.589975e+25 
-Mtp:        1.219999e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      75.1977 
-half duration:    1.5000 
-latitude:       -32.7793 
-longitude:      -71.5949 
-depth:           30.2848 
-Mrr:       -4.650598e+23 
-Mtt:       -3.175699e+25 
-Mpp:        3.222205e+25 
-Mrt:        3.846544e+24 
-Mrp:       -5.122033e+24 
-Mtp:        4.009621e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      75.9510 
-half duration:   10.5000 
-latitude:       -32.7647 
-longitude:      -71.7427 
-depth:           25.3568 
-Mrr:        2.912529e+21 
-Mtt:       -4.071325e+22 
-Mpp:        3.780072e+22 
-Mrt:       -1.019907e+22 
-Mrp:        3.690464e+22 
-Mtp:        5.201397e+22 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      75.9875 
-half duration:    1.5000 
+time shift:      71.1875 
+half duration:    7.5000 
 latitude:       -30.4480 
 longitude:      -72.1764 
 depth:            0.7168 
-Mrr:        4.435739e+24 
-Mtt:       -5.610903e+25 
-Mpp:        5.167329e+25 
-Mrt:       -1.587488e+25 
-Mrp:        5.608642e+25 
-Mtp:        7.175643e+25 
+Mrr:        8.994918e+24 
+Mtt:       -1.138653e+26 
+Mpp:        1.048704e+26 
+Mrt:       -3.218657e+25 
+Mrp:        1.137354e+26 
+Mtp:        1.456183e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      76.0149 
+time shift:      71.4084 
+half duration:    6.0000 
+latitude:       -32.6482 
+longitude:      -71.2775 
+depth:           40.1408 
+Mrr:       -2.181689e+22 
+Mtt:       -1.609350e+24 
+Mpp:        1.631167e+24 
+Mrt:        1.873809e+23 
+Mrp:       -2.378761e+23 
+Mtp:        2.032262e+24 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      71.9976 
+half duration:   15.0000 
+latitude:       -30.3170 
+longitude:      -71.8590 
+depth:           10.5728 
+Mrr:       -9.733828e+23 
+Mtt:       -8.273823e+25 
+Mpp:        8.371162e+25 
+Mrt:        8.994174e+24 
+Mrp:       -1.039278e+25 
+Mtp:        1.045063e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      72.6988 
+half duration:    9.0000 
+latitude:       -30.3024 
+longitude:      -72.0068 
+depth:            5.6448 
+Mrr:        6.884987e+24 
+Mtt:       -8.720675e+25 
+Mpp:        8.032176e+25 
+Mrt:       -2.463365e+25 
+Mrp:        8.705759e+25 
+Mtp:        1.115249e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      73.9977 
+half duration:    3.0000 
+latitude:       -32.7209 
+longitude:      -72.1861 
+depth:           10.5728 
+Mrr:        1.463629e+21 
+Mtt:       -3.130317e+22 
+Mpp:        2.983955e+22 
+Mrt:       -4.496662e+21 
+Mrp:        1.876408e+22 
+Mtp:        3.985717e+22 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      74.0964 
+half duration:    1.5000 
+latitude:       -32.7063 
+longitude:      -72.3339 
+depth:            5.6448 
+Mrr:       -6.956701e+23 
+Mtt:       -4.832203e+25 
+Mpp:        4.901770e+25 
+Mrt:        5.801341e+24 
+Mrp:       -7.645436e+24 
+Mtp:        6.101323e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      74.1394 
+half duration:   15.0000 
+latitude:       -30.1859 
+longitude:      -71.5416 
+depth:           20.4288 
+Mrr:       -4.660704e+23 
+Mtt:       -3.162315e+25 
+Mpp:        3.208922e+25 
+Mrt:        3.843143e+24 
+Mrp:       -5.137251e+24 
+Mtp:        3.992671e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      74.4149 
 half duration:   15.0000 
 latitude:       -30.2005 
 longitude:      -71.3937 
 depth:           25.3568 
-Mrr:       -1.093071e+24 
-Mtt:       -7.369447e+25 
-Mpp:        7.478754e+25 
-Mrt:        8.985980e+24 
-Mrp:       -1.205784e+25 
-Mtp:        9.304385e+25 
+Mrr:       -1.191871e+24 
+Mtt:       -8.059085e+25 
+Mpp:        8.178272e+25 
+Mrt:        9.811846e+24 
+Mrp:       -1.314298e+25 
+Mtp:        1.017516e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      76.3394 
-half duration:   10.5000 
-latitude:       -30.1859 
-longitude:      -71.5416 
-depth:           20.4288 
-Mrr:       -3.461331e+23 
-Mtt:       -2.310150e+25 
-Mpp:        2.344764e+25 
-Mrt:        2.831906e+24 
-Mrp:       -3.822977e+24 
-Mtp:        2.916648e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      76.3510 
-half duration:    1.5000 
-latitude:       -32.7355 
-longitude:      -72.0383 
-depth:           15.5008 
-Mrr:        1.387855e+21 
-Mtt:       -3.264584e+22 
-Mpp:        3.125799e+22 
-Mrt:       -4.092068e+21 
-Mrp:        1.785234e+22 
-Mtp:        4.154267e+22 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      76.3977 
-half duration:   13.5000 
-latitude:       -32.7209 
-longitude:      -72.1861 
-depth:           10.5728 
-Mrr:        4.264447e+21 
-Mtt:       -1.020743e+23 
-Mpp:        9.780987e+22 
-Mrt:       -1.247140e+22 
-Mrp:        5.489024e+22 
-Mtp:        1.298792e+23 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      76.6345 
-half duration:    3.0000 
-latitude:       -30.2151 
-longitude:      -71.2459 
-depth:           30.2848 
-Mrr:        5.808906e+22 
-Mtt:       -2.847937e+24 
-Mpp:        2.789848e+24 
-Mrt:       -8.538268e+22 
-Mrp:        7.770616e+23 
-Mtp:        3.613129e+24 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      76.6964 
-half duration:   15.0000 
-latitude:       -32.7063 
-longitude:      -72.3339 
-depth:            5.6448 
-Mrr:        1.494925e+24 
-Mtt:       -2.112041e+25 
-Mpp:        1.962548e+25 
-Mrt:       -5.221962e+24 
-Mrp:        1.894668e+25 
-Mtp:        2.697999e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      76.7973 
-half duration:    1.5000 
-latitude:       -32.7501 
-longitude:      -71.8905 
-depth:           20.4288 
-Mrr:        7.491210e+19 
-Mtt:       -2.824610e+23 
-Mpp:        2.823860e+23 
-Mrt:        1.605264e+22 
-Mrp:        6.618520e+21 
-Mtp:        3.573655e+23 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      77.6149 
-half duration:   15.0000 
+time shift:      74.4149 
+half duration:    6.0000 
 latitude:       -30.1713 
 longitude:      -71.6894 
 depth:           15.5008 
-Mrr:        1.073308e+22 
-Mtt:       -1.873114e+23 
-Mpp:        1.765783e+23 
-Mrt:       -3.542383e+22 
-Mrp:        1.367497e+23 
-Mtp:        2.388398e+23 
+Mrr:       -1.395489e+21 
+Mtt:       -4.688788e+23 
+Mpp:        4.702743e+23 
+Mrt:        3.320088e+22 
+Mrp:       -7.843300e+21 
+Mtp:        5.929545e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      77.7782 
-half duration:    7.5000 
+time shift:      74.5396 
+half duration:    3.0000 
+latitude:       -30.2878 
+longitude:      -72.1546 
+depth:            0.7168 
+Mrr:        8.589584e+24 
+Mtt:       -1.087675e+26 
+Mpp:        1.001779e+26 
+Mrt:       -3.073423e+25 
+Mrp:        1.086108e+26 
+Mtp:        1.390984e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      74.5510 
+half duration:    6.0000 
+latitude:       -32.7355 
+longitude:      -72.0383 
+depth:           15.5008 
+Mrr:        1.253702e+21 
+Mtt:       -2.054094e+22 
+Mpp:        1.928724e+22 
+Mrt:       -4.215357e+21 
+Mrp:        1.594641e+22 
+Mtp:        2.620498e+22 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      74.6345 
+half duration:    1.5000 
+latitude:       -30.2151 
+longitude:      -71.2459 
+depth:           30.2848 
+Mrr:        5.435999e+22 
+Mtt:       -8.419091e+23 
+Mpp:        7.875491e+23 
+Mrt:       -1.856016e+23 
+Mrp:        6.904476e+23 
+Mtp:        1.074577e+24 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      74.8345 
+half duration:    3.0000 
+latitude:       -30.1567 
+longitude:      -71.8372 
+depth:           10.5728 
+Mrr:        6.613601e+21 
+Mtt:       -4.558801e+23 
+Mpp:        4.492665e+23 
+Mrt:       -2.089539e+21 
+Mrp:        9.112250e+22 
+Mtp:        5.779008e+23 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      75.1782 
+half duration:    3.0000 
 latitude:       -30.2297 
 longitude:      -71.0981 
 depth:           35.2128 
-Mrr:        1.789820e+22 
-Mtt:       -5.616554e+23 
-Mpp:        5.437572e+23 
-Mrt:       -4.461868e+22 
-Mrp:        2.330626e+23 
-Mtp:        7.136820e+23 
+Mrr:        4.346084e+21 
+Mtt:       -1.930732e+23 
+Mpp:        1.887271e+23 
+Mrt:       -7.547776e+21 
+Mrp:        5.773491e+22 
+Mtp:        2.450196e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      78.5875 
-half duration:    3.0000 
+time shift:      75.5782 
+half duration:    1.5000 
+latitude:       -30.1421 
+longitude:      -71.9850 
+depth:            5.6448 
+Mrr:        4.651096e+24 
+Mtt:       -6.006750e+25 
+Mpp:        5.541640e+25 
+Mrt:       -1.657405e+25 
+Mrp:        5.883431e+25 
+Mtp:        7.680186e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      75.5973 
+half duration:    6.0000 
+latitude:       -32.7501 
+longitude:      -71.8905 
+depth:           20.4288 
+Mrr:       -8.583924e+19 
+Mtt:       -4.134360e+22 
+Mpp:        4.142944e+22 
+Mrt:        2.767052e+21 
+Mrp:       -2.305948e+20 
+Mtp:        5.229050e+22 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      75.7875 
+half duration:    9.0000 
 latitude:       -32.6917 
 longitude:      -72.4817 
 depth:            0.7168 
-Mrr:       -9.669187e+23 
-Mtt:       -7.333950e+25 
-Mpp:        7.430642e+25 
-Mrt:        8.421408e+24 
-Mrp:       -1.050204e+25 
-Mtp:        9.261668e+25 
+Mrr:       -9.321671e+23 
+Mtt:       -8.412500e+25 
+Mpp:        8.505717e+25 
+Mrt:        8.896841e+24 
+Mrp:       -9.854208e+24 
+Mtp:        1.062679e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      79.2988 
-half duration:   13.5000 
-latitude:       -30.3024 
-longitude:      -72.0068 
-depth:            5.6448 
-Mrr:       -6.548642e+23 
-Mtt:       -4.493605e+25 
-Mpp:        4.559092e+25 
-Mrt:        5.429076e+24 
-Mrp:       -7.208090e+24 
-Mtp:        5.673659e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      79.8152 
+time shift:      76.6153 
 half duration:    1.5000 
 latitude:       -30.2443 
 longitude:      -70.9503 
 depth:           40.1408 
-Mrr:        2.859231e+23 
-Mtt:       -7.287710e+24 
-Mpp:        7.001787e+24 
-Mrt:       -8.104533e+23 
-Mrp:        3.689227e+24 
-Mtp:        9.269646e+24 
+Mrr:       -2.701859e+23 
+Mtt:       -2.890113e+25 
+Mpp:        2.917132e+25 
+Mrt:        2.840640e+24 
+Mrp:       -2.765199e+24 
+Mtp:        3.651702e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      80.2345 
-half duration:   10.5000 
-latitude:       -30.1567 
-longitude:      -71.8372 
-depth:           10.5728 
-Mrr:        1.979617e+22 
-Mtt:       -7.641757e+23 
-Mpp:        7.443796e+23 
-Mrt:       -4.106200e+22 
-Mrp:        2.606572e+23 
-Mtp:        9.702282e+23 
+time shift:      76.9510 
+half duration:    7.5000 
+latitude:       -32.7647 
+longitude:      -71.7427 
+depth:           25.3568 
+Mrr:        9.591154e+20 
+Mtt:       -4.504053e+22 
+Mpp:        4.408142e+22 
+Mrt:       -1.524675e+21 
+Mrp:        1.279023e+22 
+Mtp:        5.714919e+22 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      80.3396 
+time shift:      77.2152 
 half duration:    1.5000 
-latitude:       -32.9688 
-longitude:      -71.3211 
-depth:           40.1408 
-Mrr:        3.717129e+24 
-Mtt:       -5.062414e+25 
-Mpp:        4.690701e+25 
-Mrt:       -1.309408e+25 
-Mrp:        4.707279e+25 
-Mtp:        6.469242e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      81.2988 
-half duration:    1.5000 
-latitude:       -32.9542 
-longitude:      -71.4689 
-depth:           35.2128 
-Mrr:        5.682429e+20 
-Mtt:       -5.736051e+22 
-Mpp:        5.679226e+22 
-Mrt:        8.750973e+20 
-Mrp:        8.195752e+21 
-Mtp:        7.266776e+22 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      82.1104 
-half duration:    1.5000 
-latitude:       -30.0256 
-longitude:      -71.5197 
-depth:           20.4288 
-Mrr:        7.625434e+21 
-Mtt:       -1.310755e+23 
-Mpp:        1.234500e+23 
-Mrt:       -2.528332e+22 
-Mrp:        9.711503e+22 
-Mtp:        1.671536e+23 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      82.1396 
-half duration:   15.0000 
-latitude:       -30.2878 
-longitude:      -72.1546 
+latitude:       -30.1275 
+longitude:      -72.1328 
 depth:            0.7168 
-Mrr:       -2.389802e+23 
-Mtt:       -3.065620e+25 
-Mpp:        3.089518e+25 
-Mrt:        2.807825e+24 
-Mrp:       -2.343222e+24 
-Mtp:        3.874285e+25 
+Mrr:        7.508917e+24 
+Mtt:       -9.621668e+25 
+Mpp:        8.870777e+25 
+Mrt:       -2.680181e+25 
+Mrp:        9.496920e+25 
+Mtp:        1.230321e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      82.5585 
-half duration:    9.0000 
+time shift:      77.7977 
+half duration:   15.0000 
+latitude:       -32.7793 
+longitude:      -71.5949 
+depth:           30.2848 
+Mrr:        2.832624e+22 
+Mtt:       -4.009102e+23 
+Mpp:        3.725839e+23 
+Mrt:       -9.890574e+22 
+Mrp:        3.590213e+23 
+Mtp:        5.121287e+23 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      78.1585 
+half duration:    6.0000 
 latitude:       -30.0110 
 longitude:      -71.6675 
 depth:           15.5008 
-Mrr:        3.063574e+21 
-Mtt:       -2.434566e+23 
-Mpp:        2.403931e+23 
-Mrt:        9.036476e+20 
-Mrp:        4.286042e+22 
-Mtp:        3.085388e+23 
+Mrr:        4.637618e+20 
+Mtt:       -5.015998e+22 
+Mpp:        4.969622e+22 
+Mrt:        9.081901e+20 
+Mrp:        6.756236e+21 
+Mtp:        6.353994e+22 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      82.7976 
-half duration:    1.5000 
-latitude:       -32.9396 
-longitude:      -71.6167 
-depth:           30.2848 
-Mrr:        1.994676e+20 
-Mtt:       -1.193058e+22 
-Mpp:        1.173111e+22 
-Mrt:       -1.684695e+20 
-Mrp:        2.711631e+21 
-Mtp:        1.512850e+22 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      82.9585 
-half duration:   10.5000 
-latitude:       -30.0402 
-longitude:      -71.3719 
-depth:           25.3568 
-Mrr:       -8.550665e+23 
-Mtt:       -5.822622e+25 
-Mpp:        5.908129e+25 
-Mrt:        7.062886e+24 
-Mrp:       -9.420731e+24 
-Mtp:        7.351572e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      83.9782 
-half duration:   15.0000 
-latitude:       -30.1421 
-longitude:      -71.9850 
-depth:            5.6448 
-Mrr:       -3.380206e+23 
-Mtt:       -2.433633e+25 
-Mpp:        2.467435e+25 
-Mrt:        2.868512e+24 
-Mrp:       -3.697591e+24 
-Mtp:        3.073011e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      84.0976 
-half duration:   15.0000 
+time shift:      78.2976 
+half duration:    7.5000 
 latitude:       -29.9964 
 longitude:      -71.8154 
 depth:           10.5728 
-Mrr:        4.627678e+20 
-Mtt:       -1.212246e+22 
-Mpp:        1.165969e+22 
-Mrt:       -1.292749e+21 
-Mrp:        5.977624e+21 
-Mtp:        1.541701e+22 
+Mrr:        3.787269e+21 
+Mtt:       -8.966744e+22 
+Mpp:        8.588017e+22 
+Mrt:       -1.113300e+22 
+Mrp:        4.872834e+22 
+Mtp:        1.140998e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      84.4781 
+time shift:      78.4964 
 half duration:   15.0000 
-latitude:       -32.9250 
-longitude:      -71.7645 
-depth:           25.3568 
-Mrr:       -8.195865e+23 
-Mtt:       -5.580792e+25 
-Mpp:        5.662750e+25 
-Mrt:        6.769688e+24 
-Mrp:       -9.029874e+24 
-Mtp:        7.046239e+25 
+latitude:       -32.7939 
+longitude:      -71.4471 
+depth:           35.2128 
+Mrr:        5.725643e+21 
+Mtt:       -5.983547e+23 
+Mpp:        5.926291e+23 
+Mrt:        9.999484e+21 
+Mrp:        8.299152e+22 
+Mtp:        7.579969e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      84.4976 
-half duration:    6.0000 
+time shift:      78.7104 
+half duration:   13.5000 
+latitude:       -30.0256 
+longitude:      -71.5197 
+depth:           20.4288 
+Mrr:       -6.449026e+20 
+Mtt:       -1.412023e+23 
+Mpp:        1.418472e+23 
+Mrt:        1.096716e+22 
+Mrp:       -5.145310e+21 
+Mtp:        1.785286e+23 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      79.1130 
+half duration:   12.0000 
+latitude:       -29.9818 
+longitude:      -71.9632 
+depth:            5.6448 
+Mrr:        4.881417e+24 
+Mtt:       -6.225249e+25 
+Mpp:        5.737108e+25 
+Mrt:       -1.744057e+25 
+Mrp:        6.173186e+25 
+Mtp:        7.960620e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      79.7585 
+half duration:   15.0000 
+latitude:       -30.0402 
+longitude:      -71.3719 
+depth:           25.3568 
+Mrr:       -5.595151e+23 
+Mtt:       -4.400839e+25 
+Mpp:        4.456791e+25 
+Mrt:        4.964130e+24 
+Mrp:       -6.045462e+24 
+Mtp:        5.557953e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      79.9875 
+half duration:    1.5000 
+latitude:       -32.8085 
+longitude:      -71.2993 
+depth:           40.1408 
+Mrr:       -5.757462e+23 
+Mtt:       -5.834840e+25 
+Mpp:        5.892415e+25 
+Mrt:        5.865483e+24 
+Mrp:       -5.957663e+24 
+Mtp:        7.371882e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      80.3817 
+half duration:    1.5000 
+latitude:       -29.9672 
+longitude:      -72.1110 
+depth:            0.7168 
+Mrr:        8.199148e+24 
+Mtt:       -1.041293e+26 
+Mpp:        9.593020e+25 
+Mrt:       -2.931949e+25 
+Mrp:        1.036801e+26 
+Mtp:        1.331627e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      80.6976 
+half duration:   13.5000 
 latitude:       -30.0548 
 longitude:      -71.2241 
 depth:           30.2848 
-Mrr:        1.689332e+21 
-Mtt:       -4.815909e+22 
-Mpp:        4.646976e+22 
-Mrt:       -4.492718e+21 
-Mrp:        2.189998e+22 
-Mtp:        6.122147e+22 
+Mrr:        2.683908e+21 
+Mtt:       -1.128913e+23 
+Mpp:        1.102074e+23 
+Mrt:       -5.028683e+21 
+Mrp:        3.552625e+22 
+Mtp:        1.432895e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      85.3683 
+time shift:      82.1130 
 half duration:   13.5000 
+latitude:       -30.0694 
+longitude:      -71.0763 
+depth:           35.2128 
+Mrr:        7.922366e+20 
+Mtt:       -4.119597e+22 
+Mpp:        4.040374e+22 
+Mrt:       -1.027948e+21 
+Mrp:        1.064525e+22 
+Mtp:        5.225629e+22 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      82.5976 
+half duration:    1.5000 
+latitude:       -32.8812 
+longitude:      -72.2079 
+depth:           10.5728 
+Mrr:        1.911332e+22 
+Mtt:       -4.019350e+23 
+Mpp:        3.828216e+23 
+Mrt:       -5.911832e+22 
+Mrp:        2.448995e+23 
+Mtp:        5.118246e+23 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      82.8988 
+half duration:    9.0000 
+latitude:       -32.8666 
+longitude:      -72.3558 
+depth:            5.6448 
+Mrr:       -3.577694e+23 
+Mtt:       -5.180859e+25 
+Mpp:        5.216636e+25 
+Mrt:        4.546377e+24 
+Mrp:       -3.388815e+24 
+Mtp:        6.548292e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      83.0781 
+half duration:    4.5000 
+latitude:       -32.8958 
+longitude:      -72.0601 
+depth:           15.5008 
+Mrr:        5.891364e+21 
+Mtt:       -8.594686e+23 
+Mpp:        8.535772e+23 
+Mrt:        2.442294e+22 
+Mrp:        9.030506e+22 
+Mtp:        1.088371e+24 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      83.3070 
+half duration:   10.5000 
+latitude:       -29.8508 
+longitude:      -71.6457 
+depth:           15.5008 
+Mrr:        7.224383e+21 
+Mtt:       -1.198283e+23 
+Mpp:        1.126040e+23 
+Mrt:       -2.420595e+22 
+Mrp:        9.191967e+22 
+Mtp:        1.528547e+23 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      83.3799 
+half duration:    7.5000 
+latitude:       -29.8362 
+longitude:      -71.7935 
+depth:           10.5728 
+Mrr:        1.596032e+22 
+Mtt:       -3.464300e+23 
+Mpp:        3.304697e+23 
+Mrt:       -4.873988e+22 
+Mrp:        2.047177e+23 
+Mtp:        4.410552e+23 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      84.0815 
+half duration:   12.0000 
+latitude:       -29.8654 
+longitude:      -71.4979 
+depth:           20.4288 
+Mrr:        3.239579e+21 
+Mtt:       -1.313098e+23 
+Mpp:        1.280702e+23 
+Mrt:       -6.357036e+21 
+Mrp:        4.278172e+22 
+Mtp:        1.666880e+23 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      84.0890 
+half duration:    1.5000 
+latitude:       -29.8216 
+longitude:      -71.9414 
+depth:            5.6448 
+Mrr:        9.115476e+24 
+Mtt:       -1.152963e+26 
+Mpp:        1.061808e+26 
+Mrt:       -3.262348e+25 
+Mrp:        1.152579e+26 
+Mtp:        1.474496e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      84.1684 
+half duration:    4.5000 
 latitude:       -32.9104 
 longitude:      -71.9123 
 depth:           20.4288 
-Mrr:        5.961280e+21 
-Mtt:       -3.343826e+23 
-Mpp:        3.284213e+23 
-Mrt:       -6.320414e+21 
-Mrp:        8.059298e+22 
-Mtp:        4.240763e+23 
+Mrr:        3.743418e+21 
+Mtt:       -5.098426e+23 
+Mpp:        5.060992e+23 
+Mrt:        1.341575e+22 
+Mrp:        5.664982e+22 
+Mtp:        6.456723e+23 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      84.1817 
+half duration:    3.0000 
+latitude:       -30.0841 
+longitude:      -70.9285 
+depth:           40.1408 
+Mrr:       -1.261178e+20 
+Mtt:       -8.742785e+21 
+Mpp:        8.868903e+21 
+Mrt:        1.050709e+21 
+Mrp:       -1.386391e+21 
+Mtp:        1.103893e+22 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      84.3396 
+half duration:   13.5000 
+latitude:       -32.8520 
+longitude:      -72.5036 
+depth:            0.7168 
+Mrr:       -1.081666e+24 
+Mtt:       -7.348844e+25 
+Mpp:        7.457010e+25 
+Mrt:        8.924854e+24 
+Mrp:       -1.192068e+25 
+Mtp:        9.278517e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      85.2166 
+half duration:    4.5000 
+latitude:       -29.8070 
+longitude:      -72.0892 
+depth:            0.7168 
+Mrr:        1.122181e+25 
+Mtt:       -1.458182e+26 
+Mpp:        1.345964e+26 
+Mrt:       -3.993690e+25 
+Mrp:        1.419689e+26 
+Mtp:        1.864301e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
 time shift:      85.6781 
 half duration:   15.0000 
-latitude:       -32.8958 
-longitude:      -72.0601 
-depth:           15.5008 
-Mrr:        3.570177e+21 
-Mtt:       -3.096486e+23 
-Mpp:        3.060784e+23 
-Mrt:        2.556552e+21 
-Mrp:        5.047041e+22 
-Mtp:        3.923689e+23 
+latitude:       -32.9250 
+longitude:      -71.7645 
+depth:           25.3568 
+Mrr:       -6.559269e+23 
+Mtt:       -4.443997e+25 
+Mpp:        4.509589e+25 
+Mrt:        5.404897e+24 
+Mrp:       -7.231249e+24 
+Mtp:        5.610878e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      86.1976 
-half duration:    7.5000 
-latitude:       -32.8812 
-longitude:      -72.2079 
-depth:           10.5728 
-Mrr:       -1.748236e+23 
-Mtt:       -2.206811e+25 
-Mpp:        2.224293e+25 
-Mrt:        2.033274e+24 
-Mrp:       -1.721377e+24 
-Mtp:        2.788885e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      86.5071 
-half duration:    3.0000 
-latitude:       -29.8508 
-longitude:      -71.6457 
-depth:           15.5008 
-Mrr:        6.548020e+21 
-Mtt:       -5.571631e+23 
-Mpp:        5.506151e+23 
-Mrt:        4.065145e+21 
-Mrp:        9.235042e+22 
-Mtp:        7.060266e+23 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      86.5130 
-half duration:   10.5000 
-latitude:       -30.0694 
-longitude:      -71.0763 
-depth:           35.2128 
-Mrr:        4.485949e+21 
-Mtt:       -1.180698e+23 
-Mpp:        1.135838e+23 
-Mrt:       -1.249923e+22 
-Mrp:        5.795675e+22 
-Mtp:        1.501541e+23 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      86.9130 
-half duration:    3.0000 
-latitude:       -29.9818 
-longitude:      -71.9632 
-depth:            5.6448 
-Mrr:        5.029243e+24 
-Mtt:       -6.399002e+25 
-Mpp:        5.896078e+25 
-Mrt:       -1.797730e+25 
-Mrp:        6.359834e+25 
-Mtp:        8.183010e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      87.0152 
-half duration:    3.0000 
-latitude:       -30.1275 
-longitude:      -72.1328 
-depth:            0.7168 
-Mrr:        2.648063e+24 
-Mtt:       -3.654640e+25 
-Mpp:        3.389834e+25 
-Mrt:       -9.300207e+24 
-Mrp:        3.354412e+25 
-Mtp:        4.669637e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      87.0988 
-half duration:    6.0000 
-latitude:       -32.8666 
-longitude:      -72.3558 
-depth:            5.6448 
-Mrr:        3.614555e+24 
-Mtt:       -5.405053e+25 
-Mpp:        5.043597e+25 
-Mrt:       -1.245312e+25 
-Mrp:        4.587099e+25 
-Mtp:        6.900946e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      87.1799 
-half duration:    3.0000 
-latitude:       -29.8362 
-longitude:      -71.7935 
-depth:           10.5728 
-Mrr:        3.479236e+24 
-Mtt:       -4.508541e+25 
-Mpp:        4.160617e+25 
-Mrt:       -1.238935e+25 
-Mrp:        4.401387e+25 
-Mtp:        5.764382e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      87.6815 
-half duration:   10.5000 
-latitude:       -29.8654 
-longitude:      -71.4979 
-depth:           20.4288 
-Mrr:       -5.456088e+20 
-Mtt:       -3.921317e+23 
-Mpp:        3.926773e+23 
-Mrt:        2.508662e+22 
-Mrp:        1.140056e+21 
-Mtp:        4.960064e+23 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      88.5817 
-half duration:   12.0000 
-latitude:       -30.0841 
-longitude:      -70.9285 
-depth:           40.1408 
-Mrr:        8.886967e+22 
-Mtt:       -1.221209e+24 
-Mpp:        1.132340e+24 
-Mrt:       -3.124244e+23 
-Mrp:        1.125643e+24 
-Mtp:        1.560441e+24 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      89.4890 
-half duration:   10.5000 
-latitude:       -29.8216 
-longitude:      -71.9414 
-depth:            5.6448 
-Mrr:        1.001887e+25 
-Mtt:       -1.278627e+26 
-Mpp:        1.178438e+26 
-Mrt:       -3.579054e+25 
-Mrp:        1.267034e+26 
-Mtp:        1.635048e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      89.5396 
-half duration:    7.5000 
-latitude:       -32.8520 
-longitude:      -72.5036 
-depth:            0.7168 
-Mrr:       -1.392737e+24 
-Mtt:       -9.711373e+25 
-Mpp:        9.850647e+25 
-Mrt:        1.163594e+25 
-Mrp:       -1.529872e+25 
-Mtp:        1.226204e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      89.5817 
-half duration:   15.0000 
-latitude:       -29.9672 
-longitude:      -72.1110 
-depth:            0.7168 
-Mrr:        7.073334e+24 
-Mtt:       -9.092150e+25 
-Mpp:        8.384816e+25 
-Mrt:       -2.523048e+25 
-Mrp:        8.946593e+25 
-Mtp:        1.162573e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      89.7070 
-half duration:   13.5000 
+time shift:      85.7070 
+half duration:    1.5000 
 latitude:       -29.8800 
 longitude:      -71.3501 
 depth:           25.3568 
-Mrr:        3.541729e+22 
-Mtt:       -1.002292e+24 
-Mpp:        9.668747e+23 
-Mrt:       -9.461867e+22 
-Mrp:        4.589903e+23 
-Mtp:        1.274193e+24 
+Mrr:       -2.373392e+21 
+Mtt:       -1.362782e+24 
+Mpp:        1.365156e+24 
+Mrt:        8.924187e+22 
+Mrp:       -1.950508e+21 
+Mtp:        1.723697e+24 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      90.2769 
+time shift:      86.1976 
 half duration:    1.5000 
-latitude:       -29.6759 
-longitude:      -71.7717 
-depth:           10.5728 
-Mrr:        1.032957e+25 
-Mtt:       -1.313139e+26 
-Mpp:        1.209844e+26 
-Mrt:       -3.693028e+25 
-Mrp:        1.306224e+26 
-Mtp:        1.679251e+26 
+latitude:       -32.9396 
+longitude:      -71.6167 
+depth:           30.2848 
+Mrr:        1.053077e+22 
+Mtt:       -3.181782e+23 
+Mpp:        3.076474e+23 
+Mrt:       -2.696442e+22 
+Mrp:        1.368796e+23 
+Mtp:        4.043694e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      90.8593 
-half duration:   13.5000 
-latitude:       -29.6905 
-longitude:      -71.6239 
-depth:           15.5008 
-Mrr:        2.204517e+22 
-Mtt:       -1.448033e+24 
-Mpp:        1.425988e+24 
-Mrt:       -1.111349e+22 
-Mrp:        3.022978e+23 
-Mtp:        1.835794e+24 
+time shift:      86.6988 
+half duration:    4.5000 
+latitude:       -32.9542 
+longitude:      -71.4689 
+depth:           35.2128 
+Mrr:       -1.337628e+21 
+Mtt:       -2.558540e+23 
+Mpp:        2.571917e+23 
+Mrt:        2.060126e+22 
+Mrp:       -1.141800e+22 
+Mtp:        3.234586e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      92.0166 
-half duration:   12.0000 
-latitude:       -29.8070 
-longitude:      -72.0892 
-depth:            0.7168 
-Mrr:        1.229930e+25 
-Mtt:       -1.557099e+26 
-Mpp:        1.434106e+26 
-Mrt:       -4.400979e+25 
-Mrp:        1.555176e+26 
-Mtp:        1.991316e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      92.6964 
-half duration:   15.0000 
-latitude:       -29.6613 
-longitude:      -71.9195 
-depth:            5.6448 
-Mrr:        1.795398e+25 
-Mtt:       -2.288675e+26 
-Mpp:        2.109135e+26 
-Mrt:       -6.415262e+25 
-Mrp:        2.270495e+26 
-Mtp:        2.926687e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      92.7799 
-half duration:   15.0000 
+time shift:      87.7799 
+half duration:    4.5000 
 latitude:       -29.8946 
 longitude:      -71.2023 
 depth:           30.2848 
-Mrr:        2.005445e+21 
-Mtt:       -3.284041e+23 
-Mpp:        3.263986e+23 
-Mrt:        1.039135e+22 
-Mrp:        3.146218e+22 
-Mtp:        4.158253e+23 
+Mrr:        9.903383e+21 
+Mtt:       -2.487962e+23 
+Mpp:        2.388928e+23 
+Mrt:       -2.828144e+22 
+Mrp:        1.277090e+23 
+Mtp:        3.164825e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      93.6525 
+time shift:      88.1396 
+half duration:   15.0000 
+latitude:       -32.9688 
+longitude:      -71.3211 
+depth:           40.1408 
+Mrr:       -7.086767e+23 
+Mtt:       -4.753959e+25 
+Mpp:        4.824827e+25 
+Mrt:        5.812066e+24 
+Mrp:       -7.822343e+24 
+Mtp:        6.002108e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      88.4769 
+half duration:    3.0000 
+latitude:       -29.6759 
+longitude:      -71.7717 
+depth:           10.5728 
+Mrr:        7.607416e+24 
+Mtt:       -9.715862e+25 
+Mpp:        8.955120e+25 
+Mrt:       -2.717195e+25 
+Mrp:        9.620853e+25 
+Mtp:        1.242409e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      88.6593 
+half duration:    3.0000 
+latitude:       -29.6905 
+longitude:      -71.6239 
+depth:           15.5008 
+Mrr:       -5.323740e+21 
+Mtt:       -1.212117e+24 
+Mpp:        1.217440e+24 
+Mrt:        9.322951e+22 
+Mrp:       -4.153877e+22 
+Mtp:        1.532571e+24 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      89.6964 
+half duration:    3.0000 
+latitude:       -29.6613 
+longitude:      -71.9195 
+depth:            5.6448 
+Mrr:        1.523561e+25 
+Mtt:       -2.088253e+26 
+Mpp:        1.935897e+26 
+Mrt:       -5.359237e+25 
+Mrp:        1.929667e+26 
+Mtp:        2.668402e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      89.8525 
 half duration:    6.0000 
 latitude:       -29.7051 
 longitude:      -71.4761 
 depth:           20.4288 
-Mrr:        7.458137e+22 
-Mtt:       -2.853956e+24 
-Mpp:        2.779375e+24 
-Mrt:       -1.561519e+23 
-Mrp:        9.815124e+23 
-Mtp:        3.623610e+24 
+Mrr:        8.895077e+21 
+Mtt:       -1.171476e+24 
+Mpp:        1.162580e+24 
+Mrt:        2.955893e+22 
+Mrp:        1.338048e+23 
+Mtp:        1.483625e+24 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      94.9850 
-half duration:    1.5000 
-latitude:       -29.5157 
-longitude:      -71.7499 
-depth:           10.5728 
-Mrr:        1.348228e+25 
-Mtt:       -1.717530e+26 
-Mpp:        1.582708e+26 
-Mrt:       -4.818095e+25 
-Mrp:        1.704972e+26 
-Mtp:        2.196340e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      95.6890 
-half duration:    7.5000 
+time shift:      90.0890 
+half duration:    3.0000 
 latitude:       -29.9092 
 longitude:      -71.0545 
 depth:           35.2128 
-Mrr:        8.517222e+19 
-Mtt:       -3.888361e+22 
-Mpp:        3.879844e+22 
-Mrt:        1.886998e+21 
-Mrp:        1.838573e+21 
-Mtp:        4.920799e+22 
+Mrr:        1.534428e+22 
+Mtt:       -2.798866e+23 
+Mpp:        2.645423e+23 
+Mrt:       -4.994122e+22 
+Mrp:        1.957447e+23 
+Mtp:        3.567615e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      95.9042 
-half duration:   13.5000 
+time shift:      91.1042 
+half duration:    7.5000 
 latitude:       -29.6467 
 longitude:      -72.0674 
 depth:            0.7168 
-Mrr:        1.731602e+25 
-Mtt:       -2.194362e+26 
-Mpp:        2.021202e+26 
-Mrt:       -6.194840e+25 
-Mrp:        2.189556e+26 
-Mtp:        2.806260e+26 
+Mrr:        1.637772e+25 
+Mtt:       -2.085015e+26 
+Mpp:        1.921237e+26 
+Mrt:       -5.853618e+25 
+Mrp:        2.071103e+26 
+Mtp:        2.666289e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      96.6145 
-half duration:   12.0000 
-latitude:       -29.5303 
-longitude:      -71.6021 
-depth:           15.5008 
-Mrr:        1.850823e+24 
-Mtt:       -2.518228e+25 
-Mpp:        2.333146e+25 
-Mrt:       -6.521180e+24 
-Mrp:        2.343787e+25 
-Mtp:        3.218067e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      97.0593 
+time shift:      91.8593 
 half duration:    1.5000 
 latitude:       -29.7197 
 longitude:      -71.3283 
 depth:           25.3568 
-Mrr:       -9.101190e+22 
-Mtt:       -7.243279e+24 
-Mpp:        7.334291e+24 
-Mrt:        8.123910e+23 
-Mrp:       -9.816595e+23 
-Mtp:        9.147944e+24 
+Mrr:       -3.561580e+23 
+Mtt:       -2.403299e+25 
+Mpp:        2.438914e+25 
+Mrt:        2.929138e+24 
+Mrp:       -3.928414e+24 
+Mtp:        3.034319e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:      97.7283 
-half duration:    7.5000 
-latitude:       -29.5011 
-longitude:      -71.8977 
-depth:            5.6448 
-Mrr:        2.089848e+25 
-Mtt:       -2.660290e+26 
-Mpp:        2.451306e+26 
-Mrt:       -7.469544e+25 
-Mrp:        2.642786e+26 
-Mtp:        3.401948e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:      97.8166 
-half duration:    7.5000 
+time shift:      92.4166 
+half duration:    4.5000 
 latitude:       -29.9238 
 longitude:      -70.9067 
 depth:           40.1408 
-Mrr:        1.731860e+22 
-Mtt:       -3.561498e+23 
-Mpp:        3.388312e+23 
-Mrt:       -5.403355e+22 
-Mrp:        2.217417e+23 
-Mtp:        4.535881e+23 
+Mrr:       -3.589964e+21 
+Mtt:       -6.406862e+23 
+Mpp:        6.442762e+23 
+Mrt:        5.262444e+22 
+Mrp:       -3.157029e+22 
+Mtp:        8.099336e+23 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:     100.0236 
-half duration:   15.0000 
-latitude:       -29.5449 
-longitude:      -71.4543 
-depth:           20.4288 
-Mrr:        5.409753e+23 
-Mtt:       -6.917744e+24 
-Mpp:        6.376768e+24 
-Mrt:       -1.931739e+24 
-Mrp:        6.841713e+24 
-Mtp:        8.845901e+24 
+time shift:      94.5850 
+half duration:    1.5000 
+latitude:       -29.5157 
+longitude:      -71.7499 
+depth:           10.5728 
+Mrr:        1.253143e+25 
+Mtt:       -1.586746e+26 
+Mpp:        1.461431e+26 
+Mrt:       -4.483889e+25 
+Mrp:        1.584532e+26 
+Mtp:        2.029227e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:     100.6769 
-half duration:    7.5000 
+time shift:      94.6769 
+half duration:    4.5000 
 latitude:       -29.7343 
 longitude:      -71.1805 
 depth:           30.2848 
-Mrr:       -2.289293e+22 
-Mtt:       -1.763522e+24 
-Mpp:        1.786415e+24 
-Mrt:        2.009592e+23 
-Mrp:       -2.481017e+23 
-Mtp:        2.227123e+24 
+Mrr:       -1.980066e+21 
+Mtt:       -9.979161e+23 
+Mpp:        9.998961e+23 
+Mrt:        6.639264e+22 
+Mrp:       -4.427969e+21 
+Mtp:        1.262159e+24 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:     101.0332 
+time shift:      94.8145 
+half duration:    1.5000 
+latitude:       -29.5303 
+longitude:      -71.6021 
+depth:           15.5008 
+Mrr:        1.741440e+24 
+Mtt:       -2.385898e+25 
+Mpp:        2.211754e+25 
+Mrt:       -6.126219e+24 
+Mrp:        2.205603e+25 
+Mtp:        3.048750e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      96.1282 
+half duration:   10.5000 
+latitude:       -29.5011 
+longitude:      -71.8977 
+depth:            5.6448 
+Mrr:        1.896478e+25 
+Mtt:       -2.402810e+26 
+Mpp:        2.213162e+26 
+Mrt:       -6.784971e+25 
+Mrp:        2.398026e+26 
+Mtp:        3.072840e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      96.2236 
+half duration:   10.5000 
+latitude:       -29.5449 
+longitude:      -71.4543 
+depth:           20.4288 
+Mrr:        2.232417e+23 
+Mtt:       -3.683155e+24 
+Mpp:        3.459913e+24 
+Mrt:       -7.491327e+23 
+Mrp:        2.840027e+24 
+Mtp:        4.698491e+24 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:      97.4332 
 half duration:   15.0000 
 latitude:       -29.4865 
 longitude:      -72.0455 
 depth:            0.7168 
-Mrr:        1.842895e+25 
-Mtt:       -2.339705e+26 
-Mpp:        2.155416e+26 
-Mrt:       -6.590491e+25 
-Mrp:        2.330368e+26 
-Mtp:        2.992072e+26 
+Mrr:        1.793156e+25 
+Mtt:       -2.268404e+26 
+Mpp:        2.089089e+26 
+Mrt:       -6.417343e+25 
+Mrp:        2.267308e+26 
+Mtp:        2.901003e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:     102.5021 
-half duration:   13.5000 
-latitude:       -29.3554 
-longitude:      -71.7281 
-depth:           10.5728 
-Mrr:        9.012024e+24 
-Mtt:       -1.152283e+26 
-Mpp:        1.062163e+26 
-Mrt:       -3.218131e+25 
-Mrp:        1.139748e+26 
-Mtp:        1.473457e+26 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:     103.9719 
-half duration:   15.0000 
-latitude:       -29.3700 
-longitude:      -71.5803 
-depth:           15.5008 
-Mrr:        6.366032e+22 
-Mtt:       -2.112746e+24 
-Mpp:        2.049085e+24 
-Mrt:       -1.520298e+23 
-Mrp:        8.312750e+23 
-Mtp:        2.683978e+24 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:     104.2964 
-half duration:    4.5000 
+time shift:      98.0964 
+half duration:   12.0000 
 latitude:       -29.7489 
 longitude:      -71.0327 
 depth:           35.2128 
-Mrr:       -8.822876e+19 
-Mtt:       -7.914487e+21 
-Mpp:        8.002716e+21 
-Mrt:        8.393028e+20 
-Mrp:       -9.336560e+20 
-Mtp:        9.997599e+21 
+Mrr:        3.031563e+20 
+Mtt:       -2.178261e+22 
+Mpp:        2.147945e+22 
+Mrt:       -4.442446e+19 
+Mrp:        4.194747e+21 
+Mtp:        2.761070e+22 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:     104.4145 
-half duration:    1.5000 
+time shift:      98.6145 
+half duration:    4.5000 
 latitude:       -29.5595 
 longitude:      -71.3065 
 depth:           25.3568 
-Mrr:       -1.224678e+24 
-Mtt:       -8.651879e+25 
-Mpp:        8.774347e+25 
-Mrt:        1.029699e+25 
-Mrp:       -1.343002e+25 
-Mtp:        1.092455e+26 
+Mrr:       -9.882232e+23 
+Mtt:       -6.749617e+25 
+Mpp:        6.848439e+25 
+Mrt:        8.174510e+24 
+Mrp:       -1.088371e+25 
+Mtp:        8.522035e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:     104.5795 
+time shift:     101.1042 
+half duration:    4.5000 
+latitude:       -29.7635 
+longitude:      -70.8849 
+depth:           40.1408 
+Mrr:        2.976801e+24 
+Mtt:       -3.947748e+25 
+Mpp:        3.650067e+25 
+Mrt:       -1.054787e+25 
+Mrp:        3.767604e+25 
+Mtp:        5.046171e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:     101.5021 
+half duration:   10.5000 
+latitude:       -29.3554 
+longitude:      -71.7281 
+depth:           10.5728 
+Mrr:        8.233817e+24 
+Mtt:       -1.042992e+26 
+Mpp:        9.606534e+25 
+Mrt:       -2.945914e+25 
+Mrp:        1.041131e+26 
+Mtp:        1.333835e+26 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:     101.9719 
+half duration:   12.0000 
+latitude:       -29.3700 
+longitude:      -71.5803 
+depth:           15.5008 
+Mrr:       -6.258892e+22 
+Mtt:       -4.331988e+24 
+Mpp:        4.394576e+24 
+Mrt:        5.210431e+23 
+Mrp:       -6.881666e+23 
+Mtp:        5.469693e+24 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:     102.1850 
+half duration:    3.0000 
+latitude:       -29.5741 
+longitude:      -71.1587 
+depth:           30.2848 
+Mrr:       -9.234904e+23 
+Mtt:       -6.177537e+25 
+Mpp:        6.269886e+25 
+Mrt:        7.563706e+24 
+Mrp:       -1.019696e+25 
+Mtp:        7.799399e+25 
+PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
+event name:     201509162254A  
+time shift:     102.9795 
 half duration:   15.0000 
 latitude:       -29.3408 
 longitude:      -71.8759 
 depth:            5.6448 
-Mrr:        1.551347e+25 
-Mtt:       -1.965320e+26 
-Mpp:        1.810186e+26 
-Mrt:       -5.550326e+25 
-Mrp:        1.961615e+26 
-Mtp:        2.513358e+26 
+Mrr:        1.365005e+25 
+Mtt:       -1.734805e+26 
+Mpp:        1.598305e+26 
+Mrt:       -4.880427e+25 
+Mrp:        1.726106e+26 
+Mtp:        2.218487e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:     107.1042 
-half duration:    9.0000 
-latitude:       -29.7635 
-longitude:      -70.8849 
-depth:           40.1408 
-Mrr:        3.629100e+24 
-Mtt:       -4.908550e+25 
-Mpp:        4.545640e+25 
-Mrt:       -1.280368e+25 
-Mrp:        4.595118e+25 
-Mtp:        6.273054e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:     107.1946 
-half duration:    1.5000 
+time shift:     102.9946 
+half duration:   15.0000 
 latitude:       -29.3846 
 longitude:      -71.4325 
 depth:           20.4288 
-Mrr:        2.256848e+24 
-Mtt:       -2.881965e+25 
-Mpp:        2.656280e+25 
-Mrt:       -8.061166e+24 
-Mrp:        2.854154e+25 
-Mtp:        3.685299e+25 
+Mrr:        1.992282e+23 
+Mtt:       -9.662169e+24 
+Mpp:        9.462940e+24 
+Mrt:       -2.989482e+23 
+Mrp:        2.662967e+24 
+Mtp:        1.225860e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:     107.3954 
-half duration:    3.0000 
+time shift:     104.5954 
+half duration:   15.0000 
 latitude:       -29.3262 
 longitude:      -72.0237 
 depth:            0.7168 
-Mrr:        1.369755e+25 
-Mtt:       -1.736601e+26 
-Mpp:        1.599626e+26 
-Mrt:       -4.899866e+25 
-Mrp:        1.732027e+26 
-Mtp:        2.220841e+26 
+Mrr:        1.242809e+25 
+Mtt:       -1.585745e+26 
+Mpp:        1.461464e+26 
+Mrt:       -4.439908e+25 
+Mrp:        1.571709e+26 
+Mtp:        2.027781e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:     109.5850 
-half duration:   12.0000 
-latitude:       -29.5741 
-longitude:      -71.1587 
-depth:           30.2848 
-Mrr:       -5.200239e+23 
-Mtt:       -3.791355e+25 
-Mpp:        3.843357e+25 
-Mrt:        4.440487e+24 
-Mrp:       -5.678976e+24 
-Mtp:        4.787557e+25 
-PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
-event name:     201509162254A  
-time shift:     112.1719 
-half duration:    6.0000 
+time shift:     105.7719 
+half duration:    1.5000 
 latitude:       -29.3992 
 longitude:      -71.2847 
 depth:           25.3568 
-Mrr:        9.590163e+24 
-Mtt:       -1.216281e+26 
-Mpp:        1.120380e+26 
-Mrt:       -3.430334e+25 
-Mrp:        1.212665e+26 
-Mtp:        1.555428e+26 
+Mrr:        2.687461e+24 
+Mtt:       -1.089025e+26 
+Mpp:        1.062151e+26 
+Mrt:       -5.275254e+24 
+Mrp:        3.548991e+25 
+Mtp:        1.382438e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:     113.5283 
-half duration:   10.5000 
+time shift:     106.7283 
+half duration:    1.5000 
 latitude:       -29.5887 
 longitude:      -71.0109 
 depth:           35.2128 
-Mrr:       -5.160002e+23 
-Mtt:       -3.542727e+25 
-Mpp:        3.594327e+25 
-Mrt:        4.278994e+24 
-Mrp:       -5.679212e+24 
-Mtp:        4.473078e+25 
+Mrr:       -8.510114e+23 
+Mtt:       -6.425350e+25 
+Mpp:        6.510451e+25 
+Mrt:        7.394831e+24 
+Mrp:       -9.249066e+24 
+Mtp:        8.114176e+25 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:     115.8332 
-half duration:   15.0000 
+time shift:     109.8332 
+half duration:   10.5000 
 latitude:       -29.6033 
 longitude:      -70.8631 
 depth:           40.1408 
-Mrr:        7.593417e+24 
-Mtt:       -1.053205e+26 
-Mpp:        9.772712e+25 
-Mrt:       -2.663840e+25 
-Mrp:        9.619951e+25 
-Mtp:        1.345645e+26 
+Mrr:        9.771243e+24 
+Mtt:       -1.251890e+26 
+Mpp:        1.154177e+26 
+Mrt:       -3.487775e+25 
+Mrp:        1.235817e+26 
+Mtp:        1.600792e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:     118.1021 
-half duration:    9.0000 
+time shift:     110.1021 
+half duration:   10.5000 
 latitude:       -29.4138 
 longitude:      -71.1369 
 depth:           30.2848 
-Mrr:        6.137623e+24 
-Mtt:       -1.282592e+26 
-Mpp:        1.221216e+26 
-Mrt:       -1.903085e+25 
-Mrp:        7.862524e+25 
-Mtp:        1.633321e+26 
+Mrr:       -2.055024e+23 
+Mtt:       -1.413667e+26 
+Mpp:        1.415722e+26 
+Mrt:        9.081901e+24 
+Mrp:        3.018980e+23 
+Mtp:        1.788128e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:     122.5795 
+time shift:     115.1795 
 half duration:   15.0000 
 latitude:       -29.4284 
 longitude:      -70.9891 
 depth:           35.2128 
-Mrr:        4.171240e+24 
-Mtt:       -1.692437e+26 
-Mpp:        1.650725e+26 
-Mrt:       -8.175328e+24 
-Mrp:        5.508864e+25 
-Mtp:        2.148416e+26 
+Mrr:       -1.711631e+24 
+Mtt:       -1.665883e+26 
+Mpp:        1.683000e+26 
+Mrt:        1.703886e+25 
+Mrp:       -1.784999e+25 
+Mtp:        2.104601e+26 
 PDE 2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH                
 event name:     201509162254A  
-time shift:     123.9954 
+time shift:     118.9954 
 half duration:   15.0000 
 latitude:       -29.4430 
 longitude:      -70.8413 
 depth:           40.1408 
-Mrr:        1.724161e+25 
-Mtt:       -2.250531e+26 
-Mpp:        2.078115e+26 
-Mrt:       -6.130186e+25 
-Mrp:        2.181467e+26 
-Mtp:        2.877191e+26 
+Mrr:        1.144964e+25 
+Mtt:       -2.252189e+26 
+Mpp:        2.137693e+26 
+Mrt:       -3.631610e+25 
+Mrp:        1.463912e+26 
+Mtp:        2.869226e+26 

@@ -363,69 +363,75 @@ def static_to_srf(
             max_trise = max(trise_fault)
             max_tfall = max(tfall_fault)
             total_time = max_trise + max_tfall
-
-            outfile.write("POINTS {}\n".format(len(lat_fault)))
-            zipped3 = zip(
-                lat_fault,
-                lon_fault,
-                depth_fault,
-                slip_fault,
-                rake_fault,
-                trup_fault,
-                trise_fault,
-                tfall_fault,
-                moment_fault,
-            )
-            for line in zipped3:
-                lat, lon, dep, slip, rake, t_rup, t_ris, t_fal, moment = line
-                outfile.write(
-                    "{:.4f} {:.4f} {:.2f} {:.2f} {:.2f} {:.2f} {:.2f} {:.1f} {:d} {:d}\n".format(
-                        lon,
-                        lat,
-                        dep,
-                        strike,
-                        dip,
-                        subfault_area,
-                        t_rup,
-                        stf_dt,
-                        vs,
-                        density,
-                    )
+            if total_time == 0.0:
+                print("... This looks like a static solution. Skipping SRF format.")
+            else:
+                outfile.write("POINTS {}\n".format(len(lat_fault)))
+                zipped3 = zip(
+                    lat_fault,
+                    lon_fault,
+                    depth_fault,
+                    slip_fault,
+                    rake_fault,
+                    trup_fault,
+                    trise_fault,
+                    tfall_fault,
+                    moment_fault,
                 )
-                if slip < 10e-4:
-                    print(
-                        "Zero slip at: {:.2f}, {:.2f}, {:.2f}km".format(lon, lat, dep)
-                    )
-                    Nstf = 0  # If zero slip, no slip function
-                else:  # Calculate STF
-                    tstf, stf = build_source_time_function(
-                        t_ris, t_fal, stf_dt, total_time, scale=True
-                    )
-                    stf_adjust_factor = slip / stf_dt
-                    stf = stf * stf_adjust_factor  # now tf is in cm/sec
-                    Nstf = len(stf)
-                outfile.write("{:.2f} {:.4f} {:d} 0 0 0 0 \n".format(rake, slip, Nstf))
-                if slip > 10e-4:
-                    # Write stf 6 values per line
-                    for kstf in range(Nstf):
-                        if kstf == 0:
-                            white_space = "  "
-                        elif (kstf + 1) % 6 == 0:
-                            white_space = "\n"
-                        elif (kstf + 1) == Nstf:
-                            white_space = "\n"
-                        else:
-                            white_space = "  "
-
-                        if kstf == 0:
-                            pre_white_space = "  "
-                        elif (kstf) % 6 == 0:
-                            pre_white_space = "  "
-                        else:
-                            pre_white_space = ""
-                        outfile.write(
-                            "%s%.6e%s" % (pre_white_space, stf[kstf], white_space)
+                for line in zipped3:
+                    lat, lon, dep, slip, rake, t_rup, t_ris, t_fal, moment = line
+                    outfile.write(
+                        "{:.4f} {:.4f} {:.2f} {:.2f} {:.2f} {:.2f} {:.2f} {:.1f} {:d} {:d}\n".format(
+                            lon,
+                            lat,
+                            dep,
+                            strike,
+                            dip,
+                            subfault_area,
+                            t_rup,
+                            stf_dt,
+                            vs,
+                            density,
                         )
+                    )
+                    if slip < 10e-4:
+                        print(
+                            "Zero slip at: {:.2f}, {:.2f}, {:.2f}km".format(
+                                lon, lat, dep
+                            )
+                        )
+                        Nstf = 0  # If zero slip, no slip function
+                    else:  # Calculate STF
+                        tstf, stf = build_source_time_function(
+                            t_ris, t_fal, stf_dt, total_time, scale=True
+                        )
+                        stf_adjust_factor = slip / stf_dt
+                        stf = stf * stf_adjust_factor  # now tf is in cm/sec
+                        Nstf = len(stf)
+                    outfile.write(
+                        "{:.2f} {:.4f} {:d} 0 0 0 0 \n".format(rake, slip, Nstf)
+                    )
+                    if slip > 10e-4:
+                        # Write stf 6 values per line
+                        for kstf in range(Nstf):
+                            if kstf == 0:
+                                white_space = "  "
+                            elif (kstf + 1) % 6 == 0:
+                                white_space = "\n"
+                            elif (kstf + 1) == Nstf:
+                                white_space = "\n"
+                            else:
+                                white_space = "  "
+
+                            if kstf == 0:
+                                pre_white_space = "  "
+                            elif (kstf) % 6 == 0:
+                                pre_white_space = "  "
+                            else:
+                                pre_white_space = ""
+                            outfile.write(
+                                "%s%.6e%s" % (pre_white_space, stf[kstf], white_space)
+                            )
 
 
 def build_source_time_function(
@@ -454,7 +460,7 @@ def build_source_time_function(
     :rtype: Tuple[np.ndarray, np.ndarray]
     """
     from numpy import arange, cos, exp, isnan, pi, roll, sin, where, zeros
-    from scipy.integrate import trapz  # type:ignore
+    from scipy.integrate import trapezoid  # type:ignore
 
     # Initialize outputs
     t = arange(0, total_time + dt, dt)
@@ -482,7 +488,7 @@ def build_source_time_function(
         else:
             target = scale_value
 
-        area = trapz(Mdot, t)
+        area = trapezoid(Mdot, t)
         Mdot = Mdot * (scale_value / area)
     # Check for errors
     if isnan(Mdot[0]) == True:

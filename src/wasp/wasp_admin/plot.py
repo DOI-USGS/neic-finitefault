@@ -74,9 +74,7 @@ def kml(
         "-ml",
         "--map-limits",
         help=(
-            "Specify map limits [W,E,N,S] from edges of plotted features. "
-            "eg: 0.5 0.5 0.5 0.5 gives a 0.5 degree buffer on each side. "
-            "Negative numbers will cut off plotted features."
+            "Specify map limits [W,E,N,S] in latitude and longitude (decimal degrees)"
         ),
     ),
     max_slip: float = typer.Option(
@@ -203,9 +201,7 @@ def map(
         "-ml",
         "--map-limits",
         help=(
-            "Specify map limits [W,E,N,S] from edges of plotted features. "
-            "eg: 0.5 0.5 0.5 0.5 gives a 0.5 degree buffer on each side. "
-            "Negative numbers will cut off plotted features."
+            "Specify map limits [W,E,N,S] in latitude and longitude (decimal degrees)"
         ),
     ),
     max_slip: float = typer.Option(
@@ -313,7 +309,10 @@ def neic(
         CONFIG_PATH, "-c", "--config-file", help="Path to config file"
     ),
     gcmt_tensor_file: pathlib.Path = typer.Option(
-        None, "-g", "--gcmt", help="Path to the GCMT moment tensor file"
+        None,
+        "-g",
+        "--gcmt",
+        help="Path to the GCMT moment tensor file (Required for certain downloads, see -d)",
     ),
     data_types: List[ManagedDataTypes] = typer.Option(
         [],
@@ -356,9 +355,7 @@ def neic(
         "-ml",
         "--map-limits",
         help=(
-            "Specify map limits [W,E,N,S] from edges of plotted features. "
-            "eg: 0.5 0.5 0.5 0.5 gives a 0.5 degree buffer on each side. "
-            "Negative numbers will cut off plotted features."
+            "Specify map limits [W,E,N,S] in latitude and longitude (decimal degrees)"
         ),
     ),
     max_slip: float = typer.Option(
@@ -520,12 +517,12 @@ def neic(
     if downloads:
         if gcmt_tensor_file:
             write_CMTSOLUTION_file(pdefile=gcmt_tensor_file, directory=directory)
+            write_Okada_displacements(directory=directory, pdefile=gcmt_tensor_file)
         else:
             logging.warn(
-                "No gcmt_tensor_file specified. Skipping writing CMTSOLUTION file."
+                "No gcmt_tensor_file specified. Skipping writing CMTSOLUTION file and Okada Displacements."
             )
         write_Coulomb_file(directory=directory, eventID=event_id)
-        write_Okada_displacements(directory=directory)
         make_waveproperties_json(directory=directory)
     if ffm_solution:
         shear = shear_modulous(point_sources, velmodel=vel_model)

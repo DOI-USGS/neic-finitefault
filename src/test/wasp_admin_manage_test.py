@@ -948,7 +948,6 @@ def test_update_inputs():
             app,
             [
                 "update-inputs",
-                "-d",
                 str(tempdir),
                 "-t",
                 "cgps",

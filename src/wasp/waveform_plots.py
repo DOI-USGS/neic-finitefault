@@ -4,6 +4,7 @@ from typing import List, Literal, Optional, Union
 import numpy as np
 from matplotlib import pyplot as plt  # type: ignore
 from matplotlib import ticker
+from matplotlib.axes import Axes
 
 from wasp.waveform_plots_NEIC import filt_waveform, plot_spectra  # type: ignore
 
@@ -161,13 +162,13 @@ def plot_waveform_fits(
     ]  # type: ignore
     numrows_phase = len(files) // 4 + 1
     fig, axes = plt.subplots(max(4, numrows_phase), 4, figsize=(13, 9))
-    axes2 = axes.ravel()
+    axes2: List[Axes] = axes.ravel()  # type: ignore
     for ax in axes2[len(files) :]:
         ax.axis("off")
     obs_waveforms = [waveform for waveform in obs_waveforms]
     syn_waveforms = [waveform for waveform in syn_waveforms]
 
-    axes2 = plot_waveforms(axes2, obs_times, obs_waveforms, color="black")
+    axes2 = plot_waveforms(list(axes2), obs_times, obs_waveforms, color="black")
     axes2 = plot_waveforms(axes2, syn_times, syn_waveforms, color="red", custom="fill")
     dict = {
         "weights": weights,

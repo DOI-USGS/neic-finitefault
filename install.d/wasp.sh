@@ -36,7 +36,12 @@ while [[ $# -gt 0 ]]; do
 done
 ### set positional arguments
 set -- "${REQUIRED_ARGS[@]}" # restore positional parameters
-FINITEFAULT_DIR=$1
+FINITEFAULT_DIR=${1%%/}
+if [ -z ${1+x} ]
+then 
+    echo "Argument FINITEFAULT_DIR must be set";
+    exit 1;
+fi
 
 # ==============================================================================
 # Download required data and compile FORTRAN code
