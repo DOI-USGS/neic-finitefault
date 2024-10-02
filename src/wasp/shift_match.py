@@ -345,7 +345,9 @@ def plot_shift(
     axes[1].set_xlabel("Time (s)")
     axes[0].set_ylabel("Before Shift \n" + units)
     axes[1].set_ylabel("After Shift \n" + units)
-    name_file = os.path.join(plot_folder, "{}_{}.png".format(station, channel))
+    axes[0].set_xlim([obs_times[0][0], obs_times[0][-1]])
+    axes[1].set_xlim([obs_times[0][0], obs_times[0][-1]])
+    name_file = os.path.join(plot_folder, "{}_{}.pdf".format(station, channel))
     plt.savefig(directory / name_file)
     plt.close(fig)
 
