@@ -24,7 +24,11 @@ sudo apt install -y \
 ```
 
 ## Installing Python Dependencies
-The full list of Python dependencies can be found in the provided conda environment file [environment.yml](../install.d/environment.yml). These can be installed individually with your preferred package manager or directly with conda using: `conda env create -f ./install.d/environment.yml`
+The full list of Python dependencies can be found in the provided conda environment file [environment.yml](../install.d/environment.yml). These can be installed individually with your preferred package manager or directly with conda using the following commands: 
+
+1. `conda env create -f ./install.d/environment.yml`
+2. `conda activate ff-env`
+3. `pip install -e <path to neic-finitefault directory>`
 
 # Get the Data Dependencies
 Download the [required data dependencies](./data-dependecies.md) and put them in the following locations within the source code.
