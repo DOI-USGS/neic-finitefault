@@ -2,12 +2,12 @@
 
 # ==============================================================================
 # Define usage
-#     Install conda (if needed)
+#     Install miniforge (if needed)
 # ==============================================================================
 ## define usage
 function usage {
     echo "----------------------------------------------------------------"
-    echo "Install Conda"
+    echo "Install Miniforge"
     echo "----------------------------------------------------------------"
 }
 
@@ -34,14 +34,13 @@ done
 
 # Get system information and conda install url
 system="$(uname)"
+mini_forge_url="https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
 if [ "$system" == 'Linux' ]; then
     profile=~/.bashrc
-    mini_conda_url=https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
     # shellcheck disable=SC1090
     source $profile;
 elif [ "$system" == 'FreeBSD' ] || [ "$system" == 'Darwin' ]; then
     profile=~/.bash_profile
-    mini_conda_url=https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
     # shellcheck disable=SC1090
     source $profile;
 else
@@ -49,25 +48,25 @@ else
     exit
 fi
 
-# Download and install conda if not available already
+# Download and install miniforge if not available already
 conda --version
 # shellcheck disable=SC2181
 if [ $? -ne 0 ]; then
-    echo "Conda cannot be found. Installing..."
-    sha256sum ./miniconda.sh;
-    curl -L $mini_conda_url -o ./miniconda.sh;
+    echo "Miniforge cannot be found. Installing..."
+    sha256sum ./miniforge.sh;
+    curl -L "${mini_forge_url}" -o ./miniforge.sh;
 
-    bash ./miniconda.sh -fbp "${HOME}"/miniconda;
+    bash ./miniforge.sh -fbp "${HOME}"/miniforge;
     # shellcheck disable=SC1090
-    . "${HOME}"/miniconda/etc/profile.d/conda.sh
+    . "${HOME}"/miniforge/etc/profile.d/conda.sh
     # remove the shell script
-    rm ./miniconda.sh;
+    rm ./miniforge.sh;
     # send source to profile
-    echo ". ${HOME}/miniconda/etc/profile.d/conda.sh" >> $profile;
+    echo ". ${HOME}/miniforge/etc/profile.d/conda.sh" >> $profile;
     # shellcheck disable=SC1090
     source $profile;
 else
-    echo "Conda already installed. No need to download/install."
+    echo "Miniforge already installed. No need to download/install."
 fi
 
 # shellcheck disable=SC1090
