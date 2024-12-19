@@ -2,16 +2,11 @@
 
 default:
   tags:
-    - chs-shared
-    - dind
+    - dev
+    - developers
 
 variables:
-  REPOSITORY: "ghsc/neic/algorithms/neic-finitefault"
   DOCKER_IMAGE: "code.usgs.gov:5001/devops/images/usgs/docker:20"
-  PYTHON_IMAGE: "${CI_REGISTRY}/${REPOSITORY}/wasp-python:latest"
-  FORTRAN_IMAGE: "${CI_REGISTRY}/${REPOSITORY}/wasp-fortran:latest"
-  DEPENDENCIES_IMAGE: "${CI_REGISTRY}/${REPOSITORY}/wasp-dependencies:latest"
-  WASP_IMAGE: "${CI_REGISTRY}/${REPOSITORY}/wasp:latest"
    
 
 
@@ -22,21 +17,8 @@ workflow:
     - if: $CI_COMMIT_BRANCH
 
 stages:
-  - init
-  - test
-  - deploy
+  - end-to-end
 
-
-##
-# Define type of pipeline (on a fork or on the upstream project)
-##
-.fork: &fork
-  if: $CI_PROJECT_PATH != 'ghsc/neic/algorithms/neic-finitefault'
-
-.upstream: &upstream
-  if: >
-    $CI_PROJECT_PATH == 'ghsc/neic/algorithms/neic-finitefault'
-    && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 
 .docker_login:
@@ -55,105 +37,14 @@ stages:
     - alias: docker
       name: "${DOCKER_IMAGE}-dind"
 
-## -------------------------------------
-#  Init Stage
-## -------------------------------------
-Fortran:
-  artifacts:
-    paths:
-      - fortran_code
-    expire_in: 1 week
-  image: "${PYTHON_IMAGE}"
-  script:
-    - bash install.d/wasp.sh "$(pwd)"
-  stage: init
-
-## -------------------------------------
-#  Test Stage
-## -------------------------------------
-
-Python Test:
-  image: "${WASP_IMAGE}"
-  before_script:
-    - conda init
-    - export PATH=/root/miniconda/bin:$PATH
-    - source activate base
-    - conda env remove -n ff-env -y
-    - conda env create -f ./install.d/environment.yml -y
-    - conda activate ff-env
-  script:
-    - ls /neic-finitefault
-    - safety check -i 70612 -i 51668
-    - poe lint
-    - cp -r "/neic-finitefault/fortran_code/tectonicplates" ./fortran_code/
-    - cp "/neic-finitefault/fortran_code/gfs_nm/long/fd_bank" ./fortran_code/gfs_nm/long/fd_bank
-    - cp "/neic-finitefault/fortran_code/info/LITHO1.0.nc" ./fortran_code/info/LITHO1.0.nc
-    - poe test
-  stage: test
-
-
-Shell Check:
-  image: usgs/ubuntu:latest
-  script:
-    - apt install -y shellcheck
-    - shellcheck install.sh -x
-    - shellcheck install.d/*.sh
-  stage: test
-
-## -------------------------------------
-#  Deploy Stage
-## -------------------------------------
-
-Docker Deploy:
-  dependencies:
-    - "Python Test"
-    - "Shell Check"
+End To End Test:
   extends:
     - .docker_login
-  image: "${DOCKER_IMAGE}"
-  rules:
-    - if: "$SCHEDULED"
-    - changes:
-          - Dockerfile
-          - fortran_code/*
-          - install.d/*
-          - poetry.lock
-          - pyproject.toml
-          - src/*   
+  image: "${DOCKER_IMAGE}" 
   script:
-    -  |
-      ARGS=();
-      for ARG in ${BUILD_ARGS}; do
-        ARGS+=("--build-arg" "${ARG}=${!ARG}");
-      done
-    - LOCAL_IMAGE="${CI_REGISTRY}/${REPOSITORY}/${IMAGE}:${TAG}"
-    - echo "${ARGS[@]} --tag ${LOCAL_IMAGE}" 
-    - docker build "${ARGS[@]}" --tag "wasp-latest" .
-    - TAG="${CI_COMMIT_TAG:-latest}"
-    - FF_FORTRAN="${CI_REGISTRY}/${REPOSITORY}/"wasp":${TAG}"
-    - docker build "${ARGS[@]}" --target wasp-fortran -t "${FF_FORTRAN}" .
-    - DEPENDENCY_IMAGE="${CI_REGISTRY}/${REPOSITORY}/"wasp-dependencies":${TAG}"
-    - docker build "${ARGS[@]}" --target wasp-dependencies -t "${DEPENDENCY_IMAGE}" .
-    - FF_IMAGE="${CI_REGISTRY}/${REPOSITORY}/"wasp":${TAG}"
-    - docker build "${ARGS[@]}" --target wasp -t "${FF_IMAGE}" .
-    # remove dependencies that are no longer needed on the runner
-    - rm -rf ./*
-    # push to registry
-    - if [ "${CI_PROJECT_PATH}" != "ghsc/neic/algorithms/neic-finitefault" ]; then
-      echo "Skipping push on non-upstream (${CI_PROJECT_PATH})";
-      exit 0;
-      fi
-    # push dependencies image
-    - echo "Pushing image ${DEPENDENCY_IMAGE}"
-    - docker push "${DEPENDENCY_IMAGE}";
-    # push finitefault image
-    - echo "Pushing image ${FF_IMAGE}"
-    - docker push "${FF_IMAGE}";
-  stage: deploy
+    - LOCAL_IMAGE="wasp"
+    - docker build --build-arg CI_REGISTRY="True" -t "${LOCAL_IMAGE}" .
+    - docker run wasp
+  stage: end-to-end
   variables:
-    BUILD_ARGS: DCW_VERSION GMT_VERSION GSHHG_VERSION 
-    DCW_VERSION: "2.1.1"
     DOCKER_DRIVER: overlay2
-    GMT_VERSION: "6.4.0"
-    GSHHG_VERSION: "2.3.7"
-    PYTHON_VERSION: "3.10"

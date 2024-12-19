@@ -24,7 +24,7 @@ sudo apt install -y \
 ```
 
 ## Installing Python Dependencies
-The full list of Python dependencies can be found in the provided conda environment file [environment.yml](../install.d/environment.yml). These can be installed individually with your preferred package manager or directly with conda using the following commands: 
+The full list of Python dependencies can be found in the provided miniforge/conda environment file [environment.yml](../install.d/environment.yml). These can be installed individually with your preferred package manager or directly with miniforge/conda using the following commands: 
 
 1. `conda env create -f ./install.d/environment.yml`
 2. `conda activate ff-env`

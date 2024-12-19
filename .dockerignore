@@ -1,6 +1,6 @@
 # Since this is at the top level ignore everything
 *
-# Except for the python code, conda files, fortran_code, and install scripts
+# Except for the python code, miniforge files, fortran_code, and install scripts
 !install.d
 !fortran_code
 !src

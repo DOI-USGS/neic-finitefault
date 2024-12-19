@@ -20,7 +20,7 @@ keywords = ["usgs", "neic", "earthquake", "slip", "finitefault"]
 license = {file = "LICENSE.md"}
 name = "neic-finitefault"
 requires-python = ">=3.10"
-version = "0.1.0"
+version = "1.0.0"
 
 [project.urls]
 Repository = "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault"
@@ -42,5 +42,11 @@ test = [
   { shell = "coverage xml" },
   { shell = "coverage html" }
 ]
-
+end_to_end_test = [
+  { shell = "safety check -i 51668" },
+  { shell = "pytest src/test --cov=src/wasp" },
+  { shell = "black --check src" },
+  { shell = "isort --check src/wasp" },
+  { shell = "mypy src/wasp" }
+]
 
