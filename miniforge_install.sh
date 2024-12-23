@@ -2,7 +2,7 @@
 
 # ==============================================================================
 # Define usage
-#     Install conda (if needed)
+#     Install miniforge (if needed)
 # ==============================================================================
 ## define usage
 function usage {
@@ -33,5 +33,5 @@ while [[ $# -gt 0 ]]; do
 done
 
 
-# shellcheck source=./install.d/conda.sh
-source ./install.d/conda.sh;
+# shellcheck source=./install.d/miniforge.sh
+source ./install.d/miniforge.sh;

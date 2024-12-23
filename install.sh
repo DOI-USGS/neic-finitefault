@@ -68,8 +68,10 @@ LITHO1=${LITHO1:-"download"}
 
 # Running install scripts in install.d/
 INSTALL_DIR="${FINITEFAULT_DIR}/install.d"
-# shellcheck source=./install.d/conda.sh
-source "${INSTALL_DIR}/conda.sh" "${FINITEFAULT_DIR}";
+# shellcheck source=./install.d/miniforge.sh
+source "${INSTALL_DIR}/miniforge.sh" "${FINITEFAULT_DIR}";
+# shellcheck disable=SC1090
+. "${HOME}/miniforge/etc/profile.d/conda.sh"
 # shellcheck source=./install.d/ff-env.sh
 source "${INSTALL_DIR}/ff-env.sh" "${FINITEFAULT_DIR}";
 conda activate ff-env;

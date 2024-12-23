@@ -1,4 +1,5 @@
 - [Wavelet and simulated Annealing SliP inversion (WASP)](#wavelet-and-simulated-annealing-slip-inversion-wasp)
+  - [Suggested Citation](#suggested-citation)
   - [Authors](#authors)
   - [References](#references)
 - [Installation](#installation)
@@ -6,9 +7,9 @@
   - [Wasp Installation Scripts](#wasp-installation-scripts)
 - [Local Testing](#local-testing)
 - [Using the Docker Image](#using-the-docker-image)
-  - [Pulling docker images](#pulling-docker-images)
   - [Building the docker image locally](#building-the-docker-image-locally)
   - [Run the docker image interactively](#run-the-docker-image-interactively)
+  - [Run full end to end tests in the container](#run-full-end-to-end-tests-in-the-container)
 
 # Wavelet and simulated Annealing SliP inversion (WASP)
 
@@ -55,12 +56,12 @@ In order to compile and/or install the source code there are a number of prerequ
 
 1. gfortran: To compile the code in [fortran_code](./fortran_code/)
 2. cmake: To compile the code in [fortran_code](./fortran_code/)
-3. gcc: To provide support to miniconda for compiling c code
-4. miniconda/anaconda: To install python dependencies. Conda can be installed using the provided script: [conda_install.sh](./conda_install.sh)
+3. gcc: To provide support to miniforge/conda for compiling c code
+4. miniforge/conda: To install python dependencies. Miniforge can be installed using the provided script: [miniforge_install.sh](./miniforge_install.sh)
 
 ## Wasp Installation Scripts
 
-Automated installation of the dependencies and fortran code has been provided in the form of the install script [install.sh](./install.sh). Currently this install script only supports installation on linux systems as the fortran code cannot be compiled on MacOS. To instal the code please ensure that all of the [prerequisites](#prerequisites) are available and miniconda/anaconda has been initialized
+Automated installation of the dependencies and fortran code has been provided in the form of the install script [install.sh](./install.sh). Currently this install script only supports installation on linux systems as the fortran code cannot be compiled on MacOS. To instal the code please ensure that all of the [prerequisites](#prerequisites) are available and miniforge/miniconda/anaconda environment has been initialized
 
 1. `source install.sh <path to the local neic-finitefault repository>` (with other optional configurations available, run `sudo bash user_install.sh -h` for the help information)
    1. > NOTE: The scripts in [./install.d](./install.d/) may be run individually to suit the individuals needs. For example, to only rerun compilation of the fortran you can singularly run [wasp.sh](./install.d/wasp.sh).
@@ -84,17 +85,9 @@ Tests and linting can both be run locally:
 
 
 # Using the Docker Image
-This repository provides docker images for the dependencies and source code. Below are some useful commands for interacting with these images. See the [Dockerfile](./Dockerfile) for the build steps/configuration.
+This repository provides a Dockerfile to locally build a docker image for the dependencies and source code. Below are some creating and using the image. See the [Dockerfile](./Dockerfile) for the build steps/configuration.
 
 > While these commands listed are docker commands. The commands should be 1 to 1 with Podman commands. Replace the word "docker" in the command with "podman".
-
-## Pulling docker images
-- `docker pull <image name>`
-  - Names of available images:
-    1.   Image with python dependencies (e.g. conda environment ff-env): code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp-python
-    2.  Image with all of the above (1) and the compiled fortran code: code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp-fortran
-    3. Image with all of the above (1 and 2) and the data dependencies (e.g. fd_bank): code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp-dependencies
-    4. Image with all of the above (1, 2, and 3) and the python source code: code.usgs.gov:5001/ghsc/neic/algorithms/neic-finitefault/wasp
 
 ## Building the docker image locally
 1. Go to the top level of your local repository: `cd <path to the local repository>`
@@ -111,3 +104,6 @@ This repository provides docker images for the dependencies and source code. Bel
   - Useful Optional Flags (must come before the name and specifying a bash shell):
     - mount the image to a local directory: `-v <path to local directory>:<path to location in the docker container>`
     - open a port (might be useful for jupyter notebooks that need to display on a web browser): `-p <host port>: <container port`>
+
+## Run full end to end tests in the container
+- `docker run <name>`
