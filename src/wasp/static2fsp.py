@@ -278,7 +278,7 @@ def static_to_fsp(
             )
         )
         outfile.write(
-            "% SVF  : Asymetriccosine    " "(type of slip-velocity function used)\n"
+            "% SVF  : AsymmetricCosine    " "(type of slip-velocity function used)\n"
         )
 
         outfile.write(
