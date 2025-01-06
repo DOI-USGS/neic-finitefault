@@ -238,7 +238,7 @@ def static_to_fsp(
 
     with open(directory / "fsp_sol_file.txt", "w") as outfile:
         outfile.write("%{}FINITE-SOURCE RUPTURE " "MODEL{}\n%\n".format(string, string))
-        outfile.write("% Event : {} {} CSN\n".format(location, date))
+        outfile.write("% Event : {} {} UTC\n".format(location, date))
         outfile.write("% EventTAG: {}\n%\n".format(tag))
         outfile.write(
             "% Loc  : LAT = {}  LON = {}  DEP = {}\n".format(
