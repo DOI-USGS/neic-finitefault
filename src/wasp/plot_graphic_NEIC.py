@@ -130,7 +130,18 @@ def plot_ffm_sol(
     """
     directory = pathlib.Path(directory)
     segments = segments_data["segments"]
-    vel_model = mv.select_velmodel(tensor_info, default_dirs, directory=directory)
+
+    path_velmodel = os.path.join(directory, "velmodel_data.json")
+    if not os.path.exists(path_velmodel):
+        vel_model = mv.select_velmodel(
+            tensor_info=tensor_info,
+            default_dirs=default_directories,
+            directory=directory,
+        )
+    else:
+        with open(path_velmodel) as v:
+            vel_model = json.load(v)
+
     _plot_vel_model(vel_model, directory=directory)
     plot_moment_rate_function(
         segments_data,

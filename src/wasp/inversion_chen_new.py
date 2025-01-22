@@ -535,8 +535,17 @@ def manual_modelling(
     inversion(data_type, default_dirs, logger, directory=directory)
     logger.info("Plot data in folder {}".format(directory))
     if plot_sol == True:
+        path_velmodel = os.path.join(directory, "velmodel_data.json")
+        if os.path.exists(path_velmodel):
+            with open(path_velmodel) as vm:
+                velmodel = json.load(vm)
         execute_plot(
-            tensor_info, data_type, segments_data, default_dirs, directory=directory
+            tensor_info,
+            data_type,
+            segments_data,
+            default_dirs,
+            directory=directory,
+            velmodel=velmodel,
         )
     ml.close_log(logger)
 
