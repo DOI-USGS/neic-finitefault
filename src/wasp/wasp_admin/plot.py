@@ -31,6 +31,7 @@ from wasp.plot_graphic_NEIC import (
 from wasp.plot_Map import PlotMap
 from wasp.read_config import CONFIG_PATH
 from wasp.seismic_tensor import get_tensor
+from wasp.shakemap_polygon import ShakeRupture
 from wasp.static2fsp import static_to_fsp
 from wasp.static2srf import static_to_srf
 from wasp.velocity_models import select_velmodel
@@ -575,14 +576,11 @@ def neic(
                     directory=directory,
                 )
     if polygon:
-        shakemap_polygon(
-            segments=segments,
-            point_sources=point_sources,
-            solution=solution,
-            tensor_info=tensor_info,
-            evID=event_id,
-            directory=directory,
-        )
+        fspfiles = pathlib.Path(directory).glob("*.fsp")
+        if not len(fspfiles):
+            raise FileNotFoundError(f"Could not find FSP file in output directory.")
+        shake_rupture = ShakeRupture(event_id, fspfiles[0])
+        shake_rupture.write_rupture(directory)
 
     # plot misfit
     plot_misfit(used_data_type=chosen_data_types, directory=directory)
