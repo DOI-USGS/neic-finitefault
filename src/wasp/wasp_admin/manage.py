@@ -22,7 +22,7 @@ from wasp.input_files import (
     inputs_simmulated_annealing,
 )
 from wasp.input_files import model_space as model_space_update
-from wasp.input_files import plane_for_chen
+from wasp.input_files import plane_for_chen, write_velmodel
 from wasp.management import default_dirs
 from wasp.many_events import (
     get_model_space_events,
@@ -769,6 +769,9 @@ def update_inputs(
     plane: bool = typer.Option(
         False, "-p", "--plane", help="Compute Fault.pos, Fault.time, Niu_model"
     ),
+    velocity_model: bool = typer.Option(
+        False, "-v", "--velocity_model", help="Update velocity model from JSON"
+    ),
 ):
     # set data types
     chosen_data_types = [d.value for d in data_types]
@@ -783,6 +786,12 @@ def update_inputs(
     # get tensor information
     with open(tensor_file) as tf:
         tensor_info = json.load(tf)
+
+    if velocity_model:
+        velocity__file = directory / "velmodel_data.json"
+        with open(velocity__file) as vm:
+            velmodel = json.load(vm)
+        write_velmodel(velmodel)
 
     if plane:
         # validate files
