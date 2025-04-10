@@ -561,6 +561,10 @@ def select_process_surf_tele(
     surf_files = glob.glob(str(long_dir) + "/*_BHZ*.sac") + glob.glob(
         str(long_dir) + "/*_SH*.sac"
     )
+
+    # Filter out files whose basename starts with "final_"
+    surf_files = [f for f in surf_files if not os.path.basename(f).startswith("final_")]
+
     __create_long_period(surf_files, tensor_info, directory=long_dir)
 
     logger1.info("Long period surface waves have been succesfully processed")

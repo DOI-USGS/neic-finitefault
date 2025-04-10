@@ -3,7 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.10.14
-  - pip=24.2
+  - pip=25.0
   - black=24.4.2
   - cartopy=0.23.0 
   - cutde=23.6.25
