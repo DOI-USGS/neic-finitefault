@@ -18,6 +18,7 @@ module annealing
                        &   insar_modify_subfault, insar_add_subfault, &
                        &   insar_remove_ramp, insar_modify_ramp, &
                        &   insar_add_ramp, ramp_length
+   use get_stations_data, only : get_options
    use omp_lib
    implicit none
    real :: coef_moment, coef_slip, coef_gps, coef_insar, coef_time
@@ -198,6 +199,12 @@ contains
    character(len=15) :: sta_name(max_stations)
    character(len=3) :: component(max_stations)
 
+   real :: weight(max_stations), wavelet_weight(12, max_stations)
+   integer :: misfit_type(12, max_stations), t_min(max_stations), t_max(max_stations)
+
+   call get_properties(sta_name, component, dt_channel, channels)
+   call get_options(weight, misfit_type, t_min, t_max, wavelet_weight)
+
    used_data = 0
    call count_wavelets(used_data)
    z0 = cmplx(0.d0, 0.d0, double)
@@ -214,6 +221,8 @@ contains
    area = dxs*dys*(1.e+10)
    delta_freq0 = 1.0/(2.0**lnpt)
    misfit2 = 0.d0
+   open(12,file='misfit_details.txt')
+   write(12,*) "id sta_name component weight misfit"
    do channel = 1, channels
       delta_freq = delta_freq0/dt_channel(channel)
       dt = dt_channel(channel)
@@ -247,6 +256,7 @@ contains
       call wavelet_syn(real1, imag1, coeffs_syn)
       call misfit_channel(channel, coeffs_syn, misfit1)
       misfit2 = misfit2 + misfit1
+      write(12,*) channel, sta_name(channel), component(channel), weight(channel), misfit1/weight(channel)
    end do
 
    amp = 1.0
@@ -278,10 +288,14 @@ contains
    call time_laplace(rupt_time, time_reg)
    if (time_reg .lt. 1.0e-9) time_reg = 1.0
  
-   coef_gps = 0.0
-   coef_insar = 0.0
+   !coef_gps = 0.0
+   !coef_insar = 0.0
    insar_misfit0 = 0.0
-   if (static) call static_synthetic(slip, rake, gps_misfit)
+   if (static) then
+      call static_synthetic(slip, rake, gps_misfit)
+      channel = channel + 1
+      write(12,*) channel, 'GPS GPS', coef_gps, gps_misfit
+   endif
    if (insar) then
       if (present(ramp)) then
          call insar_synthetic(slip, rake, insar_misfit, ramp)
@@ -289,8 +303,10 @@ contains
          call insar_synthetic(slip, rake, insar_misfit)
       endif
       insar_misfit0 = insar_misfit
+      channel = channel + 1
+      write(12,*) channel, 'INSar INSar', coef_insar, insar_misfit
    endif
-
+   close(12)
    if (get_coeff) then
       coef_moment=smooth_moment*(misfit2 - current_value)
       coef_moment = min(coef_moment, 1.0)
