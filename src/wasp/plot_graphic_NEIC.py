@@ -659,7 +659,12 @@ def PlotSlipDistribution(
         plt.clabel(contplot, fmt="%.0f", inline=True, fontsize=14, colors="k")
         grid_z = griddata(orig_grid, z.flatten(), new_grid, method="linear")
         grid_z_reshape = grid_z.reshape((np.shape(XCOLS)))
-        ax.quiver(x, y, u, v, scale=20.0, width=0.002, color="0.5", clip_on=False)
+        if autosize==True: # make sure that rake vectors are same scale for each segment
+            scale = (1./10) * (stk_subfaults * delta_strike) # One-tenth of segment width
+            width = 1/(scale * 25) # quiver width
+            ax.quiver(x, y, u, v, scale = scale, width = width, color="0.5", clip_on=False)
+        else: # will be plotted to default aspect ratio
+            ax.quiver(x, y, u, v, scale=20.0, width=0.002, color="0.5", clip_on=False)
         ax.plot(0, 0, "w*", ms=15, markeredgewidth=1.5, markeredgecolor="k")
         ax, im = __several_axes(
             grid_z_reshape, segment, ps_seg, ax, max_val=1.0, autosize=autosize
