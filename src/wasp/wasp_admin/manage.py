@@ -12,7 +12,7 @@ from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 from wasp.data_acquisition import acquisition
 from wasp.data_management import filling_data_dicts
 from wasp.fault_plane import create_finite_fault
-from wasp.get_outputs import read_solution_static_format
+from wasp.get_outputs import read_solution_static_format, synthetics_to_SAC
 from wasp.input_files import (
     input_chen_insar,
     input_chen_near_field,
@@ -719,6 +719,29 @@ def static_to_fsp(
         solution=solution,
         directory=directory,
     )
+
+
+@app.command(help="Output synthetics in SAC format")
+def synthetic_sac(
+    directory: pathlib.Path = typer.Argument(
+        ..., help="Path to the directory to read/write from"
+    ),
+    data_types: List[ManagedDataTypes] = typer.Option(
+        [],
+        "-t",
+        "--data-type",
+        help="Type to add to the data_types list, default is []",
+    ),
+):
+    chosen_data_types = [d.value for d in data_types]
+    if "body" in chosen_data_types:
+        synthetics_to_SAC("body", 10, directory)
+    if "surf" in chosen_data_types:
+        synthetics_to_SAC("surf", 10, directory)
+    if "strong" in chosen_data_types:
+        synthetics_to_SAC("strong", 10, directory)
+    if "cgps" in chosen_data_types:
+        synthetics_to_SAC("cgps", 10, directory)
 
 
 @app.command(help="Write the tensor file from a GCMT moment tensor")

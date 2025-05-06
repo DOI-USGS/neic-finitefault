@@ -12,9 +12,10 @@ import pathlib
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
-from obspy import read  # type: ignore
+from obspy import read, Stream, Trace  # type: ignore
 
 import wasp.plane_management as pl_mng
+from wasp import get_outputs
 
 ##########################
 # Get FFM model
@@ -307,6 +308,108 @@ def get_data_dict(
         for file in traces_info:
             file["observed"] = [0 for i in range(1024)]
     return traces_info
+
+
+def synthetics_to_SAC(
+    data_type: str,
+    start_margin: int = 10,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+) -> List[dict]:
+    """Fill dictionary with synthetic data at station and channel
+
+    :param traces_info: The properties of each stations/channel
+    :type traces_info: List[dict]
+    :param syn_file: The path to the synthetic file, defaults to None
+    :type syn_file: Optional[Union[pathlib.Path, str]], optional
+    :param margin: The file margin, defaults to 10
+    :type margin: int, optional
+    :param directory: Where the files should be read from, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
+    :return: The updated traces_info dictionaries
+    :rtype: List[dict]
+    """
+    print(f"Datatype: {data_type}")
+    directory = pathlib.Path(directory)
+    # Create output directory for Synthetic SACs #
+    if not os.path.exists(directory / "forward_model"):
+        os.mkdir(directory / "forward_model")
+
+    if data_type == "body":
+        fwd_directory = directory / "forward_model/BODY"
+        if not os.path.exists(fwd_directory):
+            os.mkdir(fwd_directory)
+        if not os.path.isfile(directory / "tele_waves.json"):
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), "tele_waves.json"
+            )
+        with open(directory / "tele_waves.json") as t:
+            traces_info = json.load(t)
+        files = get_outputs.get_data_dict(
+            traces_info, syn_file="synthetics_body.txt", directory=directory
+        )
+    if data_type == "surf":
+        fwd_directory = directory / "forward_model/LONG"
+        if not os.path.exists(fwd_directory):
+            os.mkdir(fwd_directory)
+        if not os.path.isfile(directory / "surf_waves.json"):
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), "surf_waves.json"
+            )
+        with open(directory / "surf_waves.json") as t:
+            traces_info = json.load(t)
+        files = get_outputs.get_data_dict(
+            traces_info, syn_file="synthetics_surf.txt", margin=0, directory=directory
+        )
+    if data_type == "strong":
+        fwd_directory = directory / "forward_model/STR"
+        if not os.path.exists(fwd_directory):
+            os.mkdir(fwd_directory)
+        if not os.path.isfile(directory / "strong_motion_waves.json"):
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), "strong_motion_waves.json"
+            )
+        with open(directory / "strong_motion_waves.json") as t:
+            traces_info = json.load(t)
+        files = get_outputs.get_data_dict(
+            traces_info, syn_file="synthetics_strong.txt", directory=directory
+        )
+    if data_type == "cgps":
+        fwd_directory = directory / "forward_model/cGPS"
+        if not os.path.exists(fwd_directory):
+            os.mkdir(fwd_directory)
+        if not os.path.isfile(directory / "cgps_waves.json"):
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), "cgps_waves.json"
+            )
+        with open(directory / "cgps_waves.json") as t:
+            traces_info = json.load(t)
+        files = get_outputs.get_data_dict(
+            traces_info, syn_file="synthetics_cgps.txt", directory=directory
+        )
+
+    start_waveform: List[float] = []
+    for file in files:
+        dt = file["dt"]
+        nstart = file["start_signal"]
+        margin = int(start_margin / int(dt))
+        margin = min(nstart, margin)
+        start_waveform = start_waveform + [margin]
+        name = file["name"]
+        comp = file["component"]
+        lon = file["location"][0]
+        lat = file["location"][1]
+        synthetic = file["synthetic"]
+        sacfile_name = f"{fwd_directory}/forward_{name}_{comp}.sac"
+        St = Stream(Trace())
+        St[0].stats.station = name
+        St[0].stats.channel = comp
+        St[0].stats.longitude = lon
+        St[0].stats.latitude = lat
+        St[0].stats.delta = dt
+        St[0].data = np.array(synthetic)
+        St.write(sacfile_name, format="SAC")
+
+    return
 
 
 def _get_observed_from_chen(
