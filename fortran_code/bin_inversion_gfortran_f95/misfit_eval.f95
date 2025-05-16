@@ -23,7 +23,7 @@ contains
    end subroutine misfit_eval_set_data_properties
 
 
-   pure subroutine misfit_channel(channel, wave_syn, misfit)
+   pure subroutine misfit_channel(channel, wave_syn, weighted_misfit, misfit)
 !
 !  Args:
 !  channel: number of current channel
@@ -34,6 +34,7 @@ contains
 !
    real, intent(inout) :: wave_syn(wave_pts2)
    integer, intent(in) :: channel
+   real*8, intent(out) :: weighted_misfit
    real*8, intent(out) :: misfit
    real*8 :: misfit0, value1, value2, value3, diff!, misfit 
    real :: max_coeff0
@@ -94,7 +95,7 @@ contains
       misfit = misfit + misfit0
    end do
    misfit = misfit/(jmax-jmin+1)
-   misfit = misfit*weight(channel)
+   weighted_misfit = misfit*weight(channel)
    end subroutine misfit_channel
 
 
