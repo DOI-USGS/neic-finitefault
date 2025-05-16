@@ -797,12 +797,16 @@ def update_inputs(
         # validate files
         velocity__file = directory / "velmodel_data.json"
         segments_file = directory / "segments_data.json"
-        validate_files([velocity__file, segments_file, sampling_file])
+        tensor_file = directory / "tensor_info.json"
+        validate_files([velocity__file, segments_file, sampling_file, tensor_file])
 
         with open(velocity__file) as vm:
             velmodel = json.load(vm)
         with open(segments_file) as sd:
             segments_data = json.load(sd)
+        with open(tensor_file) as tf:
+            tensor_info = json.load(tf)
+
         segments = segments_data["segments"]
         min_vel = segments[0]["min_vel"]
         max_vel = segments[0]["max_vel"]
