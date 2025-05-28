@@ -294,7 +294,7 @@ contains
    if (static) then
       call static_synthetic(slip, rake, gps_misfit)
       channel = channel + 1
-      write(12,*) channel, 'GPS GPS', coef_gps, gps_misfit
+      write(12,*) channel, 'GNSS GNSS', coef_gps, gps_misfit
    endif
    if (insar) then
       if (present(ramp)) then
@@ -304,7 +304,7 @@ contains
       endif
       insar_misfit0 = insar_misfit
       channel = channel + 1
-      write(12,*) channel, 'INSar INSar', coef_insar, insar_misfit
+      write(12,*) channel, 'InSAR InSAR', coef_insar, insar_misfit
    endif
    close(12)
    if (get_coeff) then
