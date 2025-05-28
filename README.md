@@ -15,11 +15,11 @@
 
 ---
 
-This code uses a nonlinear simulated annealing inversion method to model slip amplitude, rake, rupture time, and rise time on a discretized fault plane, finding the solution that best fits the observations in the wavelet domain.
+This code uses a nonlinear simulated annealing inversion method to model slip amplitude, rake, rupture time, and rise time on a discretized fault plane, finding the solution that best fits the observations in the wavelet domain. WASP currently accomodates observations from (1) teleseismic broadband stations, (2) regional strong-motion accelerometer stations, (3) static and high-rate Global Navigation Satellite Systems stations, and (4) Interferometric Synthetic Aperture Radar.
 
-WASP currently accomodates observations from (1) teleseismic broadband stations, (2) regional strong-motion accelerometer stations, (3) static and high-rate Global Navigation Satellite Systems stations, and (4) Interferometric Synthetic Aperture Radar.
+The inversion approach is based on the method of Ji et al. (2002, 2003) and Shao et al. (2011). The original inversion package was developed by Dr. Chen Ji. Koch et al. (2019) modified the heuristic rules used to automatically define the search ranges for finite-fault inversions based on the moment tensor solution, and incorporated regional strong-motion waveforms into the workflow. They also converted the codebase of the software package from Fortran 77 to Fortran 95, improving its flexibility. Goldberg et al. (2022) enabled the integration of satellite geodetic observations into the inversion framework.
 
-The inversion approach is based on the method of Ji et al. (2002, 2003) and Shao et al. (2011). The original inversion package was developed by Dr. Chen Ji. Koch et al. (2019) modified the heuristic rules used to automatically define the search ranges for finite-fault inversions based on the moment tensor solution, and incorporated regional strong-motion waveforms into the workflow. They also converted the codebase of the software package from Fortran 77 to Fortran 95, improving its flexibility. Goldberg et al. (2022) enabled the integration of satellite geodetic observations into the inversion framework. Details of the implementation can be found in Koch et al. (2019) and Goldberg et al. (2022). The Regional Green's functions are calculated using the method of Zhu & Rivera (2002).
+The Regional Green's functions are calculated using the method of Zhu & Rivera (2002).
 
 ## Suggested Citation
 
