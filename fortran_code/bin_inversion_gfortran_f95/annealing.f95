@@ -18,6 +18,7 @@ module annealing
                        &   insar_modify_subfault, insar_add_subfault, &
                        &   insar_remove_ramp, insar_modify_ramp, &
                        &   insar_add_ramp, ramp_length
+   use get_stations_data, only : get_options
    use omp_lib
    implicit none
    real :: coef_moment, coef_slip, coef_gps, coef_insar, coef_time
@@ -191,12 +192,18 @@ contains
       & time_reg, forward_real3(wave_pts2, max_stations), slip_dip, slip_stk, &
       & forward_imag3(wave_pts2, max_stations), real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2)
    real :: rake2, delta_freq, delta_freq0, moment0, kahan_y, kahan_t, kahan_c
-   real*8 :: shift, misfit2, misfit1
+   real*8 :: shift, misfit2, misfit1, misfit1_no_weight
    integer :: i, segment, channel, irise, ifall, jf, k, subfault, used_data
    complex*16 :: z0, forward(wave_pts), z, z1
    logical :: static, get_coeff, insar
    character(len=15) :: sta_name(max_stations)
    character(len=3) :: component(max_stations)
+
+   real :: weight(max_stations), wavelet_weight(12, max_stations)
+   integer :: misfit_type(12, max_stations), t_min(max_stations), t_max(max_stations)
+
+   call get_properties(sta_name, component, dt_channel, channels)
+   call get_options(weight, misfit_type, t_min, t_max, wavelet_weight)
 
    used_data = 0
    call count_wavelets(used_data)
@@ -214,6 +221,8 @@ contains
    area = dxs*dys*(1.e+10)
    delta_freq0 = 1.0/(2.0**lnpt)
    misfit2 = 0.d0
+   open(12,file='misfit_details.txt')
+   write(12,*) "id sta_name component weight misfit"
    do channel = 1, channels
       delta_freq = delta_freq0/dt_channel(channel)
       dt = dt_channel(channel)
@@ -245,8 +254,9 @@ contains
          imag1(i) = forward_imag3(i, channel)
       end do
       call wavelet_syn(real1, imag1, coeffs_syn)
-      call misfit_channel(channel, coeffs_syn, misfit1)
+      call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)
       misfit2 = misfit2 + misfit1
+      write(12,*) channel, sta_name(channel), component(channel), weight(channel), misfit1_no_weight
    end do
 
    amp = 1.0
@@ -278,10 +288,14 @@ contains
    call time_laplace(rupt_time, time_reg)
    if (time_reg .lt. 1.0e-9) time_reg = 1.0
  
-   coef_gps = 0.0
-   coef_insar = 0.0
+   !coef_gps = 0.0
+   !coef_insar = 0.0
    insar_misfit0 = 0.0
-   if (static) call static_synthetic(slip, rake, gps_misfit)
+   if (static) then
+      call static_synthetic(slip, rake, gps_misfit)
+      channel = channel + 1
+      write(12,*) channel, 'GNSS GNSS', coef_gps, gps_misfit
+   endif
    if (insar) then
       if (present(ramp)) then
          call insar_synthetic(slip, rake, insar_misfit, ramp)
@@ -289,8 +303,10 @@ contains
          call insar_synthetic(slip, rake, insar_misfit)
       endif
       insar_misfit0 = insar_misfit
+      channel = channel + 1
+      write(12,*) channel, 'InSAR InSAR', coef_insar, insar_misfit
    endif
-
+   close(12)
    if (get_coeff) then
       coef_moment=smooth_moment*(misfit2 - current_value)
       coef_moment = min(coef_moment, 1.0)
@@ -371,7 +387,7 @@ contains
       & time_reg, forward_real3(wave_pts2, max_stations), slip_dip, slip_stk, &
       & forward_imag3(wave_pts2, max_stations), real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2)
    real :: rake2, delta_freq, delta_freq0, moment0(10), kahan_y, kahan_t, kahan_c
-   real*8 :: shift, misfit2, misfit1
+   real*8 :: shift, misfit2, misfit1, misfit1_no_weight
    integer :: i, segment, channel, irise, ifall, jf, k, subfault, used_data
    complex*16 :: z0, forward(wave_pts), z, z1
    logical :: static, get_coeff, insar
@@ -425,7 +441,7 @@ contains
          imag1(i) = forward_imag3(i, channel)
       end do
       call wavelet_syn(real1, imag1, coeffs_syn)
-      call misfit_channel(channel, coeffs_syn, misfit1)
+      call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)
       misfit2 = misfit2 + misfit1
    end do
 
@@ -567,7 +583,7 @@ contains
    & rupt_beg, rupt_end, rupt_max, rise_time_beg, rise_time_end, rise_time_max
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
    real :: delta_freq0, delta_freq, rake2!, ex!, misfit2
-   real*8 :: shift, misfit2, misfit1
+   real*8 :: shift, misfit2, misfit1, misfit1_no_weight
    complex :: green_subf
    complex*16 :: z, z1, forward(wave_pts), z0
 
@@ -790,7 +806,7 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1, misfit1_no_weight)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
@@ -809,7 +825,7 @@ contains
                z = z*z1    ! we may need to increase numerical precision
             end do
             call wavelet_syn(real1, imag1, coeffs_syn)
-            call misfit_channel(channel, coeffs_syn, misfit1)     
+            call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)     
             misfit2 = misfit2 + misfit1    ! we may need to increase numerical precision
          end do
 !$omp end do
@@ -932,7 +948,7 @@ contains
    real ramp_beg, ramp_end, ramp_max, ramp_use
    real*8 :: ramp0(36), ramp1(36)
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
-   real*8 :: shift, misfit2, misfit1
+   real*8 :: shift, misfit2, misfit1, misfit1_no_weight
    real :: delta_freq, delta_freq0, rake2!, ex
    complex :: green_subf
    complex*16 :: z, z1, forward(wave_pts), z0
@@ -1158,7 +1174,7 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1, misfit1_no_weight)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
@@ -1175,7 +1191,7 @@ contains
                z = z*z1    ! we may need to increase numerical precision
             end do
             call wavelet_syn(real1, imag1, coeffs_syn)
-            call misfit_channel(channel, coeffs_syn, misfit1)     
+            call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)     
             misfit2 = misfit2 + misfit1    ! we may need to increase numerical precision
          end do
 !$omp end do
@@ -1355,7 +1371,7 @@ contains
    & rupt_beg, rupt_end, rupt_max, rise_time_beg, rise_time_end, rise_time_max
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
    real :: delta_freq0, delta_freq, rake2!, ex!, misfit2
-   real*8 :: shift, misfit2, misfit1
+   real*8 :: shift, misfit2, misfit1, misfit1_no_weight
    complex :: green_subf
    complex*16 :: z, z1, forward(wave_pts), z0
 
@@ -1595,7 +1611,7 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1, misfit1_no_weight)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
@@ -1614,7 +1630,7 @@ contains
                z = z*z1    ! we may need to increase numerical precision
             end do
             call wavelet_syn(real1, imag1, coeffs_syn)
-            call misfit_channel(channel, coeffs_syn, misfit1)     
+            call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)     
             misfit2 = misfit2 + misfit1    ! we may need to increase numerical precision
          end do
 !$omp end do
@@ -1747,7 +1763,7 @@ contains
    real ramp_beg, ramp_end, ramp_max, ramp_use
    real*8 :: ramp0(36), ramp1(36)
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
-   real*8 :: shift, misfit2, misfit1
+   real*8 :: shift, misfit2, misfit1, misfit1_no_weight
    real :: delta_freq, delta_freq0, rake2!, ex
    complex :: green_subf
    complex*16 :: z, z1, forward(wave_pts), z0
@@ -1991,7 +2007,7 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1, misfit1_no_weight)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
@@ -2008,7 +2024,7 @@ contains
                z = z*z1    ! we may need to increase numerical precision
             end do
             call wavelet_syn(real1, imag1, coeffs_syn)
-            call misfit_channel(channel, coeffs_syn, misfit1)     
+            call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)     
             misfit2 = misfit2 + misfit1    ! we may need to increase numerical precision
          end do
 !$omp end do
