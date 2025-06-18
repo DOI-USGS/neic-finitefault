@@ -12,7 +12,7 @@ import pathlib
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
-from obspy import Stream, Trace, read
+from obspy import Stream, Trace, read # type: ignore
 
 import wasp.plane_management as pl_mng
 from wasp import get_outputs
@@ -314,7 +314,7 @@ def synthetics_to_SAC(
     data_type: str,
     start_margin: int = 10,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
-) -> List[dict]:
+):
     """Save synthetic data in SAC format for each station/channel
 
     :param data_type: The type of data (e.g., surf, cgps)
