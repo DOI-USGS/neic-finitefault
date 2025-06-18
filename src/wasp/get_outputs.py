@@ -315,18 +315,14 @@ def synthetics_to_SAC(
     start_margin: int = 10,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> List[dict]:
-    """Fill dictionary with synthetic data at station and channel
+    """Save synthetic data in SAC format for each station/channel
 
-    :param traces_info: The properties of each stations/channel
-    :type traces_info: List[dict]
-    :param syn_file: The path to the synthetic file, defaults to None
-    :type syn_file: Optional[Union[pathlib.Path, str]], optional
-    :param margin: The file margin, defaults to 10
-    :type margin: int, optional
+    :param data_type: The type of data (e.g., surf, cgps)
+    :type data_type: str
+    :param start_margin: waveform start margin, defaults to 10
+    :type start_margin: int
     :param directory: Where the files should be read from, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
-    :return: The updated traces_info dictionaries
-    :rtype: List[dict]
     """
     print(f"Datatype: {data_type}")
     directory = pathlib.Path(directory)
