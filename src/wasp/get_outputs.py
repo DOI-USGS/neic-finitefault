@@ -7,12 +7,12 @@ the inverse problem, and the synthetic waveforms produced by such model,
 
 import errno
 import json
+import numpy as np
+from obspy import read, Stream, Trace
 import os
 import pathlib
 from typing import Dict, List, Optional, Tuple, Union
 
-import numpy as np
-from obspy import read, Stream, Trace  # type: ignore
 
 import wasp.plane_management as pl_mng
 from wasp import get_outputs
