@@ -2,9 +2,11 @@ import json
 import os
 import pathlib
 import shutil
+from obspy import read # type: ignore
 from tempfile import mkdtemp
 
 import numpy as np
+
 
 from wasp.get_outputs import (
     __get_channel,
@@ -14,6 +16,7 @@ from wasp.get_outputs import (
     read_solution_fsp_format,
     read_solution_static_format,
     retrieve_gps,
+    synthetics_to_SAC,
 )
 
 from .testutils import (
@@ -201,6 +204,84 @@ def test_read_solution_fsp_format():
             ],
         ):
             assert np.max(solution[key]) == target
+    finally:
+        shutil.rmtree(tempdir)
+
+
+def test_synthetics_to_SAC():
+    tempdir = pathlib.Path(mkdtemp())
+    try:
+        waveform_type = ["body", "surf", "strong", "cgps"]
+        data_dir = ["BODY", "LONG", "STR", "cGPS"]
+        waveform_json = [
+            "tele_waves.json",
+            "surf_waves.json",
+            "strong_motion_waves.json",
+            "cgps_waves.json",
+        ]
+        synthetic_txt = [
+            "synthetics_body.txt",
+            "synthetics_surf.txt",
+            "synthetics_strong.txt",
+            "synthetics_cgps.txt",
+        ]
+        target_lon = [
+            5.110109806060791,
+            5.110109806060791,
+            -30.172700881958008,
+            -30.6037540435791,
+        ]
+        target_lat = [
+            -52.64448165893555,
+            -52.64448165893555,
+            -70.79930114746094,
+            -71.20388793945312,
+        ]
+        target_id = ["MPG", "MPG", "GO04", "ovll"]
+        target_dt = [0.2, 4.0, 0.4, 0.4]
+        target_min = [-329.32175, -1.349203, -2.30605, -25.51653]
+        target_max = [147.96167, 1.2100694, 2.70080, 6.467616]
+        for data_type in range(len(waveform_json)):
+            with open(
+                END_TO_END_DIR / "results" / "NP1" / waveform_json[data_type], "r"
+            ) as t:
+                waveform_dict = json.load(t)
+            waveform_dict[0][
+                "file"
+            ] = f'{END_TO_END_DIR}/results/data/{waveform_dict[0]["file"]}'
+            # copy only first station to test
+            station_name = waveform_dict[0]["name"]
+            station_comp = waveform_dict[0]["component"]
+            with open(tempdir / waveform_json[data_type], "w") as f:
+                json.dump(
+                    [waveform_dict[0]],
+                    f,
+                    sort_keys=True,
+                    indent=4,
+                    separators=(",", ": "),
+                    ensure_ascii=False,
+                )
+            out_file = tempdir / synthetic_txt[data_type]
+            with open(out_file, "w") as outfile:
+                with open(
+                    END_TO_END_DIR / "results" / "NP1" / synthetic_txt[data_type], "r"
+                ) as file:
+                    for line in file.readlines()[0:1025]:  # copy only first station
+                        outfile.write(line)
+            outfile.close()
+            # check targets
+            synthetics_to_SAC(waveform_type[data_type], directory=tempdir)
+            st = read(
+                f"{tempdir}/forward_model/{data_dir[data_type]}/forward_{station_name}_{station_comp}.sac"
+            )
+            assert st[0].stats.sac.stla == target_lat[data_type]
+            assert st[0].stats.sac.stlo == target_lon[data_type]
+            assert st[0].stats.sac.kstnm == target_id[data_type]
+            np.testing.assert_almost_equal(
+                st[0].stats.sac.delta, target_dt[data_type], 7
+            )
+            np.testing.assert_almost_equal(np.min(st[0].data), target_min[data_type], 5)
+            np.testing.assert_almost_equal(np.max(st[0].data), target_max[data_type], 5)
     finally:
         shutil.rmtree(tempdir)
 
