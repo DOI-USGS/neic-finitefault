@@ -120,7 +120,6 @@ def forward_model(
     ny = int(dip_ps / 2)
     nx = int(strike_ps / 2)
     times = [point_sources[:, :, ny, nx, 4] for point_sources in point_sources0]
-    print(np.shape(times), np.shape(trup_segs))
     trup_segs2 = [rupt_seg - time for time, rupt_seg in zip(times, trup_segs)]
 
     zipped = zip(segments, slip_segs, rake_segs, trup_segs2, tris_segs, tfall_segs)

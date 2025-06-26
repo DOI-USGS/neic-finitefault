@@ -43,7 +43,7 @@ test = [
   { shell = "coverage html" }
 ]
 end_to_end_test = [
-  { shell = "safety check -i 51668" },
+  { shell = "safety check" },
   { shell = "pytest src/test --cov=src/wasp" },
   { shell = "black --check src" },
   { shell = "isort --check src/wasp" },

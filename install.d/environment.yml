@@ -25,6 +25,7 @@ dependencies:
   - safety=2.3.4
   - scipy=1.14.0
   - shapely=2.0.6
+  - sqlalchemy=2.0.0b1
   - typer=0.9.4
   - pip:
     - pyrocko==2023.10.11
