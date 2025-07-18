@@ -122,7 +122,7 @@ def tele_body_traces(
     if len(files) == 0:
         return []
     p_files = [file for file in files if "_BHZ" in str(file)]
-    sh_files = [file for file in files if "_SH" in str(file)]
+    sh_files = [file for file in files if "_BHT" in str(file)]
     p_files = select_tele_stations(p_files, "P", tensor_info)
     sh_files = select_tele_stations(sh_files, "SH", tensor_info)
     files = p_files + sh_files
@@ -153,7 +153,7 @@ def tele_body_traces(
             arrival = arrivals["p_arrival"][0].time
             weight = 1.0
             wavelet_weight = wavelet_weight0
-        elif header.kcmpnm == "SH":
+        elif header.kcmpnm == "BHT":
             arrival = arrivals["s_arrival"][0].time
             weight = 0.5
             wavelet_weight = wavelet_weight1
@@ -216,7 +216,7 @@ def tele_surf_traces(
     if len(files) == 0:
         return []
     p_files = [file for file in files if "_BHZ." in str(file)]
-    sh_files = [file for file in files if "_SH." in str(file)]
+    sh_files = [file for file in files if "_BHT." in str(file)]
     p_files = select_tele_stations(p_files, "Rayleigh", tensor_info)
     sh_files = select_tele_stations(sh_files, "Love", tensor_info)
     files = p_files + sh_files
@@ -995,15 +995,18 @@ def get_traces_files(
     directory = pathlib.Path(directory)
     traces_files: List[Union[pathlib.Path, str]] = []
     if data_type == "body":
-        p_traces_files = glob(os.path.join(directory / "P", "final*"))
-        sh_traces_files = glob(os.path.join(directory / "SH", "final*"))
+        p_traces_files = glob(os.path.join(directory / "P", "processed*"))
+        sh_traces_files = glob(os.path.join(directory / "SH", "processed*"))
         traces_files = p_traces_files + sh_traces_files  # type: ignore
     if data_type == "surf":
-        traces_files = glob(os.path.join(directory / "LONG", "final*"))  # type: ignore
+        traces_files = list(
+            glob(os.path.join(directory / "RAYLEIGH", "processed*"))
+            + glob(os.path.join(directory / "LOVE", "processed*"))
+        )
     if data_type == "strong":
-        traces_files = glob(os.path.join(directory / "STR", "final*"))  # type: ignore
+        traces_files = glob(os.path.join(directory / "STR", "processed*"))  # type: ignore
     if data_type == "cgps":
-        traces_files = glob(os.path.join(directory / "cGPS", "final*"))  # type: ignore
+        traces_files = glob(os.path.join(directory / "cGPS", "processed*"))  # type: ignore
     traces_files = [os.path.abspath(file) for file in traces_files]  # type: ignore
     return traces_files
 

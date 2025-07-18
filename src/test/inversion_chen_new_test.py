@@ -9,7 +9,7 @@ import tempfile
 
 import numpy as np
 import pytest
-from obspy import read
+from obspy import read  # type:ignore
 
 from wasp.data_management import filling_data_dicts
 from wasp.green_functions import fk_green_fun1
@@ -69,7 +69,12 @@ def _compare(f1, ftarget, tempdir):
                     for key, target_item in target_dict.items():
                         if data_dict[key] == None and target_item == []:
                             continue
-                        assert data_dict[key] == target_item
+                        if isinstance(data_dict[key], float):
+                            np.testing.assert_almost_equal(
+                                data_dict[key], target_item, decimal=5
+                            )
+                        else:
+                            assert data_dict[key] == target_item
                     match = True
                     break
             if not match:

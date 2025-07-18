@@ -113,7 +113,7 @@ def plot_waveforms(
                     ha="right",
                     va="bottom",
                 )
-            if type_str == "body" and comp == "SH":
+            if type_str == "body" and comp == "BHT":
                 ax.text(
                     1.1 * min_time,
                     0.2 * max(abs(min_val), max_val),
@@ -129,7 +129,7 @@ def plot_waveforms(
                     ha="right",
                     va="bottom",
                 )
-            if type_str == "surf" and comp == "SH":
+            if type_str == "surf" and comp == "BHT":
                 ax.text(
                     1.2 * min_time,
                     0.2 * max(abs(min_val), max_val),
@@ -415,13 +415,13 @@ def plot_waveform_fits(
     if type_str == "body":
         if "BHZ" in components:
             plot_name = "P_body_waves"
-        if "SH" in components:
+        if "BHT" in components:
             plot_name = "SH_body_waves"
 
     if type_str == "surf":
         if "BHZ" in components:
             plot_name = "Rayleigh_surf_waves"
-        if "SH" in components:
+        if "BHT" in components:
             plot_name = "Love_surf_waves"
 
     if type_str == "cgps":

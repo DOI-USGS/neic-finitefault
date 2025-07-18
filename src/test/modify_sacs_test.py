@@ -8,7 +8,7 @@ from os import mkdir
 from unittest import mock
 
 import numpy as np
-from obspy import read
+from obspy import read  # type:ignore
 
 from wasp.modify_sacs import __is_number, correct_waveforms, plot_channels
 
@@ -92,7 +92,7 @@ def test_correct_waveforms_input(mock_input):
         correct_waveforms(pathlib.Path(tempdir) / "tele_waves.json")
 
         # check baseline shift
-        stream = read(pathlib.Path(tempdir) / "P" / "final_IU_RCBR_BHZ.sac")
+        stream = read(pathlib.Path(tempdir) / "P" / "processed_IU_RCBR_BHZ.sac")
         assert np.max(stream[0].data) == 356.4468994140625
 
         # check time shift
@@ -136,7 +136,7 @@ def test_correct_waveforms_dict():
         )
 
         # check baseline shift
-        stream = read(pathlib.Path(tempdir) / "P" / "final_IU_RCBR_BHZ.sac")
+        stream = read(pathlib.Path(tempdir) / "P" / "processed_IU_RCBR_BHZ.sac")
         assert np.max(stream[0].data) == 356.4468994140625
 
         # check time shift

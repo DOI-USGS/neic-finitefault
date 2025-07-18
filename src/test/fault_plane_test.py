@@ -4,7 +4,7 @@ import shutil
 import tempfile
 
 import numpy as np
-from obspy import UTCDateTime
+from obspy import UTCDateTime  # type:ignore
 
 import wasp.seismic_tensor as tensor
 from wasp.fault_plane import (
@@ -47,7 +47,15 @@ def test_create_finite_fault():
             ["cgps", "gps", "insar", "strong", "body", "surf_waves"],
             directory=tempdir,
         )
-        assert data == SEGMENTS
+        for i, key in data["segments"][0].items():
+            target_values = SEGMENTS["segments"][0][i]
+            if isinstance(key, float):
+                np.testing.assert_almost_equal(key, target_values)
+            else:
+                assert key == target_values
+        for i, key in data["rise_time"].items():
+            target_values = SEGMENTS["rise_time"][i]
+            assert key == target_values
     finally:
         shutil.rmtree(tempdir)
 

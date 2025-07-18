@@ -91,7 +91,8 @@ def test_input_chen_dart():
         )
         with open(tempdir / "dart_waves.json", "w") as tw:
             json.dump(new_surfwaves, tw)
-        os.mkdir(tempdir / "LONG")
+        os.mkdir(tempdir / "RAYLEIGH")
+        os.mkdir(tempdir / "LOVE")
         for o, n in zip(get_surf_waves_json(all=True), new_surfwaves):
             shutil.copyfile(o["file"], n["file"])
 
@@ -223,7 +224,8 @@ def test_input_chen_surf_body():
             config = c.read()
         with open(tempdir / "config.ini", "w") as c:
             c.write(config.replace("/home/user/neic-finitefault", str(tempdir)))
-        os.mkdir(tempdir / "LONG")
+        os.mkdir(tempdir / "RAYLEIGH")
+        os.mkdir(tempdir / "LOVE")
         for o, n in zip(get_surf_waves_json(all=True), new_surfwaves):
             shutil.copyfile(o["file"], n["file"])
 
@@ -314,6 +316,7 @@ def test_plane_for_chen():
         min_vel, max_vel = [lambda_min * rupt_vel, lambda_max * rupt_vel]
         plane_for_chen(CMT, segments, min_vel, max_vel, velmodel, tempdir)
         for f in ["fault&rise_time.txt", "point_sources.txt", "shear_model.txt"]:
+            print(f)
             with open(tempdir / f, "r") as d:
                 data = d.read()
             with open(RESULTS_DIR / "NP1" / f, "r") as t:
@@ -331,7 +334,8 @@ def test_from_synthetic_to_obs():
         os.makedirs(tempdir / "cGPS")
         os.makedirs(tempdir / "P")
         os.makedirs(tempdir / "SH")
-        os.makedirs(tempdir / "LONG")
+        os.makedirs(tempdir / "RAYLEIGH")
+        os.makedirs(tempdir / "LOVE")
         os.makedirs(tempdir / "STR")
         for data_type, method in zip(
             ["cgps", "strong", "surf", "body"],

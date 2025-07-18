@@ -263,9 +263,9 @@ contains
       call fft(real1, imag1, lnpt, 1.0)
       nl = 2**lnpt
       if (llove(i) .eq. 0) then
-         write(18,*)nl,dt,sta_name(channel),'P'
+         write(18,*)nl,dt,sta_name(channel),'BHZ'
       else
-         write(18,*)nl,dt,sta_name(channel),'SH'
+         write(18,*)nl,dt,sta_name(channel),'BHT'
       end if
       do j = 1, nl
          write(18,*) real1(j), imag1(j)
@@ -353,9 +353,9 @@ contains
       call fft(real1, imag1, lnpt, 1.0)
    
       if (io_up(i) .eq. 1) then
-         write(18,*)nlen,dt,sta_name(channel),'P'
+         write(18,*)nlen,dt,sta_name(channel),'BHZ'
       else
-         write(18,*)nlen,dt,sta_name(channel),'SH'
+         write(18,*)nlen,dt,sta_name(channel),'BHT'
       end if
       do j = 1, nlen
          write(18,*) real1(j), imag1(j)

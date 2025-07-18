@@ -8,7 +8,7 @@ import tempfile
 from unittest import mock
 
 import numpy as np
-from obspy import read
+from obspy import read  # type:ignore
 from typer.testing import CliRunner
 
 from .testutils import DATA_DIR, END_TO_END_DIR, HOME, RESULTS_DIR
@@ -160,12 +160,16 @@ def test_run_multiple():
         for surf_dict in surfs:
             new_surf = deepcopy(surf_dict)
             new_surf["file"] = surf_dict["file"].replace(
-                "LONG", str((tempdir / "LONG").resolve())
+                "RAYLEIGH", str((tempdir / "RAYLEIGH").resolve())
+            )
+            new_surf["file"] = surf_dict["file"].replace(
+                "LOVE", str((tempdir / "LOVE").resolve())
             )
         updated_surfs += [new_surf]
         with open(tempdir / "data" / "NP1" / "surf_waves.json", "w") as fw:
             json.dump(updated_surfs, fw)
-        shutil.copytree(RESULTS_DIR / "data" / "LONG", tempdir / "LONG")
+        shutil.copytree(RESULTS_DIR / "data" / "RAYLEIGH", tempdir / "RAYLEIGH")
+        shutil.copytree(RESULTS_DIR / "data" / "LOVE", tempdir / "LOVE")
         result = runner.invoke(
             app,
             [

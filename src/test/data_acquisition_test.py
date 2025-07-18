@@ -4,8 +4,8 @@ import tempfile
 from glob import glob
 from unittest import mock
 
-from obspy import UTCDateTime
-from obspy.core.inventory.channel import Channel
+from obspy import UTCDateTime  # type:ignore
+from obspy.core.inventory.channel import Channel  # type:ignore
 
 from .data import MockObspyClient
 

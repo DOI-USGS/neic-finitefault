@@ -1,7 +1,7 @@
 from tempfile import mkdtemp
 
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
+import cartopy.crs as ccrs  # type:ignore
+import cartopy.feature as cfeature  # type:ignore
 import matplotlib.pyplot as plt
 import numpy as np
 

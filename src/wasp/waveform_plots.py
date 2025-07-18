@@ -197,13 +197,13 @@ def plot_waveform_fits(
     if type_str == "body":
         if "BHZ" in components:
             plot_name = "P_body_waves"
-        if "SH" in components:
+        if "BHT" in components:
             plot_name = "SH_body_waves"
 
     if type_str == "surf":
         if "BHZ" in components:
             plot_name = "Rayleigh_surf_waves"
-        if "SH" in components:
+        if "BHT" in components:
             plot_name = "Love_surf_waves"
 
     if event is not None:

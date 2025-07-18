@@ -6,7 +6,7 @@ import tempfile
 from unittest import mock
 
 import numpy as np
-from obspy import read
+from obspy import read  # type:ignore
 from typer.testing import CliRunner
 
 from .testutils import (

@@ -81,8 +81,8 @@ def test_get_data_dict():
 
 
 def test_get_channel():
-    assert __get_channel("P") == ["P", "BHZ"]
-    assert __get_channel("BHE") == ["SH"]
+    assert __get_channel("P") == ["BHZ"]
+    assert __get_channel("BHE") == ["BHT"]
     assert __get_channel("HLZ") == ["HNZ", "HLZ", "BNZ"]
     assert __get_channel("HNE") == ["HNE", "HLE", "BNE"]
     assert __get_channel("HNN") == ["HNN", "HLN", "BNN"]

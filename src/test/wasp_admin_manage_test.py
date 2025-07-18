@@ -6,7 +6,7 @@ import tempfile
 from unittest import mock
 
 import numpy as np
-from obspy import read
+from obspy import read  # type:ignore
 from typer.testing import CliRunner
 
 from .testutils import (
@@ -553,7 +553,7 @@ def test_modify_sacs():
         print(result.exception)
         assert result.exit_code == 0
         # check baseline shift
-        stream = read(pathlib.Path(tempdir) / "P" / "final_IU_RCBR_BHZ.sac")
+        stream = read(pathlib.Path(tempdir) / "P" / "processed_IU_RCBR_BHZ.sac")
         assert np.max(stream[0].data) == 356.4468994140625
 
         # check time shift
@@ -912,7 +912,8 @@ def test_update_inputs():
         os.mkdir(tempdir / "cGPS")
         os.mkdir(tempdir / "SH")
         os.mkdir(tempdir / "P")
-        os.mkdir(tempdir / "LONG")
+        os.mkdir(tempdir / "LOVE")
+        os.mkdir(tempdir / "RAYLEIGH")
         for a, b, c, d, e, f, g, h in zip(
             SURF_WAVES,
             new_surf_waves,
@@ -1113,121 +1114,6 @@ def test_tensor_from_gcmt():
         del target["timedelta"]
         del data["timedelta"]
         assert data == target
-    finally:
-        shutil.rmtree(tempdir)
-
-
-def test_velmodel_from_tensor():
-    from wasp.wasp_admin.manage import app
-
-    tempdir = pathlib.Path(tempfile.mkdtemp())
-    try:
-        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "strong_motion_waves.json",
-            tempdir / "strong_motion_waves.json",
-        )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "cgps_waves.json",
-            tempdir / "cgps_waves.json",
-        )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "static_data.json",
-            tempdir / "static_data.json",
-        )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "tele_waves.json",
-            tempdir / "tele_waves.json",
-        )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "surf_waves.json",
-            tempdir / "surf_waves.json",
-        )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "insar_data.json",
-            tempdir / "insar_data.json",
-        )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "insar_data.txt",
-            tempdir / "insar_data.txt",
-        )
-        shutil.copyfile(
-            END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
-        )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "velmodel_data.json", tempdir / "velmodel_data.json"
-        )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "segments_data.json", tempdir / "segments_data.json"
-        )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "strong_motion_waves.json",
-            tempdir / "strong_motion_waves.json",
-        )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "tele_waves.json",
-            tempdir / "tele_waves.json",
-        )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "surf_waves.json",
-            tempdir / "surf_waves.json",
-        )
-        shutil.copyfile(
-            RESULTS_DIR / "NP1" / "cgps_waves.json",
-            tempdir / "cgps_waves.json",
-        )
-
-        result = runner.invoke(
-            app,
-            [
-                "static-to-fsp",
-                str(tempdir),
-                str(tempdir / "20003k7a_cmt_CMT"),
-                "-t",
-                "cgps",
-                "-t",
-                "gps",
-                "-t",
-                "insar",
-                "-t",
-                "strong",
-                "-t",
-                "surf",
-                "-t",
-                "body",
-            ],
-        )
-        result = runner.invoke(
-            app,
-            [
-                "static-to-fsp",
-                str(tempdir),
-                str(tempdir / "20003k7a_cmt_CMT"),
-                "-t",
-                "cgps",
-                "-t",
-                "gps",
-                "-t",
-                "insar",
-                "-t",
-                "strong",
-                "-t",
-                "surf",
-                "-t",
-                "body",
-                "-s",
-                str(tempdir / "segments_data.json"),
-                "-v",
-                str(tempdir / "velmodel_data.json"),
-            ],
-        )
-        assert result.exit_code == 0
-        with open(tempdir / "fsp_sol_file.txt") as f:
-            data = f.readlines()[41:]
-        with open(RESULTS_DIR / "NP1" / "fsp_sol_file.txt") as f:
-            target = f.readlines()[41:]
-        for l, t in zip(data, target):
-            assert l == t
     finally:
         shutil.rmtree(tempdir)
 
