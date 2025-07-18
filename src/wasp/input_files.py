@@ -1156,7 +1156,7 @@ def from_synthetic_to_obs(
                     max_val0 = 5 * max_val
                 waveform = 0 * np.array(file["synthetic"])
                 shift = np.random.randn(1) * std_shift
-                shift = int(shift / dt)  # type:ignore
+                shift = int(shift[0] / dt)  # type:ignore
                 length = len(waveform)
                 error = np.zeros(length)
                 if shift > 0:

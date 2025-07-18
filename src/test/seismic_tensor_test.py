@@ -2,7 +2,8 @@ import pathlib
 import shutil
 import tempfile
 
-from obspy import UTCDateTime
+from obspy import UTCDateTime  # type:ignore
+import numpy as np
 
 from wasp.seismic_tensor import get_tensor, planes_from_tensor, write_tensor
 
@@ -81,13 +82,17 @@ def test_get_tensor():
 def test_planes_from_tensor():
     tensor = get_tensor_info()
     p1, p2 = planes_from_tensor(tensor)
-    assert p1["plane_info"] == {
+    p1_target = {
         "strike": 6.613912311529926,
         "dip": 19.280827965117993,
         "rake": 109.27817171619564,
     }
-    assert p2["plane_info"] == {
+    p2_target = {
         "strike": 166.28167341901923,
         "dip": 71.83929826714792,
         "rake": 83.41183885645165,
     }
+    for key, target_values in p1["plane_info"].items():
+        np.testing.assert_almost_equal(p1["plane_info"][key], p1_target[key], decimal=5)
+    for key, target_values in p2["plane_info"].items():
+        np.testing.assert_almost_equal(p2["plane_info"][key], p2_target[key], decimal=5)

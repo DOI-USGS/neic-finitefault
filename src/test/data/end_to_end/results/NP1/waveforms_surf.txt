@@ -7559,7 +7559,7 @@ data:
 0.00010218020906904712
 0.0002869495074264705
 name: MPG
-channel: SH
+channel: BHT
 dt: 4.0
 length: 750
 ffm_duration: 750
@@ -8315,7 +8315,7 @@ data:
 -0.0048143439926207066
 -0.0025921836495399475
 name: MACI
-channel: SH
+channel: BHT
 dt: 4.0
 length: 750
 ffm_duration: 750
@@ -9071,7 +9071,7 @@ data:
 0.016914794221520424
 0.008319835178554058
 name: RCBR
-channel: SH
+channel: BHT
 dt: 4.0
 length: 750
 ffm_duration: 750
@@ -9827,7 +9827,7 @@ data:
 0.011934388428926468
 0.005738692358136177
 name: KOWA
-channel: SH
+channel: BHT
 dt: 4.0
 length: 750
 ffm_duration: 750
@@ -10583,7 +10583,7 @@ data:
 -0.00021210653358139098
 -6.0127284086775035e-05
 name: TSUM
-channel: SH
+channel: BHT
 dt: 4.0
 length: 750
 ffm_duration: 750
@@ -11339,7 +11339,7 @@ data:
 -0.0011110922787338495
 -0.00038003764348104596
 name: SUR
-channel: SH
+channel: BHT
 dt: 4.0
 length: 750
 ffm_duration: 750
@@ -12095,7 +12095,7 @@ data:
 0.00309968669898808
 0.0015087670180946589
 name: CRZF
-channel: SH
+channel: BHT
 dt: 4.0
 length: 750
 ffm_duration: 750
@@ -12851,7 +12851,7 @@ data:
 -0.007306699641048908
 -0.003782436018809676
 name: SNAA
-channel: SH
+channel: BHT
 dt: 4.0
 length: 750
 ffm_duration: 750
@@ -13607,7 +13607,7 @@ data:
 -0.004034974612295628
 -0.00208177138119936
 name: GOGA
-channel: SH
+channel: BHT
 dt: 4.0
 length: 750
 ffm_duration: 750

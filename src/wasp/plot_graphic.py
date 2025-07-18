@@ -219,7 +219,7 @@ def plot_misfit(
                 traces_info,
                 event,
             )
-        values = [["BHZ"], ["SH"]]
+        values = [["BHZ"], ["BHT"]]
         for components in values:
             plot_waveform_fits(
                 traces_info,
@@ -246,7 +246,7 @@ def plot_misfit(
                 traces_info,
                 event,
             )
-        values = [["BHZ"], ["SH"]]
+        values = [["BHZ"], ["BHT"]]
         for components in values:
             plot_waveform_fits(
                 traces_info,

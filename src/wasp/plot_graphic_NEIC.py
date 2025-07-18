@@ -200,7 +200,7 @@ def plot_misfit(
         traces_info = get_outputs.get_data_dict(
             traces_info, syn_file="synthetics_body.txt", directory=directory
         )
-        values = [["BHZ"], ["SH"]]
+        values = [["BHZ"], ["BHT"]]
         for components in values:
             plot_waveform_fits(
                 traces_info, components, "body", plot_directory=directory
@@ -215,7 +215,7 @@ def plot_misfit(
         traces_info = get_outputs.get_data_dict(
             traces_info, syn_file="synthetics_surf.txt", margin=0, directory=directory
         )
-        values = [["BHZ"], ["SH"]]
+        values = [["BHZ"], ["BHT"]]
         for components in values:
             plot_waveform_fits(
                 traces_info, components, "surf", plot_directory=directory
@@ -3028,15 +3028,15 @@ def _plot_waveforms(
             plot_name = "HNE_strong_motion_waves.png"
 
     if type_str == "body":
-        if "P" in components:
+        if "BHZ" in components:
             plot_name = "P_body_waves.png"
-        if "SH" in components:
+        if "BHT" in components:
             plot_name = "SH_body_waves.png"
 
     if type_str == "surf":
-        if "P" in components:
+        if "BHZ" in components:
             plot_name = "Rayleigh_surf_waves.png"
-        if "SH" in components:
+        if "BHT" in components:
             plot_name = "Love_surf_waves.png"
 
     if type_str == "dart":

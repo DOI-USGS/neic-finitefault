@@ -472,9 +472,9 @@ def __get_channel(channel: str) -> List[str]:
     :rtype: List[str]
     """
     if channel in ["P", "BHZ"]:
-        channels = ["P", "BHZ"]
-    if channel in ["SH", None, "BH1", "BH2", "BHE", "BHN"]:
-        channels = ["SH"]
+        channels = ["BHZ"]
+    if channel in ["SH", None, "BH1", "BH2", "BHE", "BHN", "BHT"]:
+        channels = ["BHT"]
     if channel in ["HNZ", "HLZ", "BNZ"]:
         channels = ["HNZ", "HLZ", "BNZ"]
     if channel in ["HNE", "HLE", "BNE"]:

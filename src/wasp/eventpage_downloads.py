@@ -185,7 +185,7 @@ def make_waveproperties_json(directory: Union[pathlib.Path, str] = pathlib.Path(
     ]
     bodywave_count = Counter(bodywave_components)
     num_pwaves = int(bodywave_count["BHZ"])
-    num_shwaves = int(bodywave_count["SH"])
+    num_shwaves = int(bodywave_count["BHT"])
     if os.path.exists(directory / "surf_waves.json"):
         with open(directory / "surf_waves.json") as f:
             surfwave_channels = json.load(f)

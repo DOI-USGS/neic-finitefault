@@ -756,7 +756,7 @@ def checkerboard(
 def set_directory_structure(
     tensor_info: dict, directory: Union[pathlib.Path, str] = pathlib.Path()
 ) -> pathlib.Path:
-    """Create directory structure
+    """Create directory structure TO DO: IS THIS FUNCTION USED?
 
     :param tensor_info: The moment tensor information
     :type tensor_info: dict
@@ -778,7 +778,8 @@ def set_directory_structure(
         os.path.join("data", "STR"),
         os.path.join("data", "P"),
         os.path.join("data", "SH"),
-        os.path.join("data", "LONG"),
+        os.path.join("data", "RAYLEIGH"),
+        os.path.join("data", "LOVE"),
         os.path.join("data", "final"),
         os.path.join("data", "final_r"),
         "NP1",

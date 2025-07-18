@@ -48,7 +48,8 @@ def test_shift_match2():
         os.mkdir(tempdir / "data")
         os.mkdir(tempdir / "data" / "SH")
         os.mkdir(tempdir / "data" / "P")
-        os.mkdir(tempdir / "data" / "LONG")
+        os.mkdir(tempdir / "data" / "LOVE")
+        os.mkdir(tempdir / "data" / "RAYLEIGH")
         for (
             a,
             b,

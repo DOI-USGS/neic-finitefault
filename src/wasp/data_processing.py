@@ -108,7 +108,7 @@ def select_process_tele_body(
     p_dir = directory / "P"
     p_files = glob.glob(str(p_dir) + "/*_BHZ*sac")
     process_body_waves(p_files, "P", data_prop, tensor_info, directory=p_dir)
-    s_files = glob.glob(str(sh_dir) + "/*_SH*sac")
+    s_files = glob.glob(str(sh_dir) + "/*_BHT*sac")
     process_body_waves(s_files, "SH", data_prop, tensor_info, directory=sh_dir)
 
     logger1.info("Body waves have been succesfully processed")
@@ -379,8 +379,8 @@ def __rotation(
             stream[1].stats.channel = channel2[:-1] + "E"
         net = stream[0].stats.network
         if rotate_RT:
-            transverse = string(net, sta, "SH")
-            radial = string(net, sta, "RD")
+            transverse = string(net, sta, "BHT")
+            radial = string(net, sta, "BHR")
             dist, az, baz = gps2dist_azimuth(
                 event_lat, event_lon, station_lat, station_lon
             )
@@ -437,12 +437,12 @@ def process_body_waves(
         sacheader.t8 = low_freq
         sacheader.t9 = high_freq
         if phase == "SH":
-            sacheader.kcmpnm = "SH"
+            sacheader.kcmpnm = "BHT"
         sacheader.write(sac, byteorder="little")
     if phase == "SH":
         for sac in tele_files:
             sacheader = SACTrace.read(sac)
-            sacheader.kcmpnm = "SH"
+            sacheader.kcmpnm = "BHT"
             sacheader.write(sac, byteorder="little")
 
     high_freq = 1 if phase == "P" else 0.5
@@ -472,7 +472,7 @@ def process_body_waves(
             continue
         stream[0] = tr
         stream.write(
-            str(directory / "final_{}".format(os.path.basename(sac))),
+            str(directory / "processed_{}".format(os.path.basename(sac))),
             format="SAC",
             byteorder=0,
         )
@@ -534,8 +534,10 @@ def select_process_surf_tele(
         return
     if not os.path.isdir(directory / "logs"):
         os.mkdir(directory / "logs")
-    if not os.path.isdir(directory / "LONG"):
-        os.mkdir(directory / "LONG")
+    if not os.path.isdir(directory / "RAYLEIGH"):
+        os.mkdir(directory / "RAYLEIGH")
+    if not os.path.isdir(directory / "LOVE"):
+        os.mkdir(directory / "LOVE")
     logger1 = ml.create_log(
         "surf_tele_processing",
         os.path.join(directory, "logs", "surf_tele_processing.log"),
@@ -554,18 +556,23 @@ def select_process_surf_tele(
         tele_files1, response_files, data_prop, logger=logger1, directory=directory
     )
     logger1.info("Rotate horizontal components for surface waves")
-    long_dir = directory / "LONG"
-    horizontal_sacs = glob.glob(str(long_dir) + "/*_BH[EN12]*sac")
-    __rotation(tensor_info, horizontal_sacs, directory=long_dir)
-    logger1.info("Get final surface waves")
-    surf_files = glob.glob(str(long_dir) + "/*_BHZ*.sac") + glob.glob(
-        str(long_dir) + "/*_SH*.sac"
-    )
+    rayleigh_dir = directory / "RAYLEIGH"
+    love_dir = directory / "LOVE"
+    horizontal_sacs = glob.glob(str(love_dir) + "/*_BH[EN12]*sac")
+    __rotation(tensor_info, horizontal_sacs, directory=love_dir)
+    logger1.info("Get proprocessed surface waves")
+    love_files = glob.glob(str(love_dir) + "/*_BHT*.sac")
+    rayleigh_files = glob.glob(str(rayleigh_dir) + "/*_BHZ*.sac")
 
-    # Filter out files whose basename starts with "final_"
-    surf_files = [f for f in surf_files if not os.path.basename(f).startswith("final_")]
-
-    __create_long_period(surf_files, tensor_info, directory=long_dir)
+    # Filter out files whose basename starts with "processed_"
+    love_files = [
+        f for f in love_files if not os.path.basename(f).startswith("processed_")
+    ]
+    rayleigh_files = [
+        f for f in rayleigh_files if not os.path.basename(f).startswith("processed_")
+    ]
+    __create_long_period(love_files, tensor_info, directory=love_dir)
+    __create_long_period(rayleigh_files, tensor_info, directory=rayleigh_dir)
 
     logger1.info("Long period surface waves have been succesfully processed")
     ml.close_log(logger1)
@@ -637,7 +644,10 @@ def __remove_response_surf(
                 )
             continue
         netwk = stream[0].stats.network
-        str_name = os.path.join("LONG", new_name(netwk, name, channel))
+        if stream[0].stats.sac.kcmpnm == "BHZ":
+            str_name = os.path.join("RAYLEIGH", new_name(netwk, name, channel))
+        else:  # horizontal
+            str_name = os.path.join("LOVE", new_name(netwk, name, channel))
 
         stream[0].differentiate()
         stream[0].taper(max_percentage=0.05)
@@ -670,7 +680,7 @@ def __create_long_period(
     directory = pathlib.Path(directory)
     for sac in surf_files:
         sacheader = SACTrace.read(sac)
-        sacheader.kcmpnm = "SH" if not sacheader.kcmpnm == "BHZ" else sacheader.kcmpnm
+        sacheader.kcmpnm = "BHT" if not sacheader.kcmpnm == "BHZ" else sacheader.kcmpnm
         sacheader.write(sac, byteorder="little")
 
     for sac in surf_files:
@@ -683,7 +693,7 @@ def __create_long_period(
             continue
         st[0] = tr
         st.write(
-            str(directory / f"final_{os.path.basename(sac)}"),
+            str(directory / f"processed_{os.path.basename(sac)}"),
             format="SAC",
             byteorder=0,
         )
@@ -732,10 +742,10 @@ def select_process_cgps(
     __select_cgps_files(cgps_files, tensor_info, directory=directory)
     logger1.info("Process selected cGPS traces")
     cgps_dir = directory / "cGPS"
-    final_files = glob.glob(str(cgps_dir) + "/final*")
-    for final_file in final_files:
-        if os.path.isfile(final_file):
-            os.remove(final_file)
+    processed_files = glob.glob(str(cgps_dir) + "/processed*")
+    for processed_file in processed_files:
+        if os.path.isfile(processed_file):
+            os.remove(processed_file)
     cgps_files1 = glob.glob(str(cgps_dir) + "/*L[HXY]*.sac") + glob.glob(
         str(cgps_dir) + "/*L[HXY]*.SAC"
     )
@@ -744,7 +754,7 @@ def select_process_cgps(
         tensor_info, cgps_files1, data_prop, logger=logger1, directory=directory
     )
     logger1.info("cGPS waves have been succesfully processed")
-    strong_files3 = glob.glob(os.path.join(cgps_dir, "final*"))
+    strong_files3 = glob.glob(os.path.join(cgps_dir, "processed*"))
     select_strong_stations(tensor_info, strong_files3)
     ml.close_log(logger1)
     return
@@ -1086,8 +1096,10 @@ def _filter_decimate(
         filt_data = filtfilt(b, a, st[0].data)
         st[0].data = 100 * filt_data
         sac_file_name = sac.split("/")[-1]
-        final_file_name = f"final_{sac_file_name}"
-        st.write(sac.replace(sac_file_name, final_file_name), format="SAC", byteorder=0)
+        processed_file_name = f"processed_{sac_file_name}"
+        st.write(
+            sac.replace(sac_file_name, processed_file_name), format="SAC", byteorder=0
+        )
     return
 
 
@@ -1139,10 +1151,10 @@ def select_process_strong(
     )
     response_files = [os.path.abspath(response) for response in response_files]
     str_dir = directory / "STR"
-    final_files = glob.glob(str(str_dir) + "/final*")
-    for final_file in final_files:
-        if os.path.isfile(final_file):
-            os.remove(final_file)
+    processed_files = glob.glob(str(str_dir) + "/processed*")
+    for processed_file in processed_files:
+        if os.path.isfile(processed_file):
+            os.remove(processed_file)
     strong_files1 = glob.glob(str(str_dir) + "/acc*")
     if remove_response:
         logger1.info("Remove response for selected strong motion traces")
@@ -1166,7 +1178,7 @@ def select_process_strong(
     __change_start(strong_files2, tensor_info)
     logger1.info("Process selected strong motion traces")
     process_strong_motion(strong_files2, data_prop, logger=logger1, directory=str_dir)
-    strong_files3 = glob.glob(os.path.join(directory, "STR", "final*"))
+    strong_files3 = glob.glob(os.path.join(directory, "STR", "processed*"))
     select_strong_stations(tensor_info, strong_files3)
     logger1.info("Strong motion waves have been succesfully processed")
     ml.close_log(logger1)

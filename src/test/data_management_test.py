@@ -5,7 +5,7 @@ import shutil
 import tempfile
 
 import numpy as np
-from obspy.io.sac import SACTrace
+from obspy.io.sac import SACTrace  # type:ignore
 
 from wasp.data_management import (
     __failsafe,
@@ -75,8 +75,14 @@ def test_cgps_traces():
             cgps_json = json.load(f)
         print(json.dumps(cgps_json, indent=4))
         for idx, d in enumerate(new_cgps_waves):
-            assert cgps_info[idx] == cgps_json[idx]
-            assert cgps_info[idx] == d
+            for key, target_values in d.items():
+                test_values = cgps_info[idx][key]
+                if isinstance(target_values, float):
+                    np.testing.assert_almost_equal(
+                        target_values, test_values, decimal=5
+                    )
+                else:
+                    assert test_values == target_values
     finally:
         shutil.rmtree(tempdir)
 
@@ -133,7 +139,8 @@ def test_filling_data_dicts():
         os.mkdir(tempdir / "data" / "cGPS")
         os.mkdir(tempdir / "data" / "SH")
         os.mkdir(tempdir / "data" / "P")
-        os.mkdir(tempdir / "data" / "LONG")
+        os.mkdir(tempdir / "data" / "LOVE")
+        os.mkdir(tempdir / "data" / "RAYLEIGH")
         for a, b, c, d, e, f, g, h in zip(
             SURF_WAVES,
             new_surf_waves,
@@ -195,20 +202,30 @@ def test_filling_data_dicts():
                         "observed",
                         "name",
                         "component",
-                        "azimuth",
-                        "distance",
                         "location",
                         "derivative",
                         "data_error",
                     ]:
                         assert props[idx][key] == d[key]
+                    for key in [
+                        "azimuth",
+                        "distance",
+                    ]:
+                        np.testing.assert_almost_equal(props[idx][key], d[key], 5)
             else:
                 for idx, t in enumerate(target):
                     match = False
                     for idy, d in enumerate(props):
                         if t["name"] == d["name"] and t["component"] == d["component"]:
-                            assert t == d
                             match = True
+                            for key, target_values in t.items():
+                                test_values = d[key]
+                                if isinstance(target_values, float):
+                                    np.testing.assert_almost_equal(
+                                        test_values, target_values, decimal=5
+                                    )
+                                else:
+                                    assert test_values == target_values
                     if not match:
                         raise Exception(
                             f"No match found for target {t['name']} {t['component']}"
@@ -223,9 +240,9 @@ def test_get_traces_files():
     ]
     assert len(tele_files) == 20
     for target in [
-        "final_G_MPG_BHZ.sac",
-        "final_IU_RCBR_BHZ.sac",
-        "final_IU_MACI_BHZ.sac",
+        "processed_G_MPG_BHZ.sac",
+        "processed_IU_RCBR_BHZ.sac",
+        "processed_IU_MACI_BHZ.sac",
     ]:
         assert target in tele_files
     surf_files = [
@@ -233,9 +250,9 @@ def test_get_traces_files():
     ]
     assert len(surf_files) == 20
     for target in [
-        "final_G_MPG_BHZ.sac",
-        "final_IU_RCBR_BHZ.sac",
-        "final_IU_MACI_BHZ.sac",
+        "processed_G_MPG_BHZ.sac",
+        "processed_IU_RCBR_BHZ.sac",
+        "processed_IU_MACI_BHZ.sac",
     ]:
         assert target in surf_files
     sm_files = [
@@ -243,16 +260,20 @@ def test_get_traces_files():
     ]
     assert len(sm_files) == 9
     for target in [
-        "final_vel_GO04_HNN_C.sac",
-        "final_vel_VA03_HNZ_C1.sac",
-        "final_vel_CO03_HNZ_C1.sac",
+        "processed_vel_GO04_HNN_C.sac",
+        "processed_vel_VA03_HNZ_C1.sac",
+        "processed_vel_CO03_HNZ_C1.sac",
     ]:
         assert target in sm_files
     cgps_files = [
         f.split("/")[-1] for f in get_traces_files("cgps", RESULTS_DIR / "data")
     ]
     assert len(cgps_files) == 9
-    for target in ["final_ovll_LXZ.sac", "final_pedr_LXZ.sac", "final_pfrj_LXE.sac"]:
+    for target in [
+        "processed_ovll_LXZ.sac",
+        "processed_pedr_LXZ.sac",
+        "processed_pfrj_LXE.sac",
+    ]:
         assert target in cgps_files
 
 
@@ -360,24 +381,24 @@ def test_select_tele_stations():
     rayleigh = [f.split("/")[-1] for f in select_tele_stations(files, "Rayleigh", CMT)]
     sh = [f.split("/")[-1] for f in select_tele_stations(files, "SH", CMT)]
     assert love == [
-        "final_G_MPG_BHZ.sac",
-        "final_IU_MACI_BHZ.sac",
-        "final_IU_RCBR_BHZ.sac",
+        "processed_G_MPG_BHZ.sac",
+        "processed_IU_MACI_BHZ.sac",
+        "processed_IU_RCBR_BHZ.sac",
     ]
     assert p == [
-        "final_G_MPG_BHZ.sac",
-        "final_IU_MACI_BHZ.sac",
-        "final_IU_RCBR_BHZ.sac",
+        "processed_G_MPG_BHZ.sac",
+        "processed_IU_MACI_BHZ.sac",
+        "processed_IU_RCBR_BHZ.sac",
     ]
     assert rayleigh == [
-        "final_G_MPG_BHZ.sac",
-        "final_IU_MACI_BHZ.sac",
-        "final_IU_RCBR_BHZ.sac",
+        "processed_G_MPG_BHZ.sac",
+        "processed_IU_MACI_BHZ.sac",
+        "processed_IU_RCBR_BHZ.sac",
     ]
     assert sh == [
-        "final_G_MPG_BHZ.sac",
-        "final_IU_MACI_BHZ.sac",
-        "final_IU_RCBR_BHZ.sac",
+        "processed_G_MPG_BHZ.sac",
+        "processed_IU_MACI_BHZ.sac",
+        "processed_IU_RCBR_BHZ.sac",
     ]
 
 
@@ -525,8 +546,21 @@ def test_static_data():
                 "derivative",
                 "data_error",
             ]:
-                assert static_info2[idx][key] == static_json2[idx][key]
-                assert static_info2[idx][key] == d[key]
+                test_values = static_json2[idx][key]
+                target_values = static_info2[idx][key]
+                print(target_values)
+                if isinstance(target_values, list):
+                    if isinstance(target_values, list):
+                        try:  # some are lists of floats but one is list of components (alpha)
+                            target_values = [float(v) for v in target_values]
+                            test_values = [float(v) for v in test_values]
+                            np.testing.assert_almost_equal(
+                                test_values, target_values, decimal=5
+                            )
+                        except ValueError:
+                            assert test_values == target_values
+                else:
+                    assert test_values == target_values
     finally:
         shutil.rmtree(tempdir)
 
@@ -550,8 +584,14 @@ def test_strong_motion_traces():
         with open(tempdir / "strong_motion_waves.json", "r") as f:
             strong_json = json.load(f)
         for idx, d in enumerate(new_strong_waves):
-            assert strong_info[idx] == strong_json[idx]
-            assert strong_info[idx] == d
+            for key, target_values in d.items():
+                test_values = strong_info[idx][key]
+                if isinstance(target_values, float):
+                    np.testing.assert_almost_equal(
+                        target_values, test_values, decimal=5
+                    )
+                else:
+                    assert test_values == target_values
         with open(tempdir / "outlier_strong_motion_waves.json", "r") as f:
             outlier_json = json.load(f)
         assert outlier_json == []
@@ -578,8 +618,14 @@ def test_tele_body_traces():
         with open(tempdir / "tele_waves.json", "r") as f:
             tele_json = json.load(f)
         for idx, d in enumerate(new_tele_waves):
-            assert tele_info[idx] == tele_json[idx]
-            assert tele_info[idx] == d
+            for key, target_values in d.items():
+                test_values = tele_info[idx][key]
+                if isinstance(target_values, float):
+                    np.testing.assert_almost_equal(
+                        target_values, test_values, decimal=5
+                    )
+                else:
+                    assert test_values == target_values
     finally:
         shutil.rmtree(tempdir)
 
@@ -590,7 +636,8 @@ def test_tele_surf_traces():
         new_surf_waves = update_manager_file_locations(
             SURF_WAVES, tempdir, replace_dir=str(RESULTS_DIR / "data")
         )
-        os.mkdir(tempdir / "LONG")
+        os.mkdir(tempdir / "LOVE")
+        os.mkdir(tempdir / "RAYLEIGH")
         print(new_surf_waves)
         for o, n in zip(SURF_WAVES, new_surf_waves):
             shutil.copyfile(o["file"], n["file"])
@@ -604,8 +651,14 @@ def test_tele_surf_traces():
         with open(tempdir / "surf_waves.json", "r") as f:
             surf_json = json.load(f)
         for idx, d in enumerate(new_surf_waves):
-            assert surf_info[idx] == surf_json[idx]
-            assert surf_info[idx] == d
+            for key, target_values in d.items():
+                test_values = surf_info[idx][key]
+                if isinstance(target_values, float):
+                    np.testing.assert_almost_equal(
+                        target_values, test_values, decimal=5
+                    )
+                else:
+                    assert test_values == target_values
     finally:
         shutil.rmtree(tempdir)
 

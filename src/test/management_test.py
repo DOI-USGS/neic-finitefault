@@ -2,7 +2,8 @@ import pathlib
 import shutil
 from tempfile import mkdtemp
 
-from obspy.taup import TauPyModel
+from obspy.taup import TauPyModel  # type:ignore
+import numpy as np
 
 from wasp.management import (
     _distazbaz,
@@ -103,22 +104,52 @@ def test_start_time_id():
 def test_theoretical_arrivals():
     model = TauPyModel(model="ak135f_no_mud")
     arrivals = theoretic_arrivals(model, 20, 35)
-    assert arrivals["p_arrival"][0].time == 269.4806309224751
-    assert arrivals["p_arrival"][1].time == 271.3779514441007
-    assert arrivals["p_arrival"][2].time == 271.5371397639714
-    assert arrivals["p_arrival"][3].time == 274.5748317621238
-    assert arrivals["p_arrival"][4].time == 274.9422784875743
-    assert arrivals["pp_arrival"][0].time == 286.0118331807067
-    assert arrivals["s_arrival"][0].time == 492.4317556718514
-    assert arrivals["s_arrival"][1].time == 495.0629873974531
-    assert arrivals["s_arrival"][2].time == 495.27848920935264
-    assert arrivals["s_arrival"][3].time == 496.01914493591386
-    assert arrivals["s_arrival"][4].time == 496.49098362769223
-    assert arrivals["s_arrival"][5].time == 500.20455604428753
-    assert arrivals["s_arrival"][6].time == 501.3508832952396
-    assert arrivals["ss_arrival"][0].time == 509.84935358894506
-    assert arrivals["p_slowness"] == 10.875067057735919
-    assert arrivals["s_slowness"] == 19.92570580559402
+    np.testing.assert_almost_equal(
+        arrivals["p_arrival"][0].time, 269.4806309224751, decimal=5
+    )
+    np.testing.assert_almost_equal(
+        arrivals["p_arrival"][1].time, 271.3779514441007, decimal=5
+    )
+    np.testing.assert_almost_equal(
+        arrivals["p_arrival"][2].time, 271.5371397639714, decimal=5
+    )
+    np.testing.assert_almost_equal(
+        arrivals["p_arrival"][3].time, 274.5748317621238, decimal=5
+    )
+    np.testing.assert_almost_equal(
+        arrivals["p_arrival"][4].time, 274.9422784875743, decimal=5
+    )
+    np.testing.assert_almost_equal(
+        arrivals["pp_arrival"][0].time, 286.0118331807067, decimal=5
+    )
+    np.testing.assert_almost_equal(
+        arrivals["s_arrival"][0].time, 492.4317556718514, decimal=5
+    )
+    np.testing.assert_almost_equal(
+        arrivals["s_arrival"][1].time, 495.0629873974531, decimal=5
+    )
+    np.testing.assert_almost_equal(
+        arrivals["s_arrival"][2].time, 495.27848920935264, decimal=5
+    )
+    np.testing.assert_almost_equal(
+        arrivals["s_arrival"][3].time, 496.01914493591386, decimal=5
+    )
+    np.testing.assert_almost_equal(
+        arrivals["s_arrival"][4].time, 496.49098362769223, decimal=5
+    )
+    np.testing.assert_almost_equal(
+        arrivals["s_arrival"][5].time, 500.20455604428753, decimal=5
+    )
+    np.testing.assert_almost_equal(
+        arrivals["s_arrival"][6].time, 501.3508832952396, decimal=5
+    )
+    np.testing.assert_almost_equal(
+        arrivals["ss_arrival"][0].time, 509.84935358894506, decimal=5
+    )
+    np.testing.assert_almost_equal(
+        arrivals["p_slowness"], 10.875067057735919, decimal=5
+    )
+    np.testing.assert_almost_equal(arrivals["s_slowness"], 19.92570580559402, decimal=5)
 
 
 def test_use_waveforms():

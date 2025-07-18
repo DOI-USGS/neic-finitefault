@@ -47,7 +47,8 @@ def test_kml():
         )
         os.mkdir(tempdir / "data" / "P")
         os.mkdir(tempdir / "data" / "SH")
-        os.mkdir(tempdir / "data" / "LONG")
+        os.mkdir(tempdir / "data" / "RAYLEIGH")
+        os.mkdir(tempdir / "data" / "LOVE")
         os.mkdir(tempdir / "data" / "STR")
         for o, n in zip(tele_waves, new_tele_waves):
             shutil.copyfile(o["file"], n["file"])
@@ -165,7 +166,8 @@ def test_map():
         )
         os.mkdir(tempdir / "data" / "P")
         os.mkdir(tempdir / "data" / "SH")
-        os.mkdir(tempdir / "data" / "LONG")
+        os.mkdir(tempdir / "data" / "RAYLEIGH")
+        os.mkdir(tempdir / "data" / "LOVE")
         os.mkdir(tempdir / "data" / "STR")
         for o, n in zip(tele_waves, new_tele_waves):
             shutil.copyfile(o["file"], n["file"])
@@ -279,7 +281,8 @@ def test_neic():
         )
         os.mkdir(tempdir / "data" / "P")
         os.mkdir(tempdir / "data" / "SH")
-        os.mkdir(tempdir / "data" / "LONG")
+        os.mkdir(tempdir / "data" / "RAYLEIGH")
+        os.mkdir(tempdir / "data" / "LOVE")
         os.mkdir(tempdir / "data" / "STR")
         for o, n in zip(tele_waves, new_tele_waves):
             shutil.copyfile(o["file"], n["file"])
