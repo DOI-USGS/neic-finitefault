@@ -983,7 +983,7 @@ def new_process_cgps(
             st[0].decimate(ratio)
         if st[0].stats.delta > dt_cgps:
             st[0].interpolate(1 / dt_cgps)
-            st[0].resample(sampling_rate=1 / dt_cgps)
+            # st[0].resample(sampling_rate=1 / dt_cgps)
         sacheader = SACTrace.from_obspy_trace(st[0])
         sacheader.t9 = high_freq
         sacheader.write(sac, byteorder="little")
