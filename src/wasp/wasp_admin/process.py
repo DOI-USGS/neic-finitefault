@@ -3,6 +3,7 @@ import os
 import pathlib
 import time
 from glob import glob
+import subprocess
 from typing import Any, List
 
 import typer
@@ -14,6 +15,7 @@ from wasp.data_processing import (
     select_process_tele_body,
 )
 from wasp.green_functions import fk_green_fun1, gf_retrieve
+from wasp.input_files import write_green_file
 from wasp.management import default_dirs
 from wasp.read_config import CONFIG_PATH
 from wasp.seismic_tensor import get_tensor
@@ -82,6 +84,7 @@ def greens(
 
     # get default directories
     default_directories = default_dirs(config_path=config_file)
+    get_gf_bank = default_directories["strong_motion_gf_bank2"]
 
     if "strong" in chosen_data_types:
         green_dict = fk_green_fun1(
@@ -91,6 +94,15 @@ def greens(
             max_depth=max_depth,
             directory=directory,
         )
+        write_green_file(green_dict, directory=directory)
+        with open(
+            os.path.join(directory / "logs", "GF_strong_log"), "w"
+        ) as out_gf_strong:
+            p2 = subprocess.Popen(
+                [get_gf_bank, "strong", f"{(directory)}/"],
+                stdout=out_gf_strong,
+            )
+        p2.wait()
     if "cgps" in chosen_data_types:
         green_dict = fk_green_fun1(
             data_prop=data_prop,
@@ -100,6 +112,12 @@ def greens(
             max_depth=max_depth,
             directory=directory,
         )
+        write_green_file(green_dict, cgps=True, directory=directory)
+        with open(os.path.join(directory / "logs", "GF_cgps_log"), "w") as out_gf_cgps:
+            p1 = subprocess.Popen(
+                [get_gf_bank, "cgps", f"{(directory)}/"], stdout=out_gf_cgps
+            )
+        p1.wait()
     gf_retrieve(chosen_data_types, default_directories, directory=directory)
 
 
