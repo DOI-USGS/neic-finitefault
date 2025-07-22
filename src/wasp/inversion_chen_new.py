@@ -156,7 +156,7 @@ def automatic_usgs(
     files4 = glob.glob(str(directory) + "/waveforms_*txt")
     files5 = glob.glob(str(directory) + "/*waves.json")
     files6 = glob.glob(str(directory) + "/static*")
-    files7 = glob.glob(str(directory) + "/filter_info*") + glob.glob(
+    files7 = glob.glob(str(directory) + "/filter*") + glob.glob(
         str(directory) + "/surf_filter*"
     )
     files8 = [
