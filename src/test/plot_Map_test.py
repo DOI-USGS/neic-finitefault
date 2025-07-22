@@ -21,7 +21,7 @@ from .testutils import (
 def testPlotMap():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "segments_data.json", tempdir / "segments_data.json"
         )

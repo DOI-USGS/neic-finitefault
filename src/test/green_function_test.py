@@ -53,7 +53,7 @@ def test_gf_retrieve_gps():
 def test_gf_retrieve_tele():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        shutil.copyfile(RESULTS_DIR / "filtro_tele.txt", tempdir / "filtro_tele.txt")
+        shutil.copyfile(RESULTS_DIR / "filter_tele.txt", tempdir / "filter_tele.txt")
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "fault&rise_time.txt", tempdir / "fault&rise_time.txt"
         )

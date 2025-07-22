@@ -30,7 +30,7 @@ def test_kml():
             config = f.read().replace("/home/user/neic-finitefault", str(HOME))
         with open(tempdir / "config.ini", "w") as wf:
             wf.write(config)
-        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
         cgps_waves = get_cgps_json()
         new_cgps_waves = update_manager_file_locations(
             cgps_waves,
@@ -149,7 +149,7 @@ def test_map():
             config = f.read().replace("/home/user/neic-finitefault", str(HOME))
         with open(tempdir / "config.ini", "w") as wf:
             wf.write(config)
-        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
         cgps_waves = get_cgps_json()
         new_cgps_waves = update_manager_file_locations(
             cgps_waves,
@@ -264,7 +264,7 @@ def test_neic():
             config = f.read().replace("/home/user/neic-finitefault", str(HOME))
         with open(tempdir / "config.ini", "w") as wf:
             wf.write(config)
-        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
         cgps_waves = get_cgps_json()
         new_cgps_waves = update_manager_file_locations(
             cgps_waves,

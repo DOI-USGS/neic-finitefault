@@ -43,7 +43,7 @@ TENSOR = get_tensor_info()
 def __get_solution():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
         point_sources = point_sources_param(
             SEGMENTS["segments"],
             TENSOR,
@@ -75,7 +75,7 @@ def test_calculate_cumulative_moment_tensor():
 def test_plot():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
         cgps_waves = get_cgps_json()
         new_cgps_waves = update_manager_file_locations(
             cgps_waves,

@@ -148,7 +148,7 @@ def test_input_chen_near_field():
 
         input_chen_near_field(CMT, SAMPLE_FILTER, "strong", tempdir)
         for f in [
-            "filtro_strong.txt",
+            "filter_strong.txt",
             "channels_strong.txt",
             "wavelets_strong.txt",
             "waveforms_strong.txt",
@@ -173,7 +173,7 @@ def test_input_chen_near_field():
 
         input_chen_near_field(CMT, SAMPLE_FILTER, "cgps", tempdir)
         for f in [
-            "filtro_cgps.txt",
+            "filter_cgps.txt",
             "channels_cgps.txt",
             "wavelets_cgps.txt",
             "waveforms_cgps.txt",
@@ -271,7 +271,7 @@ def test_input_chen_tele_body():
             "Wavelets_tele_body.txt",
             "body_wave_weight.txt",
             "channels_body.txt",
-            "filtro_tele.txt",
+            "filter_tele.txt",
             "instrumental_response.txt",
             "wavelets_body.txt",
         ]:

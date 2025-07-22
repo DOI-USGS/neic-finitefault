@@ -282,7 +282,7 @@ def test_many_events():
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "strong_motion_waves.json",
             tempdir / "strong_motion_waves.json",
@@ -612,7 +612,7 @@ def test_static_srf():
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "strong_motion_waves.json",
             tempdir / "strong_motion_waves.json",
@@ -754,7 +754,7 @@ def test_static_fsp():
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "strong_motion_waves.json",
             tempdir / "strong_motion_waves.json",
@@ -978,7 +978,7 @@ def test_velmodel_from_tensor():
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "strong_motion_waves.json",
             tempdir / "strong_motion_waves.json",

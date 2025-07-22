@@ -180,7 +180,7 @@ def _end_to_end(
     files4 = glob.glob(str(directory) + "/waveforms_*txt")
     files5 = glob.glob(str(directory) + "/*waves.json")
     files6 = glob.glob(str(directory) + "/static*")
-    files7 = glob.glob(str(directory) + "/filtro*") + glob.glob(
+    files7 = glob.glob(str(directory) + "/filter*") + glob.glob(
         str(directory) + "/surf_filter*"
     )
     files8 = [
@@ -305,9 +305,9 @@ def test_automatic_usgs():
                         ) == json.dumps(target_item)
                     else:
                         assert data[key] == target_item
-        with open(tempdir / "20150916225432" / "ffm.0" / "NP1" / "Solucion.txt") as f:
+        with open(tempdir / "20150916225432" / "ffm.0" / "NP1" / "Solution.txt") as f:
             solucion = f.read()
-        with open(RESULTS_DIR / "NP1" / "Solucion.txt") as t:
+        with open(RESULTS_DIR / "NP1" / "Solution.txt") as t:
             target = t.read()
         assert solucion == target
         # compare processed cGPS waveforms
@@ -397,9 +397,9 @@ def test_automatic_cgps():
                 tempdir,
             )
         # compare solucion
-        with open(tempdir / "20150916225432" / "ffm.0" / "NP1" / "Solucion.txt") as f:
+        with open(tempdir / "20150916225432" / "ffm.0" / "NP1" / "Solution.txt") as f:
             solucion = f.read()
-        with open(RESULTS_DIR / "NP1" / "Solucion_cgps.txt", "r") as f:
+        with open(RESULTS_DIR / "NP1" / "Solution_cgps.txt", "r") as f:
             target_solucion = f.read()
         assert solucion == target_solucion
         # compare processed waveforms
@@ -462,9 +462,9 @@ def test_automatic_gps():
                 tempdir,
             )
         # compare solucion
-        with open(tempdir / "20150916225432" / "ffm.0" / "NP1" / "Solucion.txt") as f:
+        with open(tempdir / "20150916225432" / "ffm.0" / "NP1" / "Solution.txt") as f:
             solucion = f.read()
-        with open(RESULTS_DIR / "NP1" / "Solucion_gps.txt", "r") as f:
+        with open(RESULTS_DIR / "NP1" / "Solution_gps.txt", "r") as f:
             target_solucion = f.read()
         assert solucion == target_solucion
     finally:
@@ -513,9 +513,9 @@ def test_automatic_insar():
                 tempdir,
             )
         # compare solucion
-        with open(tempdir / "20150916225432" / "ffm.0" / "NP1" / "Solucion.txt") as f:
+        with open(tempdir / "20150916225432" / "ffm.0" / "NP1" / "Solution.txt") as f:
             solucion = f.read()
-        with open(RESULTS_DIR / "NP1" / "Solucion_insar.txt", "r") as f:
+        with open(RESULTS_DIR / "NP1" / "Solution_insar.txt", "r") as f:
             target_solucion = f.read()
         assert solucion == target_solucion
     finally:
@@ -567,9 +567,9 @@ def test_automatic_strong_motion():
                 tempdir,
             )
         # compare solucion
-        with open(tempdir / "20150916225432" / "ffm.0" / "NP1" / "Solucion.txt") as f:
+        with open(tempdir / "20150916225432" / "ffm.0" / "NP1" / "Solution.txt") as f:
             solucion = f.read()
-        with open(RESULTS_DIR / "NP1" / "Solucion_strong_motion.txt", "r") as f:
+        with open(RESULTS_DIR / "NP1" / "Solution_strong_motion.txt", "r") as f:
             target_solucion = f.read()
         assert solucion == target_solucion
         # compare processed waveforms
@@ -634,9 +634,9 @@ def test_automatic_tele():
                 tempdir,
             )
         # compare solucion
-        with open(tempdir / "20150916225432" / "ffm.0" / "NP1" / "Solucion.txt") as f:
+        with open(tempdir / "20150916225432" / "ffm.0" / "NP1" / "Solution.txt") as f:
             solucion = f.read()
-        with open(RESULTS_DIR / "NP1" / "Solucion_tele.txt", "r") as f:
+        with open(RESULTS_DIR / "NP1" / "Solution_tele.txt", "r") as f:
             target_solucion = f.read()
         assert solucion == target_solucion
         # compare processed waveforms

@@ -36,7 +36,7 @@ def read_solution_static_format(
                             of fault segments
     :raises RuntimeError: If the number of subfaults does not match
                             (in segments and in the solution file)
-    :return: The parsed information from Solucion.txt
+    :return: The parsed information from Solution.txt
     :rtype: dict
     """
     lat: List[float] = []
@@ -50,11 +50,11 @@ def read_solution_static_format(
     moment: List[float] = []
 
     data_dir = pathlib.Path(data_dir)
-    if not os.path.isfile(data_dir / "Solucion.txt"):
+    if not os.path.isfile(data_dir / "Solution.txt"):
         raise FileNotFoundError(
-            errno.ENOENT, os.strerror(errno.ENOENT), str(data_dir / "Solucion.txt")
+            errno.ENOENT, os.strerror(errno.ENOENT), str(data_dir / "Solution.txt")
         )
-    with open(data_dir / "Solucion.txt", "r") as input_file:
+    with open(data_dir / "Solution.txt", "r") as input_file:
         jk = [line.split() for line in input_file]
 
     faults_data = [
@@ -70,7 +70,7 @@ def read_solution_static_format(
     headers = headers[1:] + [len(jk)]
     if not len(headers) == len(segments):
         raise RuntimeError(
-            "Inconsistency between Fault.time and Solucion.txt."
+            "Inconsistency between Fault.time and Solution.txt."
             " Different amount of fault segments"
         )
     for segment, start, end in zip(segments, faults_data, headers):
@@ -99,7 +99,7 @@ def read_solution_static_format(
         #
         if not slip_fault.size == stk_subfaults * dip_subfaults:
             raise RuntimeError(
-                "Inconsistency between Fault.time and Solucion.txt."
+                "Inconsistency between Fault.time and Solution.txt."
                 " Different size of fault segment"
             )
         lat_fault.shape = dip_subfaults, stk_subfaults  # type: ignore

@@ -28,7 +28,7 @@ def static_to_srf(
     solution: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Write SRF file with the solution of FFM modelling from file Solucion.txt
+    """Write SRF file with the solution of FFM modelling from file Solution.txt
 
     :param tensor_info: The moment tensor information
     :type tensor_info: dict

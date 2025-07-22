@@ -15,7 +15,7 @@ TENSOR = get_tensor_info()
 def test_write_KML():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
         point_sources = point_sources_param(
             SEGMENTS["segments"],
             TENSOR,

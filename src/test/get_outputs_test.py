@@ -125,8 +125,8 @@ def test_read_solution_static_format():
     tempdir = mkdtemp()
     try:
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "Solucion.txt",
-            pathlib.Path(tempdir) / "Solucion.txt",
+            RESULTS_DIR / "NP1" / "Solution.txt",
+            pathlib.Path(tempdir) / "Solution.txt",
         )
         solution = read_solution_static_format(
             SEGMENTS["segments"],

@@ -4,9 +4,9 @@ import shutil
 import tempfile
 
 from wasp.traces_properties import (
-    filtro_strong,
-    filtro_surf,
-    filtro_tele,
+    filter_strong,
+    filter_surf,
+    filter_tele,
     nyquist_frequency,
     properties_json,
     sampling,
@@ -14,26 +14,26 @@ from wasp.traces_properties import (
 )
 
 
-def test_filtro_tele():
-    assert filtro_tele({"time_shift": 5, "depth": 22.4}) == {
+def test_filter_tele():
+    assert filter_tele({"time_shift": 5, "depth": 22.4}) == {
         "freq0": 0.003,
         "freq3": 1.2,
         "high_freq": 1.0,
         "low_freq": 0.01,
     }
-    assert filtro_tele({"time_shift": 15, "depth": 22.4}) == {
+    assert filter_tele({"time_shift": 15, "depth": 22.4}) == {
         "freq0": 0.003,
         "freq3": 1.2,
         "high_freq": 1.0,
         "low_freq": 0.006,
     }
-    assert filtro_tele({"time_shift": 40, "depth": 22.4}) == {
+    assert filter_tele({"time_shift": 40, "depth": 22.4}) == {
         "freq0": 0.002,
         "freq3": 1.2,
         "high_freq": 1.0,
         "low_freq": 0.004,
     }
-    assert filtro_tele({"time_shift": 90, "depth": 210}) == {
+    assert filter_tele({"time_shift": 90, "depth": 210}) == {
         "freq0": 0.001,
         "freq3": 0.9,
         "high_freq": 0.8,
@@ -41,8 +41,8 @@ def test_filtro_tele():
     }
 
 
-def test_filtro_surf():
-    assert filtro_surf() == {
+def test_filter_surf():
+    assert filter_surf() == {
         "freq1": 0.003,
         "freq2": 0.004,
         "freq3": 0.006,
@@ -50,20 +50,20 @@ def test_filtro_surf():
     }
 
 
-def test_filtro_strong():
-    assert filtro_strong(
+def test_filter_strong():
+    assert filter_strong(
         {"time_shift": 5, "depth": 22.4},
     ) == {"high_freq": 0.125, "low_freq": 0.02}
-    assert filtro_strong(
+    assert filter_strong(
         {"time_shift": 15, "depth": 22.4},
     ) == {"high_freq": 0.125, "low_freq": 0.01}
-    assert filtro_strong(
+    assert filter_strong(
         {"time_shift": 35, "depth": 22.4},
     ) == {"high_freq": 0.125, "low_freq": 0.01}
-    assert filtro_strong(
+    assert filter_strong(
         {"time_shift": 65, "depth": 22.4},
     ) == {"high_freq": 0.125, "low_freq": 0.01}
-    assert filtro_strong({"time_shift": 105, "depth": 22.4}, cgps=True) == {
+    assert filter_strong({"time_shift": 105, "depth": 22.4}, cgps=True) == {
         "high_freq": 0.3,
         "low_freq": 0.01,
     }

@@ -17,8 +17,8 @@ def test_load_ffm_model():
         segments = get_segments_data()
         tensor = get_tensor_info()
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "Solucion.txt",
-            tempdir / "Solucion.txt",
+            RESULTS_DIR / "NP1" / "Solution.txt",
+            tempdir / "Solution.txt",
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "fault&rise_time.txt",

@@ -267,7 +267,7 @@ def PlotMap_KML(
     :type segments: List[dict]
     :param point_sources: The point source locations
     :type point_sources: list
-    :param solution: The solution read from Solucion.txt
+    :param solution: The solution read from Solution.txt
     :type solution: dict
     :param default_dirs: The location of default directories
     :type default_dirs: dict
