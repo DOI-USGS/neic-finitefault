@@ -332,7 +332,7 @@ def synthetics_to_SAC(
         St[0].stats.latitude = lat
         St[0].stats.delta = dt
         St[0].data = np.array(synthetic)
-        header =  {'kstnm': name, 'kcmpnm': comp, 'stla': lat, 'stlo': lon, 'delta': dt}
+        header = {"kstnm": name, "kcmpnm": comp, "stla": lat, "stlo": lon, "delta": dt}
         St[0].stats.sac = header
         St.write(sacfile_name, format="SAC")
     return

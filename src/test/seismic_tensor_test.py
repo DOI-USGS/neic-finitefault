@@ -2,8 +2,8 @@ import pathlib
 import shutil
 import tempfile
 
-from obspy import UTCDateTime  # type:ignore
 import numpy as np
+from obspy import UTCDateTime  # type:ignore
 
 from wasp.seismic_tensor import get_tensor, planes_from_tensor, write_tensor
 

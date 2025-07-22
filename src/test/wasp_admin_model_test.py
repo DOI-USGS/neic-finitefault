@@ -1,13 +1,13 @@
-from copy import deepcopy
 import json
 import os
 import pathlib
-import pytest
 import shutil
 import tempfile
+from copy import deepcopy
 from unittest import mock
 
 import numpy as np
+import pytest
 from obspy import read  # type:ignore
 from typer.testing import CliRunner
 
