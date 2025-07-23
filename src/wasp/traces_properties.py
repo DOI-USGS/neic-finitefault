@@ -91,7 +91,12 @@ def filter_tele(
         freq1 = 0.002
         freq2 = 0.8
         freq3 = 0.9
-    filter_info = {"freq0": freq0, "low_freq": freq1, "high_freq": freq2, "freq3": freq3}
+    filter_info = {
+        "freq0": freq0,
+        "low_freq": freq1,
+        "high_freq": freq2,
+        "freq3": freq3,
+    }
     return filter_info
 
 
