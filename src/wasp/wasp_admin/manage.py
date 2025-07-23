@@ -72,13 +72,14 @@ def _parse_insar(value: str) -> Tuple[pathlib.Path, Optional[str]]:
         parts = value.split(":")
         filepath = pathlib.Path(parts[0])
         validate_files([filepath])
-        ramp = parts[-1]
+        ramp = parts[1]
+        description = parts[-1]
         if ramp not in VALID_INSAR_RAMPS:
             raise ValueError(
                 f"The insar ramp provided ({ramp}) is not valid. "
                 f"Must be one of {VALID_INSAR_RAMPS}."
             )
-        return filepath, ramp
+        return filepath, ramp, description
 
 
 @app.command(help="Acquire strong motion and teleseismic bodywave data")
@@ -180,50 +181,36 @@ def fill_dicts(
         "--data-type",
         help=f"Type to add to the data_types list, default is []",
     ),
-    insar_ascending: List[str] = typer.Option(
+    imagery_files: List[str] = typer.Option(
         [],
-        "-ina",
-        "--insar-ascending",
-        help=("Path and ramp ascending insar file. " "Example: -ina <path>:<ramp>"),
-    ),
-    insar_descending: List[str] = typer.Option(
-        [],
-        "-ind",
-        "--insar-descending",
-        help=("Path and ramp descending insar file. " "Example: -ind <path>:<ramp>"),
+        "-im",
+        "--imagery-info",
+        help=("Path, ramp, and description of imagery file. " "Example: -im <path>:<ramp>:<description>"),
     ),
 ):
     # set default data type
     chosen_data_types: List[str]
     chosen_data_types = [d.value for d in data_types]
     if (
-        insar_ascending is not None or insar_descending is not None
+        imagery_files is not None
     ) and "insar" not in data_types:
         chosen_data_types += ["insar"]
 
     # Parse files and ramps
-    insar_ascending_files: Optional[List[Union[str, pathlib.Path]]]
-    insar_descending_files: Optional[List[Union[str, pathlib.Path]]]
-    if not len(insar_ascending):
-        insar_ascending_files = None
-        insar_ascending_ramps = None
+    imagery_files: Optional[List[Union[str, pathlib.Path]]]
+    if not len(imagery_files):
+        imagery_filepath = None
+        imagery_ramps = None
+        imagery_desc = None
     else:
-        insar_ascending_files = []
-        insar_ascending_ramps = []
-        for ia in insar_ascending:
-            filepath, ramp = _parse_insar(ia)
-            insar_ascending_files += [filepath]
-            insar_ascending_ramps += [ramp]
-    if not len(insar_descending):
-        insar_descending_files = None
-        insar_descending_ramps = None
-    else:
-        insar_descending_files = []
-        insar_descending_ramps = []
-        for id in insar_descending:
-            filepath, ramp = _parse_insar(id)
-            insar_descending_files += [filepath]
-            insar_descending_ramps += [ramp]
+        imagery_filepath = []
+        imagery_ramps = []
+        imagery_desc = []
+        for ia in imagery_files:
+            filepath, ramp, description = _parse_insar(ia)
+            imagery_filepath += [filepath]
+            imagery_ramps += [ramp]
+            imagery_desc += [description]
 
     # validate files
     files_to_validate = []
@@ -249,10 +236,9 @@ def fill_dicts(
         chosen_data_types,
         data_prop,
         directory,
-        insar_asc=insar_ascending_files,
-        insar_desc=insar_descending_files,
-        ramp_asc=insar_ascending_ramps,
-        ramp_desc=insar_descending_ramps,
+        imagery_files=imagery_files,
+        ramp_types=imagery_ramps,
+        imagery_description=imagery_desc,
         working_directory=directory,
     )
 
