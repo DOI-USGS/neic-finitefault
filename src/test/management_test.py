@@ -2,8 +2,8 @@ import pathlib
 import shutil
 from tempfile import mkdtemp
 
-from obspy.taup import TauPyModel  # type:ignore
 import numpy as np
+from obspy.taup import TauPyModel  # type:ignore
 
 from wasp.management import (
     _distazbaz,

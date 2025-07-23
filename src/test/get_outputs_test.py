@@ -2,11 +2,10 @@ import json
 import os
 import pathlib
 import shutil
-from obspy import read # type: ignore
 from tempfile import mkdtemp
 
 import numpy as np
-
+from obspy import read  # type: ignore
 
 from wasp.get_outputs import (
     __get_channel,

@@ -11,9 +11,9 @@ from .testutils import (
     END_TO_END_DIR,
     RESULTS_DIR,
     get_segments_data,
-    get_tensor_info,
     get_surf_waves_json,
     get_tele_waves_json,
+    get_tensor_info,
     get_velmodel_data,
 )
 
