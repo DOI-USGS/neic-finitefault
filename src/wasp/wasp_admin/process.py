@@ -1,9 +1,9 @@
 import json
 import os
 import pathlib
+import subprocess
 import time
 from glob import glob
-import subprocess
 from typing import Any, List
 
 import typer
