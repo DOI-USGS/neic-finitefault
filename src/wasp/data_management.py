@@ -621,33 +621,27 @@ def static_data(
 
 
 def insar_data(
-    insar_asc: Optional[List[Union[pathlib.Path, str]]] = None,
-    insar_desc: Optional[List[Union[pathlib.Path, str]]] = None,
-    ramp_asc: Optional[List[Union[str, None]]] = None,
-    ramp_desc: Optional[List[Union[str, None]]] = None,
+    imagery_files: Optional[List[Union[pathlib.Path, str]]] = None,
+    ramp_types: Optional[List[Union[str, None]]] = None,
+    imagery_description: Optional[List[Union[str, None]]] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> dict:
     """Write json dictionary with properties for InSar data
 
-    :param insar_asc: The paths to ascending InSar files, defaults to None
-    :type insar_asc: Optional[List[Union[pathlib.Path, str]]], optional
-    :param insar_desc: The paths to descending InSar files, defaults to None
-    :type insar_desc: Optional[List[Union[pathlib.Path, str]]], optional
-    :param ramp_asc: The ascending ramp options, defaults to None
-    :type ramp_asc: Optional[List[Union[str, None]]], optional
-    :param ramp_desc: The descending ramp options, defaults to None
-    :type ramp_desc: Optional[List[Union[str, None]]], optional
+    :param imagery_files: The paths to ascending imagery files, defaults to None
+    :type imagery_files: Optional[List[Union[pathlib.Path, str]]], optional
+    :param ramp_types: The ramp options, defaults to None
+    :type ramp_types: Optional[List[Union[str, None]]], optional
+    :param imagery_description: The description of the imagery (e.g., InSAR, optical, etc.)
+    :type imagery_description: Optional[List[Union[str, None]]], optional
     :param directory: The directory where the data is located, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
-    :raises ValueError: If the length of ascending ramps and files are different
-    :raises ValueError: If the length of descending ramps and files are different
-    :return: The InSar properties written to cgnss_waves.json
+    :raises ValueError: If the length of ramps, files, and descriptions are different
+    :return: The imagery properties written to imagery_data.json
     :rtype: List[dict]
     """
     directory = pathlib.Path(directory)
-    print("InSAR data")
-    print(f"insar_asc: {insar_asc}")
-    print(f"insar_desc: {insar_desc}")
+    print("imagery data")
     if not insar_asc and not insar_desc:
         return {}
 
