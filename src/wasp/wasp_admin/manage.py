@@ -236,7 +236,7 @@ def fill_dicts(
         chosen_data_types,
         data_prop,
         directory,
-        imagery_files=imagery_files,
+        imagery_files=imagery_filepath,
         ramp_types=imagery_ramps,
         imagery_description=imagery_desc,
         working_directory=directory,
@@ -862,7 +862,7 @@ def update_inputs(
         validate_files([directory / "static_data.json"])
         input_chen_static(directory=directory)
     if "insar" in chosen_data_types:
-        validate_files([directory / "insar_data.json"])
+        validate_files([directory / "imagery_data.json"])
         input_chen_insar(directory=directory)
     if model_space:
         validate_files([directory / "model_space.json"])

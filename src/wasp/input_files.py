@@ -746,27 +746,26 @@ def input_chen_insar(
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """Write text files, which are inputs for Chen's scripts, with information
-       about the insar data
+       about the imagery data
 
     :param directory: The directory to read/write to, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     """
     directory = pathlib.Path(directory)
-    if not os.path.isfile(directory / "insar_data.json"):
+    if not os.path.isfile(directory / "imagery_data.json"):
         return
 
-    with open(directory / "insar_data.json", "r") as i:
-        insar_info = json.load(i)
+    with open(directory / "imagery_data.json", "r") as i:
+        imagery_info = json.load(i)
     lines: List[str] = []
     weights: List[float] = []
     sizes: List[int] = []
     ramps: List[float] = []
-    if "ascending" in insar_info:
-        properties = insar_info["ascending"]
-        for asc_property in properties:
-            track = asc_property["name"]
-            weights = weights + [asc_property["weight"]]
-            ramps = ramps + [asc_property["ramp"]]
+    for key, items in imagery_info.items():
+        for item in range(len(items)):
+            track = imagery_info[key][item]["name"]
+            weights = weights + [imagery_info[key][item]["weight"]]
+            ramps = ramps + [imagery_info[key][item]["ramp"]]
             new_lines: List[str] = []
             with open(track, "r") as infile:
                 for line in infile:
@@ -776,22 +775,7 @@ def input_chen_insar(
                         new_lines.append(line.split())  # type: ignore
             lines = lines + [new_lines]  # type: ignore
             sizes = sizes + [len(new_lines)]  # type: ignore
-        lines_asc = len(lines)
-    if "descending" in insar_info:
-        properties = insar_info["descending"]
-        for desc_property in properties:
-            track = desc_property["name"]
-            weights = weights + [desc_property["weight"]]
-            ramps = ramps + [desc_property["ramp"]]
-            new_lines = []
-            with open(track, "r") as infile:
-                for line in infile:
-                    if line.startswith("#"):
-                        continue
-                    else:
-                        new_lines.append(line.split())  # type: ignore
-            lines = lines + [new_lines]  # type: ignore
-            sizes = sizes + [len(new_lines)]  # type: ignore
+        lines_imagery = len(lines)
     points = np.sum(sizes)
 
     string = (
@@ -802,7 +786,7 @@ def input_chen_insar(
         i, name, lat, lon, a, b, c, d
     )
     points2 = 0
-    with open(directory / "insar_data.txt", "w") as outfile:
+    with open(directory / "imagery_data.txt", "w") as outfile:
         outfile.write("{}\n\n".format(points))
         for new_lines in lines:  # type: ignore
             for i, line in enumerate(new_lines):  # type: ignore
@@ -819,7 +803,7 @@ def input_chen_insar(
                     )
                 )
 
-    with open(directory / "insar_weights.txt", "w") as outfile:
+    with open(directory / "imagery_weights.txt", "w") as outfile:
         outfile.write("{}\n".format(len(weights)))
         zipped = zip(sizes, weights)
         for length, weight in zipped:

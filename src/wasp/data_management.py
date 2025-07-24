@@ -626,9 +626,9 @@ def insar_data(
     imagery_description: Optional[List[Union[str, None]]] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> dict:
-    """Write json dictionary with properties for InSar data
+    """Write json dictionary with properties for imagery data
 
-    :param imagery_files: The paths to ascending imagery files, defaults to None
+    :param imagery_files: The paths to imagery files, defaults to None
     :type imagery_files: Optional[List[Union[pathlib.Path, str]]], optional
     :param ramp_types: The ramp options, defaults to None
     :type ramp_types: Optional[List[Union[str, None]]], optional
@@ -641,7 +641,6 @@ def insar_data(
     :rtype: List[dict]
     """
     directory = pathlib.Path(directory)
-    print("imagery data")
     if not imagery_files:
         return {}
 

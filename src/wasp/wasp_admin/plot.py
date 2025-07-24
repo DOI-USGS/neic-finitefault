@@ -16,7 +16,7 @@ from wasp.eventpage_downloads import (
     write_Okada_displacements,
 )
 from wasp.fault_plane import point_sources_param, shear_modulous
-from wasp.get_outputs import get_insar, read_solution_static_format, retrieve_gnss
+from wasp.get_outputs import get_imagery, read_solution_static_format, retrieve_gnss
 from wasp.load_ffm_model import load_ffm_model
 from wasp.management import default_dirs
 from wasp.plot_graphic_NEIC import (
@@ -548,7 +548,7 @@ def neic(
             directory=directory,
         )
     if ManagedDataTypes.insar in chosen_data_types:
-        insar_data = get_insar(data_dir=directory)
+        insar_data = get_imagery(data_dir=directory)
         if "ascending" in insar_data:
             for scene in range(len(insar_data["ascending"])):
                 insar_points = insar_data["ascending"][scene]["points"]
