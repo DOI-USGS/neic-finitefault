@@ -64,7 +64,7 @@ def sampling(
     return {"dt_tele": dt_tele, "dt_strong": dt_strong, "dt_cgps": dt_cgps}
 
 
-def filtro_tele(
+def filter_tele(
     tensor_info: Dict[str, Union[UTCDateTime, float, str]],
 ) -> Dict[str, float]:
     """Set filter properties for teleseismic data
@@ -91,21 +91,26 @@ def filtro_tele(
         freq1 = 0.002
         freq2 = 0.8
         freq3 = 0.9
-    filtro = {"freq0": freq0, "low_freq": freq1, "high_freq": freq2, "freq3": freq3}
-    return filtro
+    filter_info = {
+        "freq0": freq0,
+        "low_freq": freq1,
+        "high_freq": freq2,
+        "freq3": freq3,
+    }
+    return filter_info
 
 
-def filtro_surf() -> Dict[str, float]:
+def filter_surf() -> Dict[str, float]:
     """Sef filter properties for surface waves
 
     :return: The filter properties
     :rtype: Dict[str,float]
     """
-    filtro = {"freq1": 0.003, "freq2": 0.004, "freq3": 0.006, "freq4": 0.007}
-    return filtro
+    filter_info = {"freq1": 0.003, "freq2": 0.004, "freq3": 0.006, "freq4": 0.007}
+    return filter_info
 
 
-def filtro_strong(
+def filter_strong(
     tensor_info: Dict[str, Union[UTCDateTime, float, str]], cgps: bool = False
 ) -> Dict[str, float]:
     """Set filter properties for strong motion data
@@ -135,8 +140,8 @@ def filtro_strong(
     if cgps:
         max_freq = 0.3
     max_freq = max_freq if float(tensor_info["depth"]) < 300 else 0.05
-    filtro = {"low_freq": min_freq, "high_freq": max_freq}
-    return filtro
+    filter_info = {"low_freq": min_freq, "high_freq": max_freq}
+    return filter_info
 
 
 def properties_json(
@@ -157,10 +162,10 @@ def properties_json(
     """
     data_directory = pathlib.Path(data_directory)
     dict1 = sampling(tensor_info, dt_cgps)
-    dict2 = filtro_tele(tensor_info)
-    dict3 = filtro_surf()
-    dict4 = filtro_strong(tensor_info)
-    dict5 = filtro_strong(tensor_info, cgps=True)
+    dict2 = filter_tele(tensor_info)
+    dict3 = filter_surf()
+    dict4 = filter_strong(tensor_info)
+    dict5 = filter_strong(tensor_info, cgps=True)
     scales = wavelet_scales()
     dict6: Dict[str, Union[List[int], Dict[str, float]]] = {
         "sampling": dict1,

@@ -322,11 +322,11 @@ def input_chen_tele_body(
     date_origin = UTCDateTime(tensor_info["datetime"])
     dt = traces_info[0]["dt"]
     dt = round(dt, 1)
-    filtro = data_prop["tele_filter"]
-    low_freq = filtro["low_freq"]
-    high_freq = filtro["high_freq"]
+    filter_info = data_prop["tele_filter"]
+    low_freq = filter_info["low_freq"]
+    high_freq = filter_info["high_freq"]
 
-    with open(directory / "filtro_tele.txt", "w") as outfile:
+    with open(directory / "filter_tele.txt", "w") as outfile:
         outfile.write("Corners: {} {}\n".format(low_freq, high_freq))
         outfile.write("dt: {}".format(dt))
 
@@ -454,11 +454,11 @@ def input_chen_tele_surf(
 
     nsta = len(traces_info)
 
-    filtro = data_prop["surf_filter"]
-    freq1 = filtro["freq1"]
-    freq2 = filtro["freq2"]
-    freq3 = filtro["freq3"]
-    freq4 = filtro["freq4"]
+    filter_info = data_prop["surf_filter"]
+    freq1 = filter_info["freq1"]
+    freq2 = filter_info["freq2"]
+    freq3 = filter_info["freq3"]
+    freq4 = filter_info["freq4"]
     with open(directory / "surf_filter.txt", "w") as outfile:
         outfile.write("{} {} {} {}".format(freq1, freq2, freq3, freq4))
     date_origin = UTCDateTime(tensor_info["datetime"])
@@ -554,16 +554,16 @@ def input_chen_near_field(
     directory = pathlib.Path(directory)
     if data_type == "strong":
         dict1 = directory / "strong_motion_waves.json"
-        filename1 = directory / "filtro_strong.txt"
-        filtro = data_prop["strong_filter"]
+        filename1 = directory / "filter_strong.txt"
+        filter_info = data_prop["strong_filter"]
         filename2 = directory / "channels_strong.txt"
         filename3 = directory / "wavelets_strong.txt"
         filename4 = directory / "waveforms_strong.txt"
         filename5 = directory / "Wavelets_strong_motion.txt"
     elif data_type == "cgps":
         dict1 = directory / "cgps_waves.json"
-        filename1 = directory / "filtro_cgps.txt"
-        filtro = data_prop["cgps_filter"]
+        filename1 = directory / "filter_cgps.txt"
+        filter_info = data_prop["cgps_filter"]
         filename2 = directory / "channels_cgps.txt"
         filename3 = directory / "wavelets_cgps.txt"
         filename4 = directory / "waveforms_cgps.txt"
@@ -583,8 +583,8 @@ def input_chen_near_field(
     depth = tensor_info["depth"]
     dt_strong = traces_info[0]["dt"]
     dt_strong = round(dt_strong, 2)
-    low_freq = filtro["low_freq"]
-    high_freq = filtro["high_freq"]
+    low_freq = filter_info["low_freq"]
+    high_freq = filter_info["high_freq"]
 
     nsta = len(traces_info)
 
@@ -1083,11 +1083,11 @@ def from_synthetic_to_obs(
     """
     directory = pathlib.Path(directory)
     dt = files[0]["dt"]
-    filtro_strong = data_prop["strong_filter"]
-    filtro_cgps = data_prop["strong_filter"]
+    filter_strong = data_prop["strong_filter"]
+    filter_cgps = data_prop["strong_filter"]
     if "cgps_filter" in data_prop:
-        filtro_cgps = data_prop["cgps_filter"]
-    filtro_tele = data_prop["tele_filter"]
+        filter_cgps = data_prop["cgps_filter"]
+    filter_tele = data_prop["tele_filter"]
     nyq = 0.5 / dt if not data_type == "gps" else 10000
     std_shift: Union[float, int] = 0
     if data_type == "strong":
@@ -1095,8 +1095,8 @@ def from_synthetic_to_obs(
         syn_file = directory / "synthetics_strong.txt"
         obser_file = directory / "waveforms_strong.txt"
         std_shift = 2
-        low_freq = filtro_strong["low_freq"]
-        high_freq = filtro_strong["high_freq"]
+        low_freq = filter_strong["low_freq"]
+        high_freq = filter_strong["high_freq"]
         corners = [low_freq / nyq, high_freq / nyq]
         filters = ["highpass", "lowpass"]
         orders = [4]
@@ -1106,7 +1106,7 @@ def from_synthetic_to_obs(
         obser_file = directory / "waveforms_cgps.txt"
         std_shift = 0.5
         low_freq = 0
-        high_freq = filtro_cgps["high_freq"]
+        high_freq = filter_cgps["high_freq"]
         corners = [high_freq / nyq]
         filters = ["lowpass"]
         orders = [4]
@@ -1116,8 +1116,8 @@ def from_synthetic_to_obs(
         obser_file = directory / "waveforms_body.txt"
         std_shift = 0.5
         high_freq = 1.0
-        low_freq = filtro_tele["low_freq"]
-        high_freq = filtro_tele["high_freq"]
+        low_freq = filter_tele["low_freq"]
+        high_freq = filter_tele["high_freq"]
         corners = [low_freq / nyq, high_freq / nyq]
         filters = ["highpass", "lowpass"]
         orders = [2, 2]

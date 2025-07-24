@@ -845,19 +845,19 @@ def __used_stations(
     return total
 
 
-def __failsafe(filtro: dict, header: SACTrace, cgps: bool = False):
+def __failsafe(filter_info: dict, header: SACTrace, cgps: bool = False):
     """Check that the selected filter matches the filter applied to the data
 
-    :param filtro: The filter properties
-    :type filtro: dict
+    :param filter_info: The filter properties
+    :type filter_info: dict
     :param header: The sac class
     :type header: SACTrace
     :param cgps: Whether it is cgps data, defaults to False
     :type cgps: bool, optional
     :raises ValueError: If the filter selected does not match that applied to the data
     """
-    low_freq = filtro["low_freq"]
-    high_freq = filtro["high_freq"]
+    low_freq = filter_info["low_freq"]
+    high_freq = filter_info["high_freq"]
     low_freq2 = header.t8
     high_freq2 = header.t9
     if not cgps:
@@ -1012,14 +1012,14 @@ def get_traces_files(
 
 
 def wavelets_body_waves(
-    duration: int, filtro_tele: dict, dt_tele: float, n_begin: int, n_end: int
+    duration: int, filter_tele: dict, dt_tele: float, n_begin: int, n_end: int
 ) -> Tuple[str, str]:
     """Automatic determination of weight of wavelet scales
 
     :param duration: The duration of the waveform
     :type duration: int
-    :param filtro_tele: The filter dictionary
-    :type filtro_tele: dict
+    :param filter_tele: The filter dictionary
+    :type filter_tele: dict
     :param dt_tele: The dt of the waveform
     :type dt_tele: float
     :param n_begin: The minimum scale
@@ -1029,7 +1029,7 @@ def wavelets_body_waves(
     :return: The wavelet scales
     :rtype: Tuple[str, str]
     """
-    low_freq = filtro_tele["low_freq"]
+    low_freq = filter_tele["low_freq"]
     min_wavelet = int(np.log2(3 * 2**8 * dt_tele * low_freq)) + 1
     min_index = int(duration / dt_tele)
     min_wavelet = max(min_wavelet, 10 - int(np.log2(min_index)))
@@ -1089,7 +1089,7 @@ def __wavelets_dart(n_begin: int, n_end: int) -> str:
 
 def wavelets_strong_motion(
     duration: int,
-    filtro_strong: dict,
+    filter_strong: dict,
     dt_strong: float,
     n_begin: int,
     n_end: int,
@@ -1099,8 +1099,8 @@ def wavelets_strong_motion(
 
     :param duration: The duration of the waveform
     :type duration: int
-    :param filtro_strong: The filter dictionary
-    :type filtro_strong: dict
+    :param filter_strong: The filter dictionary
+    :type filter_strong: dict
     :param dt_strong: The dt of the waveform
     :type dt_strong: float
     :param n_begin: The minimum scale
@@ -1112,8 +1112,8 @@ def wavelets_strong_motion(
     :return: The wavelet scales
     :rtype: str
     """
-    low_freq = filtro_strong["low_freq"]
-    high_freq = filtro_strong["high_freq"]
+    low_freq = filter_strong["low_freq"]
+    high_freq = filter_strong["high_freq"]
     min_wavelet = int(np.log2(3 * 2**8 * dt_strong * low_freq)) + 1
     if cgps:
         min_wavelet = 1  # 4

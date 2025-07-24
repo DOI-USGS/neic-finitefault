@@ -16,7 +16,7 @@ from .testutils import (
 def test_static_to_fsp():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "strong_motion_waves.json",
             tempdir / "strong_motion_waves.json",

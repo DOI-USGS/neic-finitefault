@@ -101,7 +101,7 @@ def kml(
     paths_to_validate += [gcmt_tensor_file]
     segments_file = directory / "segments_data.json"
     paths_to_validate += [segments_file]
-    paths_to_validate += [directory / "Solucion.txt"]
+    paths_to_validate += [directory / "Solution.txt"]
     for dt in chosen_data_types:
         paths_to_validate += [directory / DEFAULT_MANAGEMENT_FILES[dt]]
     validate_files(paths_to_validate)
@@ -228,7 +228,7 @@ def map(
     paths_to_validate += [gcmt_tensor_file]
     segments_file = directory / "segments_data.json"
     paths_to_validate += [segments_file]
-    paths_to_validate += [directory / "Solucion.txt"]
+    paths_to_validate += [directory / "Solution.txt"]
     for dt in chosen_data_types:
         paths_to_validate += [directory / DEFAULT_MANAGEMENT_FILES[dt]]
     validate_files(paths_to_validate)
@@ -412,7 +412,7 @@ def neic(
     paths_to_validate += [tensor_file]
     segments_file = directory / "segments_data.json"
     paths_to_validate += [segments_file]
-    paths_to_validate += [directory / "Solucion.txt"]
+    paths_to_validate += [directory / "Solution.txt"]
     for dt in chosen_data_types:
         paths_to_validate += [directory / DEFAULT_MANAGEMENT_FILES[dt]]
     validate_files(paths_to_validate)

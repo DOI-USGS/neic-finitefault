@@ -87,9 +87,9 @@ contains
    integer :: ir, no
    integer :: integer1, integer2
    logical :: disp, is_file
-   filter_file = 'filtro_strong.txt'
-   inquire( file = 'filtro_cgps.txt', exist = is_file )
-   if (is_file .and. disp) filter_file = 'filtro_cgps.txt'
+   filter_file = 'filter_strong.txt'
+   inquire( file = 'filter_cgps.txt', exist = is_file )
+   if (is_file .and. disp) filter_file = 'filter_cgps.txt'
    open(1, file=filter_file, status='old')
    read(1,*)string1, low_freq, high_freq
    close(1)

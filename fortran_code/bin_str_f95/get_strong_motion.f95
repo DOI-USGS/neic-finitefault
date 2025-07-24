@@ -97,9 +97,9 @@ program get_strong_motion
    enddo
    close(22)
 
-   filter_file = 'filtro_strong.txt'
-   inquire( file = trim(directory)//'filtro_cgps.txt', exist = is_file )
-   if (is_file .and. disp) filter_file = 'filtro_cgps.txt'
+   filter_file = 'filter_strong.txt'
+   inquire( file = trim(directory)//'filter_cgps.txt', exist = is_file )
+   if (is_file .and. disp) filter_file = 'filter_cgps.txt'
    filterfile=trim(directory)//filter_file
    open(1, file=filterfile, status='old')
    read(1,*)string1, low_freq, high_freq

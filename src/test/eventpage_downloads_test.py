@@ -53,7 +53,7 @@ def test_temporary_file_reorganization_for_publishing():
         "CMTSOLUTION",
         "Coulomb.inp",
         "STF.txt",
-        "Solucion.txt",
+        "Solution.txt",
         ["plots", "MomentRate.png"],
         "insar_ascending.txt",
         "insar_descending.txt",
@@ -103,7 +103,7 @@ def test_write_CMTSOLUTION_file():
     tempdir = tempfile.mkdtemp()
     try:
         tempdir = pathlib.Path(tempdir)
-        shutil.copyfile(RESULTS_DIR / "NP1" / "Solucion.txt", tempdir / "Solucion.txt")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
         write_CMTSOLUTION_file(END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir)
         with open(tempdir / "CMTSOLUTION", "r") as f:
             cmt = f.read()
@@ -118,7 +118,7 @@ def test_write_Coulomb_file():
     tempdir = tempfile.mkdtemp()
     try:
         tempdir = pathlib.Path(tempdir)
-        for f in ["Solucion.txt"]:
+        for f in ["Solution.txt"]:
             shutil.copyfile(RESULTS_DIR / "NP1" / f, tempdir / f)
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "static_data.json",
@@ -154,7 +154,7 @@ def test_write_Okada_displacements():
     tempdir = tempfile.mkdtemp()
     try:
         tempdir = pathlib.Path(tempdir)
-        for f in ["fsp_sol_file.txt", "Solucion.txt"]:
+        for f in ["fsp_sol_file.txt", "Solution.txt"]:
             shutil.copyfile(RESULTS_DIR / "NP1" / f, tempdir / f)
         write_Okada_displacements(END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir)
         with open(tempdir / "surface_deformation.disp", "r") as f:

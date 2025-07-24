@@ -56,9 +56,9 @@ def temporary_file_reorganization_for_publishing(
     ##################
     ### PARAM FILE ###
     ##################
-    orig_param = directory / "Solucion.txt"
+    orig_param = directory / "Solution.txt"
     shutil.copy(orig_param, pub_directory)
-    mv_param = pub_directory / "Solucion.txt"
+    mv_param = pub_directory / "Solution.txt"
     pub_param = pub_directory / f"{evID}.param"
     os.rename(mv_param, pub_param)
 
@@ -241,7 +241,7 @@ def write_CMTSOLUTION_file(
     T_FAL: List[float] = []
     MO: List[float] = []
 
-    with open(directory / "Solucion.txt") as sol:
+    with open(directory / "Solution.txt") as sol:
         for line in sol:
             if "#" in line:  # HEADER LINES
                 continue
@@ -408,7 +408,7 @@ def write_Coulomb_file(
         STRIKE = []
         DIP = []
 
-        with open(directory / "Solucion.txt") as param:
+        with open(directory / "Solution.txt") as param:
             for line in param:
                 if "#" in line:  # HEADER LINES
                     continue
@@ -684,7 +684,7 @@ def write_Okada_displacements(
     fault_tensile_slip: List[float] = []
     fault_strike: List[float] = []
     fault_dip: List[float] = []
-    with open(directory / "Solucion.txt", "r") as sol:
+    with open(directory / "Solution.txt", "r") as sol:
         for line in sol:
             if line.startswith("#Fault_segment"):
                 sf_length = float(line.split()[7].split("km")[0])

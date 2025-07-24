@@ -26,7 +26,7 @@ def static_to_fsp(
     solution: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Write FSP file with the solution of FFM modelling from file Solucion.txt
+    """Write FSP file with the solution of FFM modelling from file Solution.txt
 
     :param tensor_info: dictionary with moment tensor information
     :param segments_data: list of dictionaries with properties of fault segments

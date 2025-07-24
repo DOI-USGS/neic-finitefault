@@ -229,17 +229,17 @@ def __remove_response_body(
     with open(directory / "response_file.txt", "w") as resp_file:
         resp_file.write(string)
     paz_dict2, is_paz = __read_paz(directory / "response_file.txt")
-    filtro = data_prop["tele_filter"]
+    filter_info = data_prop["tele_filter"]
     depth = tensor_info["depth"]
     time_shift = tensor_info["time_shift"]
     t_min = 120.0
     t_max = 400.0
     if depth < 300:
         t_max = 240.0 if time_shift < 80 else 400.0
-    freq0 = filtro["freq0"]
-    freq1 = filtro["low_freq"]
-    freq2 = filtro["high_freq"]
-    freq3 = filtro["freq3"]
+    freq0 = filter_info["freq0"]
+    freq1 = filter_info["low_freq"]
+    freq2 = filter_info["high_freq"]
+    freq3 = filter_info["freq3"]
     freqs = [freq0, freq1, freq2, freq3]
 
     full_signal1 = (
@@ -426,9 +426,9 @@ def process_body_waves(
     directory = pathlib.Path(directory)
     dt = data_prop["sampling"]["dt_tele"]
     date_origin = UTCDateTime(tensor_info["datetime"])
-    filtro = data_prop["tele_filter"]
-    low_freq = filtro["low_freq"]
-    high_freq = filtro["high_freq"]
+    filter_info = data_prop["tele_filter"]
+    low_freq = filter_info["low_freq"]
+    high_freq = filter_info["high_freq"]
     t_min = 120.0
     t_max = 360.0
 
@@ -606,11 +606,11 @@ def __remove_response_surf(
         "{}_{}_{}.sac".format(network, station, channel)
     )
 
-    filtro = data_prop["surf_filter"]
-    freq1 = filtro["freq1"]
-    freq2 = filtro["freq2"]
-    freq3 = filtro["freq3"]
-    freq4 = filtro["freq4"]
+    filter_info = data_prop["surf_filter"]
+    freq1 = filter_info["freq1"]
+    freq2 = filter_info["freq2"]
+    freq3 = filter_info["freq3"]
+    freq4 = filter_info["freq4"]
     freqs = [freq1, freq2, freq3, freq4]
 
     for sac in used_tele_sacs:
@@ -966,15 +966,15 @@ def new_process_cgps(
     """
     directory = pathlib.Path(directory)
     start = UTCDateTime(tensor_info["datetime"])
-    filtro_cgps = data_prop["strong_filter"]
+    filter_cgps = data_prop["strong_filter"]
     if "cgps_filter" in data_prop:
-        filtro_cgps = data_prop["cgps_filter"]
+        filter_cgps = data_prop["cgps_filter"]
     lat_ep = tensor_info["lat"]
     lon_ep = tensor_info["lon"]
     sampling = data_prop["sampling"]
     dt_cgps = sampling["dt_cgps"]
 
-    high_freq = min(filtro_cgps["high_freq"], 0.5)
+    high_freq = min(filter_cgps["high_freq"], 0.5)
 
     for sac in stations_str:
         st = read(sac)
@@ -996,7 +996,7 @@ def new_process_cgps(
         sacheader.write(sac, byteorder="little")
     _filter_decimate(
         stations_str,
-        filtro_cgps,
+        filter_cgps,
         dt_cgps,
         corners=4,
         passes=2,
@@ -1047,7 +1047,7 @@ def __get_gaps(data):
 
 def _filter_decimate(
     sac_files: List[str],
-    filtro: dict,
+    filter_info: dict,
     dt: float,
     corners: int = 4,
     passes: int = 2,
@@ -1060,8 +1060,8 @@ def _filter_decimate(
 
     :param sac_files: List of sac files
     :type sac_files: List[str]
-    :param filtro: The filter properties
-    :type filtro: dict
+    :param filter_info: The filter properties
+    :type filter_info: dict
     :param dt: The dt of the data
     :type dt: float
     :param corners: The number of coners, defaults to 4
@@ -1078,8 +1078,8 @@ def _filter_decimate(
     :type directory: Union[pathlib.Path,str], optional
     """
     directory = pathlib.Path(directory)
-    low_freq = filtro["low_freq"]
-    high_freq = filtro["high_freq"]
+    low_freq = filter_info["low_freq"]
+    high_freq = filter_info["high_freq"]
     power = lambda m, n: max([d for d in range(10) if m % (n**d) == 0])
     for sac in sac_files:
         st = read(sac)
@@ -1433,10 +1433,10 @@ def process_strong_motion(
     directory = pathlib.Path(directory)
     muestreo = data_prop["sampling"]
     dt_strong = muestreo["dt_strong"]
-    filtro_strong = data_prop["strong_filter"]
+    filter_strong = data_prop["strong_filter"]
 
-    low_freq = filtro_strong["low_freq"]
-    high_freq = filtro_strong["high_freq"]
+    low_freq = filter_strong["low_freq"]
+    high_freq = filter_strong["high_freq"]
 
     for sac in strong_files:
         sacheader = SACTrace.read(sac)
@@ -1452,7 +1452,7 @@ def process_strong_motion(
         )
     strong_files2 = glob.glob(str(directory) + "/vel*")
 
-    _filter_decimate(strong_files2, filtro_strong, dt_strong, directory=directory)
+    _filter_decimate(strong_files2, filter_strong, dt_strong, directory=directory)
     return
 
 

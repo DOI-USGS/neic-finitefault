@@ -156,7 +156,7 @@ def automatic_usgs(
     files4 = glob.glob(str(directory) + "/waveforms_*txt")
     files5 = glob.glob(str(directory) + "/*waves.json")
     files6 = glob.glob(str(directory) + "/static*")
-    files7 = glob.glob(str(directory) + "/filtro*") + glob.glob(
+    files7 = glob.glob(str(directory) + "/filter*") + glob.glob(
         str(directory) + "/surf_filter*"
     )
     files8 = [
@@ -556,7 +556,7 @@ def forward_modelling(
     data_type: List[str],
     default_dirs: dict,
     segments_data: dict,
-    option: str = "Solucion.txt",
+    option: str = "Solution.txt",
     max_slip: Union[float, int] = 200,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
@@ -570,7 +570,7 @@ def forward_modelling(
     :type default_dirs: dict
     :param segments_data: The segments properties
     :type segments_data: dict
-    :param option: Name of the file with the kinematic model, defaults to "Solucion.txt"
+    :param option: Name of the file with the kinematic model, defaults to "Solution.txt"
     :type option: str, optional
     :param max_slip: Maximum slip in case of checkerboard test, defaults to 200
     :type max_slip: Union[float, int], optional

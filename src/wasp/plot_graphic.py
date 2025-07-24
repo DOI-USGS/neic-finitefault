@@ -58,7 +58,7 @@ def plot_ffm_sol(
     :type point_sources: list
     :param shear: The shear moduli
     :type shear: list
-    :param solution: The kinematic model read from Solucion.txt
+    :param solution: The kinematic model read from Solution.txt
     :type solution: dict
     :param vel_model: The velocity model
     :type vel_model: dict
@@ -105,14 +105,14 @@ def plot_ffm_sol(
     .. note::
 
         To plot the results of the FFM modelling, we need to run this code
-        in a folder whih contains files Solucion.txt, Fault.time, Fault.pos,
+        in a folder whih contains files Solution.txt, Fault.time, Fault.pos,
         Event_mult.in, and some among the files synm.tele, synm.str_low,
         synm.str and synm.cgps.
 
     .. note::
 
         When running this code manually, it is good idea to check if
-        the information among files Solucion.txt, Fault.pos, Fault.time,
+        the information among files Solution.txt, Fault.pos, Fault.time,
         and Event_mult.in is consistent.
 
     """
@@ -379,7 +379,7 @@ def _PlotRuptTime(
     :type segments: dict
     :param point_sources: The point source locations
     :type point_sources: list
-    :param solution: The kinematic solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solution.txt
     :type solution: dict
     :param directory: The location where to write plots, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
@@ -433,7 +433,7 @@ def _PlotRiseTime(
     :type segments: dict
     :param point_sources: The point source locations
     :type point_sources: list
-    :param solution: The kinematic solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solution.txt
     :type solution: dict
     :param directory: The location where to write plots, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
@@ -509,7 +509,7 @@ def PlotSlipDistribution(
     :type segments: dict
     :param point_sources: The point source locations
     :type point_sources: list
-    :param solution: The kinematic solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solution.txt
     :type solution: dict
     :param directory: The location where to write plots, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
@@ -577,7 +577,7 @@ def PlotSlipDist_Compare(
     :type point_sources: list
     :param input_model: The model
     :type input_model: dict
-    :param solution: The kinematic solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solution.txt
     :type solution: dict
     :param directory: The location where to write plots, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path,str], optional
@@ -685,7 +685,7 @@ def PlotMap(
     :type segments: List[dict]
     :param point_sources: The point source locations
     :type point_sources: list
-    :param solution: The kinematic solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solution.txt
     :type solution: dict
     :param default_dirs: The location of default directories
     :type default_dirs: dict
@@ -1098,7 +1098,7 @@ def PlotComparisonMap(
     :type point_sources: list
     :param input_model: the model
     :type input_model: dict
-    :param solution: The kinematic solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solution.txt
     :type solution: dict
     :param directory: Where to write the plots, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path,str], optional
@@ -1372,7 +1372,7 @@ def _PlotSnapshotSlip(
 
     :param segments: The segment properties
     :type segments: dict
-    :param solution: The kinematic solution read from Solucion.txt
+    :param solution: The kinematic solution read from Solution.txt
     :type solution: dict
     :param directory: Where to write the plots, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path,str], optional

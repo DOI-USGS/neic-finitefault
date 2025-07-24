@@ -17,19 +17,19 @@ from wasp import get_outputs
 def load_ffm_model(
     segments_data: dict,
     point_sources: list,
-    option: str = "Solucion.txt",
+    option: str = "Solution.txt",
     max_slip: float = 1000,
     len_stk: int = 4,
     len_dip: int = 4,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> dict:
-    """Load a finite fault model from an input file (e.g. Solucion.txt)
+    """Load a finite fault model from an input file (e.g. Solution.txt)
 
     :param segments_data: The segment properties
     :type segments_data: dict
     :param point_sources: The point sources
     :type point_sources: list
-    :param option: The path to the solution file, defaults to Solucion.txt
+    :param option: The path to the solution file, defaults to Solution.txt
     :type option: str, optional
     :param max_slip: The maximum slip, defaults to 1000
     :type max_slip: float, optional
@@ -50,7 +50,7 @@ def load_ffm_model(
     trise = []
     tfall = []
 
-    if option == "Solucion.txt":
+    if option == "Solution.txt":
         solution = get_outputs.read_solution_static_format(segments, data_dir=directory)
         slip = solution["slip"]
         rake = solution["rake"]

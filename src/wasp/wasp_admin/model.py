@@ -32,7 +32,7 @@ class ModellingOption(str, Enum):
     faultrisetime = "fault&rise_time.txt"
     patches = "Patches"
     pointsource = "point_source"
-    solucion = "Solucion.txt"
+    solucion = "Solution.txt"
 
 
 class ModellingOption2(str, Enum):

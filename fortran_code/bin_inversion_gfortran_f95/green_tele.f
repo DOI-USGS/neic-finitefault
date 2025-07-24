@@ -106,7 +106,7 @@ C
 
 c get the directory files should be in 
       call getarg(1, directory)       
-      filterfile=TRIM(directory)//'filtro_tele.txt'
+      filterfile=TRIM(directory)//'filter_tele.txt'
       open(1,file=filterfile)
       read(1,*)string, low_freq, high_freq
       read(1,*)string, dt
