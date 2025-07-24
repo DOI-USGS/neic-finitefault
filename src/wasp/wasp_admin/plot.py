@@ -548,31 +548,18 @@ def neic(
             directory=directory,
         )
     if ManagedDataTypes.insar in chosen_data_types:
-        insar_data = get_imagery(data_dir=directory)
-        if "ascending" in insar_data:
-            for scene in range(len(insar_data["ascending"])):
-                insar_points = insar_data["ascending"][scene]["points"]
+        imagery_data = get_imagery(data_dir=directory)
+        for key, scenes in imagery_data.items():
+            for scene in range(len(scenes)):
+                imagery_points = imagery_data[key][scene]["points"]
                 PlotInsar(
                     tensor_info=tensor_info,
                     segments=segments,
                     point_sources=point_sources,
                     solution=solution,
-                    insar_points=insar_points,
+                    insar_points=imagery_points,
                     scene=str(scene),
-                    los="ascending",
-                    directory=directory,
-                )
-        if "descending" in insar_data:
-            for scene in range(len(insar_data["descending"])):
-                insar_points = insar_data["descending"][scene]["points"]
-                PlotInsar(
-                    tensor_info=tensor_info,
-                    segments=segments,
-                    point_sources=point_sources,
-                    solution=solution,
-                    insar_points=insar_points,
-                    scene=str(scene),
-                    los="descending",
+                    los="test",
                     directory=directory,
                 )
     if polygon:
