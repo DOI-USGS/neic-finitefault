@@ -486,7 +486,7 @@ def modelling_new_data(
         data_type2 = data_type2 + ["cgnss"]
     if os.path.isfile(directory / "static_data.json"):
         data_type2 = data_type2 + ["gnss"]
-    if os.path.isfile(directory / "insar_data.json"):
+    if os.path.isfile(directory / "imagery_data.json"):
         data_type2 = data_type2 + ["insar"]
     if os.path.isfile(directory / "dart_waves.json"):
         data_type2 = data_type2 + ["dart"]
@@ -1137,35 +1137,34 @@ def execute_plot(
             directory=directory,
         )
     if "insar" in data_type:
-        insar_data = get_outputs.get_insar(data_dir=directory)
-        if "ascending" in insar_data:
-            asc_properties = insar_data["ascending"]
-            for scene, asc_property in enumerate(asc_properties):
-                insar_points = asc_property["points"]
+        imagery_data = get_outputs.get_imagery(data_dir=directory)
+        for key, scenes in imagery_data.items():
+            for scene in range(len(scenes)):
+                imagery_points = imagery_data[key][scene]["points"]
                 plot.PlotInsar(
                     tensor_info,
                     segments,
                     point_sources,
                     solution,
-                    insar_points,
+                    imagery_points,
                     str(scene),
                     los="ascending",
                     directory=directory,
                 )
-        if "descending" in insar_data:
-            desc_properties = insar_data["descending"]
-            for scene, desc_property in enumerate(desc_properties):
-                insar_points = desc_property["points"]
-                plot.PlotInsar(
-                    tensor_info,
-                    segments,
-                    point_sources,
-                    solution,
-                    insar_points,
-                    str(scene),
-                    los="descending",
-                    directory=directory,
-                )
+#        if "descending" in insar_data:
+#            desc_properties = insar_data["descending"]
+#            for scene, desc_property in enumerate(desc_properties):
+#                insar_points = desc_property["points"]
+#                plot.PlotInsar(
+#                    tensor_info,
+#                    segments,
+#                    point_sources,
+#                    solution,
+#                    insar_points,
+#                    str(scene),
+#                    los="descending",
+#                    directory=directory,
+#                )
     if plot_input:
         input_model = load_ffm_model(
             segments_data,

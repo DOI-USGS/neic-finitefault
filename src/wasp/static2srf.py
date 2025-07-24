@@ -149,7 +149,7 @@ def static_to_srf(
     quantity_insar_points = 0
     insar_r = 0
     if "insar" in used_data:
-        insar_data = pd.read_json(directory / "insar_data.json")
+        insar_data = pd.read_json(directory / "imagery_data.json")
         if "ascending" in insar_data:
             asc_insar = len(insar_data["ascending"])
             quantity_insar_scenes += asc_insar
