@@ -1151,20 +1151,6 @@ def execute_plot(
                     los="ascending",
                     directory=directory,
                 )
-#        if "descending" in insar_data:
-#            desc_properties = insar_data["descending"]
-#            for scene, desc_property in enumerate(desc_properties):
-#                insar_points = desc_property["points"]
-#                plot.PlotInsar(
-#                    tensor_info,
-#                    segments,
-#                    point_sources,
-#                    solution,
-#                    insar_points,
-#                    str(scene),
-#                    los="descending",
-#                    directory=directory,
-#                )
     if plot_input:
         input_model = load_ffm_model(
             segments_data,
