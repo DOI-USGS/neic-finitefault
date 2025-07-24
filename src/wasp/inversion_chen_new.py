@@ -838,8 +838,8 @@ def processing(
         + glob.glob(os.path.join(directory, "*_HL*sac*"))
         + glob.glob(os.path.join(directory, "*HG*sac*"))
     )
-    cgps_files = glob.glob(os.path.join(directory, "*L[HXY]*sac")) + glob.glob(
-        os.path.join(directory, "*L[HXY]*SAC")
+    cgps_files = glob.glob(os.path.join(directory, "*L[HXY][ENZ].sac")) + glob.glob(
+        os.path.join(directory, "*L[HXY][ENZ].SAC")
     )
     if "body" in data_type:
         proc.select_process_tele_body(

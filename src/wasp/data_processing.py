@@ -746,8 +746,8 @@ def select_process_cgps(
     for processed_file in processed_files:
         if os.path.isfile(processed_file):
             os.remove(processed_file)
-    cgps_files1 = glob.glob(str(cgps_dir) + "/*L[HXY]*.sac") + glob.glob(
-        str(cgps_dir) + "/*L[HXY]*.SAC"
+    cgps_files1 = glob.glob(str(cgps_dir) + "/*L[HXY][ENZ].sac") + glob.glob(
+        str(cgps_dir) + "/*L[HXY][ENZ].SAC"
     )
     __change_start(cgps_files1, tensor_info, cgps=True)
     new_process_cgps(
@@ -983,7 +983,7 @@ def new_process_cgps(
             st[0].decimate(ratio)
         if st[0].stats.delta > dt_cgps:
             st[0].interpolate(1 / dt_cgps)
-            # st[0].resample(sampling_rate=1/dt_cgps)
+            # st[0].resample(sampling_rate=1 / dt_cgps)
         sacheader = SACTrace.from_obspy_trace(st[0])
         sacheader.t9 = high_freq
         sacheader.write(sac, byteorder="little")
