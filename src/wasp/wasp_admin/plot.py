@@ -320,11 +320,11 @@ def neic(
         "--data-type",
         help="Data types to plot misfit for, default is []",
     ),
-    downloads: bool = typer.Option(
+    generate_downloads: bool = typer.Option(
         False,
         "-d",
-        "--downloads",
-        help="Create downloads to be displayed on the USGS event pages",
+        "--generate_downloads",
+        help="Generate downloads to be displayed on the USGS event pages",
     ),
     event_id: str = typer.Option(
         None,
