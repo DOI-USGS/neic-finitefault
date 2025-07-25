@@ -323,7 +323,7 @@ def neic(
     generate_downloads: bool = typer.Option(
         False,
         "-d",
-        "--generate_downloads",
+        "--generate-downloads",
         help="Generate downloads to be displayed on the USGS event pages",
     ),
     event_id: str = typer.Option(
@@ -514,7 +514,7 @@ def neic(
         )
     if tensor:
         calculate_cumulative_moment_tensor(solution=solution, directory=directory)
-    if downloads:
+    if generate_downloads:
         if gcmt_tensor_file:
             write_CMTSOLUTION_file(pdefile=gcmt_tensor_file, directory=directory)
             write_Okada_displacements(directory=directory, pdefile=gcmt_tensor_file)
