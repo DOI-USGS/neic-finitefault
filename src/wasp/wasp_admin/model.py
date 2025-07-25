@@ -113,10 +113,10 @@ def run(
         "--option2",
         help="The second model output option to be used in checkerboard routines",
     ),
-    remove_response: bool = typer.Option(
+    skip_remove_response: bool = typer.Option(
         True,
         "-r",
-        "--remove-response",
+        "--skip-remove-response",
         help=(
             "Whether to remove response for processing strong motion data "
             "used by new data and usgs routines"
@@ -214,7 +214,7 @@ def run(
             default_dirs=default_directories,
             data_folder=data_directory,
             segments_data=segments_data,
-            st_response=remove_response,
+            st_response=skip_remove_response,
             directory=directory,
         )
     if modelling_routine == ModellingRoutine.auto_model:
@@ -236,7 +236,7 @@ def run(
             default_dirs=default_directories,
             velmodel=velmodel,
             dt_cgps=cgps_dt,
-            st_response=remove_response,
+            st_response=skip_remove_response,
             config_path=config_file,
             directory=solution_folder,
         )
