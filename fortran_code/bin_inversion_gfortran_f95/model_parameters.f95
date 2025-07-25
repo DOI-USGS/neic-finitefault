@@ -209,7 +209,7 @@ contains
    end do
 
 
-   open(13, file='Solucion.txt')
+   open(13, file='Solution.txt')
    write(13,*)'#Total number of fault_segments=', segments
    subfault = 0
    do segment = 1, segments
