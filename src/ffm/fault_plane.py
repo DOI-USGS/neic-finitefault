@@ -14,8 +14,8 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
 from obspy import UTCDateTime  # type: ignore
 
-import wasp.management as mng
-import wasp.seismic_tensor as tensor
+import ffm.management as mng
+import ffm.seismic_tensor as tensor
 
 
 def create_finite_fault(

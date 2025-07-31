@@ -19,10 +19,10 @@ from obspy.io.sac.util import SacIOError  # type: ignore
 from obspy.taup import TauPyModel  # type: ignore
 from scipy.signal import butter, filtfilt  # type: ignore
 
-import wasp.fault_plane as pf
-import wasp.get_outputs as get_outputs
-import wasp.management as mng
-import wasp.seismic_tensor as tensor
+import ffm.fault_plane as pf
+import ffm.get_outputs as get_outputs
+import ffm.management as mng
+import ffm.seismic_tensor as tensor
 
 ################################
 # velocity models

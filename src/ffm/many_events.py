@@ -3,7 +3,7 @@ import os
 import pathlib
 from typing import List, Union
 
-import wasp.seismic_tensor as tensor
+import ffm.seismic_tensor as tensor
 
 
 def get_waveforms_events(

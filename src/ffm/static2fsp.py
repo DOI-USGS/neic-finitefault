@@ -13,9 +13,9 @@ import numpy as np
 import pandas as pd  # type:ignore
 from obspy.geodetics import flinnengdahl  # type:ignore
 
-import wasp.fault_plane as pf
-import wasp.plane_management as pl_mng
-import wasp.seismic_tensor as tensor
+import ffm.fault_plane as pf
+import ffm.plane_management as pl_mng
+import ffm.seismic_tensor as tensor
 
 
 def static_to_fsp(

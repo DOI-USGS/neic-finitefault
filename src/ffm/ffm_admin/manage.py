@@ -9,10 +9,10 @@ import numpy as np
 import typer
 from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 
-from wasp.data_acquisition import acquisition
-from wasp.data_management import filling_data_dicts
-from wasp.fault_plane import create_finite_fault
-from wasp.get_outputs import read_solution_static_format, synthetics_to_SAC
+from ffm.data_acquisition import acquisition
+from ffm.data_management import filling_data_dicts
+from ffm.fault_plane import create_finite_fault
+from ffm.get_outputs import read_solution_static_format, synthetics_to_SAC
 from wasp.input_files import (
     input_chen_imagery,
     input_chen_near_field,
@@ -21,24 +21,24 @@ from wasp.input_files import (
     input_chen_tele_surf,
     inputs_simmulated_annealing,
 )
-from wasp.input_files import model_space as model_space_update
-from wasp.input_files import plane_for_chen, write_velmodel
-from wasp.management import default_dirs
-from wasp.many_events import (
+from ffm.input_files import model_space as model_space_update
+from ffm.input_files import plane_for_chen, write_velmodel
+from ffm.management import default_dirs
+from ffm.many_events import (
     get_model_space_events,
     get_moment_events,
     get_segments_events,
     get_waveforms_events,
 )
-from wasp.modelling_parameters import modelling_prop
-from wasp.modify_jsons import modify_channels
-from wasp.modify_sacs import correct_waveforms, plot_channels
-from wasp.read_config import CONFIG_PATH, PROJECT_DIRECTORY
-from wasp.seismic_tensor import get_tensor, modify_tensor, write_tensor
-from wasp.static2fsp import static_to_fsp as convert_static_to_fsp
-from wasp.static2srf import static_to_srf as convert_static_to_srf
-from wasp.traces_properties import properties_json
-from wasp.velocity_models import model2dict, select_velmodel, velmodel2json
+from ffm.modelling_parameters import modelling_prop
+from ffm.modify_jsons import modify_channels
+from ffm.modify_sacs import correct_waveforms, plot_channels
+from ffm.read_config import CONFIG_PATH, PROJECT_DIRECTORY
+from ffm.seismic_tensor import get_tensor, modify_tensor, write_tensor
+from ffm.static2fsp import static_to_fsp as convert_static_to_fsp
+from ffm.static2srf import static_to_srf as convert_static_to_srf
+from ffm.traces_properties import properties_json
+from ffm.velocity_models import model2dict, select_velmodel, velmodel2json
 
 from .datautils import (
     DEFAULT_MANAGEMENT_FILES,
@@ -48,7 +48,7 @@ from .datautils import (
 )
 from .fileutils import validate_files
 
-app = typer.Typer(help="Manage WASP data, faults, and property files")
+app = typer.Typer(help="Manage WAFFLES data, faults, and property files")
 
 
 VALID_Imagery_RAMPS = ["static", "bilinear", "linear", "quadratic"]

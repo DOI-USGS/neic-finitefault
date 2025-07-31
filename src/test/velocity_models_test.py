@@ -2,7 +2,7 @@ import pathlib
 import shutil
 import tempfile
 
-from wasp.velocity_models import (
+from ffm.velocity_models import (
     __process_line,
     model2dict,
     model_depth2thick,

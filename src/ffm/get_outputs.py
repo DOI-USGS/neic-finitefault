@@ -14,8 +14,8 @@ from typing import Dict, List, Optional, Tuple, Union
 import numpy as np
 from obspy import Stream, Trace, read  # type: ignore
 
-import wasp.plane_management as pl_mng
-from wasp import get_outputs
+import ffm.plane_management as pl_mng
+from ffm import get_outputs
 
 ##########################
 # Get FFM model

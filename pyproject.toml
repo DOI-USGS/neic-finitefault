@@ -29,25 +29,25 @@ Repository = "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault"
 where = ["src"]
 
 [project.scripts]
-"wasp" = "wasp.wasp_admin.wasp:app"
+"ffm" = "ffm.ffm_admin.ffm:app"
 
 [tool.poe.tasks]
 lint = [
   { shell = "black --check src" },
-  { shell = "isort --check src/wasp" },
-  { shell = "mypy src/wasp" }
+  { shell = "isort --check src/ffm" },
+  { shell = "mypy src/ffm" }
 ]
 test = [
-  { shell = "pytest src/test --cov=src/wasp" },
+  { shell = "pytest src/test --cov=src/ffm" },
   { shell = "coverage xml" },
   { shell = "coverage html" }
 ]
 end_to_end_test = [
   { shell = "safety check --ignore=51668" },
-  { shell = "pytest src/test --cov=src/wasp" },
+  { shell = "pytest src/test --cov=src/ffm" },
   { shell = "black --check src" },
-  { shell = "isort --check src/wasp" },
-  { shell = "mypy src/wasp" }
+  { shell = "isort --check src/ffm" },
+  { shell = "mypy src/ffm" }
 ]
 
 

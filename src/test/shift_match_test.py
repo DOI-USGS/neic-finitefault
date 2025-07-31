@@ -4,7 +4,7 @@ import pathlib
 import shutil
 import tempfile
 
-from wasp.shift_match import print_arrival, shift_match2, shift_match_regional
+from ffm.shift_match import print_arrival, shift_match2, shift_match_regional
 
 from .testutils import (
     RESULTS_DIR,

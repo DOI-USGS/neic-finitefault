@@ -10,8 +10,8 @@ from typing import Literal, Optional, Union
 
 import numpy as np
 
-import wasp.plane_management as pl_mng
-from wasp import get_outputs
+import ffm.plane_management as pl_mng
+from ffm import get_outputs
 
 
 def load_ffm_model(

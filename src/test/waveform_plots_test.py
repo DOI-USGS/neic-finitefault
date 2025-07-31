@@ -4,7 +4,7 @@ import tempfile
 import matplotlib.pyplot as plt
 import numpy as np
 
-from wasp.waveform_plots import add_metadata, plot_waveform_fits, plot_waveforms
+from ffm.waveform_plots import add_metadata, plot_waveform_fits, plot_waveforms
 
 
 def test_plot_waveforms():

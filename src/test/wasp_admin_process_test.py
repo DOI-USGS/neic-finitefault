@@ -22,9 +22,9 @@ from .testutils import (
 runner = CliRunner()
 
 
-@mock.patch(target="wasp.green_functions.gf_retrieve")
+@mock.patch(target="ffm.green_functions.gf_retrieve")
 def test_greens(p1):
-    from wasp.wasp_admin.process import app
+    from ffm.ffm_admin.process import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -99,7 +99,7 @@ def test_greens(p1):
 
 
 def test_process_tele():
-    from wasp.wasp_admin.process import app
+    from ffm.ffm_admin.process import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -170,7 +170,7 @@ def test_process_tele():
 
 
 def test_process_missing_file():
-    from wasp.wasp_admin.process import app
+    from ffm.ffm_admin.process import app
 
     result = runner.invoke(
         app,
@@ -186,7 +186,7 @@ def test_process_missing_file():
 
 
 def test_remove_baseline():
-    from wasp.wasp_admin.process import app
+    from ffm.ffm_admin.process import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -223,7 +223,7 @@ def test_remove_baseline():
 
 
 def test_shift_match():
-    from wasp.wasp_admin.process import app
+    from ffm.ffm_admin.process import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:

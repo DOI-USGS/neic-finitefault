@@ -10,10 +10,10 @@ from typing import List, Optional, Union
 import numpy as np
 import pandas as pd  # type:ignore
 
-import wasp.fault_plane as pf
-import wasp.inversion_chen_new as inv
-import wasp.management as mng
-import wasp.seismic_tensor as tensor
+import ffm.fault_plane as pf
+import ffm.inversion_chen_new as inv
+import ffm.management as mng
+import ffm.seismic_tensor as tensor
 
 
 def multiple_solutions(

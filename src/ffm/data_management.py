@@ -23,7 +23,7 @@ from obspy.geodetics import kilometers2degrees  # type: ignore
 from obspy.io.sac import SACTrace  # type: ignore
 from obspy.taup import TauPyModel  # type: ignore
 
-import wasp.management as mng
+import ffm.management as mng
 
 
 def _dict_trace(

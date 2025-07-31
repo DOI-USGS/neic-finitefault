@@ -19,20 +19,20 @@ from typing import List, Optional, Tuple, Union
 
 import numpy as np
 
-import wasp.data_management as dm
-import wasp.data_processing as proc
-import wasp.fault_plane as pf
-import wasp.green_functions as gf
-import wasp.management as mng
-import wasp.modelling_parameters as mp
-import wasp.modulo_logs as ml
-import wasp.plot_graphic_NEIC as plot
-import wasp.seismic_tensor as tensor
-import wasp.traces_properties as tp
-import wasp.velocity_models as mv
-from wasp import get_outputs, input_files
-from wasp.load_ffm_model import load_ffm_model
-from wasp.static2fsp import static_to_fsp
+import ffm.data_management as dm
+import ffm.data_processing as proc
+import ffm.fault_plane as pf
+import ffm.green_functions as gf
+import ffm.management as mng
+import ffm.modelling_parameters as mp
+import ffm.modulo_logs as ml
+import ffm.plot_graphic_NEIC as plot
+import ffm.seismic_tensor as tensor
+import ffm.traces_properties as tp
+import ffm.velocity_models as mv
+from ffm import get_outputs, input_files
+from ffm.load_ffm_model import load_ffm_model
+from ffm.static2fsp import static_to_fsp
 
 
 def automatic_usgs(

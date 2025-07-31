@@ -3,7 +3,7 @@ import pathlib
 from copy import deepcopy
 from typing import List, Optional
 
-from wasp.seismic_tensor import get_tensor
+from ffm.seismic_tensor import get_tensor
 
 HOME = pathlib.Path(__file__).parent.parent.parent
 DATA_DIR = pathlib.Path(__file__).parent / "data"

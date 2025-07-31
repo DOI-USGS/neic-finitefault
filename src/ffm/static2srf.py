@@ -14,10 +14,10 @@ import pandas as pd  # type:ignore
 from obspy.geodetics import flinnengdahl  # type:ignore
 from pyproj import Geod  # type:ignore
 
-import wasp.fault_plane as pf
-import wasp.plane_management as pl_mng
-import wasp.seismic_tensor as tensor
-from wasp import get_outputs
+import ffm.fault_plane as pf
+import ffm.plane_management as pl_mng
+import ffm.seismic_tensor as tensor
+from ffm import get_outputs
 
 
 def static_to_srf(

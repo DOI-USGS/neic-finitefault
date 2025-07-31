@@ -17,12 +17,12 @@ import pygmt  # type:ignore
 #
 # local modules
 #
-import wasp.fault_plane as pf
-import wasp.plane_management as pl_mng
-import wasp.seismic_tensor as tensor
-import wasp.velocity_models as mv
-from wasp import get_outputs
-from wasp.plot_graphic_NEIC import __redefine_lat_lon
+import ffm.fault_plane as pf
+import ffm.plane_management as pl_mng
+import ffm.seismic_tensor as tensor
+import ffm.velocity_models as mv
+from ffm import get_outputs
+from ffm.plot_graphic_NEIC import __redefine_lat_lon
 
 
 def PlotMap(
@@ -231,7 +231,7 @@ def PlotMap(
     else:
         maxslip = max_slip  # type:ignore
     pygmt.makecpt(
-        cmap=str(default_dirs["root_dir"]) + "/src/wasp/fault2.cpt",
+        cmap=str(default_dirs["root_dir"]) + "/src/ffm/fault2.cpt",
         series=[0, maxslip],
     )
 

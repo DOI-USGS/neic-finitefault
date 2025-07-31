@@ -77,11 +77,11 @@ source "${INSTALL_DIR}/ff-env.sh" "${FINITEFAULT_DIR}";
 conda activate ff-env;
 conda env list
 pip install -e "${FINITEFAULT_DIR}";
-# shellcheck source=./install.d/wasp.sh
-source "${INSTALL_DIR}/wasp.sh" "${FINITEFAULT_DIR}";
+# shellcheck source=./install.d/ffm.sh
+source "${INSTALL_DIR}/ffm.sh" "${FINITEFAULT_DIR}";
 # shellcheck source=./install.d/data_dependencies.sh
 source "${INSTALL_DIR}/data_dependencies.sh" "${FINITEFAULT_DIR}" --fd-bank "${FD_BANK}" --lith "${LITHO1}";
 
 # get back to top level directly and message completion of installation
 cd "${FINITEFAULT_DIR}" || echo "Failed to return to finite fault top level directly";
-echo "Wasp installation completed!";
+echo "WAFFLES installation completed!";

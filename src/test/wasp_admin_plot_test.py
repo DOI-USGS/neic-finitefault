@@ -22,7 +22,7 @@ runner = CliRunner()
 
 
 def test_kml():
-    from wasp.wasp_admin.plot import app
+    from ffm.ffm_admin.plot import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -142,7 +142,7 @@ def test_kml():
 
 
 def test_map():
-    from wasp.wasp_admin.plot import app
+    from ffm.ffm_admin.plot import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -258,7 +258,7 @@ def test_map():
 
 
 def test_neic():
-    from wasp.wasp_admin.plot import app
+    from ffm.ffm_admin.plot import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:

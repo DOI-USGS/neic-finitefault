@@ -4,7 +4,7 @@ import shutil
 import tempfile
 from unittest import mock
 
-from wasp.modify_jsons import modify_channels
+from ffm.modify_jsons import modify_channels
 
 CHANNELS = [
     {

@@ -16,9 +16,9 @@ from .testutils import DATA_DIR, END_TO_END_DIR, HOME, RESULTS_DIR
 runner = CliRunner()
 
 
-@mock.patch(target="wasp.inversion_chen_new.automatic_usgs", return_value=None)
+@mock.patch(target="ffm.inversion_chen_new.automatic_usgs", return_value=None)
 def test_run(p1):
-    from wasp.wasp_admin.model import app
+    from ffm.ffm_admin.model import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     with open(HOME / "fortran_code" / "gfs_nm" / "long" / "low.in", "r") as f:
@@ -95,7 +95,7 @@ def test_run(p1):
     reason="Build runner does not have the resources to run",
 )
 def test_run_multiple():
-    from wasp.wasp_admin.model import app
+    from ffm.ffm_admin.model import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     with open(HOME / "fortran_code" / "gfs_nm" / "long" / "low.in", "r") as f:

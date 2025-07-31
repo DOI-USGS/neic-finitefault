@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from wasp.waveform_plots_NEIC import (
+from ffm.waveform_plots_NEIC import (
     add_metadata,
     filt_waveform,
     plot_spectra,

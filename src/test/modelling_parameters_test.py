@@ -3,7 +3,7 @@ import pathlib
 import shutil
 import tempfile
 
-from wasp.modelling_parameters import modelling_prop
+from ffm.modelling_parameters import modelling_prop
 
 from .testutils import RESULTS_DIR, get_segments_data, get_tensor_info
 

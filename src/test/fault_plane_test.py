@@ -6,8 +6,8 @@ import tempfile
 import numpy as np
 from obspy import UTCDateTime  # type:ignore
 
-import wasp.seismic_tensor as tensor
-from wasp.fault_plane import (
+import ffm.seismic_tensor as tensor
+from ffm.fault_plane import (
     __default_vel_of_eq,
     __epicenter_location,
     __fault_plane_properties,

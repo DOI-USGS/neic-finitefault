@@ -15,7 +15,7 @@ RUN apt install -y \
     && apt clean;
 
 ### miniforge
-FROM packages as wasp-python
+FROM packages as ffm-python
 
 WORKDIR /root
 SHELL ["/bin/bash", "-i", "-c"]
@@ -25,16 +25,16 @@ RUN bash /neic-finitefault/install.d/ff-env.sh /neic-finitefault
 RUN echo "conda activate ff-env" >> /root/.bashrc
 COPY pyproject.toml /neic-finitefault/pyproject.toml
 
-### wasp-fortran
-FROM wasp-python as wasp-fortran
+### ffm-fortran
+FROM ffm-python as ffm-fortran
 
 WORKDIR /neic-finitefault
 COPY fortran_code /neic-finitefault/fortran_code
-RUN install.d/wasp.sh /neic-finitefault
+RUN install.d/ffm.sh /neic-finitefault
 RUN chmod 777 -R /neic-finitefault
 
 ### data dependencies
-FROM wasp-fortran as wasp-dependencies
+FROM ffm-fortran as ffm-dependencies
 
 RUN apt install -y git
 RUN bash /neic-finitefault/install.d/data_dependencies.sh /neic-finitefault
@@ -44,7 +44,7 @@ RUN apt remove -y git
 RUN rm -rf /neic-finitefault/install.d
 
 ### add python source code and install
-FROM wasp-dependencies as wasp
+FROM ffm-dependencies as ffm
 ARG RUN_ALL
 ARG CI_REGISTRY
 ENV RUN_ALL "${RUN_ALL:-True}"

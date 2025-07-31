@@ -4,9 +4,9 @@ import tempfile
 
 import numpy as np
 
-from wasp.fault_plane import point_sources_param
-from wasp.get_outputs import read_solution_static_format
-from wasp.load_ffm_model import load_ffm_model
+from ffm.fault_plane import point_sources_param
+from ffm.get_outputs import read_solution_static_format
+from ffm.load_ffm_model import load_ffm_model
 
 from .testutils import RESULTS_DIR, get_segments_data, get_tensor_info
 

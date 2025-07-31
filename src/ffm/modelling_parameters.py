@@ -14,8 +14,8 @@ from typing import Optional, Tuple, Union
 
 import numpy as np
 
-import wasp.management as mng
-import wasp.seismic_tensor as tensor
+import ffm.management as mng
+import ffm.seismic_tensor as tensor
 
 
 def modelling_prop(

@@ -18,9 +18,9 @@ from test.testutils import (
 
 import pytest
 
-from wasp.fault_plane import point_sources_param, shear_modulous
-from wasp.get_outputs import get_imagery, read_solution_static_format, retrieve_gnss
-from wasp.plot_graphic import (
+from ffm.fault_plane import point_sources_param, shear_modulous
+from ffm.get_outputs import get_imagery, read_solution_static_format, retrieve_gnss
+from ffm.plot_graphic import (
     PlotComparisonMap,
     PlotImagery,
     PlotSlipDist_Compare,

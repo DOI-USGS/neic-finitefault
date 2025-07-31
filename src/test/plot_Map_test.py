@@ -4,9 +4,9 @@ import pathlib
 import shutil
 import tempfile
 
-from wasp.fault_plane import point_sources_param
-from wasp.get_outputs import read_solution_static_format
-from wasp.plot_Map import PlotMap
+from ffm.fault_plane import point_sources_param
+from ffm.get_outputs import read_solution_static_format
+from ffm.plot_Map import PlotMap
 
 from .testutils import (
     RESULTS_DIR,

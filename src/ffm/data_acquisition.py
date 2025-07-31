@@ -22,7 +22,7 @@ from obspy.core.inventory.inventory import Inventory  # type: ignore
 from obspy.core.inventory.util import Latitude, Longitude  # type: ignore
 from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 
-import wasp.seismic_tensor as tensor
+import ffm.seismic_tensor as tensor
 
 
 def acquisition(

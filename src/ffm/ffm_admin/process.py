@@ -8,25 +8,25 @@ from typing import Any, List
 
 import typer
 
-from wasp.data_processing import (
+from ffm.data_processing import (
     select_process_cgnss,
     select_process_strong,
     select_process_surf_tele,
     select_process_tele_body,
 )
-from wasp.green_functions import fk_green_fun1, gf_retrieve
-from wasp.input_files import write_green_file
-from wasp.management import default_dirs
-from wasp.read_config import CONFIG_PATH
-from wasp.seismic_tensor import get_tensor
-from wasp.shift_match import (
+from ffm.green_functions import fk_green_fun1, gf_retrieve
+from ffm.input_files import write_green_file
+from ffm.management import default_dirs
+from ffm.read_config import CONFIG_PATH
+from ffm.seismic_tensor import get_tensor
+from ffm.shift_match import (
     manual_shift,
     print_arrival,
     save_waveforms,
     shift_match2,
     shift_match_regional,
 )
-from wasp.wang_baseline_removal_v1 import wang_process
+from ffm.wang_baseline_removal_v1 import wang_process
 
 from .datautils import (
     DEFAULT_MANAGEMENT_FILES,
@@ -36,7 +36,7 @@ from .datautils import (
 )
 from .fileutils import validate_files
 
-app = typer.Typer(help="WASP data processing")
+app = typer.Typer(help="WAFFLES data processing")
 
 
 @app.command(help="Recalculate Green's functions")

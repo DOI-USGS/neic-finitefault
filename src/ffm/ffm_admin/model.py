@@ -7,7 +7,7 @@ from typing import List
 
 import typer
 
-from wasp.inversion_chen_new import (
+from ffm.inversion_chen_new import (
     automatic_usgs,
     checkerboard,
     forward_modelling,
@@ -15,16 +15,16 @@ from wasp.inversion_chen_new import (
     modelling_new_data,
     set_directory_structure,
 )
-from wasp.management import default_dirs
-from wasp.multiple_solutions import multiple_solutions
-from wasp.read_config import CONFIG_PATH
-from wasp.seismic_tensor import get_tensor
-from wasp.velocity_models import model2dict
-from wasp.wasp_admin.fileutils import validate_files
+from ffm.management import default_dirs
+from ffm.multiple_solutions import multiple_solutions
+from ffm.read_config import CONFIG_PATH
+from ffm.seismic_tensor import get_tensor
+from ffm.velocity_models import model2dict
+from ffm.ffm_admin.fileutils import validate_files
 
 from .datautils import ManagedDataTypes
 
-app = typer.Typer(help="WASP modelling scripts")
+app = typer.Typer(help="WAFFLES modelling scripts")
 
 
 class ModellingOption(str, Enum):

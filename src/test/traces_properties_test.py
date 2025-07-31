@@ -3,7 +3,7 @@ import pathlib
 import shutil
 import tempfile
 
-from wasp.traces_properties import (
+from ffm.traces_properties import (
     filter_strong,
     filter_surf,
     filter_tele,

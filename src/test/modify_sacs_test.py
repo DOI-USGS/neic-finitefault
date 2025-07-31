@@ -10,7 +10,7 @@ from unittest import mock
 import numpy as np
 from obspy import read  # type:ignore
 
-from wasp.modify_sacs import __is_number, correct_waveforms, plot_channels
+from ffm.modify_sacs import __is_number, correct_waveforms, plot_channels
 
 from .testutils import update_manager_file_locations
 

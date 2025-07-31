@@ -7,7 +7,7 @@ import tempfile
 import numpy as np
 from obspy.io.sac import SACTrace  # type:ignore
 
-from wasp.data_management import (
+from ffm.data_management import (
     __failsafe,
     __is_number,
     __s2nr,
@@ -30,7 +30,7 @@ from wasp.data_management import (
     wavelets_strong_motion,
     wavelets_surf_tele,
 )
-from wasp.management import _distazbaz
+from ffm.management import _distazbaz
 
 from .testutils import (
     RESULTS_DIR,

@@ -16,10 +16,10 @@ import numpy as np
 from matplotlib.axes import Axes
 from obspy import UTCDateTime, read  # type:ignore
 
-import wasp.seismic_tensor as tensor
-from wasp import get_outputs
-from wasp.many_events import select_waveforms_event
-from wasp.waveform_plots import plot_waveforms
+import ffm.seismic_tensor as tensor
+from ffm import get_outputs
+from ffm.many_events import select_waveforms_event
+from ffm.waveform_plots import plot_waveforms
 
 
 def manual_shift(

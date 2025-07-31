@@ -5,7 +5,7 @@ from tempfile import mkdtemp
 import numpy as np
 from obspy.taup import TauPyModel  # type:ignore
 
-from wasp.management import (
+from ffm.management import (
     _distazbaz,
     coords2utm,
     correct_response_file,

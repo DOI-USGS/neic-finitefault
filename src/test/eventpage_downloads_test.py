@@ -19,15 +19,15 @@ from .testutils import (
 
 RESULTS_DIR = pathlib.Path(__file__).parent / "data" / "end_to_end" / "results"
 
-from wasp import get_outputs
-from wasp.eventpage_downloads import (
+from ffm import get_outputs
+from ffm.eventpage_downloads import (
     make_waveproperties_json,
     temporary_file_reorganization_for_publishing,
     write_CMTSOLUTION_file,
     write_Coulomb_file,
     write_Okada_displacements,
 )
-from wasp.static2fsp import static_to_fsp
+from ffm.static2fsp import static_to_fsp
 
 
 def test_make_waveproperties_json():

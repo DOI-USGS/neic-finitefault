@@ -4,9 +4,9 @@ import tempfile
 
 import numpy as np
 
-from wasp.fault_plane import point_sources_param
-from wasp.get_outputs import read_solution_static_format
-from wasp.shakemap_tools import (
+from ffm.fault_plane import point_sources_param
+from ffm.get_outputs import read_solution_static_format
+from ffm.shakemap_tools import (
     equivalent_slip_length,
     locate_equivalent_slip,
     translate_xy_to_latlondep,

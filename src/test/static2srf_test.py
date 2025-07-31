@@ -2,8 +2,8 @@ import pathlib
 import shutil
 import tempfile
 
-from wasp import get_outputs
-from wasp.static2srf import static_to_srf
+from ffm import get_outputs
+from ffm.static2srf import static_to_srf
 
 from .testutils import (
     RESULTS_DIR,

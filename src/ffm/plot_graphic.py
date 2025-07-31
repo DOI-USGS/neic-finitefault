@@ -26,14 +26,14 @@ from obspy.imaging.beachball import beach  # type: ignore
 #
 # local modules
 #
-import wasp.fault_plane as pf
-import wasp.plane_management as pl_mng
-import wasp.seismic_tensor as tensor
-import wasp.velocity_models as mv
-from wasp import get_outputs, load_ffm_model
-from wasp.many_events import select_waveforms_event
-from wasp.plot_maps import plot_borders, plot_map, set_map_cartopy
-from wasp.waveform_plots import plot_waveform_fits
+import ffm.fault_plane as pf
+import ffm.plane_management as pl_mng
+import ffm.seismic_tensor as tensor
+import ffm.velocity_models as mv
+from ffm import get_outputs, load_ffm_model
+from ffm.many_events import select_waveforms_event
+from ffm.plot_maps import plot_borders, plot_map, set_map_cartopy
+from ffm.waveform_plots import plot_waveform_fits
 
 
 def plot_ffm_sol(

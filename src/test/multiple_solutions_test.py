@@ -6,7 +6,7 @@ import tempfile
 from copy import deepcopy
 from unittest import mock
 
-from wasp.multiple_solutions import (
+from ffm.multiple_solutions import (
     __worker,
     force_plane_above_ground,
     get_summary,
@@ -20,7 +20,7 @@ SEGMENTS = get_segments_data()["segments"]
 TENSOR = get_tensor_info()
 
 
-@mock.patch(target="wasp.inversion_chen_new.manual_modelling", return_value=None)
+@mock.patch(target="ffm.inversion_chen_new.manual_modelling", return_value=None)
 def test___worker(mock_inversion):
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:

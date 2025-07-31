@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt  # type: ignore
 from matplotlib import ticker
 from matplotlib.axes import Axes
 
-from wasp.waveform_plots_NEIC import filt_waveform, plot_spectra  # type: ignore
+from ffm.waveform_plots_NEIC import filt_waveform, plot_spectra  # type: ignore
 
 
 def plot_waveforms(

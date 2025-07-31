@@ -58,9 +58,9 @@ SURF_WAVES = get_surf_waves_json()
 TELE_WAVES = get_tele_waves_json()
 
 
-@mock.patch("wasp.data_acquisition.acquisition", return_value=None)
+@mock.patch("ffm.data_acquisition.acquisition", return_value=None)
 def test_acquire(p1):
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -78,7 +78,7 @@ def test_acquire(p1):
 
 
 def test_config():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -119,7 +119,7 @@ def test_config():
 
 
 def test_create_ff():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -156,7 +156,7 @@ def test_create_ff():
 
 
 def test_fill_dicts():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -240,7 +240,7 @@ def test_fill_dicts():
 
 
 def test_fill_dicts_missing_file():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -266,7 +266,7 @@ def test_fill_dicts_missing_file():
 
 
 def test_many_events():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -359,7 +359,7 @@ def test_many_events():
 
 
 def test_model_props():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -408,7 +408,7 @@ def test_model_props():
 
 
 def test_modify_dicts():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -490,7 +490,7 @@ def test_modify_dicts():
 
 
 def test_modify_dicts_missing_file():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     result = runner.invoke(
         app,
@@ -511,7 +511,7 @@ def test_modify_dicts_missing_file():
 
 
 def test_modify_sacs():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -555,7 +555,7 @@ def test_modify_sacs():
 
 
 def test_modify_sacs_missing_file():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     result = runner.invoke(
         app,
@@ -568,7 +568,7 @@ def test_modify_sacs_missing_file():
 
 
 def test_sampling_filtering():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -596,7 +596,7 @@ def test_sampling_filtering():
 
 
 def test_static_srf():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -738,7 +738,7 @@ def test_static_srf():
 
 
 def test_static_fsp():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -853,7 +853,7 @@ def test_static_fsp():
 
 
 def test_update_inputs():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -962,7 +962,7 @@ def test_update_inputs():
 
 
 def test_velmodel_from_tensor():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -1077,7 +1077,7 @@ def test_velmodel_from_tensor():
 
 
 def test_tensor_from_gcmt():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -1107,7 +1107,7 @@ def test_tensor_from_gcmt():
 
 
 def test_velmodel_to_json():
-    from wasp.wasp_admin.manage import app
+    from ffm.ffm_admin.manage import app
 
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:

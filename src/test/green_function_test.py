@@ -6,7 +6,7 @@ from glob import glob
 
 import pytest
 
-from wasp.green_functions import fk_green_fun1, gf_retrieve
+from ffm.green_functions import fk_green_fun1, gf_retrieve
 
 from .testutils import (
     RESULTS_DIR,

@@ -27,9 +27,9 @@ from obspy.taup import TauPyModel  # type: ignore
 from scipy.integrate import cumulative_trapezoid  # type: ignore
 from scipy.signal import butter, filtfilt  # type: ignore
 
-import wasp.management as mng
-import wasp.modulo_logs as ml
-import wasp.wang_baseline_removal_v1 as wang1
+import ffm.management as mng
+import ffm.modulo_logs as ml
+import ffm.wang_baseline_removal_v1 as wang1
 
 ###################################
 # teleseismic body waves

@@ -11,20 +11,20 @@ import numpy as np
 import pytest
 from obspy import read  # type:ignore
 
-from wasp.data_management import filling_data_dicts
-from wasp.green_functions import fk_green_fun1
-from wasp.input_files import write_green_file, write_velmodel
-from wasp.inversion_chen_new import (
+from ffm.data_management import filling_data_dicts
+from ffm.green_functions import fk_green_fun1
+from ffm.input_files import write_green_file, write_velmodel
+from ffm.inversion_chen_new import (
     _automatic2,
     automatic_usgs,
     processing,
     set_directory_structure,
     writing_inputs0,
 )
-from wasp.management import default_dirs
-from wasp.seismic_tensor import get_tensor, planes_from_tensor
-from wasp.traces_properties import properties_json
-from wasp.velocity_models import select_velmodel
+from ffm.management import default_dirs
+from ffm.seismic_tensor import get_tensor, planes_from_tensor
+from ffm.traces_properties import properties_json
+from ffm.velocity_models import select_velmodel
 
 from .testutils import (
     DATA_DIR,

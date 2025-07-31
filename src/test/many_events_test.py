@@ -4,7 +4,7 @@ import shutil
 import tempfile
 from test.testutils import RESULTS_DIR
 
-from wasp.many_events import (
+from ffm.many_events import (
     get_model_space_events,
     get_moment_events,
     get_segments_events,

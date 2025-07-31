@@ -8,18 +8,18 @@ from typing import List, Tuple
 
 import typer
 
-from wasp.eventpage_downloads import (
+from ffm.eventpage_downloads import (
     make_waveproperties_json,
     temporary_file_reorganization_for_publishing,
     write_CMTSOLUTION_file,
     write_Coulomb_file,
     write_Okada_displacements,
 )
-from wasp.fault_plane import point_sources_param, shear_modulous
-from wasp.get_outputs import get_imagery, read_solution_static_format, retrieve_gnss
-from wasp.load_ffm_model import load_ffm_model
-from wasp.management import default_dirs
-from wasp.plot_graphic_NEIC import (
+from ffm.fault_plane import point_sources_param, shear_modulous
+from ffm.get_outputs import get_imagery, read_solution_static_format, retrieve_gnss
+from ffm.load_ffm_model import load_ffm_model
+from ffm.management import default_dirs
+from ffm.plot_graphic_NEIC import (
     PlotComparisonMap,
     PlotImagery,
     PlotSlipDist_Compare,
@@ -28,14 +28,14 @@ from wasp.plot_graphic_NEIC import (
     plot_misfit,
     shakemap_polygon,
 )
-from wasp.plot_Map import PlotMap
-from wasp.read_config import CONFIG_PATH
-from wasp.seismic_tensor import get_tensor
-from wasp.shakemap_polygon import ShakeRupture
-from wasp.static2fsp import static_to_fsp
-from wasp.static2srf import static_to_srf
-from wasp.velocity_models import select_velmodel
-from wasp.write_KML import PlotMap_KML
+from ffm.plot_Map import PlotMap
+from ffm.read_config import CONFIG_PATH
+from ffm.seismic_tensor import get_tensor
+from ffm.shakemap_polygon import ShakeRupture
+from ffm.static2fsp import static_to_fsp
+from ffm.static2srf import static_to_srf
+from ffm.velocity_models import select_velmodel
+from ffm.write_KML import PlotMap_KML
 
 from .datautils import DEFAULT_MANAGEMENT_FILES, ManagedDataTypes
 from .fileutils import validate_files

@@ -6,7 +6,7 @@ import tempfile
 
 import numpy as np
 
-from wasp.input_files import (
+from ffm.input_files import (
     forward_model,
     from_synthetic_to_obs,
     input_chen_dart,

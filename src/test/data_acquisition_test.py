@@ -13,7 +13,7 @@ from .data import MockObspyClient
 @mock.patch("obspy.clients.fdsn.Client", return_value=MockObspyClient)
 @mock.patch("obspy.clients.iris.Client", return_value=MockObspyClient)
 def test_acquisition(mock_iris, mock_fdsn):
-    from wasp.data_acquisition import acquisition
+    from ffm.data_acquisition import acquisition
 
     tempdir = tempfile.mkdtemp()
     try:
@@ -37,7 +37,7 @@ def test_acquisition(mock_iris, mock_fdsn):
 
 
 def test_get_channel_information_manual():
-    from wasp.data_acquisition import __get_channel_information_manual
+    from ffm.data_acquisition import __get_channel_information_manual
 
     channel = Channel("code", "loc", 56, 78, 10, 12)
     channel.azimuth = 20

@@ -5,7 +5,7 @@ import cartopy.feature as cfeature  # type:ignore
 import matplotlib.pyplot as plt
 import numpy as np
 
-from wasp.plot_maps import plot_borders, plot_map, set_map_cartopy
+from ffm.plot_maps import plot_borders, plot_map, set_map_cartopy
 
 
 def test_plot_borders():

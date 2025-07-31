@@ -9,7 +9,7 @@ import pathlib
 import subprocess
 from typing import List, Optional, Union
 
-import wasp.modulo_logs as ml
+import ffm.modulo_logs as ml
 
 
 def gf_retrieve(

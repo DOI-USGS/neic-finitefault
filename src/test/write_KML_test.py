@@ -2,9 +2,9 @@ import pathlib
 import shutil
 import tempfile
 
-from wasp import get_outputs
-from wasp.fault_plane import point_sources_param
-from wasp.write_KML import PlotMap_KML
+from ffm import get_outputs
+from ffm.fault_plane import point_sources_param
+from ffm.write_KML import PlotMap_KML
 
 from .testutils import END_TO_END_DIR, RESULTS_DIR, get_segments_data, get_tensor_info
 

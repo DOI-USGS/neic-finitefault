@@ -35,7 +35,7 @@ from numpy import (
 )
 from obspy.imaging.scripts import mopad  # type: ignore
 
-import wasp.management as mng
+import ffm.management as mng
 
 
 def temporary_file_reorganization_for_publishing(
@@ -1225,7 +1225,7 @@ def plot_okada_map(
     if annotation == 0:
         annotation = 0.1
     pygmt.makecpt(
-        cmap=str(default_dirs["root_dir"]) + "/src/wasp/lajolla_white.cpt",
+        cmap=str(default_dirs["root_dir"]) + "/src/ffm/lajolla_white.cpt",
         reverse=True,
         series=[0, minmax_horiz],
     )

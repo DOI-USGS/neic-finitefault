@@ -12,7 +12,7 @@ from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 from obspy.taup import TauPyModel  # type: ignore
 from obspy.taup.tau import Arrivals  # type: ignore
 
-from wasp.read_config import read_config
+from ffm.read_config import read_config
 
 
 def theoretic_arrivals(

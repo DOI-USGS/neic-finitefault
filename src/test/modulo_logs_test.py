@@ -3,7 +3,7 @@ import pathlib
 import shutil
 import tempfile
 
-from wasp.modulo_logs import add_console_handler, close_log, create_log
+from ffm.modulo_logs import add_console_handler, close_log, create_log
 
 
 def test_create_log():

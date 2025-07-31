@@ -6,7 +6,7 @@ from glob import glob
 
 import numpy as np
 
-from wasp.wang_baseline_removal_v1 import wang_process
+from ffm.wang_baseline_removal_v1 import wang_process
 
 from .testutils import DATA_DIR, END_TO_END_DIR
 

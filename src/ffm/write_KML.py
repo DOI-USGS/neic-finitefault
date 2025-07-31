@@ -21,9 +21,9 @@ from matplotlib import pyplot as plt  # type: ignore
 from matplotlib.colors import ListedColormap  # type: ignore
 from matplotlib.patches import Rectangle  # type: ignore
 
-import wasp.plane_management as pl_mng
-from wasp.plot_graphic_NEIC import __redefine_lat_lon
-from wasp.plot_maps_NEIC import plot_map
+import ffm.plane_management as pl_mng
+from ffm.plot_graphic_NEIC import __redefine_lat_lon
+from ffm.plot_maps_NEIC import plot_map
 
 """
 Set colorbar for slip

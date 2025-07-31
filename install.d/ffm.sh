@@ -7,7 +7,7 @@
 ## define usage
 function usage {
     echo "----------------------------------------------------------------"
-    echo "Compile the wasp fortran code."
+    echo "Compile the WAFFLES fortran code."
     echo "----------------------------------------------------------------"
     echo ""
     echo "  FINITEFAULT_DIR string  the directory where the finite fault"

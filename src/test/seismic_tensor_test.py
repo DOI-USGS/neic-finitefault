@@ -5,7 +5,7 @@ import tempfile
 import numpy as np
 from obspy import UTCDateTime  # type:ignore
 
-from wasp.seismic_tensor import get_tensor, planes_from_tensor, write_tensor
+from ffm.seismic_tensor import get_tensor, planes_from_tensor, write_tensor
 
 from .testutils import END_TO_END_DIR, RESULTS_DIR, get_tensor_info
 
