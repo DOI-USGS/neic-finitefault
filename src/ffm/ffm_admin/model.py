@@ -7,6 +7,7 @@ from typing import List
 
 import typer
 
+from ffm.ffm_admin.fileutils import validate_files
 from ffm.inversion_chen_new import (
     automatic_usgs,
     checkerboard,
@@ -20,7 +21,6 @@ from ffm.multiple_solutions import multiple_solutions
 from ffm.read_config import CONFIG_PATH
 from ffm.seismic_tensor import get_tensor
 from ffm.velocity_models import model2dict
-from ffm.ffm_admin.fileutils import validate_files
 
 from .datautils import ManagedDataTypes
 
