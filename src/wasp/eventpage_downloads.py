@@ -529,7 +529,7 @@ def write_Coulomb_file(
 
         deg2km = 111.19
         # Determine grid size based on Mw #
-        if Mw < 8:
+        if Mw < 8.4:
             gsize = 6
         else:
             gsize = 10
