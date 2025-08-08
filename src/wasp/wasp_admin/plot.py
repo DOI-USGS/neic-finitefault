@@ -320,11 +320,11 @@ def neic(
         "--data-type",
         help="Data types to plot misfit for, default is []",
     ),
-    downloads: bool = typer.Option(
+    generate_downloads: bool = typer.Option(
         False,
         "-d",
-        "--downloads",
-        help="Create downloads to be displayed on the USGS event pages",
+        "--generate-downloads",
+        help="Generate downloads to be displayed on the USGS event pages",
     ),
     event_id: str = typer.Option(
         None,
@@ -514,7 +514,7 @@ def neic(
         )
     if tensor:
         calculate_cumulative_moment_tensor(solution=solution, directory=directory)
-    if downloads:
+    if generate_downloads:
         if gcmt_tensor_file:
             write_CMTSOLUTION_file(pdefile=gcmt_tensor_file, directory=directory)
             write_Okada_displacements(directory=directory, pdefile=gcmt_tensor_file)
