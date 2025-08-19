@@ -235,12 +235,14 @@ def add_metadata(
                         arrival = "P"
                     elif type_str == "body" and comps == "BHT":
                         arrival = "SH"
-                    elif type_str == "surf" and comps == "BHZ": 
+                    elif type_str == "surf" and comps == "BHZ":
                         arrival = "Z"
                     elif type_str == "surf" and comps == "BHT":
                         arrival = "T"
                     else:
-                        raise ValueError("Valid components for body or surf waveforms are BHZ or BHT")
+                        raise ValueError(
+                            "Valid components for body or surf waveforms are BHZ or BHT"
+                        )
                     ax.text(
                         -0.02,
                         0.55,
