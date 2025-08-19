@@ -48,10 +48,10 @@ def test_add_metadata():
     ax = add_metadata(
         [ax, ax, ax, ax],
         azimuths=[30, 10, 20, 5],
-        comps=["BHZ", "SH", "BHZ", "SH"],
+        comps="BHZ",
         distances=[5, 100, 20, 10],
         names=["name1", "name2", "name3", "name4"],
-        type_str=["body", "surf", "strong", "body"],
+        type_str="body",
         weights=[0, 1, 2, 3],
     )
     plt.close()
