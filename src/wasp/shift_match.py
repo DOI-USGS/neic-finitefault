@@ -702,9 +702,9 @@ def get_observed(
     length2 = int(margin / dt)
     waveform = stream[0].data
     new_baseline = waveform[start]
+    start2 = max(0, start - length2)
+    start3 = start - start2
     if start >= 0:
-        start2 = max(0, start - length2)
-        start3 = start - start2
         waveform1 = np.array(
             [val for i, val in enumerate(waveform[start2:]) if i < length]
         )
