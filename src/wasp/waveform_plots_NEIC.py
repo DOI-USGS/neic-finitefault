@@ -105,38 +105,6 @@ def plot_waveforms(
                 ax.hlines(0, -15, np.max(time), "k", lw=1)
                 ax.set_xlim((-15, np.max(time)))
             min_time, max_time = ax.get_xlim()
-            if type_str == "body" and comp == "BHZ":
-                ax.text(
-                    1.1 * min_time,
-                    0.2 * max(abs(min_val), max_val),
-                    "P",
-                    ha="right",
-                    va="bottom",
-                )
-            if type_str == "body" and comp == "BHT":
-                ax.text(
-                    1.1 * min_time,
-                    0.2 * max(abs(min_val), max_val),
-                    "SH",
-                    ha="right",
-                    va="bottom",
-                )
-            if type_str == "surf" and comp == "BHZ":
-                ax.text(
-                    1.2 * min_time,
-                    0.2 * max(abs(min_val), max_val),
-                    "Z",
-                    ha="right",
-                    va="bottom",
-                )
-            if type_str == "surf" and comp == "BHT":
-                ax.text(
-                    1.2 * min_time,
-                    0.2 * max(abs(min_val), max_val),
-                    "T",
-                    ha="right",
-                    va="bottom",
-                )
         if custom == "syn":
             max_val = np.maximum(abs(min(waveform)), max(waveform))
             tmin, tmax = ax.get_xlim()
@@ -212,7 +180,19 @@ def add_metadata(
     :return: The updated axes
     :rtype: List[plt.Axes]
     """
+    print(f"COMPS: {comps}")
     if type_str is not None:
+        # units of waveforms
+        if type_str == "cgps":
+            unit = "cm"
+        elif type_str == "strong":
+            unit = "cm/s"
+        elif type_str == "body":
+            unit = "nm"
+        elif type_str == "surf":
+            unit = "mm"
+        else:
+            raise ValueError("Data type must be waveform (body, surf, strong, or cgps)")
         if type_str == "cgps" or type_str == "strong":
             if distances is not None:
                 for ax, dist in zip(axes, distances):
@@ -229,10 +209,10 @@ def add_metadata(
                     for ax, comp, name in zip(axes, comps, names):
                         if comp[-1] == "E":
                             ax.text(
-                                -0.18,
+                                -0.20,
                                 0.5,
-                                name,
-                                ha="right",
+                                f"{name}\n({unit})",
+                                ha="center",
                                 va="center",
                                 transform=ax.transAxes,
                                 rotation=90,
@@ -240,7 +220,7 @@ def add_metadata(
                             )
                 for ax, comp in zip(axes, comps):
                     ax.text(
-                        -0.13,
+                        -0.10,
                         0.5,
                         comp,
                         ha="right",
@@ -251,10 +231,20 @@ def add_metadata(
         else:
             if names is not None:
                 for ax, name in zip(axes, names):
+                    if type_str == "body" and comps == "BHZ":
+                        arrival = "P"
+                    elif type_str == "body" and comps == "BHT":
+                        arrival = "SH"
+                    elif type_str == "surf" and comps == "BHZ": 
+                        arrival = "Z"
+                    elif type_str == "surf" and comps == "BHT":
+                        arrival = "T"
+                    else:
+                        raise ValueError("Valid components for body or surf waveforms are BHZ or BHT")
                     ax.text(
                         -0.02,
-                        0.50,
-                        name,
+                        0.55,
+                        f"{arrival}\n{name}\n({unit})",
                         ha="right",
                         va="center",
                         transform=ax.transAxes,
