@@ -1337,7 +1337,7 @@ def plot_moment_rate_function(
     time = np.arange(nmax) * dt  # type:ignore
     with open(directory / "STF.txt", "w") as outf:
         outf.write("dt: {}\n".format(dt))
-        outf.write("Time[s]     Moment_Rate [Nm]\n")
+        outf.write("Time[s]     Moment_Rate [Nm/s]\n")
         for t, val in zip(time, mr):  # type:ignore
             outf.write("{:8.2f}:   {:8.4e}\n".format(t, val))
 

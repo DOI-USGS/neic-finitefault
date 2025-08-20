@@ -2528,14 +2528,14 @@ def plot_moment_rate_function(
             t_seg = np.arange(nmax) * dt
             with open(directory / f"STF_{seg_num}.txt", "w") as outsegf:
                 outsegf.write("dt: {}\n".format(dt))
-                outsegf.write("Time[s]    Moment_Rate [Nm]\n")
+                outsegf.write("Time[s]    Moment_Rate [Nm/s]\n")
                 for t, val in zip(t_seg, mr_seg):
                     outsegf.write("{:8.2f}\t\t{:8.4e}\n".format(t, val))
             seg_num += 1
         time = np.arange(nmax) * dt  # type:ignore
         with open(directory / "STF.txt", "w") as outf:
             outf.write("dt: {}\n".format(dt))
-            outf.write("Time[s]     Moment_Rate [Nm]\n")
+            outf.write("Time[s]     Moment_Rate [Nm/s]\n")
             for t, val in zip(time, mr):  # type:ignore
                 outf.write("{:8.2f}\t\t{:8.4e}\n".format(t, val))
 
