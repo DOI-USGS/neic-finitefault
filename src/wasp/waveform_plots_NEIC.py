@@ -181,19 +181,17 @@ def add_metadata(
     :rtype: List[plt.Axes]
     """
     if type_str is not None:
-        unit = "unit"
-        #        # units of waveforms
-        #        if type_str == "cgps":
-        #            unit = "cm"
-        #        elif type_str == "strong":
-        #            unit = "cm/s"
-        #        elif type_str == "body":
-        #            unit = "nm"
-        #        elif type_str == "surf":
-        #            unit = "mm"
-        #        else:
-        #            raise ValueError("Data type must be waveform (body, surf, strong, or cgps)")
-        print(type_str)
+        # units of waveforms
+        if type_str == "cgps":
+            unit = "cm"
+        elif type_str == "strong":
+            unit = "cm/s"
+        elif type_str == "body":
+            unit = "nm"
+        elif type_str == "surf":
+            unit = "mm"
+        else:
+            raise ValueError("Data type must be waveform (body, surf, strong, or cgps)")
         if type_str == "cgps" or type_str == "strong":
             if distances is not None:
                 for ax, dist in zip(axes, distances):
