@@ -6,6 +6,7 @@ import sys
 import typing
 
 import numpy as np
+import numpy.typing as npt
 
 SM_PROFILE = pathlib.Path.home() / ".shakemap" / "profiles.conf"
 # 2021-10-25 17:04:20
@@ -92,7 +93,7 @@ class ShakeRupture:
             segment["data"] = data_array
         return segments
 
-    def read_fsp_headers(self, fobj: typing.TextIO) -> list:
+    def read_fsp_headers(self, fobj: typing.TextIO) -> list[dict[str, typing.Any]]:
         """
         Read FSP format headers and return segment metadata.
 
@@ -104,7 +105,7 @@ class ShakeRupture:
                 List of segment dictionaries with metadata.
         """
         segments = []
-        segment = {}
+        segment: dict[str, typing.Any] = {}
         dx = None
         dz = None
         nlines = 0
@@ -156,7 +157,9 @@ class ShakeRupture:
                 continue
         return segments
 
-    def organize_data(self, data: np.array, nx: int, ny: int) -> np.recarray:
+    def organize_data(
+        self, data: npt.NDArray, nx: int, ny: int
+    ) -> npt.NDArray[np.float32]:
         """
         Arrange 2D data array into labeled numpy record arrays.
 
@@ -205,7 +208,7 @@ class ShakeRupture:
 
         return polygon_file
 
-    def get_segment_corners(self) -> list:
+    def get_segment_corners(self) -> dict:
         """
         Write ShakeMap compatible polygon text file with trimmed edges.
 

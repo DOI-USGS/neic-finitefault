@@ -50,3 +50,7 @@ end_to_end_test = [
   { shell = "mypy src/wasp" }
 ]
 
+[tool.mypy]
+plugins = numpy.typing.mypy_plugin
+
+
