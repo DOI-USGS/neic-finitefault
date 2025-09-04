@@ -22,8 +22,8 @@ def test_static_to_srf():
             tempdir / "strong_motion_waves.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "cgps_waves.json",
-            tempdir / "cgps_waves.json",
+            RESULTS_DIR / "NP1" / "cgnss_waves.json",
+            tempdir / "cgnss_waves.json",
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "static_data.json",
@@ -52,7 +52,7 @@ def test_static_to_srf():
         static_to_srf(
             get_tensor_info(),
             segments,
-            ["cgps", "gps", "insar", "strong", "surf", "body"],
+            ["cgnss", "gnss", "insar", "strong", "surf", "body"],
             get_velmodel_data(),
             solution,
             directory=tempdir,
@@ -63,7 +63,7 @@ def test_static_to_srf():
         target = [
             "2.0\n",
             "#\n",
-            "# Data :\tBODY\tSURF\tSTRONG\tcGPS\tGPS\tInSAR\tDART\tTRIL\tLEVEL\tOTHER\n",
+            "# Data :\tBODY\tSURF\tSTRONG\tcGNSS\tGNSS\tInSAR\tDART\tTRIL\tLEVEL\tOTHER\n",
             "# NoS  :\t19\t19\t3\t3\t10\t2166\t0\t0\t0\t0\n",
             "# PHImx :\t186.81\t186.81\t246.51\t312.71\t183.06\t2\t0.00\t0.0\t0.0\t0.0\n",
             "# Rmin :\t40.80\t40.80\t1.11\t0.89\t0.36\t--\t0.00\t0.0\t0.0\t0.0\n",

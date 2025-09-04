@@ -9,7 +9,7 @@ from test.testutils import (
     END_TO_END_DIR,
     HOME,
     RESULTS_DIR,
-    get_cgps_json,
+    get_cgnss_json,
     get_strong_motion_json,
     get_surf_waves_json,
     get_tele_waves_json,
@@ -31,15 +31,15 @@ def test_kml():
         with open(tempdir / "config.ini", "w") as wf:
             wf.write(config)
         shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
-        cgps_waves = get_cgps_json()
-        new_cgps_waves = update_manager_file_locations(
-            cgps_waves,
+        cgnss_waves = get_cgnss_json()
+        new_cgnss_waves = update_manager_file_locations(
+            cgnss_waves,
             tempdir,
             replace_dir=str(RESULTS_DIR / "data"),
         )
         os.mkdir(tempdir / "data")
-        os.mkdir(tempdir / "cGPS")
-        for o, n in zip(cgps_waves, new_cgps_waves):
+        os.mkdir(tempdir / "cGNSS")
+        for o, n in zip(cgnss_waves, new_cgnss_waves):
             shutil.copyfile(o["file"], n["file"])
         tele_waves = get_tele_waves_json(all=True)
         new_tele_waves = update_manager_file_locations(
@@ -91,7 +91,8 @@ def test_kml():
             tempdir / "synthetics_strong.txt",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "synthetics_cgps.txt", tempdir / "synthetics_cgps.txt"
+            RESULTS_DIR / "NP1" / "synthetics_cgnss.txt",
+            tempdir / "synthetics_cgnss.txt",
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "velmodel_data.json", tempdir / "velmodel_data.json"
@@ -102,8 +103,8 @@ def test_kml():
             json.dump(new_surf_waves, f)
         with open(tempdir / "strong_motion_waves.json", "w") as f:
             json.dump(new_strong_waves, f)
-        with open(tempdir / "cgps_waves.json", "w") as f:
-            json.dump(new_cgps_waves, f)
+        with open(tempdir / "cgnss_waves.json", "w") as f:
+            json.dump(new_cgnss_waves, f)
 
         shutil.copyfile(
             END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
@@ -117,7 +118,7 @@ def test_kml():
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
-                "cgps",
+                "cgnss",
                 "-t",
                 "surf",
                 "-t",
@@ -150,15 +151,15 @@ def test_map():
         with open(tempdir / "config.ini", "w") as wf:
             wf.write(config)
         shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
-        cgps_waves = get_cgps_json()
-        new_cgps_waves = update_manager_file_locations(
-            cgps_waves,
+        cgnss_waves = get_cgnss_json()
+        new_cgnss_waves = update_manager_file_locations(
+            cgnss_waves,
             tempdir,
             replace_dir=str(RESULTS_DIR / "data"),
         )
         os.mkdir(tempdir / "data")
-        os.mkdir(tempdir / "cGPS")
-        for o, n in zip(cgps_waves, new_cgps_waves):
+        os.mkdir(tempdir / "cGNSS")
+        for o, n in zip(cgnss_waves, new_cgnss_waves):
             shutil.copyfile(o["file"], n["file"])
         tele_waves = get_tele_waves_json(all=True)
         new_tele_waves = update_manager_file_locations(
@@ -210,7 +211,8 @@ def test_map():
             tempdir / "synthetics_strong.txt",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "synthetics_cgps.txt", tempdir / "synthetics_cgps.txt"
+            RESULTS_DIR / "NP1" / "synthetics_cgnss.txt",
+            tempdir / "synthetics_cgnss.txt",
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "velmodel_data.json", tempdir / "velmodel_data.json"
@@ -221,8 +223,8 @@ def test_map():
             json.dump(new_surf_waves, f)
         with open(tempdir / "strong_motion_waves.json", "w") as f:
             json.dump(new_strong_waves, f)
-        with open(tempdir / "cgps_waves.json", "w") as f:
-            json.dump(new_cgps_waves, f)
+        with open(tempdir / "cgnss_waves.json", "w") as f:
+            json.dump(new_cgnss_waves, f)
 
         shutil.copyfile(
             END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
@@ -236,7 +238,7 @@ def test_map():
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
-                "cgps",
+                "cgnss",
                 "-t",
                 "surf",
                 "-t",
@@ -265,15 +267,15 @@ def test_neic():
         with open(tempdir / "config.ini", "w") as wf:
             wf.write(config)
         shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
-        cgps_waves = get_cgps_json()
-        new_cgps_waves = update_manager_file_locations(
-            cgps_waves,
+        cgnss_waves = get_cgnss_json()
+        new_cgnss_waves = update_manager_file_locations(
+            cgnss_waves,
             tempdir,
             replace_dir=str(RESULTS_DIR / "data"),
         )
         os.mkdir(tempdir / "data")
-        os.mkdir(tempdir / "cGPS")
-        for o, n in zip(cgps_waves, new_cgps_waves):
+        os.mkdir(tempdir / "cGNSS")
+        for o, n in zip(cgnss_waves, new_cgnss_waves):
             shutil.copyfile(o["file"], n["file"])
         tele_waves = get_tele_waves_json(all=True)
         new_tele_waves = update_manager_file_locations(
@@ -325,7 +327,8 @@ def test_neic():
             tempdir / "synthetics_strong.txt",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "synthetics_cgps.txt", tempdir / "synthetics_cgps.txt"
+            RESULTS_DIR / "NP1" / "synthetics_cgnss.txt",
+            tempdir / "synthetics_cgnss.txt",
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "velmodel_data.json", tempdir / "velmodel_data.json"
@@ -336,8 +339,8 @@ def test_neic():
             json.dump(new_surf_waves, f)
         with open(tempdir / "strong_motion_waves.json", "w") as f:
             json.dump(new_strong_waves, f)
-        with open(tempdir / "cgps_waves.json", "w") as f:
-            json.dump(new_cgps_waves, f)
+        with open(tempdir / "cgnss_waves.json", "w") as f:
+            json.dump(new_cgnss_waves, f)
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "tensor_info.json", tempdir / "tensor_info.json"
         )
@@ -349,7 +352,7 @@ def test_neic():
                 "neic",
                 str(tempdir),
                 "-t",
-                "cgps",
+                "cgnss",
                 "-t",
                 "surf",
                 "-t",
@@ -372,7 +375,7 @@ def test_neic():
         assert (tempdir / "Map.eps").exists()
         assert (tempdir / "SlipDist_plane0.ps").exists()
         assert (plot_dir / "Rayleigh_surf_waves.png").exists()
-        assert (plot_dir / "cGPS_waves.png").exists()
+        assert (plot_dir / "cGNSS_waves.png").exists()
         assert (plot_dir / "strong_motion_waves.png").exists()
         assert (plot_dir / "SH_body_waves.png").exists()
         assert (plot_dir / "Love_surf_waves.png").exists()

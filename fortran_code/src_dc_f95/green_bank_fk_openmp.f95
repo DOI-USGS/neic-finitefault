@@ -24,10 +24,10 @@ program green_bank_fk_openmp
 !
    call getarg(1, input)
    call getarg(2, directory)
-   disp = (input.eq.'cgps')
+   disp = (input.eq.'cgnss')
 
    gf_file = 'Green_strong.txt'
-   if (disp) gf_file = 'Green_cgps.txt'
+   if (disp) gf_file = 'Green_cgnss.txt'
    call get_gf_data(trim(directory)//gf_file, vel_model, gf_bank)
    npt=2**lnpt
 !

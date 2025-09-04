@@ -22,7 +22,7 @@
 ! subroutines called:
 !	kernel() in kernel.f	computing Kernels U(k,w)
 !
-! Written by Lupei Zhu, Seismo Lab, Caltech (lupei@gps.caltech.edu)
+! Written by Lupei Zhu, Seismo Lab, Caltech (lupei@gnss.caltech.edu)
 !
 ! Modified history:
 !	03/05/1996  Lupei Zhu	Initial coding.
@@ -82,7 +82,7 @@ contains
 !  x: range of source-station distances to compute GF
 !  t0: start time for each waveform
 !  green: GF to be computed
-!  disp: True if GF for cGPS, False otherwise
+!  disp: True if GF for cGNSS, False otherwise
 !
 !
    use omp_lib

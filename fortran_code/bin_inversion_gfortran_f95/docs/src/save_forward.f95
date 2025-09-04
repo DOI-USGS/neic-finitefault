@@ -17,14 +17,14 @@ module save_forward
 contains
 
 
-   subroutine write_forward(slip, rake, rupt_time, tl, tr, strong, cgps, body, surf, dart)
+   subroutine write_forward(slip, rake, rupt_time, tl, tr, strong, cgnss, body, surf, dart)
    !!
    !!  We save the forward solution given a kinematic model, for all specified 
    !!  data types.
    !!  
    implicit none
    integer ll_in, ll_out
-   logical :: strong, cgps, body, surf, dart
+   logical :: strong, cgnss, body, surf, dart
    real slip(nnxy, max_seg), rake(nnxy, max_seg), rupt_time(nnxy, max_seg), tr(nnxy, max_seg), &
    &  tl(nnxy, max_seg), erm, ermin
    complex z0
@@ -39,8 +39,8 @@ contains
       call write_strong_motion_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
       ll_in = ll_out
    end if
-   if (cgps) then
-      call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+   if (cgnss) then
+      call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
       ll_in = ll_out
    end if
    if (body) then
@@ -57,7 +57,7 @@ contains
    end if
 !   select case (io_data)
 !      case (1)
-!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !      case (2)
 !         call write_strong_motion_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !      case (3)
@@ -65,11 +65,11 @@ contains
 !      case (4)
 !         call write_strong_motion_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !         lL_in = ll_out
-!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !      case (5)
 !         call write_body_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !         ll_in = ll_out
-!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !      case (6)
 !         call write_body_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !         ll_in = ll_out
@@ -79,7 +79,7 @@ contains
 !         ll_in = ll_out
 !         call write_surface_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !      case (8)
-!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !         ll_in = ll_out
 !         call write_surface_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !      case (9)
@@ -91,13 +91,13 @@ contains
 !         ll_in = ll_out
 !         call write_strong_motion_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !         ll_in = lL_out
-!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !      case (11)
 !         call write_body_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !         ll_in = ll_out
 !         call write_surface_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !         ll_in = ll_out
-!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !      case (12)
 !         call write_body_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !         ll_in = ll_out
@@ -109,13 +109,13 @@ contains
 !         ll_in = ll_out
 !         call write_surface_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !         lL_in = ll_out
-!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !      case (14)
 !         call write_body_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !         ll_in = ll_out
 !         call write_strong_motion_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !         ll_in = ll_out
-!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !      case (15)
 !         call write_body_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !         ll_in = ll_out
@@ -123,7 +123,7 @@ contains
 !         ll_in = ll_out
 !         call write_surface_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !         ll_in = ll_out
-!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
 !   endselect
    end subroutine write_forward
    
@@ -258,7 +258,7 @@ contains
    end subroutine write_strong_motion_forward
    
    
-   subroutine write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
+   subroutine write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)
    implicit none
    integer ll_in, ll_out, ll_g, isl, isr, ll, n_chan3, int1, int2, int3, &
    &  jf, i, k, ll_s, i_s, ir, n_chan, ixs, iys, ir_max
@@ -273,7 +273,7 @@ contains
    z0 = cmplx(0.0, 0.0)
    n_chan3 = 0
    
-   open(9,file='Readlp.cgps',status='old')
+   open(9,file='Readlp.cgnss',status='old')
    read(9,*)
    read(9,*)
    read(9,*)
@@ -304,7 +304,7 @@ contains
 !
 !  end of rise time 
 !       
-   open(18,file='synm.cgps')
+   open(18,file='synm.cgnss')
    k = 0
 !       
 !  set up the green function for every subfault
@@ -357,7 +357,7 @@ contains
    end do   
    close(18)
    ll_out = ll_out+n_chan
-   end subroutine write_cgps_forward
+   end subroutine write_cgnss_forward
 
 
    subroutine write_body_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)

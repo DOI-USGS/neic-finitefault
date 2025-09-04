@@ -374,15 +374,15 @@ def strong_motion_traces(
     return info_traces
 
 
-def cgps_traces(
+def cgnss_traces(
     files: List[Union[pathlib.Path, str]],
     tensor_info: dict,
     data_prop: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> List[dict]:
-    """Write json dictionary with properties for cGPS data
+    """Write json dictionary with properties for cGNSS data
 
-    :param files: List of files holding cGPS data
+    :param files: List of files holding cGNSS data
     :type files: List[Union[pathlib.Path, str]]
     :param tensor_info: The tensor information
     :type tensor_info: dict
@@ -390,12 +390,12 @@ def cgps_traces(
     :type data_prop: dict
     :param directory: Where the file should be written, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
-    :return: The cGPS properties written to cgps_waves.json
+    :return: The cGNSS properties written to cgnss_waves.json
     :rtype: List[dict]
 
     .. warning::
 
-        Make sure the filters of cGPS data agree with the values in
+        Make sure the filters of cGNSS data agree with the values in
         sampling_filter.json!
     """
     directory = pathlib.Path(directory)
@@ -406,20 +406,20 @@ def cgps_traces(
     depth = tensor_info["depth"]
     origin_time = UTCDateTime(tensor_info["datetime"])
     headers = [SACTrace.read(file) for file in files]
-    dt_cgps = headers[0].delta
-    dt_cgps = round(dt_cgps, 2)
+    dt_cgnss = headers[0].delta
+    dt_cgnss = round(dt_cgnss, 2)
     fun1 = lambda header: mng._distazbaz(header.stla, header.stlo, event_lat, event_lon)
     values = map(fun1, headers)
     distances = [value[0] for value in values]
     zipped = zip(distances, headers)
     arrivals = [np.sqrt(dist**2 + depth**2) / 5 for dist in distances]
-    duration = duration_strong_motion(distances, arrivals, tensor_info, dt_cgps)
+    duration = duration_strong_motion(distances, arrivals, tensor_info, dt_cgnss)
     filter0 = data_prop["strong_filter"]
-    if "cgps_filter" in data_prop:
-        filter0 = data_prop["cgps_filter"]
+    if "cgnss_filter" in data_prop:
+        filter0 = data_prop["cgnss_filter"]
     n0, n1 = data_prop["wavelet_scales"]
     wavelet_weight = wavelets_strong_motion(
-        duration, filter0, dt_cgps, n0, n1, cgps=True
+        duration, filter0, dt_cgnss, n0, n1, cgnss=True
     )
     info_traces = []
     vertical = ["LXZ", "LHZ", "LYZ"]
@@ -443,16 +443,16 @@ def cgps_traces(
             channel=header.kcmpnm,
             azimuth=azimuth,
             distance=distance / 111.11,
-            dt=dt_cgps,
+            dt=dt_cgnss,
             duration=duration,
-            n_start_obs=int(start // dt_cgps),
+            n_start_obs=int(start // dt_cgnss),
             trace_weight=weight,
             wavelet_weight=wavelet_weight,
             synthetic_trace=[],
             location=[header.stla, header.stlo],
         )
         info_traces.append(info)
-    with open(directory / "cgps_waves.json", "w") as f:
+    with open(directory / "cgnss_waves.json", "w") as f:
         json.dump(
             info_traces,
             f,
@@ -469,7 +469,7 @@ def static_data(
     unit: Literal["cm", "m", "mm"] = "m",
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> List[dict]:
-    """Write json dictionary with properties for gps data
+    """Write json dictionary with properties for gnss data
 
     :param tensor_info: The tensor information
     :type tensor_info: dict
@@ -477,34 +477,34 @@ def static_data(
     :type unit: Literal[&#39;cm&#39;,&#39;m&#39;,&#39;mm&#39;], optional
     :param directory: Where the file should be written, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
-    :return: The gps properties written to static_data.json
+    :return: The gnss properties written to static_data.json
     :rtype: List[dict]
     """
     directory = pathlib.Path(directory)
     event_lat = tensor_info["lat"]
     event_lon = tensor_info["lon"]
     info_traces = []
-    if not os.path.isfile(directory / "cgps_waves.json") and not os.path.isfile(
-        directory / "gps_data"
+    if not os.path.isfile(directory / "cgnss_waves.json") and not os.path.isfile(
+        directory / "gnss_data"
     ):
         raise FileNotFoundError(
-            "Static data specified but neither cgps_waves.json nor gps_data exists"
+            "Static data specified but neither cgnss_waves.json nor gnss_data exists"
         )
 
-    if os.path.isfile(directory / "cgps_waves.json") and not os.path.isfile(
-        directory / "gps_data"
+    if os.path.isfile(directory / "cgnss_waves.json") and not os.path.isfile(
+        directory / "gnss_data"
     ):
-        with open(directory / "cgps_waves.json") as cgps_f:
-            cgps_data = json.load(cgps_f)
+        with open(directory / "cgnss_waves.json") as cgnss_f:
+            cgnss_data = json.load(cgnss_f)
 
-        names = [file["name"] for file in cgps_data]
+        names = [file["name"] for file in cgnss_data]
         names = list(set(names))
 
         for name in names:
             observed: List[Union[str, int, float]] = [0, 0, 0]
             weights: List[Union[str, int, float]] = [0, 0, 0]
             error: List[Union[str, int, float]] = [0, 0, 0]
-            for file in cgps_data:
+            for file in cgnss_data:
                 name2 = file["name"]
                 if not name2 == name:
                     continue
@@ -544,7 +544,7 @@ def static_data(
             info["data_error"] = error
             info_traces.append(info)
 
-    if os.path.isfile(directory / "gps_data"):
+    if os.path.isfile(directory / "gnss_data"):
         factor: Union[int, float] = 1
         if unit == "cm":
             factor = 1
@@ -554,7 +554,7 @@ def static_data(
             factor = 1 / 10
         else:
             raise ValueError(f"Unsupport unit '{unit}' specified!")
-        with open(directory / "gps_data", "r") as infile:
+        with open(directory / "gnss_data", "r") as infile:
             lines = [line.split() for line in infile]
         for line in lines[2:]:
             if len(line) < 9:
@@ -641,7 +641,7 @@ def insar_data(
     :type directory: Union[pathlib.Path, str], optional
     :raises ValueError: If the length of ascending ramps and files are different
     :raises ValueError: If the length of descending ramps and files are different
-    :return: The InSar properties written to cgps_waves.json
+    :return: The InSar properties written to cgnss_waves.json
     :rtype: List[dict]
     """
     directory = pathlib.Path(directory)
@@ -845,22 +845,22 @@ def __used_stations(
     return total
 
 
-def __failsafe(filter_info: dict, header: SACTrace, cgps: bool = False):
+def __failsafe(filter_info: dict, header: SACTrace, cgnss: bool = False):
     """Check that the selected filter matches the filter applied to the data
 
     :param filter_info: The filter properties
     :type filter_info: dict
     :param header: The sac class
     :type header: SACTrace
-    :param cgps: Whether it is cgps data, defaults to False
-    :type cgps: bool, optional
+    :param cgnss: Whether it is cgnss data, defaults to False
+    :type cgnss: bool, optional
     :raises ValueError: If the filter selected does not match that applied to the data
     """
     low_freq = filter_info["low_freq"]
     high_freq = filter_info["high_freq"]
     low_freq2 = header.t8
     high_freq2 = header.t9
-    if not cgps:
+    if not cgnss:
         if not abs(low_freq - low_freq2) + abs(high_freq - high_freq2) < 0.0001:
             print([low_freq, high_freq])
             print([low_freq2, high_freq2])
@@ -962,11 +962,13 @@ def filling_data_dicts(
             strong_motion_traces(
                 strong_traces, tensor_info, data_prop, directory=working_directory
             )
-    if "cgps" in data_types:
-        cgps_data = get_traces_files("cgps", directory=data_folder)
-        if not os.path.isfile(working_directory / "cgps_waves.json"):
-            cgps_traces(cgps_data, tensor_info, data_prop, directory=working_directory)
-    if "gps" in data_types:
+    if "cgnss" in data_types:
+        cgnss_data = get_traces_files("cgnss", directory=data_folder)
+        if not os.path.isfile(working_directory / "cgnss_waves.json"):
+            cgnss_traces(
+                cgnss_data, tensor_info, data_prop, directory=working_directory
+            )
+    if "gnss" in data_types:
         static_data(tensor_info, unit="m", directory=working_directory)
     if "insar" in data_types:
         insar_data(
@@ -979,14 +981,14 @@ def filling_data_dicts(
 
 
 def get_traces_files(
-    data_type: Literal["cgps", "strong", "surf", "body"],
+    data_type: Literal["cgnss", "strong", "surf", "body"],
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> List[Union[pathlib.Path, str]]:
     """Get list with waveform files (in sac format) for stations and
     channels selected for modelling
 
     :param data_type: The type of data
-    :type data_type: Literal[&quot;cgps&quot;, &quot;strong_motion&quot;, &quot;surf_tele&quot;, &quot;tele_body&quot;]
+    :type data_type: Literal[&quot;cgnss&quot;, &quot;strong_motion&quot;, &quot;surf_tele&quot;, &quot;tele_body&quot;]
     :param directory: The directory where files are located, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     :return: The list of sac files
@@ -1005,8 +1007,8 @@ def get_traces_files(
         )
     if data_type == "strong":
         traces_files = glob(os.path.join(directory / "STR", "processed*"))  # type: ignore
-    if data_type == "cgps":
-        traces_files = glob(os.path.join(directory / "cGPS", "processed*"))  # type: ignore
+    if data_type == "cgnss":
+        traces_files = glob(os.path.join(directory / "cGNSS", "processed*"))  # type: ignore
     traces_files = [os.path.abspath(file) for file in traces_files]  # type: ignore
     return traces_files
 
@@ -1093,7 +1095,7 @@ def wavelets_strong_motion(
     dt_strong: float,
     n_begin: int,
     n_end: int,
-    cgps: bool = False,
+    cgnss: bool = False,
 ) -> str:
     """Automatic determination of weight of wavelet scales
 
@@ -1107,15 +1109,15 @@ def wavelets_strong_motion(
     :type n_begin: int
     :param n_end: The maximum scale
     :type n_end: int
-    :param cgps: Whether a cgps, defaults to False
-    :type cgps: bool, optional
+    :param cgnss: Whether a cgnss, defaults to False
+    :type cgnss: bool, optional
     :return: The wavelet scales
     :rtype: str
     """
     low_freq = filter_strong["low_freq"]
     high_freq = filter_strong["high_freq"]
     min_wavelet = int(np.log2(3 * 2**8 * dt_strong * low_freq)) + 1
-    if cgps:
+    if cgnss:
         min_wavelet = 1  # 4
     min_index = int(duration / dt_strong)
     min_wavelet = max(min_wavelet, 10 - int(np.log2(min_index)))

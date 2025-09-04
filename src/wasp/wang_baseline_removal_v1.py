@@ -60,13 +60,29 @@ def wang_process(
     a0, a1, a2, a3, t1, t2, tp, t_d0, t_pgd, t_pga, t_end = constants
     disp_data = disp_trace.data
     delta = disp_trace.stats.delta
-    disp_data2, gps, t_jump = _gps_jump(disp_data, t_end, t1, t2, a1, a2, a3, tp, delta)
+    disp_data2, gnss, t_jump = _gnss_jump(
+        disp_data, t_end, t1, t2, a1, a2, a3, tp, delta
+    )
     disp_trace2 = disp_trace.copy()
     disp_trace2.data = disp_data2
     vel_trace2 = disp_trace2.copy()
     vel_trace2.differentiate()
     if plot:
-        constants = [a0, a1, a2, a3, t1, t2, tp, t_d0, t_pgd, t_pga, t_end, gps, t_jump]
+        constants = [
+            a0,
+            a1,
+            a2,
+            a3,
+            t1,
+            t2,
+            tp,
+            t_d0,
+            t_pgd,
+            t_pga,
+            t_end,
+            gnss,
+            t_jump,
+        ]
         _optional_plots(vel_trace, disp_trace, constants, directory=directory)
         _opt_plots2(trace, vel_trace, disp_trace, tp, directory=directory)
     return vel_trace2
@@ -191,8 +207,8 @@ def _function(
     length = len(disp_data)
     disp_corr = _correct_disp(length, delta, a1, a2, a3, time1, time2, time_end)
     disp_data2 = disp_data - disp_corr
-    gps = np.mean(disp_data2[time_end:])
-    comparison = disp_data2 - gps / 2
+    gnss = np.mean(disp_data2[time_end:])
+    comparison = disp_data2 - gnss / 2
     after = comparison[1:]
     before = comparison[:-1]
     crossings = np.nonzero(comparison == 0)[0]
@@ -200,11 +216,11 @@ def _function(
     crossings = [index for index in crossings if index > time_p]  # type:ignore
     if not crossings:
         return np.sum(disp_data2**2)
-    results = [_heaviside_fit(int(index), disp_data2, gps) for index in crossings]
+    results = [_heaviside_fit(int(index), disp_data2, gnss) for index in crossings]
     return min(results)
 
 
-def _gps_jump(
+def _gnss_jump(
     disp_data: np.ndarray,
     time_end: int,
     time1: int,
@@ -242,20 +258,20 @@ def _gps_jump(
     length = len(disp_data)
     disp_corr = _correct_disp(length, delta, a1, a2, a3, time1, time2, time_end)
     disp_data2 = disp_data - disp_corr
-    gps = np.mean(disp_data2[time_end:])
-    comparison = disp_data2 - gps / 2
+    gnss = np.mean(disp_data2[time_end:])
+    comparison = disp_data2 - gnss / 2
     after = comparison[1:]
     before = comparison[:-1]
     crossings = np.nonzero(comparison == 0)[0]
     crossings = list(crossings) + list(np.nonzero(before * after < 0)[0])  # type:ignore
     crossings = [index for index in crossings if index > time_p]  # type:ignore
     if not crossings:
-        return np.sum(disp_data**2), gps, 0
-    results = [_heaviside_fit(int(index), disp_data2, gps) for index in crossings]
+        return np.sum(disp_data**2), gnss, 0
+    results = [_heaviside_fit(int(index), disp_data2, gnss) for index in crossings]
     best_result = min(results)
     zipped = zip(crossings, results)
     time_jump = next(index for index, result in zipped if result == best_result)
-    return disp_data2, gps, time_jump
+    return disp_data2, gnss, time_jump
 
 
 def _constraint(x: np.ndarray) -> float:
@@ -608,7 +624,7 @@ def _optional_plots(
     station = disp.stats.station
     channel = disp.stats.channel
     delta = disp.stats.delta
-    a0, a1, a2, a3, t1, t2, tp, t_d0, t_pgd, t_pga, t_end, gps, t_jump = constants
+    a0, a1, a2, a3, t1, t2, tp, t_d0, t_pgd, t_pga, t_end, gnss, t_jump = constants
 
     length = len(disp.data)
     disp_corr = _correct_disp(length, delta, a1, a2, a3, t1, t2, t_end)
@@ -632,9 +648,9 @@ def _optional_plots(
     ax3.set_xlabel("time[s]")
     ax3.set_ylabel("disp[mt]")
     ax3.plot(time, disp.data - disp_corr)
-    gps_trace = np.zeros(len(disp.data))
-    gps_trace[t_jump:] = gps
-    ax3.plot(time, gps_trace, "k", linewidth=2)
+    gnss_trace = np.zeros(len(disp.data))
+    gnss_trace[t_jump:] = gnss
+    ax3.plot(time, gnss_trace, "k", linewidth=2)
     ax3.axvline(x=tp * delta, color="k", label="$t_p$")
     ax3.axvline(x=t1 * delta, color="r", label="$t_1$")
     ax3.axvline(x=t2 * delta, color="g", label="$t_2$")

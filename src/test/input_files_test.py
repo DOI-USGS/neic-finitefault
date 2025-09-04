@@ -24,7 +24,7 @@ from wasp.input_files import (
 
 from .testutils import (
     RESULTS_DIR,
-    get_cgps_json,
+    get_cgnss_json,
     get_insar_json,
     get_sampling_filter,
     get_segments_data,
@@ -159,24 +159,24 @@ def test_input_chen_near_field():
                 target = t.read()
             assert new_data == target
 
-        # test for cgps
-        new_cgps = update_manager_file_locations(
-            get_cgps_json(all=True),
+        # test for cgnss
+        new_cgnss = update_manager_file_locations(
+            get_cgnss_json(all=True),
             tempdir,
             replace_dir=str(RESULTS_DIR / "data"),
         )
-        with open(tempdir / "cgps_waves.json", "w") as tw:
-            json.dump(new_cgps, tw)
-        os.mkdir(tempdir / "cGPS")
-        for o, n in zip(get_cgps_json(all=True), new_cgps):
+        with open(tempdir / "cgnss_waves.json", "w") as tw:
+            json.dump(new_cgnss, tw)
+        os.mkdir(tempdir / "cGNSS")
+        for o, n in zip(get_cgnss_json(all=True), new_cgnss):
             shutil.copyfile(o["file"], n["file"])
 
-        input_chen_near_field(CMT, SAMPLE_FILTER, "cgps", tempdir)
+        input_chen_near_field(CMT, SAMPLE_FILTER, "cgnss", tempdir)
         for f in [
-            "filter_cgps.txt",
-            "channels_cgps.txt",
-            "wavelets_cgps.txt",
-            "waveforms_cgps.txt",
+            "filter_cgnss.txt",
+            "channels_cgnss.txt",
+            "wavelets_cgnss.txt",
+            "waveforms_cgnss.txt",
         ]:
             with open(tempdir / f, "r") as nd:
                 new_data = nd.read()
@@ -194,7 +194,7 @@ def test_input_chen_static():
         new_static = get_static_json(all=True)
         with open(tempdir / "static_data.json", "w") as tw:
             json.dump(new_static, tw)
-        shutil.copyfile(RESULTS_DIR / "NP1" / "gps_data", tempdir / "gps_data")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "gnss_data", tempdir / "gnss_data")
 
         input_chen_static(tempdir)
         for f in ["static_data.txt"]:
@@ -331,16 +331,16 @@ def test_from_synthetic_to_obs():
     ## TODO: add baseline test data
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        os.makedirs(tempdir / "cGPS")
+        os.makedirs(tempdir / "cGNSS")
         os.makedirs(tempdir / "P")
         os.makedirs(tempdir / "SH")
         os.makedirs(tempdir / "RAYLEIGH")
         os.makedirs(tempdir / "LOVE")
         os.makedirs(tempdir / "STR")
         for data_type, method in zip(
-            ["cgps", "strong", "surf", "body"],
+            ["cgnss", "strong", "surf", "body"],
             [
-                get_cgps_json,
+                get_cgnss_json,
                 get_strong_motion_json,
                 get_surf_waves_json,
                 get_tele_waves_json,
@@ -356,7 +356,7 @@ def test_from_synthetic_to_obs():
             files = d
             for f in [
                 "synthetics_strong.txt",
-                "synthetics_cgps.txt",
+                "synthetics_cgnss.txt",
                 "synthetics_body.txt",
                 "synthetics_surf.txt",
             ]:
@@ -370,7 +370,7 @@ def test_from_synthetic_to_obs():
             )
         for f in [
             "waveforms_strong.txt",
-            "waveforms_cgps.txt",
+            "waveforms_cgnss.txt",
             "waveforms_body.txt",
             "waveforms_surf.txt",
         ]:
@@ -413,8 +413,8 @@ def test_write_green_file():
     try:
         with open(RESULTS_DIR / "strong_motion_gf.json") as s:
             sm_gf = json.load(s)
-        with open(RESULTS_DIR / "cgps_gf.json") as c:
-            cgps_gf = json.load(c)
+        with open(RESULTS_DIR / "cgnss_gf.json") as c:
+            cgnss_gf = json.load(c)
 
         # test strong motion
         write_green_file(sm_gf, False, tempdir)
@@ -424,13 +424,13 @@ def test_write_green_file():
             green_strong_target = gst.read()
         assert green_strong == green_strong_target
 
-        # test cgps
-        write_green_file(cgps_gf, True, tempdir)
-        with open(tempdir / "Green_cgps.txt") as gc:
-            green_cgps = "\n".join(gc.read().split("\n")[0:-1])
-        with open(RESULTS_DIR / "Green_cgps.txt") as gct:
-            green_cgps_target = gct.read()
-        assert green_cgps == green_cgps_target
+        # test cgnss
+        write_green_file(cgnss_gf, True, tempdir)
+        with open(tempdir / "Green_cgnss.txt") as gc:
+            green_cgnss = "\n".join(gc.read().split("\n")[0:-1])
+        with open(RESULTS_DIR / "Green_cgnss.txt") as gct:
+            green_cgnss_target = gct.read()
+        assert green_cgnss == green_cgnss_target
     finally:
         shutil.rmtree(tempdir)
 

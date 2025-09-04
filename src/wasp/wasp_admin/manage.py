@@ -291,7 +291,7 @@ def many_events(
         strong_motion_events: list = []
         tele_events: list = []
         surf_events: list = []
-        cgps_events: list = []
+        cgnss_events: list = []
         static_events: list = []
 
         # validate files
@@ -342,11 +342,11 @@ def many_events(
             with open(event_folder / "surf_waves.json") as sw:
                 traces_surf = json.load(sw)
             surf_events = surf_events + [traces_surf]
-        if "cgps" in chosen_data_types:
-            with open(event_folder / "cgps_waves.json") as cw:
-                traces_cgps = json.load(cw)
-            cgps_events = cgps_events + [traces_cgps]
-        if "gps" in chosen_data_types:
+        if "cgnss" in chosen_data_types:
+            with open(event_folder / "cgnss_waves.json") as cw:
+                traces_cgnss = json.load(cw)
+            cgnss_events = cgnss_events + [traces_cgnss]
+        if "gnss" in chosen_data_types:
             with open(event_folder / "static_data.json") as sd:
                 static_data = json.load(sd)
             static_events = static_events + [static_data]
@@ -359,14 +359,14 @@ def many_events(
     get_segments_events(segments_events, tensors, directory=directory)
     if "strong" in chosen_data_types:
         get_waveforms_events(strong_motion_events, "strong", directory=directory)
-    if "cgps" in chosen_data_types:
-        get_waveforms_events(cgps_events, "cgps", directory=directory)
+    if "cgnss" in chosen_data_types:
+        get_waveforms_events(cgnss_events, "cgnss", directory=directory)
     if "body" in chosen_data_types:
         get_waveforms_events(tele_events, "body", directory=directory)
     if "surf" in chosen_data_types:
         get_waveforms_events(surf_events, "surf", directory=directory)
-    if "gps" in chosen_data_types:
-        get_waveforms_events(static_events, "gps", directory=directory)
+    if "gnss" in chosen_data_types:
+        get_waveforms_events(static_events, "gnss", directory=directory)
 
 
 @app.command(help="Write modelling properties file")
@@ -560,16 +560,16 @@ def sampling_filtering(
     gcmt_tensor_file: pathlib.Path = typer.Argument(
         ..., help="Path to the GCMT moment tensor file"
     ),
-    cgps_dt: float = typer.Option(
+    cgnss_dt: float = typer.Option(
         None,
         "-cdt",
-        "--cgps-dt",
-        help="CGPS dt to be used in in USGS routines",
+        "--cgnss-dt",
+        help="CGNSS dt to be used in in USGS routines",
     ),
 ):
     # get tensor information
     tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
-    properties_json(tensor_info, dt_cgps=cgps_dt, data_directory=directory)
+    properties_json(tensor_info, dt_cgnss=cgnss_dt, data_directory=directory)
 
 
 @app.command(help="Convert the static solution to SRF format")
@@ -603,7 +603,7 @@ def static_to_srf(
     chosen_data_types: List[str]
     chosen_data_types = [d.value for d in data_types]
     for d in data_types:
-        if d not in ["insar", "gps"]:
+        if d not in ["insar", "gnss"]:
             validate_files([directory / DEFAULT_MANAGEMENT_FILES[d]])
 
     # get tensor information
@@ -683,7 +683,7 @@ def static_to_fsp(
     chosen_data_types: List[str]
     chosen_data_types = [d.value for d in data_types]
     for d in data_types:
-        if d not in ["insar", "gps"]:
+        if d not in ["insar", "gnss"]:
             validate_files([directory / DEFAULT_MANAGEMENT_FILES[d]])
 
     # get tensor information
@@ -740,8 +740,8 @@ def synthetic_sac(
         synthetics_to_SAC("surf", 10, directory)
     if "strong" in chosen_data_types:
         synthetics_to_SAC("strong", 10, directory)
-    if "cgps" in chosen_data_types:
-        synthetics_to_SAC("cgps", 10, directory)
+    if "cgnss" in chosen_data_types:
+        synthetics_to_SAC("cgnss", 10, directory)
 
 
 @app.command(help="Write the tensor file from a GCMT moment tensor")
@@ -864,15 +864,15 @@ def update_inputs(
             data_type="strong",
             directory=directory,
         )
-    if "cgps" in chosen_data_types:
-        validate_files([directory / "cgps_waves.json"])
+    if "cgnss" in chosen_data_types:
+        validate_files([directory / "cgnss_waves.json"])
         input_chen_near_field(
             tensor_info=tensor_info,
             data_prop=data_prop,
-            data_type="cgps",
+            data_type="cgnss",
             directory=directory,
         )
-    if "gps" in chosen_data_types:
+    if "gnss" in chosen_data_types:
         validate_files([directory / "static_data.json"])
         input_chen_static(directory=directory)
     if "insar" in chosen_data_types:

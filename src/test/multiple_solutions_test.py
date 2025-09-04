@@ -39,7 +39,7 @@ def test___worker(mock_inversion):
                 },
                 f,
             )
-        __worker(TENSOR, "cgps", {}, folder1)
+        __worker(TENSOR, "cgnss", {}, folder1)
     finally:
         shutil.rmtree(tempdir)
 
@@ -178,7 +178,7 @@ def test_multiple_solutions():
             json.dump(get_segments_data(), f)
         multiple_solutions(
             TENSOR,
-            ["cgps"],
+            ["cgnss"],
             {},
             [folder1],
             strike=[1],

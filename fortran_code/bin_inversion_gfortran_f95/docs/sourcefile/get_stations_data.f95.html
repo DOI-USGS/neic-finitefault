@@ -277,14 +277,14 @@
 <a name="ln-14"></a><span class="k">contains</span>
 <a name="ln-15"></a>
 <a name="ln-16"></a>
-<a name="ln-17"></a><span class="k">   subroutine </span><span class="n">get_data</span><span class="p">(</span><span class="n">strong</span><span class="p">,</span> <span class="n">cgps</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">surf</span><span class="p">,</span> <span class="n">dart</span><span class="p">)</span>
+<a name="ln-17"></a><span class="k">   subroutine </span><span class="n">get_data</span><span class="p">(</span><span class="n">strong</span><span class="p">,</span> <span class="n">cgnss</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">surf</span><span class="p">,</span> <span class="n">dart</span><span class="p">)</span>
 <a name="ln-18"></a>   <span class="k">implicit none</span>
 <a name="ln-19"></a>   <span class="c">!!</span>
 <a name="ln-20"></a>   <span class="c">!!  We load into memory, wavelet transform of observed data, and </span>
 <a name="ln-21"></a>   <span class="c">!!  other properties of stations</span>
 <a name="ln-22"></a>   <span class="c">!!</span>
 <a name="ln-23"></a>   <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span>
-<a name="ln-24"></a>   <span class="kt">logical</span> <span class="kd">::</span> <span class="n">strong</span><span class="p">,</span> <span class="n">cgps</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">surf</span><span class="p">,</span> <span class="n">dart</span>
+<a name="ln-24"></a>   <span class="kt">logical</span> <span class="kd">::</span> <span class="n">strong</span><span class="p">,</span> <span class="n">cgnss</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">surf</span><span class="p">,</span> <span class="n">dart</span>
 <a name="ln-25"></a>   <span class="kt">real </span><span class="n">erm</span>
 <a name="ln-26"></a>   <span class="kt">complex </span><span class="n">z0</span>
 <a name="ln-27"></a>
@@ -298,8 +298,8 @@
 <a name="ln-35"></a><span class="k">      call </span><span class="n">get_strong_motion_stations</span><span class="p">(</span><span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span><span class="p">)</span>
 <a name="ln-36"></a>      <span class="n">ll_in</span> <span class="o">=</span> <span class="n">ll_out</span>
 <a name="ln-37"></a>   <span class="k">end if</span>
-<a name="ln-38"></a><span class="k">   if</span> <span class="p">(</span><span class="n">cgps</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-39"></a><span class="k">      call </span><span class="n">get_cgps_stations</span><span class="p">(</span><span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span><span class="p">)</span>
+<a name="ln-38"></a><span class="k">   if</span> <span class="p">(</span><span class="n">cgnss</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-39"></a><span class="k">      call </span><span class="n">get_cgnss_stations</span><span class="p">(</span><span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span><span class="p">)</span>
 <a name="ln-40"></a>      <span class="n">ll_in</span> <span class="o">=</span> <span class="n">ll_out</span>
 <a name="ln-41"></a>   <span class="k">end if</span>
 <a name="ln-42"></a><span class="k">   if</span> <span class="p">(</span><span class="n">body</span><span class="p">)</span> <span class="k">then</span>
@@ -316,7 +316,7 @@
 <a name="ln-53"></a>   <span class="k">end if</span>
 <a name="ln-54"></a><span class="c">!   select case (io_data)</span>
 <a name="ln-55"></a><span class="c">!      case (1)</span>
-<a name="ln-56"></a><span class="c">!         call get_cgps_stations(ll_in, ll_out)</span>
+<a name="ln-56"></a><span class="c">!         call get_cgnss_stations(ll_in, ll_out)</span>
 <a name="ln-57"></a><span class="c">!      case (2)</span>
 <a name="ln-58"></a><span class="c">!         call get_strong_motion_stations(ll_in, ll_out)</span>
 <a name="ln-59"></a><span class="c">!      case (3)</span>
@@ -324,11 +324,11 @@
 <a name="ln-61"></a><span class="c">!      case (4)</span>
 <a name="ln-62"></a><span class="c">!         call get_strong_motion_stations(ll_in, ll_out)</span>
 <a name="ln-63"></a><span class="c">!         lL_in = ll_out</span>
-<a name="ln-64"></a><span class="c">!         call get_cgps_stations(ll_in, ll_out)</span>
+<a name="ln-64"></a><span class="c">!         call get_cgnss_stations(ll_in, ll_out)</span>
 <a name="ln-65"></a><span class="c">!      case (5)</span>
 <a name="ln-66"></a><span class="c">!         call get_body_waves_stations(ll_in, ll_out)</span>
 <a name="ln-67"></a><span class="c">!         ll_in = ll_out</span>
-<a name="ln-68"></a><span class="c">!         call get_cgps_stations(ll_in, ll_out)</span>
+<a name="ln-68"></a><span class="c">!         call get_cgnss_stations(ll_in, ll_out)</span>
 <a name="ln-69"></a><span class="c">!      case (6)</span>
 <a name="ln-70"></a><span class="c">!         call get_body_waves_stations(ll_in, ll_out)</span>
 <a name="ln-71"></a><span class="c">!         ll_in = ll_out</span>
@@ -338,7 +338,7 @@
 <a name="ln-75"></a><span class="c">!         ll_in = ll_out</span>
 <a name="ln-76"></a><span class="c">!         call get_surface_waves_stations(ll_in, ll_out)</span>
 <a name="ln-77"></a><span class="c">!      case (8)</span>
-<a name="ln-78"></a><span class="c">!         call get_cgps_stations(ll_in, ll_out)</span>
+<a name="ln-78"></a><span class="c">!         call get_cgnss_stations(ll_in, ll_out)</span>
 <a name="ln-79"></a><span class="c">!         ll_in = ll_out</span>
 <a name="ln-80"></a><span class="c">!         call get_surface_waves_stations(ll_in, ll_out)</span>
 <a name="ln-81"></a><span class="c">!      case (9)</span>
@@ -350,13 +350,13 @@
 <a name="ln-87"></a><span class="c">!         ll_in = ll_out</span>
 <a name="ln-88"></a><span class="c">!         call get_strong_motion_stations(ll_in, ll_out)</span>
 <a name="ln-89"></a><span class="c">!         ll_in = lL_out</span>
-<a name="ln-90"></a><span class="c">!         call get_cgps_stations(ll_in, ll_out)</span>
+<a name="ln-90"></a><span class="c">!         call get_cgnss_stations(ll_in, ll_out)</span>
 <a name="ln-91"></a><span class="c">!      case (11)</span>
 <a name="ln-92"></a><span class="c">!         call get_body_waves_stations(ll_in, ll_out)</span>
 <a name="ln-93"></a><span class="c">!         ll_in = ll_out</span>
 <a name="ln-94"></a><span class="c">!         call get_surface_waves_stations(ll_in, ll_out)</span>
 <a name="ln-95"></a><span class="c">!         ll_in = ll_out</span>
-<a name="ln-96"></a><span class="c">!         call get_cgps_stations(ll_in, ll_out)</span>
+<a name="ln-96"></a><span class="c">!         call get_cgnss_stations(ll_in, ll_out)</span>
 <a name="ln-97"></a><span class="c">!      case (12)</span>
 <a name="ln-98"></a><span class="c">!         call get_body_waves_stations(ll_in, ll_out)</span>
 <a name="ln-99"></a><span class="c">!         ll_in = ll_out</span>
@@ -368,13 +368,13 @@
 <a name="ln-105"></a><span class="c">!         ll_in = ll_out</span>
 <a name="ln-106"></a><span class="c">!         call get_surface_waves_stations(ll_in, ll_out)</span>
 <a name="ln-107"></a><span class="c">!         lL_in = ll_out</span>
-<a name="ln-108"></a><span class="c">!         call get_cgps_stations(ll_in, ll_out)</span>
+<a name="ln-108"></a><span class="c">!         call get_cgnss_stations(ll_in, ll_out)</span>
 <a name="ln-109"></a><span class="c">!      case (14)</span>
 <a name="ln-110"></a><span class="c">!         call get_body_waves_stations(ll_in, ll_out)</span>
 <a name="ln-111"></a><span class="c">!         ll_in = ll_out</span>
 <a name="ln-112"></a><span class="c">!         call get_strong_motion_stations(ll_in, ll_out)</span>
 <a name="ln-113"></a><span class="c">!         ll_in = ll_out</span>
-<a name="ln-114"></a><span class="c">!         call get_cgps_stations(ll_in, ll_out)</span>
+<a name="ln-114"></a><span class="c">!         call get_cgnss_stations(ll_in, ll_out)</span>
 <a name="ln-115"></a><span class="c">!      case (15)</span>
 <a name="ln-116"></a><span class="c">!         call get_body_waves_stations(ll_in, ll_out)</span>
 <a name="ln-117"></a><span class="c">!         ll_in = ll_out</span>
@@ -382,7 +382,7 @@
 <a name="ln-119"></a><span class="c">!         ll_in = ll_out</span>
 <a name="ln-120"></a><span class="c">!         call get_surface_waves_stations(ll_in, ll_out)</span>
 <a name="ln-121"></a><span class="c">!         ll_in = ll_out</span>
-<a name="ln-122"></a><span class="c">!         call get_cgps_stations(ll_in, ll_out)</span>
+<a name="ln-122"></a><span class="c">!         call get_cgnss_stations(ll_in, ll_out)</span>
 <a name="ln-123"></a><span class="c">!   endselect   </span>
 <a name="ln-124"></a>   <span class="k">end subroutine </span><span class="n">get_data</span>
 <a name="ln-125"></a>
@@ -502,7 +502,7 @@
 <a name="ln-239"></a>   <span class="k">end subroutine </span><span class="n">get_strong_motion_stations</span>
 <a name="ln-240"></a>
 <a name="ln-241"></a>   
-<a name="ln-242"></a>   <span class="k">subroutine </span><span class="n">get_cgps_stations</span><span class="p">(</span><span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span><span class="p">)</span>
+<a name="ln-242"></a>   <span class="k">subroutine </span><span class="n">get_cgnss_stations</span><span class="p">(</span><span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span><span class="p">)</span>
 <a name="ln-243"></a>   <span class="k">implicit none</span>
 <a name="ln-244"></a><span class="k">   </span><span class="kt">integer </span><span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span><span class="p">,</span> <span class="n">ll_g</span><span class="p">,</span> <span class="p">&amp;</span>
 <a name="ln-245"></a>   <span class="p">&amp;</span>  <span class="n">nstb</span><span class="p">,</span> <span class="n">io_chan</span><span class="p">,</span> <span class="n">nm</span><span class="p">,</span> <span class="n">j_con</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">ir</span><span class="p">,</span> <span class="n">no</span><span class="p">,</span> <span class="p">&amp;</span>
@@ -521,9 +521,9 @@
 <a name="ln-258"></a><span class="c">!  suppose the ni = u3e+11, then then moment of 1cm*1km^2 </span>
 <a name="ln-259"></a><span class="c">!       subfault is 3e+21. The gfs is for Mo = 1e+20</span>
 <a name="ln-260"></a><span class="c">!</span>
-<a name="ln-261"></a>   <span class="k">open</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="s1">&#39;Readlp.cgps&#39;</span><span class="p">,</span><span class="n">status</span><span class="o">=</span><span class="s1">&#39;old&#39;</span><span class="p">)</span>
-<a name="ln-262"></a>   <span class="k">open</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="s1">&#39;Obser.cgps&#39;</span><span class="p">,</span><span class="n">status</span><span class="o">=</span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span>
-<a name="ln-263"></a>   <span class="k">open</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="s1">&#39;Wave.cgps&#39;</span><span class="p">)</span>
+<a name="ln-261"></a>   <span class="k">open</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="s1">&#39;Readlp.cgnss&#39;</span><span class="p">,</span><span class="n">status</span><span class="o">=</span><span class="s1">&#39;old&#39;</span><span class="p">)</span>
+<a name="ln-262"></a>   <span class="k">open</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="s1">&#39;Obser.cgnss&#39;</span><span class="p">,</span><span class="n">status</span><span class="o">=</span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span>
+<a name="ln-263"></a>   <span class="k">open</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="s1">&#39;Wave.cgnss&#39;</span><span class="p">)</span>
 <a name="ln-264"></a>   <span class="k">read</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="n">jmin</span><span class="p">,</span> <span class="n">jmax</span><span class="p">,</span> <span class="n">jfmax</span>
 <a name="ln-265"></a>   <span class="k">read</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="o">*</span><span class="p">)</span>
 <a name="ln-266"></a>   <span class="k">read</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="n">n_wave_weight</span>
@@ -613,7 +613,7 @@
 <a name="ln-350"></a><span class="k">   close</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
 <a name="ln-351"></a>   <span class="k">close</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
 <a name="ln-352"></a>   <span class="n">ll_out</span> <span class="o">=</span> <span class="n">ll_in</span> <span class="o">+</span> <span class="n">n_chan</span>
-<a name="ln-353"></a>   <span class="k">end subroutine </span><span class="n">get_cgps_stations</span>
+<a name="ln-353"></a>   <span class="k">end subroutine </span><span class="n">get_cgnss_stations</span>
 <a name="ln-354"></a>
 <a name="ln-355"></a>   
 <a name="ln-356"></a>   <span class="k">subroutine </span><span class="n">get_body_waves_stations</span><span class="p">(</span><span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span><span class="p">)</span>

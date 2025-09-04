@@ -83,7 +83,7 @@ def plot_waveforms(
                 )
                 ax.hlines(0, -350, np.max(time), "k", lw=1)
                 ax.set_xlim((-350, np.max(time)))
-            elif type_str == "cgps" or type_str == "strong":
+            elif type_str == "cgnss" or type_str == "strong":
                 min_wval = np.min(waveform)
                 max_wval = np.max(waveform)
                 if max_wval > abs(min_wval):
@@ -127,7 +127,7 @@ def plot_waveforms(
                     va="center",
                     color="red",
                 )
-            elif type_str == "cgps" or type_str == "strong":
+            elif type_str == "cgnss" or type_str == "strong":
                 ax.text(
                     tmax,
                     0.6 * ymin,
@@ -143,7 +143,7 @@ def plot_waveforms(
         elif type_str == "surf":
             ax.xaxis.set_major_locator(ticker.MultipleLocator(500))
             ax.yaxis.set_major_locator(ticker.NullLocator())
-        elif type_str == "cgps" or type_str == "strong":
+        elif type_str == "cgnss" or type_str == "strong":
             ax.xaxis.set_major_locator(ticker.MultipleLocator(40))
             ax.yaxis.get_major_locator().set_params(integer=True)  # type:ignore
         if nPlot > len(weights) - 3:
@@ -182,7 +182,7 @@ def add_metadata(
     """
     if type_str is not None:
         # units of waveforms
-        if type_str == "cgps":
+        if type_str == "cgnss":
             unit = "cm"
         elif type_str == "strong":
             unit = "cm/s"
@@ -191,8 +191,10 @@ def add_metadata(
         elif type_str == "surf":
             unit = "mm"
         else:
-            raise ValueError("Data type must be waveform (body, surf, strong, or cgps)")
-        if type_str == "cgps" or type_str == "strong":
+            raise ValueError(
+                "Data type must be waveform (body, surf, strong, or cgnss)"
+            )
+        if type_str == "cgnss" or type_str == "strong":
             if distances is not None:
                 for ax, dist in zip(axes, distances):
                     ax.text(
@@ -303,7 +305,7 @@ def plot_waveform_fits(
     if type_str == "body" or type_str == "surf":
         files = [file for file in files if file["component"] in components]
         print("Creating Waveform Fit Plot: " + str(type_str) + " " + str(components[0]))
-    if type_str == "cgps" or type_str == "strong":
+    if type_str == "cgnss" or type_str == "strong":
         files = [file for file in files]
         print("Creating Waveform Fit Plot: " + str(type_str))
     if not len(files):
@@ -371,7 +373,7 @@ def plot_waveform_fits(
             "type_str": type_str,
             "comps": comp[0],
         }
-    if type_str == "cgps" or type_str == "strong":
+    if type_str == "cgnss" or type_str == "strong":
         axes2 = plot_waveforms(
             list(axes2),
             obs_times,
@@ -415,8 +417,8 @@ def plot_waveform_fits(
         if "BHT" in components:
             plot_name = "Love_surf_waves"
 
-    if type_str == "cgps":
-        plot_name = "cGPS_waves"
+    if type_str == "cgnss":
+        plot_name = "cGNSS_waves"
 
     if type_str == "strong":
         plot_name = "strong_motion_waves"

@@ -19,14 +19,14 @@ module get_stations_data
 contains
 
 
-   subroutine get_data(strong, cgps, body, surf, dart)
+   subroutine get_data(strong, cgnss, body, surf, dart)
    implicit none
 !
 !  Here, we load into memory, wavelet transform of observed data, and 
 !       other properties of stations
 !
    integer :: ll_in, ll_out
-   logical :: strong, cgps, body, surf, dart
+   logical :: strong, cgnss, body, surf, dart
    real erm
    complex z0
 
@@ -41,8 +41,8 @@ contains
       call get_strong_motion_stations(ll_in, ll_out)
       ll_in = ll_out
    end if
-   if (cgps) then
-      call get_cgps_stations(ll_in, ll_out)
+   if (cgnss) then
+      call get_cgnss_stations(ll_in, ll_out)
       ll_in = ll_out
    end if
    if (body) then
@@ -138,7 +138,7 @@ contains
    end subroutine get_strong_motion_stations
 
    
-   subroutine get_cgps_stations(ll_in, ll_out)
+   subroutine get_cgnss_stations(ll_in, ll_out)
    implicit none
    integer ll_in, ll_out, ll_g, io_chan, j_con(11), k, ir, no, &
    &  n_wave_weight, ir_max, n_chan, &
@@ -153,8 +153,8 @@ contains
 !  suppose the ni = u3e+11, then then moment of 1cm*1km^2 
 !       subfault is 3e+21. The gfs is for Mo = 1e+20
 !
-   open(9, file='Readlp.cgps', status='old')
-   open(15, file='Wave.cgps', status='old')
+   open(9, file='Readlp.cgnss', status='old')
+   open(15, file='Wave.cgnss', status='old')
    read(15,*) jmin, jmax, jfmax
    read(15,*)
    read(15,*) n_wave_weight
@@ -183,7 +183,7 @@ contains
    end do
    close(9)
 
-   filename = 'Obser.cgps'
+   filename = 'Obser.cgnss'
    filename = trim(filename)
    call get_waveforms(filename, ir_max, ll_in, ll_out) 
 
@@ -212,7 +212,7 @@ contains
    end do
    close(15)
    ll_out = ll_in + n_chan
-   end subroutine get_cgps_stations
+   end subroutine get_cgnss_stations
 
    
    subroutine get_body_waves_stations(ll_in, ll_out)

@@ -14,14 +14,14 @@ from wasp.get_outputs import (
     get_insar,
     read_solution_fsp_format,
     read_solution_static_format,
-    retrieve_gps,
+    retrieve_gnss,
     synthetics_to_SAC,
 )
 
 from .testutils import (
     END_TO_END_DIR,
     RESULTS_DIR,
-    get_cgps_json,
+    get_cgnss_json,
     get_insar_json,
     get_segments_data,
     get_static_json,
@@ -36,25 +36,26 @@ TENSOR = get_tensor_info()
 def test_get_data_dict():
     tempdir = pathlib.Path(mkdtemp())
     try:
-        cgps_waves = get_cgps_json()
-        new_cgps_waves = update_manager_file_locations(
-            cgps_waves, tempdir / "data", replace_dir=str(RESULTS_DIR / "data")
+        cgnss_waves = get_cgnss_json()
+        new_cgnss_waves = update_manager_file_locations(
+            cgnss_waves, tempdir / "data", replace_dir=str(RESULTS_DIR / "data")
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "synthetics_cgps.txt", tempdir / "synthetics_cgps.txt"
+            RESULTS_DIR / "NP1" / "synthetics_cgnss.txt",
+            tempdir / "synthetics_cgnss.txt",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "waveforms_cgps.txt", tempdir / "waveforms_cgps.txt"
+            RESULTS_DIR / "NP1" / "waveforms_cgnss.txt", tempdir / "waveforms_cgnss.txt"
         )
         os.mkdir(tempdir / "data")
-        os.mkdir(tempdir / "data" / "cGPS")
-        for o, n in zip(cgps_waves, new_cgps_waves):
+        os.mkdir(tempdir / "data" / "cGNSS")
+        for o, n in zip(cgnss_waves, new_cgnss_waves):
             shutil.copyfile(o["file"], n["file"])
         updated = get_data_dict(
-            new_cgps_waves,
-            tempdir / "synthetics_cgps.txt",
+            new_cgnss_waves,
+            tempdir / "synthetics_cgnss.txt",
             True,
-            tempdir / "waveforms_cgps.txt",
+            tempdir / "waveforms_cgnss.txt",
         )
         for wform, target_min, target_max, target_mean in zip(
             updated,
@@ -65,7 +66,9 @@ def test_get_data_dict():
             assert np.min(wform["synthetic"]) == target_min
             assert np.max(wform["synthetic"]) == target_max
             assert np.mean(wform["synthetic"]) == target_mean
-        updated = get_data_dict(new_cgps_waves, tempdir / "synthetics_cgps.txt", False)
+        updated = get_data_dict(
+            new_cgnss_waves, tempdir / "synthetics_cgnss.txt", False
+        )
         for wform, target_min, target_max, target_mean in zip(
             updated,
             [-25.5165386, -15.0545864, -156.320694],
@@ -210,19 +213,19 @@ def test_read_solution_fsp_format():
 def test_synthetics_to_SAC():
     tempdir = pathlib.Path(mkdtemp())
     try:
-        waveform_type = ["body", "surf", "strong", "cgps"]
-        data_dir = ["BODY", "LONG", "STR", "cGPS"]
+        waveform_type = ["body", "surf", "strong", "cgnss"]
+        data_dir = ["BODY", "LONG", "STR", "cGNSS"]
         waveform_json = [
             "tele_waves.json",
             "surf_waves.json",
             "strong_motion_waves.json",
-            "cgps_waves.json",
+            "cgnss_waves.json",
         ]
         synthetic_txt = [
             "synthetics_body.txt",
             "synthetics_surf.txt",
             "synthetics_strong.txt",
-            "synthetics_cgps.txt",
+            "synthetics_cgnss.txt",
         ]
         target_lon = [
             5.110109806060791,
@@ -285,7 +288,7 @@ def test_synthetics_to_SAC():
         shutil.rmtree(tempdir)
 
 
-def test_retrieve_gps():
+def test_retrieve_gnss():
     tempdir = pathlib.Path(mkdtemp())
     try:
         static_data = get_static_json()
@@ -297,7 +300,7 @@ def test_retrieve_gps():
             tempdir / "static_synthetics.txt",
         )
 
-        names, lats, lons, observed, synthetic, error = retrieve_gps(directory=tempdir)
+        names, lats, lons, observed, synthetic, error = retrieve_gnss(directory=tempdir)
         assert names == [
             "VALN",
             "ZAPA",

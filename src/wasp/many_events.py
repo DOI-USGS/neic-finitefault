@@ -21,9 +21,9 @@ def get_waveforms_events(
     :type directory: Union[pathlib.Path, str], optional
     """
     directory = pathlib.Path(directory)
-    if "cgps" in data_type:
-        file_name = "cgps_events.txt"
-        dict_name = "cgps_waves.json"
+    if "cgnss" in data_type:
+        file_name = "cgnss_events.txt"
+        dict_name = "cgnss_waves.json"
     if "strong" in data_type:
         file_name = "strong_motion_events.txt"
         dict_name = "strong_motion_waves.json"
@@ -33,7 +33,7 @@ def get_waveforms_events(
     if "surf" in data_type:
         file_name = "surf_events.txt"
         dict_name = "surf_waves.json"
-    if "gps" in data_type:
+    if "gnss" in data_type:
         file_name = "static_events.txt"
         dict_name = "static_data.json"
     get_waveforms_events2(waveforms_events, directory / file_name)

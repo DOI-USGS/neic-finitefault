@@ -49,8 +49,8 @@ def manual_shift(
         json_file = "tele_waves.json"
     if data_type == "strong":
         json_file = "strong_motion_waves.json"
-    if data_type == "cgps":
-        json_file = "cgps_waves.json"
+    if data_type == "cgnss":
+        json_file = "cgnss_waves.json"
     if data_type == "surf":
         json_file = "surf_waves.json"
     with open(directory / json_file) as f:
@@ -62,7 +62,9 @@ def manual_shift(
         else (
             "synthetics_strong.txt"
             if data_type == "strong"
-            else "synthetics_surf.txt" if data_type == "surf" else "synthetics_cgps.txt"
+            else (
+                "synthetics_surf.txt" if data_type == "surf" else "synthetics_cgnss.txt"
+            )
         )
     )
     files = get_outputs.get_data_dict(
@@ -123,7 +125,7 @@ def manual_shift(
                             ]
                             stream[0].data = stream[0].data - new_baseline
                             stream.write(channel["file"], format="SAC", byteorder=0)
-        else:  # strong and cgps data_type
+        else:  # strong and cgnss data_type
             compon = 0  # sanity check that there are 3 components being adjusted here
             tr_shift = channel_shift
             for idx in range(len(files) - 1, -1, -1):
@@ -192,7 +194,7 @@ def plot_3comp_shift(
     :type zero_start: bool
     """
     plot_folder: Union[pathlib.Path, str] = (
-        "strong_shift" if data_type == "strong" else "cgps_shift"
+        "strong_shift" if data_type == "strong" else "cgnss_shift"
     )
     if not os.path.isdir(plot_folder):
         os.mkdir(plot_folder)
@@ -206,14 +208,14 @@ def plot_3comp_shift(
     if data_type == "strong":
         json_file = "strong_motion_waves.json"
         units = "Velocity (cm/s)"
-    if data_type == "cgps":
-        json_file = "cgps_waves.json"
+    if data_type == "cgnss":
+        json_file = "cgnss_waves.json"
         units = "Displacement (cm)"
     with open(directory / json_file) as fs:
         files = json.load(fs)
 
     synthetics_file = (
-        "synthetics_strong.txt" if data_type == "strong" else "synthetics_cgps.txt"
+        "synthetics_strong.txt" if data_type == "strong" else "synthetics_cgnss.txt"
     )
     files = get_outputs.get_data_dict(
         files, syn_file=synthetics_file, directory=directory
@@ -539,18 +541,18 @@ def shift_match_regional(
     if data_type == "strong":
         json_file = "strong_motion_waves.json"
         units = "Velocity (cm/s)"
-    if data_type == "cgps":
-        json_file = "cgps_waves.json"
+    if data_type == "cgnss":
+        json_file = "cgnss_waves.json"
         units = "Displacement (cm)"
     with open(directory / json_file) as fs:
         files = json.load(fs)
     synthetics_file = (
-        "synthetics_strong.txt" if data_type == "strong" else "synthetics_cgps.txt"
+        "synthetics_strong.txt" if data_type == "strong" else "synthetics_cgnss.txt"
     )
 
     dt = float(files[0]["dt"])
     plot_folder: Union[pathlib.Path, str] = (
-        "strong_shift" if data_type == "strong" else "cgps_shift"
+        "strong_shift" if data_type == "strong" else "cgnss_shift"
     )
     files = get_outputs.get_data_dict(
         files, syn_file=synthetics_file, directory=directory
@@ -663,8 +665,8 @@ def save_waveforms(data_type: str, files: List[dict]):
         json_file = "tele_waves.json"
     if data_type == "strong":
         json_file = "strong_motion_waves.json"
-    if data_type == "cgps":
-        json_file = "cgps_waves.json"
+    if data_type == "cgnss":
+        json_file = "cgnss_waves.json"
     if data_type == "surf":
         json_file = "surf_waves.json"
     with open(json_file, "w") as f:

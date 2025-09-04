@@ -14,7 +14,7 @@ from .testutils import (
     END_TO_END_DIR,
     HOME,
     RESULTS_DIR,
-    get_cgps_json,
+    get_cgnss_json,
     get_insar_json,
     get_sampling_filter,
     get_static_json,
@@ -48,7 +48,7 @@ CHANNELS = [
         "trace_weight": 1.0,
     },
 ]
-CGPS_WAVES = get_cgps_json()
+CGNSS_WAVES = get_cgnss_json()
 CMT = get_tensor_info()
 INSAR_DATA = get_insar_json()
 SAMPLING_FILTER = get_sampling_filter()
@@ -288,8 +288,8 @@ def test_many_events():
             tempdir / "strong_motion_waves.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "cgps_waves.json",
-            tempdir / "cgps_waves.json",
+            RESULTS_DIR / "NP1" / "cgnss_waves.json",
+            tempdir / "cgnss_waves.json",
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "static_data.json",
@@ -325,8 +325,8 @@ def test_many_events():
             tempdir / "surf_waves.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "cgps_waves.json",
-            tempdir / "cgps_waves.json",
+            RESULTS_DIR / "NP1" / "cgnss_waves.json",
+            tempdir / "cgnss_waves.json",
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "sampling_filter.json",
@@ -348,9 +348,9 @@ def test_many_events():
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
-                "cgps",
+                "cgnss",
                 "-t",
-                "gps",
+                "gnss",
                 "-t",
                 "insar",
                 "-t",
@@ -389,7 +389,7 @@ def test_model_props():
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
-                "cgps",
+                "cgnss",
                 "-t",
                 "insar",
                 "-t",
@@ -618,8 +618,8 @@ def test_static_srf():
             tempdir / "strong_motion_waves.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "cgps_waves.json",
-            tempdir / "cgps_waves.json",
+            RESULTS_DIR / "NP1" / "cgnss_waves.json",
+            tempdir / "cgnss_waves.json",
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "static_data.json",
@@ -658,9 +658,9 @@ def test_static_srf():
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
-                "cgps",
+                "cgnss",
                 "-t",
-                "gps",
+                "gnss",
                 "-t",
                 "insar",
                 "-t",
@@ -678,9 +678,9 @@ def test_static_srf():
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
-                "cgps",
+                "cgnss",
                 "-t",
-                "gps",
+                "gnss",
                 "-t",
                 "insar",
                 "-t",
@@ -702,7 +702,7 @@ def test_static_srf():
         target = [
             "2.0\n",
             "#\n",
-            "# Data :\tBODY\tSURF\tSTRONG\tcGPS\tGPS\tInSAR\tDART\tTRIL\tLEVEL\tOTHER\n",
+            "# Data :\tBODY\tSURF\tSTRONG\tcGNSS\tGNSS\tInSAR\tDART\tTRIL\tLEVEL\tOTHER\n",
             "# NoS  :\t19\t19\t3\t3\t10\t2166\t0\t0\t0\t0\n",
             "# PHImx :\t186.81\t186.81\t246.51\t312.71\t183.06\t2\t0.00\t0.0\t0.0\t0.0\n",
             "# Rmin :\t40.80\t40.80\t1.11\t0.89\t0.36\t--\t0.00\t0.0\t0.0\t0.0\n",
@@ -760,8 +760,8 @@ def test_static_fsp():
             tempdir / "strong_motion_waves.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "cgps_waves.json",
-            tempdir / "cgps_waves.json",
+            RESULTS_DIR / "NP1" / "cgnss_waves.json",
+            tempdir / "cgnss_waves.json",
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "static_data.json",
@@ -805,8 +805,8 @@ def test_static_fsp():
             tempdir / "surf_waves.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "cgps_waves.json",
-            tempdir / "cgps_waves.json",
+            RESULTS_DIR / "NP1" / "cgnss_waves.json",
+            tempdir / "cgnss_waves.json",
         )
 
         result = runner.invoke(
@@ -816,9 +816,9 @@ def test_static_fsp():
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
-                "cgps",
+                "cgnss",
                 "-t",
-                "gps",
+                "gnss",
                 "-t",
                 "insar",
                 "-t",
@@ -836,9 +836,9 @@ def test_static_fsp():
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
-                "cgps",
+                "cgnss",
                 "-t",
-                "gps",
+                "gnss",
                 "-t",
                 "insar",
                 "-t",
@@ -880,8 +880,8 @@ def test_update_inputs():
             tempdir,
             replace_dir=str(RESULTS_DIR / "data"),
         )
-        new_cgps_waves = update_manager_file_locations(
-            CGPS_WAVES, tempdir, replace_dir=str(RESULTS_DIR / "data")
+        new_cgnss_waves = update_manager_file_locations(
+            CGNSS_WAVES, tempdir, replace_dir=str(RESULTS_DIR / "data")
         )
         new_insar = update_manager_file_locations(
             INSAR_DATA, tempdir, replace_dir=str(RESULTS_DIR / "NP1"), file_key="name"
@@ -892,8 +892,8 @@ def test_update_inputs():
             json.dump(new_surf_waves, f)
         with open(tempdir / "strong_motion_waves.json", "w") as f:
             json.dump(new_strong_waves, f)
-        with open(tempdir / "cgps_waves.json", "w") as f:
-            json.dump(new_cgps_waves, f)
+        with open(tempdir / "cgnss_waves.json", "w") as f:
+            json.dump(new_cgnss_waves, f)
         with open(tempdir / "insar_data.json", "w") as f:
             json.dump(new_insar, f)
         shutil.copyfile(
@@ -909,7 +909,7 @@ def test_update_inputs():
             tempdir / "static_data.json",
         )
         os.mkdir(tempdir / "STR")
-        os.mkdir(tempdir / "cGPS")
+        os.mkdir(tempdir / "cGNSS")
         os.mkdir(tempdir / "SH")
         os.mkdir(tempdir / "P")
         os.mkdir(tempdir / "LOVE")
@@ -921,8 +921,8 @@ def test_update_inputs():
             new_tele_waves,
             STRONG_WAVES,
             new_strong_waves,
-            CGPS_WAVES,
-            new_cgps_waves,
+            CGNSS_WAVES,
+            new_cgnss_waves,
         ):
             shutil.copyfile(a["file"], b["file"])
             shutil.copyfile(c["file"], d["file"])
@@ -951,9 +951,9 @@ def test_update_inputs():
                 "update-inputs",
                 str(tempdir),
                 "-t",
-                "cgps",
+                "cgnss",
                 "-t",
-                "gps",
+                "gnss",
                 "-t",
                 "insar",
                 "-t",
@@ -984,8 +984,8 @@ def test_velmodel_from_tensor():
             tempdir / "strong_motion_waves.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "cgps_waves.json",
-            tempdir / "cgps_waves.json",
+            RESULTS_DIR / "NP1" / "cgnss_waves.json",
+            tempdir / "cgnss_waves.json",
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "static_data.json",
@@ -1029,8 +1029,8 @@ def test_velmodel_from_tensor():
             tempdir / "surf_waves.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "cgps_waves.json",
-            tempdir / "cgps_waves.json",
+            RESULTS_DIR / "NP1" / "cgnss_waves.json",
+            tempdir / "cgnss_waves.json",
         )
 
         result = runner.invoke(
@@ -1040,9 +1040,9 @@ def test_velmodel_from_tensor():
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
-                "cgps",
+                "cgnss",
                 "-t",
-                "gps",
+                "gnss",
                 "-t",
                 "insar",
                 "-t",
@@ -1060,9 +1060,9 @@ def test_velmodel_from_tensor():
                 str(tempdir),
                 str(tempdir / "20003k7a_cmt_CMT"),
                 "-t",
-                "cgps",
+                "cgnss",
                 "-t",
-                "gps",
+                "gnss",
                 "-t",
                 "insar",
                 "-t",

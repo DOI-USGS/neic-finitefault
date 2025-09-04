@@ -701,20 +701,20 @@ def __create_long_period(
 
 
 ###################################
-# cgps
+# cgnss
 ###################################
 
 
-def select_process_cgps(
-    cgps_files: List[str],
+def select_process_cgnss(
+    cgnss_files: List[str],
     tensor_info: dict,
     data_prop: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Module for selecting and processing cGPS data
+    """Module for selecting and processing cGNSS data
 
-    :param cgps_files: The list of available cGPS file's properties
-    :type cgps_files: List[str]
+    :param cgnss_files: The list of available cGNSS file's properties
+    :type cgnss_files: List[str]
     :param tensor_info: The moment tensor information
     :type tensor_info: dict
     :param data_prop: The sampling/filtering properties
@@ -730,31 +730,31 @@ def select_process_cgps(
     directory = pathlib.Path(directory)
     if not os.path.isdir(directory / "logs"):
         os.mkdir(directory / "logs")
-    if not os.path.isdir(directory / "cGPS"):
-        os.mkdir(directory / "cGPS")
+    if not os.path.isdir(directory / "cGNSS"):
+        os.mkdir(directory / "cGNSS")
     logger1 = ml.create_log(
-        "cgps_processing", os.path.join(directory / "logs", "cgps_processing.log")
+        "cgnss_processing", os.path.join(directory / "logs", "cgnss_processing.log")
     )
     logger1 = ml.add_console_handler(logger1)
-    logger1.info("Process cGPS data")
+    logger1.info("Process cGNSS data")
     separator = "\n*************************************************\n"
-    logger1.info("Select cGPS traces")
-    __select_cgps_files(cgps_files, tensor_info, directory=directory)
-    logger1.info("Process selected cGPS traces")
-    cgps_dir = directory / "cGPS"
-    processed_files = glob.glob(str(cgps_dir) + "/processed*")
+    logger1.info("Select cGNSS traces")
+    __select_cgnss_files(cgnss_files, tensor_info, directory=directory)
+    logger1.info("Process selected cGNSS traces")
+    cgnss_dir = directory / "cGNSS"
+    processed_files = glob.glob(str(cgnss_dir) + "/processed*")
     for processed_file in processed_files:
         if os.path.isfile(processed_file):
             os.remove(processed_file)
-    cgps_files1 = glob.glob(str(cgps_dir) + "/*L[HXY][ENZ].sac") + glob.glob(
-        str(cgps_dir) + "/*L[HXY][ENZ].SAC"
+    cgnss_files1 = glob.glob(str(cgnss_dir) + "/*L[HXY][ENZ].sac") + glob.glob(
+        str(cgnss_dir) + "/*L[HXY][ENZ].SAC"
     )
-    __change_start(cgps_files1, tensor_info, cgps=True)
-    new_process_cgps(
-        tensor_info, cgps_files1, data_prop, logger=logger1, directory=directory
+    __change_start(cgnss_files1, tensor_info, cgnss=True)
+    new_process_cgnss(
+        tensor_info, cgnss_files1, data_prop, logger=logger1, directory=directory
     )
-    logger1.info("cGPS waves have been succesfully processed")
-    strong_files3 = glob.glob(os.path.join(cgps_dir, "processed*"))
+    logger1.info("cGNSS waves have been succesfully processed")
+    strong_files3 = glob.glob(os.path.join(cgnss_dir, "processed*"))
     select_strong_stations(tensor_info, strong_files3)
     ml.close_log(logger1)
     return
@@ -814,16 +814,16 @@ def __select_time(sac: str, tensor_info: dict) -> UTCDateTime:
     return st[0].stats.starttime - origin_time < 20 * 60
 
 
-def __select_cgps_files(
-    cgps_files: List[str],
+def __select_cgnss_files(
+    cgnss_files: List[str],
     tensor_info: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Select cgps data and do some basic quality control
+    """Select cgnss data and do some basic quality control
        (synthetic length, missing data check, station distance within bounds)
 
-    :param cgps_files: The cgps files
-    :type cgps_files: List[str]
+    :param cgnss_files: The cgnss files
+    :type cgnss_files: List[str]
     :param tensor_info: The moment tensor information
     :type tensor_info: dict
     :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
@@ -840,7 +840,7 @@ def __select_cgps_files(
     depth = tensor_info["depth"]
     distance = 2 if time_shift < 50 else 4
 
-    for sac in cgps_files:
+    for sac in cgnss_files:
         stream = read(sac)
         station_lat = stream[0].stats.sac.stla
         station_lon = stream[0].stats.sac.stlo
@@ -901,19 +901,19 @@ def __select_cgps_files(
 
         station = stream[0].stats.station
         channel = stream[0].stats.channel
-        name = os.path.join(directory, "cGPS", "{}_{}.sac".format(station, channel))
+        name = os.path.join(directory, "cGNSS", "{}_{}.sac".format(station, channel))
         stream.write(name, format="SAC", byteorder=0)
 
 
-def __change_start(stations_str: List[str], tensor_info: dict, cgps: bool = False):
-    """Routine for modifying start time of cGPS data
+def __change_start(stations_str: List[str], tensor_info: dict, cgnss: bool = False):
+    """Routine for modifying start time of cGNSS data
 
     :param stations_str: The list of
     :type stations_str: List[str]
     :param tensor_info: The moment tensor information
     :type tensor_info: dict
-    :param cgps: Whether this is cgps data, defaults to False
-    :type cgps: bool, optional
+    :param cgnss: Whether this is cgnss data, defaults to False
+    :type cgnss: bool, optional
     """
     event_lat = tensor_info["lat"]
     event_lon = tensor_info["lon"]
@@ -933,7 +933,7 @@ def __change_start(stations_str: List[str], tensor_info: dict, cgps: bool = Fals
         diff = st[0].stats.starttime - UTCDateTime(tensor_info["datetime"])
         if diff > est_arrival:
             continue
-        if cgps:
+        if cgnss:
             st[0].trim(
                 endtime=UTCDateTime(tensor_info["datetime"]) + 1100
             )  # - 60 * 10)
@@ -944,14 +944,14 @@ def __change_start(stations_str: List[str], tensor_info: dict, cgps: bool = Fals
         st.write(sac, format="SAC", byteorder=0)
 
 
-def new_process_cgps(
+def new_process_cgnss(
     tensor_info: dict,
     stations_str: List[str],
     data_prop: dict,
     logger: Optional[logging.Logger] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Routine for processing (filtering and filling header) selected cGPS data
+    """Routine for processing (filtering and filling header) selected cGNSS data
 
     :param tensor_info: The moment tensor information
     :type tensor_info: dict
@@ -966,24 +966,24 @@ def new_process_cgps(
     """
     directory = pathlib.Path(directory)
     start = UTCDateTime(tensor_info["datetime"])
-    filter_cgps = data_prop["strong_filter"]
-    if "cgps_filter" in data_prop:
-        filter_cgps = data_prop["cgps_filter"]
+    filter_cgnss = data_prop["strong_filter"]
+    if "cgnss_filter" in data_prop:
+        filter_cgnss = data_prop["cgnss_filter"]
     lat_ep = tensor_info["lat"]
     lon_ep = tensor_info["lon"]
     sampling = data_prop["sampling"]
-    dt_cgps = sampling["dt_cgps"]
+    dt_cgnss = sampling["dt_cgnss"]
 
-    high_freq = min(filter_cgps["high_freq"], 0.5)
+    high_freq = min(filter_cgnss["high_freq"], 0.5)
 
     for sac in stations_str:
         st = read(sac)
-        if dt_cgps > st[0].stats.delta:
-            ratio = int(dt_cgps / st[0].stats.delta)
+        if dt_cgnss > st[0].stats.delta:
+            ratio = int(dt_cgnss / st[0].stats.delta)
             st[0].decimate(ratio)
-        if st[0].stats.delta > dt_cgps:
-            st[0].interpolate(1 / dt_cgps)
-            # st[0].resample(sampling_rate=1 / dt_cgps)
+        if st[0].stats.delta > dt_cgnss:
+            st[0].interpolate(1 / dt_cgnss)
+            # st[0].resample(sampling_rate=1 / dt_cgnss)
         sacheader = SACTrace.from_obspy_trace(st[0])
         sacheader.t9 = high_freq
         sacheader.write(sac, byteorder="little")
@@ -996,8 +996,8 @@ def new_process_cgps(
         sacheader.write(sac, byteorder="little")
     _filter_decimate(
         stations_str,
-        filter_cgps,
-        dt_cgps,
+        filter_cgnss,
+        dt_cgnss,
         corners=4,
         passes=2,
         decimate=False,

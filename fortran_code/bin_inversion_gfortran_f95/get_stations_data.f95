@@ -15,7 +15,7 @@ module get_stations_data
    integer :: mmm(max_stations), llove(max_stations), io_up(max_stations), idata(max_stations), &
          &     disp_or_vel(max_stations)
    logical :: dart_channels(max_stations)
-   logical :: cgps_channels(max_stations)
+   logical :: cgnss_channels(max_stations)
    integer :: lnpt, nlen, jmin, jmax, max_freq, start(max_stations)
    integer :: event_sta(max_stations)
 
@@ -95,11 +95,11 @@ contains
    end subroutine get_event_sta
 
 
-   subroutine get_data(strong, cgps, body, surf, dart)
+   subroutine get_data(strong, cgnss, body, surf, dart)
 !
 !  Args:
 !  strong: True if strong motion data are used, False otherwise
-!  cgps: True if cGPS data are used, False otherwise
+!  cgnss: True if cGNSS data are used, False otherwise
 !  body: True if body wave data are used, False otherwise
 !  surf: True if surface wave data are used, False otherwise
 !  dart: True if DART data are used, False otherwise
@@ -110,7 +110,7 @@ contains
 !       other properties of stations
 !
    integer :: first, last
-   logical :: strong, cgps, body, surf, dart
+   logical :: strong, cgnss, body, surf, dart
 
    write(*,*)'Get stations metadata and waveforms and store them in memory...'
    first = 0
@@ -120,8 +120,8 @@ contains
       call get_near_field_stations(first, last, strong, .False.)
       first = last
    end if
-   if (cgps) then
-      call get_near_field_stations(first, last, .False., cgps)
+   if (cgnss) then
+      call get_near_field_stations(first, last, .False., cgnss)
       first = last
    end if
    if (body) then
@@ -140,13 +140,13 @@ contains
    end subroutine get_data
 
 
-   subroutine get_near_field_stations(first, last, strong, cgps)
+   subroutine get_near_field_stations(first, last, strong, cgnss)
 !
 !  Args:
 !  first: number of initial channel
 !  last: number of final channel
 !  strong: True if strong motion data are used, False otherwise
-!  cgps: True if cGPS data are used, False otherwise
+!  cgnss: True if cGNSS data are used, False otherwise
 !
    implicit none
    integer first, last, channel, channel0, misfit_type0(11), k, i, int0, &
@@ -155,12 +155,12 @@ contains
    logical, parameter :: dart = .False.
    character(len=20) filename, string2, string1
    character(len=30) event_file, channels_file, wavelets_file, waveforms_file
-   logical :: is_file, strong, cgps
+   logical :: is_file, strong, cgnss
 !   character(len=6) sta_name(max_stations)
 !   character(len=3) component(max_stations)
 
    if (strong) write(*,*)'Get strong motion stations metadata and waveforms...'
-   if (cgps) write(*,*)'Get cGPS stations metadata and waveforms...'
+   if (cgnss) write(*,*)'Get cGNSS stations metadata and waveforms...'
    used_channels = 0
 !
 !  suppose the ni = u3e+11, then then moment of 1cm*1km^2 
@@ -168,11 +168,11 @@ contains
 !
 
    channels_file = 'channels_strong.txt'
-   if (cgps) channels_file = 'channels_cgps.txt'
+   if (cgnss) channels_file = 'channels_cgnss.txt'
    channels_file = trim(channels_file)
    open(9,file=channels_file,status='old')
    wavelets_file = 'wavelets_strong.txt'
-   if (cgps) wavelets_file = 'wavelets_cgps.txt'
+   if (cgnss) wavelets_file = 'wavelets_cgnss.txt'
    wavelets_file = trim(wavelets_file)
    open(15,file=wavelets_file, status='old')
    read(15,*) jmin, jmax, max_freq
@@ -195,8 +195,8 @@ contains
  
    do i = 1, stations
       channel = i+first
-      cgps_channels(channel) = .False.
-      if (cgps) cgps_channels(channel) = .True.
+      cgnss_channels(channel) = .False.
+      if (cgnss) cgnss_channels(channel) = .True.
       dart_channels(channel) = .False.
       read(9,*) int0, sta_name(channel), lat_s, lon_s, int1, component(channel), weig(i), int2
       if (weig(i) .gt. 0) used_channels = used_channels + 1
@@ -205,7 +205,7 @@ contains
 !   write(*,*)'channels0: ', used_channels
 
    filename = 'waveforms_strong.txt'
-   if (cgps) filename = 'waveforms_cgps.txt'
+   if (cgnss) filename = 'waveforms_cgnss.txt'
    filename = trim(filename)
    call get_waveforms(filename, channels0, first)
 
@@ -231,7 +231,7 @@ contains
    close(15) 
 
    event_file = 'strong_motion_events.txt'
-   if (cgps) event_file = 'cgps_events.txt'
+   if (cgnss) event_file = 'cgnss_events.txt'
    inquire(file = event_file, exist = is_file)
    if (is_file) then
       open(12, file=event_file, status='old')
@@ -257,7 +257,7 @@ contains
    &  int0, used_channels, int1, love, int2
    real lat_sta, lon_sta, wavelet_weight0(11), dt, & 
    &  rang, az, angle, float1, float2
-   logical, parameter :: cgps=.False., dart = .False.
+   logical, parameter :: cgnss=.False., dart = .False.
    character(len=20) filename, string1, string2
    character(len=30) event_file
    character(len=6)  earth, sttyp 
@@ -299,11 +299,11 @@ contains
    
    filename = 'waveforms_body.txt'
    filename = trim(filename)
-   call get_waveforms(filename, channels0, first)!, cgps, dart)
+   call get_waveforms(filename, channels0, first)!, cgnss, dart)
 
    do i = 1, channels0
       channel = i+first
-      cgps_channels(channel) = .False.
+      cgnss_channels(channel) = .False.
       dart_channels(channel) = .False.
       read(9,*) int1, earth, sttyp, sta_name(channel), fname, &
       & rang, az, lat_sta, lon_sta, angle, float1, &
@@ -360,7 +360,7 @@ contains
    real lat_s, lon_s, dt, ang_ns, ang_ew, &
    &  weig(max_stations, 3), wavelet_weight0(11), dt_sample, &
    &  dip, rake, theta
-   logical, parameter :: cgps=.False., dart=.False.
+   logical, parameter :: cgnss=.False., dart=.False.
    character(len=20) filename, string1, string2
    character(len=30) event_file
 !   character(len=6) sta_name(max_stations)
@@ -401,7 +401,7 @@ contains
 !  
    do i = 1, stations    
       channel = i+first
-      cgps_channels(channel) = .False.
+      cgnss_channels(channel) = .False.
       dart_channels(channel) = .False.
       read(9,*) int0, sta_name(channel), lat_s, lon_s, int1, &
       & io_up(i), io_ns(i), io_ew(i), ang_ns, ang_ew, &
@@ -468,7 +468,7 @@ contains
    integer first, last, channel, misfit_type0(11), k, i, int0, &
    &  n_wave_weight, stations, channels0, int1, int2, used_channels
    real :: lat_s, lon_s, dt, weig(max_stations), wavelet_weight0(11), dt_sample
-   logical, parameter :: cgps=.False., dart=.True.
+   logical, parameter :: cgnss=.False., dart=.True.
    character(len=20) filename
 !   character(len=6) sta_name(max_stations)
 !   character(len=3) component(max_stations)
@@ -499,7 +499,7 @@ contains
  
    do i = 1, stations
       channel = i+first
-      cgps_channels(channel) = .False.
+      cgnss_channels(channel) = .False.
       dart_channels(channel) = .True.
       read(9,*) int0, sta_name(channel), lat_s, lon_s, int1, component(channel), weig(i), int2
       if (weig(i) .gt. 0) used_channels = used_channels + 1
@@ -577,20 +577,20 @@ contains
    real real1(wave_pts2), imag1(wave_pts2), observed2(n_data), &
    &  max_coeff0, mean
    real :: coeffs_obs(n_data)
-   logical :: cgps, dart
+   logical :: cgnss, dart
 !
 ! TODO : how to implement this in a more elegant way?
 !
    do channel = 1, channels
       start1 = start(channel)
-      cgps = cgps_channels(channel)
+      cgnss = cgnss_channels(channel)
       dart = dart_channels(channel)
       mean = sum(observed(start1 - 20:start1, channel)) / 20.0
       index0 = min(start1, nlen - 80)
       do i = 1, wave_pts2
          real1(i) = 0.0 
          imag1(i) = 0.0
-         if (cgps) then
+         if (cgnss) then
             if (i .lt. index0) then
                observed2(i) = observed(i, channel) 
             else
@@ -622,7 +622,7 @@ contains
             atom_max0 = i
          end if
       end do
-      if (dart .or. cgps) then
+      if (dart .or. cgnss) then
          max_coeff0 = 0.0
          do j = jmin, jmax
             n_begin = 2**(j-1)

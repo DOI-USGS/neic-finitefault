@@ -18,7 +18,7 @@ program run_modelling
    real :: t_rise(max_subfaults), t_fall(max_subfaults)
    real :: t
    real*8 :: ramp(18)
-   logical :: static, strong, cgps, dart, body, surf, auto
+   logical :: static, strong, cgnss, dart, body, surf, auto
    logical :: insar, ramp_gf_file
    logical :: use_waveforms, use_static, many_events
    integer :: int0, seed0, int1
@@ -29,7 +29,7 @@ program run_modelling
    static = .False.
    insar = .False.
    strong = .False.
-   cgps = .False.
+   cgnss = .False.
    body = .False.
    surf = .False.
    dart = .False.
@@ -38,17 +38,17 @@ program run_modelling
    do i = 1, iargc()
       call getarg(i, input)
       input = trim(input)
-      if (input .eq.'gps') static = .True.
+      if (input .eq.'gnss') static = .True.
       if (input .eq.'insar') insar = .True.
       if (input .eq.'strong') strong = .True.
-      if (input .eq.'cgps') cgps = .True.
+      if (input .eq.'cgnss') cgnss = .True.
       if (input .eq.'body') body = .True.
       if (input .eq.'surf') surf = .True.
       if (input .eq.'dart') dart = .True.
       if (input .eq.'auto') auto = .True.
       if (input .eq.'many') many_events = .True.
    end do
-   call check_waveforms(strong, cgps, body, surf, dart, use_waveforms)
+   call check_waveforms(strong, cgnss, body, surf, dart, use_waveforms)
    call check_static(static, insar, use_static)
    call n_threads(auto)
    call read_annealing_param()
@@ -65,12 +65,12 @@ program run_modelling
    call regularization_set_fault_parameters()
    call ffmmethod_set_procedure_param()
    if ((use_waveforms) .and. (use_static .eqv. .False.)) then
-      call waveform_ffm(strong, cgps, body, surf, dart, &
+      call waveform_ffm(strong, cgnss, body, surf, dart, &
        & slip, rake, rupt_time, t_rise, t_fall, many_events)
    elseif ((use_static) .and. (use_waveforms .eqv. .False.)) then
       call static_ffm(slip, rake, static, insar, many_events)
    elseif ((use_static) .and. (use_waveforms)) then
-      call mixed_ffm(strong, cgps, body, surf, dart, &
+      call mixed_ffm(strong, cgnss, body, surf, dart, &
        & static, insar, slip, rake, rupt_time, t_rise, t_fall, many_events)
    endif
    call deallocate_ps()

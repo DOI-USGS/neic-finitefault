@@ -18,10 +18,10 @@ REPLACE_DICT = {
     'Obser.str': 'waveforms_strong.txt',
     'Wave.str': 'wavelets_strong.txt',
     'synm.str': 'synthetics_strong.txt',
-    'Readlp.cgps': 'channels_cgps.txt',
-    'Obser.cgps': 'waveforms_cgps.txt',
-    'Wave.cgps': 'wavelets_cgps.txt',
-    'synm.cgps': 'synthetics_cgps.txt',
+    'Readlp.cgnss': 'channels_cgnss.txt',
+    'Obser.cgnss': 'waveforms_cgnss.txt',
+    'Wave.cgnss': 'wavelets_cgnss.txt',
+    'synm.cgnss': 'synthetics_cgnss.txt',
     'filter_tele': 'filter_tele.txt',
     'filter_strong': 'filter_strong.txt',
     'Readlp.static': 'static_data.txt',
@@ -37,7 +37,7 @@ REPLACE_DICT = {
     'continue': 'regularization_borders.txt',
     'continue.special': 'special_regularization_borders.txt',
     'Green.in': 'Green_strong.txt',
-    'Green_cgps.in': 'Green_cgps.txt'
+    'Green_cgnss.in': 'Green_cgnss.txt'
 }
 
 

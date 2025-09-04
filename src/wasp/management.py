@@ -80,12 +80,12 @@ def default_dirs(
     get_near_gf = paths["get_near_gf"]
     modelling = paths["modelling"]
     default_dirs = {
-        "cgps_gf_bank": os.path.join(get_near_gf, "cgps"),
+        "cgnss_gf_bank": os.path.join(get_near_gf, "cgnss"),
         "crust_codes": os.path.join(info, "CNtype2.txt"),
         "finite_fault": os.path.join(modelling, "run_modelling"),
         "forward": os.path.join(modelling, "run_forward"),
         "gf_bank": paths["surf_gf_bank"],
-        "gps_gf": os.path.join(compute_near_gf, "gf_static_f95"),
+        "gnss_gf": os.path.join(compute_near_gf, "gf_static_f95"),
         "litho_model": os.path.join(info, "LITHO1.0.nc"),
         "long_gf_bank": paths["surf_gf_bank"],
         "models_codes": os.path.join(info, "CNtype2_key.txt"),
@@ -337,7 +337,7 @@ def use_waveforms(data_type: List[str]) -> bool:
     use_waveforms = False
     if "strong" in data_type:
         use_waveforms = True
-    if "cgps" in data_type:
+    if "cgnss" in data_type:
         use_waveforms = True
     if "body" in data_type:
         use_waveforms = True

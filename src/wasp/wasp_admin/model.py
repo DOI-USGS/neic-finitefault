@@ -62,11 +62,11 @@ def run(
         "--add-error",
         help="Whether to add error in checkerboard and forward routines",
     ),
-    cgps_dt: float = typer.Option(
+    cgnss_dt: float = typer.Option(
         None,
         "-cdt",
-        "--cgps-dt",
-        help="CGPS dt to be used in in USGS routines",
+        "--cgnss-dt",
+        help="CGNSS dt to be used in in USGS routines",
     ),
     config_file: pathlib.Path = typer.Option(
         CONFIG_PATH, "-c", "--config-file", help="Path to config file"
@@ -235,7 +235,7 @@ def run(
             data_type=data_types,
             default_dirs=default_directories,
             velmodel=velmodel,
-            dt_cgps=cgps_dt,
+            dt_cgnss=cgnss_dt,
             st_response=skip_remove_response,
             config_path=config_file,
             directory=solution_folder,

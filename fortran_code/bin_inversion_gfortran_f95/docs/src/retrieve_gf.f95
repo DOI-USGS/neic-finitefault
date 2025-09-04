@@ -21,14 +21,14 @@ module retrieve_gf
 contains
 
 
-   subroutine get_gf(strong, cgps, body, surf, dart)
+   subroutine get_gf(strong, cgnss, body, surf, dart)
    !!
    !!  Here, we load into memory the green functions for each subfault, for every used station
    !!
    implicit none
 !
    integer ll_in, ll_out
-   logical :: strong, cgps, body, surf, dart
+   logical :: strong, cgnss, body, surf, dart
    allocate(green_dip(npuse, nnsta, nnxy_m))
    allocate(green_stk(npuse, nnsta, nnxy_m))
 
@@ -40,8 +40,8 @@ contains
       call get_strong_motion_gf(ll_in, ll_out)
       ll_in = ll_out
    end if
-   if (cgps) then
-      call get_cgps_gf(ll_in, ll_out)
+   if (cgnss) then
+      call get_cgnss_gf(ll_in, ll_out)
       ll_in = ll_out
    end if
    if (body) then
@@ -58,7 +58,7 @@ contains
    end if
 !   select case (io_data)
 !      case (1)
-!         call get_cgps_gf(ll_in, ll_out)
+!         call get_cgnss_gf(ll_in, ll_out)
 !      case (2)
 !         call get_strong_motion_gf(ll_in, ll_out)
 !      case (3)
@@ -66,11 +66,11 @@ contains
 !      case (4)
 !         call get_strong_motion_gf(ll_in, ll_out)
 !         lL_in = ll_out
-!         call get_cgps_gf(ll_in, ll_out)
+!         call get_cgnss_gf(ll_in, ll_out)
 !      case (5)
 !         call get_body_waves_gf(ll_in, ll_out)
 !         ll_in = ll_out
-!         call get_cgps_gf(ll_in, ll_out)
+!         call get_cgnss_gf(ll_in, ll_out)
 !      case (6)
 !         call get_body_waves_gf(ll_in, ll_out)
 !         ll_in = ll_out
@@ -80,7 +80,7 @@ contains
 !         ll_in = ll_out
 !         call get_surface_waves_gf(ll_in, ll_out)
 !      case (8)
-!         call get_cgps_gf(ll_in, ll_out)
+!         call get_cgnss_gf(ll_in, ll_out)
 !         ll_in = ll_out
 !         call get_surface_waves_gf(ll_in, ll_out)
 !      case (9)
@@ -92,13 +92,13 @@ contains
 !         ll_in = ll_out
 !         call get_strong_motion_gf(ll_in, ll_out)
 !         ll_in = ll_out
-!         call get_cgps_gf(ll_in, ll_out)
+!         call get_cgnss_gf(ll_in, ll_out)
 !      case (11)
 !         call get_body_waves_gf(ll_in, ll_out)
 !         ll_in = ll_out
 !         call get_surface_waves_gf(ll_in, ll_out)
 !         ll_in = ll_out
-!         call get_cgps_gf(ll_in, ll_out)
+!         call get_cgnss_gf(ll_in, ll_out)
 !      case (12)
 !         call get_body_waves_gf(ll_in, ll_out)
 !         ll_in = ll_out
@@ -110,13 +110,13 @@ contains
 !         ll_in = ll_out
 !         call get_surface_waves_gf(ll_in, ll_out)
 !         lL_in = ll_out
-!         call get_cgps_gf(ll_in, ll_out)
+!         call get_cgnss_gf(ll_in, ll_out)
 !      case (14)
 !         call get_body_waves_gf(ll_in, ll_out)
 !         ll_in = ll_out
 !         call get_strong_motion_gf(ll_in, ll_out)
 !         ll_in = ll_out
-!         call get_cgps_gf(ll_in, ll_out)
+!         call get_cgnss_gf(ll_in, ll_out)
 !      case (15)
 !         call get_body_waves_gf(ll_in, ll_out)
 !         ll_in = ll_out
@@ -124,7 +124,7 @@ contains
 !         ll_in = ll_out
 !         call get_surface_waves_gf(ll_in, ll_out)
 !         ll_in = ll_out
-!         call get_cgps_gf(ll_in, ll_out)
+!         call get_cgnss_gf(ll_in, ll_out)
 !   endselect   
    end subroutine get_gf
 
@@ -235,7 +235,7 @@ contains
    end subroutine get_strong_motion_gf
 
    
-   subroutine get_cgps_gf(ll_in, ll_out)
+   subroutine get_cgnss_gf(ll_in, ll_out)
    implicit none
    integer ll_in, ll_out, ll_g, ll, n_chan3, &
    &  nstb, io_chan, i, i_s, ir, no, lnpt, nlen, &
@@ -259,9 +259,9 @@ contains
    write(*,*)'block: ', block 
    write(*,*)'area=',dxs * dys
 
-   open(9,file='Readlp.cgps',status='old')
-   open(13,file='Obser.cgps',status='unknown')
-   open(15,file='Wave.cgps')
+   open(9,file='Readlp.cgnss',status='old')
+   open(13,file='Obser.cgnss',status='unknown')
+   open(15,file='Wave.cgnss')
    read(15,*) jmin, jmax, jfmax
    read(15,'(a)')path
    read(15,*) n_wave_weight
@@ -301,9 +301,9 @@ contains
 
       io_chan = io_chan+1
       ll_g = io_chan+ll_in
-      if (comp .eq.'LXZ') filename = trim(sta_name(ir))//'.cgps.1'
-      if (comp .eq.'LXN') filename = trim(sta_name(ir))//'.cgps.2'
-      if (comp .eq.'LXE') filename = trim(sta_name(ir))//'.cgps.3'
+      if (comp .eq.'LXZ') filename = trim(sta_name(ir))//'.cgnss.1'
+      if (comp .eq.'LXN') filename = trim(sta_name(ir))//'.cgnss.2'
+      if (comp .eq.'LXE') filename = trim(sta_name(ir))//'.cgnss.3'
       filename = trim(filename)
 
       open(12,file=filename,status='unknown',access='direct',recl=block_stg)
@@ -336,7 +336,7 @@ contains
    close(12)
    close(13)
    ll_out = ll_out+n_chan
-   end subroutine get_cgps_gf
+   end subroutine get_cgnss_gf
 
 
    subroutine get_body_waves_gf(ll_in, ll_out)

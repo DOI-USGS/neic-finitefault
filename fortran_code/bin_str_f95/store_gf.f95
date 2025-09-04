@@ -78,7 +78,7 @@ contains
    subroutine get_stations_data(disp)
 !
 !  Args:
-!  disp: True if data to be used is cGPS, False otherwise
+!  disp: True if data to be used is cGNSS, False otherwise
 !  
    implicit none
    character(len=100) :: filter_file, wave_file, stat_file, event_file
@@ -88,8 +88,8 @@ contains
    integer :: integer1, integer2
    logical :: disp, is_file
    filter_file = 'filter_strong.txt'
-   inquire( file = 'filter_cgps.txt', exist = is_file )
-   if (is_file .and. disp) filter_file = 'filter_cgps.txt'
+   inquire( file = 'filter_cgnss.txt', exist = is_file )
+   if (is_file .and. disp) filter_file = 'filter_cgnss.txt'
    open(1, file=filter_file, status='old')
    read(1,*)string1, low_freq, high_freq
    close(1)
@@ -97,7 +97,7 @@ contains
 
    if (disp) low_freq = 0.0
    wave_file = 'wavelets_strong.txt'
-   if (disp) wave_file = 'wavelets_cgps.txt'
+   if (disp) wave_file = 'wavelets_cgnss.txt'
    open(13, file=wave_file, status='old')
    read(13,*)integer1, integer2, jfmax
    read(13,*)
@@ -112,7 +112,7 @@ contains
 ! 
    write(*,*)'Get near field stations data...'
    stat_file = 'channels_strong.txt'
-   if (disp) stat_file = 'channels_cgps.txt'
+   if (disp) stat_file = 'channels_cgnss.txt'
    open(12, file=stat_file, status='old')
    read(12,*)
    read(12,*)lat_e, lon_e, dep_e
@@ -147,7 +147,7 @@ contains
    close(12)
 
    event_file = 'strong_motion_events.txt'
-   if (disp) event_file = 'cgps_events.txt'
+   if (disp) event_file = 'cgnss_events.txt'
 
    inquire(file = event_file, exist = is_file)
    if (is_file) then

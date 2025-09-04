@@ -16,7 +16,7 @@ from wasp.eventpage_downloads import (
     write_Okada_displacements,
 )
 from wasp.fault_plane import point_sources_param, shear_modulous
-from wasp.get_outputs import get_insar, read_solution_static_format, retrieve_gps
+from wasp.get_outputs import get_insar, read_solution_static_format, retrieve_gnss
 from wasp.load_ffm_model import load_ffm_model
 from wasp.management import default_dirs
 from wasp.plot_graphic_NEIC import (
@@ -140,18 +140,18 @@ def kml(
     solution = read_solution_static_format(segments, data_dir=directory)
 
     # get files with trace information
-    if ManagedDataTypes.gps in chosen_data_types:
-        names, lats, lons, observed, synthetic, error = retrieve_gps(
+    if ManagedDataTypes.gnss in chosen_data_types:
+        names, lats, lons, observed, synthetic, error = retrieve_gnss(
             directory=directory
         )
-        stations_gps = zip(names, lats, lons, observed, synthetic, error)
+        stations_gnss = zip(names, lats, lons, observed, synthetic, error)
     else:
-        stations_gps = None
-    if ManagedDataTypes.cgps in chosen_data_types:
-        with open(directory / DEFAULT_MANAGEMENT_FILES["cgps"]) as c:
-            traces_info_cgps = json.load(c)
+        stations_gnss = None
+    if ManagedDataTypes.cgnss in chosen_data_types:
+        with open(directory / DEFAULT_MANAGEMENT_FILES["cgnss"]) as c:
+            traces_info_cgnss = json.load(c)
     else:
-        traces_info_cgps = None
+        traces_info_cgnss = None
     if ManagedDataTypes.strong in chosen_data_types:
         with open(directory / DEFAULT_MANAGEMENT_FILES["strong"]) as s:
             traces_info = json.load(s)
@@ -165,8 +165,8 @@ def kml(
         solution=solution,
         default_dirs=default_directories,
         stations_str=traces_info,
-        stations_gps=stations_gps,
-        stations_cgps=traces_info_cgps,
+        stations_gnss=stations_gnss,
+        stations_cgnss=traces_info_cgnss,
         max_slip=max_slip,
         legend_len=legend_length,
         scale=scale,
@@ -256,18 +256,18 @@ def map(
     solution = read_solution_static_format(segments, data_dir=directory)
 
     # get files with trace information
-    if ManagedDataTypes.gps in chosen_data_types:
-        names, lats, lons, observed, synthetic, error = retrieve_gps(
+    if ManagedDataTypes.gnss in chosen_data_types:
+        names, lats, lons, observed, synthetic, error = retrieve_gnss(
             directory=directory
         )
-        stations_gps = zip(names, lats, lons, observed, synthetic, error)
+        stations_gnss = zip(names, lats, lons, observed, synthetic, error)
     else:
-        stations_gps = None
-    if ManagedDataTypes.cgps in chosen_data_types:
-        with open(directory / DEFAULT_MANAGEMENT_FILES["cgps"]) as c:
-            traces_info_cgps = json.load(c)
+        stations_gnss = None
+    if ManagedDataTypes.cgnss in chosen_data_types:
+        with open(directory / DEFAULT_MANAGEMENT_FILES["cgnss"]) as c:
+            traces_info_cgnss = json.load(c)
     else:
-        traces_info_cgps = None
+        traces_info_cgnss = None
     if ManagedDataTypes.strong in chosen_data_types:
         with open(directory / DEFAULT_MANAGEMENT_FILES["strong"]) as s:
             traces_info = json.load(s)
@@ -281,8 +281,8 @@ def map(
         solution=solution,
         default_dirs=default_directories,
         files_str=traces_info,
-        stations_gps=stations_gps,
-        stations_cgps=traces_info_cgps,
+        stations_gnss=stations_gnss,
+        stations_cgnss=traces_info_cgnss,
         max_slip=max_slip,
         legend_len=legend_length,
         scale=scale,
@@ -343,7 +343,7 @@ def neic(
         False,
         "-l",
         "--label",
-        help="Label local stations with their IDs on the map (for strong, cgps, gps data)",
+        help="Label local stations with their IDs on the map (for strong, cgnss, gnss data)",
     ),
     legend_length: float = typer.Option(
         None,
@@ -452,18 +452,18 @@ def neic(
     solution = read_solution_static_format(segments, data_dir=directory)
 
     # get files with trace information
-    if ManagedDataTypes.gps in chosen_data_types:
-        names, lats, lons, observed, synthetic, error = retrieve_gps(
+    if ManagedDataTypes.gnss in chosen_data_types:
+        names, lats, lons, observed, synthetic, error = retrieve_gnss(
             directory=directory
         )
-        stations_gps = zip(names, lats, lons, observed, synthetic, error)
+        stations_gnss = zip(names, lats, lons, observed, synthetic, error)
     else:
-        stations_gps = None
-    if ManagedDataTypes.cgps in chosen_data_types:
-        with open(directory / DEFAULT_MANAGEMENT_FILES["cgps"]) as c:
-            traces_info_cgps = json.load(c)
+        stations_gnss = None
+    if ManagedDataTypes.cgnss in chosen_data_types:
+        with open(directory / DEFAULT_MANAGEMENT_FILES["cgnss"]) as c:
+            traces_info_cgnss = json.load(c)
     else:
-        traces_info_cgps = None
+        traces_info_cgnss = None
     if ManagedDataTypes.strong in chosen_data_types:
         with open(directory / DEFAULT_MANAGEMENT_FILES["strong"]) as s:
             traces_info = json.load(s)
@@ -537,8 +537,8 @@ def neic(
             autosize=auto_size,
             mr_time=moment_rate_time,
             files_str=traces_info,
-            stations_gps=stations_gps,
-            stations_cgps=traces_info_cgps,
+            stations_gnss=stations_gnss,
+            stations_cgnss=traces_info_cgnss,
             max_val=max_slip,
             legend_len=legend_length,
             scale=scale,

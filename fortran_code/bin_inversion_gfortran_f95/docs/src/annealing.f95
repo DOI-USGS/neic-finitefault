@@ -550,7 +550,7 @@ contains
    
    subroutine annealing_iter2(slip, rake, rupt_time, tl, tr, er, t)
    !!
-   !!  We compute an iteration of the annealing method, adding static GPS data.
+   !!  We compute an iteration of the annealing method, adding static GNSS data.
    !!  Non-parallelized version.
    !!
    implicit none
@@ -1202,7 +1202,7 @@ contains
    
    subroutine annealing_iter4(slip, rake, rupt_time, tl, tr, er, t)
    !!
-   !!  We compute an iteration of the annealing method, adding static GPS data.
+   !!  We compute an iteration of the annealing method, adding static GNSS data.
    !!  Parallelized version.
    !!
    use omp_lib

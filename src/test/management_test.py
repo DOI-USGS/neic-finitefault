@@ -88,8 +88,8 @@ def test_default_dirs():
         "gf_bank": target_gf_bank,
         "strong_motion_gf_bank2": f"{target_compute_near_gf}/green_bank_openmp_f95",
         "strong_motion_gf": f"{target_near_gf}/get_strong_motion",
-        "cgps_gf_bank": f"{target_near_gf}/cgps",
-        "gps_gf": f"{target_compute_near_gf}/gf_static_f95",
+        "cgnss_gf_bank": f"{target_near_gf}/cgnss",
+        "gnss_gf": f"{target_compute_near_gf}/gf_static_f95",
         "tele_gf": f"{target_modelling}/green_tele",
         "finite_fault": f"{target_modelling}/run_modelling",
         "forward": f"{target_modelling}/run_forward",
@@ -154,7 +154,7 @@ def test_theoretical_arrivals():
 
 def test_use_waveforms():
     assert use_waveforms("strong") == True
-    assert use_waveforms("cgps") == True
+    assert use_waveforms("cgnss") == True
     assert use_waveforms("body") == True
     assert use_waveforms("surf") == True
     assert use_waveforms("other") == False

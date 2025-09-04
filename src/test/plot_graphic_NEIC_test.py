@@ -5,7 +5,7 @@ import shutil
 import tempfile
 from test.testutils import (
     RESULTS_DIR,
-    get_cgps_json,
+    get_cgnss_json,
     get_insar_json,
     get_segments_data,
     get_strong_motion_json,
@@ -19,7 +19,7 @@ from test.testutils import (
 import pytest
 
 from wasp.fault_plane import point_sources_param, shear_modulous
-from wasp.get_outputs import get_insar, read_solution_static_format, retrieve_gps
+from wasp.get_outputs import get_insar, read_solution_static_format, retrieve_gnss
 from wasp.plot_graphic_NEIC import (
     PlotComparisonMap,
     PlotInsar,
@@ -76,15 +76,15 @@ def test_plot():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
         shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
-        cgps_waves = get_cgps_json()
-        new_cgps_waves = update_manager_file_locations(
-            cgps_waves,
+        cgnss_waves = get_cgnss_json()
+        new_cgnss_waves = update_manager_file_locations(
+            cgnss_waves,
             tempdir,
             replace_dir=str(RESULTS_DIR / "data"),
         )
         os.mkdir(tempdir / "data")
-        os.mkdir(tempdir / "cGPS")
-        for o, n in zip(cgps_waves, new_cgps_waves):
+        os.mkdir(tempdir / "cGNSS")
+        for o, n in zip(cgnss_waves, new_cgnss_waves):
             shutil.copyfile(o["file"], n["file"])
         tele_waves = get_tele_waves_json(all=True)
         new_tele_waves = update_manager_file_locations(
@@ -136,7 +136,8 @@ def test_plot():
             tempdir / "synthetics_strong.txt",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "synthetics_cgps.txt", tempdir / "synthetics_cgps.txt"
+            RESULTS_DIR / "NP1" / "synthetics_cgnss.txt",
+            tempdir / "synthetics_cgnss.txt",
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "velmodel_data.json", tempdir / "velmodel_data.json"
@@ -147,10 +148,10 @@ def test_plot():
             json.dump(new_surf_waves, f)
         with open(tempdir / "strong_motion_waves.json", "w") as f:
             json.dump(new_strong_waves, f)
-        with open(tempdir / "cgps_waves.json", "w") as f:
-            json.dump(new_cgps_waves, f)
-        names, lats, lons, observed, synthetic, error = retrieve_gps(directory=tempdir)
-        stations_gps = zip(names, lats, lons, observed, synthetic, error)
+        with open(tempdir / "cgnss_waves.json", "w") as f:
+            json.dump(new_cgnss_waves, f)
+        names, lats, lons, observed, synthetic, error = retrieve_gnss(directory=tempdir)
+        stations_gnss = zip(names, lats, lons, observed, synthetic, error)
         shear = shear_modulous(POINT_SOURCES, velmodel=get_velmodel_data())
         plot_ffm_sol(
             TENSOR,
@@ -167,8 +168,8 @@ def test_plot():
             },
             autosize=False,
             files_str=new_strong_waves,
-            stations_gps=stations_gps,
-            stations_cgps=new_cgps_waves,
+            stations_gnss=stations_gnss,
+            stations_cgnss=new_cgnss_waves,
             max_val=None,
             legend_len=None,
             scale=None,
@@ -184,7 +185,7 @@ def test_plot():
         assert (tempdir / "SlipDist_plane0.ps").exists()
         plot_misfit(
             used_data_type=[
-                "cgps",
+                "cgnss",
                 "strong",
                 "surf",
                 "body",
@@ -192,7 +193,7 @@ def test_plot():
             directory=tempdir,
         )
         assert (tempdir / "Rayleigh_surf_waves.png").exists()
-        assert (tempdir / "cGPS_waves.png").exists()
+        assert (tempdir / "cGNSS_waves.png").exists()
         assert (tempdir / "strong_motion_waves.png").exists()
         assert (tempdir / "SH_body_waves.png").exists()
         assert (tempdir / "Love_surf_waves.png").exists()

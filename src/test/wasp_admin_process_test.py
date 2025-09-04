@@ -40,7 +40,7 @@ def test_greens(p1):
             config = f.read().replace("/home/user/neic-finitefault", str(HOME))
         with open(tempdir / "config.ini", "w") as wf:
             wf.write(config)
-        with open(tempdir / "GF_cgps", "w"):
+        with open(tempdir / "GF_cgnss", "w"):
             pass
         with open(tempdir / "GF_strong", "w"):
             pass
@@ -58,9 +58,9 @@ def test_greens(p1):
                 "greens",
                 str(tempdir),
                 "-t",
-                "cgps",
+                "cgnss",
                 "-t",
-                "gps",
+                "gnss",
                 "-t",
                 "strong",
                 "-t",
@@ -73,10 +73,10 @@ def test_greens(p1):
         assert result.exit_code == 0
         with open(tempdir / "strong_motion_gf.json") as f:
             strong = json.load(f)
-        with open(tempdir / "cgps_gf.json") as f:
-            cgps = json.load(f)
-        assert cgps == {
-            "location": str(tempdir / "GF_cgps"),
+        with open(tempdir / "cgnss_gf.json") as f:
+            cgnss = json.load(f)
+        assert cgnss == {
+            "location": str(tempdir / "GF_cgnss"),
             "min_depth": 1,
             "max_depth": 49.8,
             "min_dist": 0,

@@ -39,11 +39,11 @@ contains
 
 
    subroutine write_forward(slip, rake, rupt_time, trise, tfall, &
-      &  strong, cgps, body, surf, dart)
+      &  strong, cgnss, body, surf, dart)
 !
 !  Args:
 !  strong: True if strong motion data are used, False otherwise
-!  cgps: True if cGPS data are used, False otherwise
+!  cgnss: True if cGNSS data are used, False otherwise
 !  body: True if body wave data are used, False otherwise
 !  surf: True if surface wave data are used, False otherwise
 !  dart: True if DART data are used, False otherwise
@@ -59,7 +59,7 @@ contains
 !  
    implicit none
    integer first, last
-   logical :: strong, cgps, body, surf, dart
+   logical :: strong, cgnss, body, surf, dart
    real slip(:), rake(:), rupt_time(:), tfall(:), trise(:)
    complex z0
 !
@@ -73,9 +73,9 @@ contains
                                   & strong, .False.)
       first = last
    end if
-   if (cgps) then
+   if (cgnss) then
       call write_near_field_forward(slip, rake, rupt_time, trise, tfall, first, last, &
-                                  & .False., cgps)
+                                  & .False., cgnss)
       first = last
    end if
    if (body) then
@@ -94,7 +94,7 @@ contains
    
    
    subroutine write_near_field_forward(slip, rake, rupt_time, trise, tfall, first, last, &
-   &  strong, cgps)
+   &  strong, cgnss)
 !
 !  Args:
 !  slip: array with model slip values for all subfaults
@@ -105,7 +105,7 @@ contains
 !  first: number of initial channel
 !  last: number of final channel
 !  strong: True if strong motion data are used, False otherwise
-!  cgps: True if cGPS data are used, False otherwise
+!  cgnss: True if cGNSS data are used, False otherwise
 !
    implicit none
    integer first, last, channel, channel_max, i, j, k, n_chan
@@ -116,13 +116,13 @@ contains
    complex :: source2(wave_pts, max_rise_time_range, max_rise_time_range)
    character(len=70) filename, filename2
    character(len=3) comp!component(max_stations), comp
-   logical :: strong, cgps
+   logical :: strong, cgnss
 
    if (strong) write(*,*)'Return strong motion synthetics from input kinematic model...'
-   if (cgps) write(*,*)'Return cGPS synthetics from input kinematic model...'
+   if (cgnss) write(*,*)'Return cGNSS synthetics from input kinematic model...'
    z0 = cmplx(0.0, 0.0)
    filename = 'channels_strong.txt'
-   if (cgps) filename = 'channels_cgps.txt'
+   if (cgnss) filename = 'channels_cgnss.txt'
    filename = trim(filename)
    open(9,file=filename,status='old')
    read(9,*)
@@ -159,7 +159,7 @@ contains
 !  end of rise time 
 !       
    filename2 = 'synthetics_strong.txt'
-   if (cgps) filename2 = 'synthetics_cgps.txt'
+   if (cgnss) filename2 = 'synthetics_cgnss.txt'
    filename2 = trim(filename2)
    open(18,file=filename2)
 !       

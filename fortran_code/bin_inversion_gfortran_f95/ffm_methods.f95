@@ -12,7 +12,7 @@ module ffm_methods
    use save_forward, only : write_forward, saveforward_set_fault_parameters, &
                     &   saveforward_set_data_properties
    use rise_time, only : get_source_fun, deallocate_source
-   use static_data, only : initial_gps, staticdata_set_fault_parameters
+   use static_data, only : initial_gnss, staticdata_set_fault_parameters
    use insar_data, only : initial_insar, get_insar_gf, deallocate_insar_gf, &
                     &   get_insar_data, is_ramp, initial_ramp, &
                     &   insardata_set_fault_parameters
@@ -47,21 +47,21 @@ contains
    end subroutine ffmmethod_set_procedure_param
 
 
-   subroutine check_waveforms(strong, cgps, body, surf, dart, use_waveforms)
+   subroutine check_waveforms(strong, cgnss, body, surf, dart, use_waveforms)
 !
 !  Args:
 !  strong: True if strong motion data are used, False otherwise
-!  cgps: True if cGPS data are used, False otherwise
+!  cgnss: True if cGNSS data are used, False otherwise
 !  body: True if body wave data are used, False otherwise
 !  surf: True if surface wave data are used, False otherwise
 !  dart: True if DART data are used, False otherwise
 !  use_waveforms: True if some waveform data used in modelling, False otherwise
 !
    implicit none
-   logical :: strong, cgps, dart, body, surf, use_waveforms
+   logical :: strong, cgnss, dart, body, surf, use_waveforms
    use_waveforms = .False.
    if (strong) use_waveforms = .True.
-   if (cgps) use_waveforms = .True.
+   if (cgnss) use_waveforms = .True.
    if (body) use_waveforms = .True.
    if (surf) use_waveforms = .True.
    if (dart) use_waveforms = .True.
@@ -71,7 +71,7 @@ contains
    subroutine check_static(static, insar, use_static)
 !
 !  Args:
-!  static: True if static GPS data used in modelling, False otherwise
+!  static: True if static GNSS data used in modelling, False otherwise
 !  insar: True if insar data used in modelling, False otherwise
 !  use_static: True if some static data used in modelling, False otherwise
 !
@@ -83,12 +83,12 @@ contains
    end subroutine check_static
 
 
-   subroutine waveform_ffm(strong, cgps, body, surf, dart, &
+   subroutine waveform_ffm(strong, cgnss, body, surf, dart, &
        & slip, rake, rupt_time, t_rise, t_fall, many_events)
 !
 !  Args:
 !  strong: True if strong motion data are used, False otherwise
-!  cgps: True if cGPS data are used, False otherwise
+!  cgnss: True if cGNSS data are used, False otherwise
 !  body: True if body wave data are used, False otherwise
 !  surf: True if surface wave data are used, False otherwise
 !  dart: True if DART data are used, False otherwise
@@ -102,7 +102,7 @@ contains
    implicit none
    real :: slip(:), rake(:), rupt_time(:)
    real :: t_rise(:), t_fall(:)
-   logical :: strong, cgps, dart, body, surf
+   logical :: strong, cgnss, dart, body, surf
    logical :: get_coeff, static, insar
    logical :: use_waveforms, many_events
    use_waveforms = .True.
@@ -115,7 +115,7 @@ contains
    call saveforward_set_fault_parameters()
    call fourier_coefs()
    call meyer_yamada()
-   call get_data(strong, cgps, body, surf, dart)
+   call get_data(strong, cgnss, body, surf, dart)
    call wavelets_set_data_properties()
    call misfit_eval_set_data_properties()
    call retrievegf_set_data_properties()
@@ -124,7 +124,7 @@ contains
    call annealing_set_data_properties()
    call allocate_forward()
    call get_source_fun()
-   call get_gf(strong, cgps, body, surf, dart, many_events)
+   call get_gf(strong, cgnss, body, surf, dart, many_events)
    call initial_model(slip, rake, rupt_time, t_rise, t_fall)
    t = t_mid
    if (start_annealing .eq. 0) t = t0
@@ -159,7 +159,7 @@ contains
         &  insar, get_coeff)
    endif
    call write_forward(slip, rake, rupt_time, t_rise, t_fall, &
-           &  strong, cgps, body, surf, dart)
+           &  strong, cgnss, body, surf, dart)
    call write_model(slip, rake, rupt_time, t_rise, t_fall, use_waveforms)
    call deallocate_source()
    call deallocate_forward()
@@ -167,16 +167,16 @@ contains
    end subroutine waveform_ffm
    
 
-   subroutine mixed_ffm(strong, cgps, body, surf, dart, &
+   subroutine mixed_ffm(strong, cgnss, body, surf, dart, &
        & static, insar, slip, rake, rupt_time, t_rise, t_fall, many_events)
 !
 !  Args:
 !  strong: True if strong motion data are used, False otherwise
-!  cgps: True if cGPS data are used, False otherwise
+!  cgnss: True if cGNSS data are used, False otherwise
 !  body: True if body wave data are used, False otherwise
 !  surf: True if surface wave data are used, False otherwise
 !  dart: True if DART data are used, False otherwise
-!  static: True if static GPS data used in modelling, False otherwise
+!  static: True if static GNSS data used in modelling, False otherwise
 !  insar: True if insar data used in modelling, False otherwise
 !  slip: array with model slip values for all subfaults
 !  rake: array with model rake values for all subfaults
@@ -188,7 +188,7 @@ contains
    implicit none
    real :: slip(:), rake(:), rupt_time(:)
    real :: t_rise(:), t_fall(:)
-   logical :: static, strong, cgps, dart, body, surf
+   logical :: static, strong, cgnss, dart, body, surf
    logical :: get_coeff, insar, ramp_gf_file
    logical :: use_waveforms, many_events
    use_waveforms = .True.
@@ -203,7 +203,7 @@ contains
    call insardata_set_fault_parameters()
    call fourier_coefs()
    call meyer_yamada()
-   call get_data(strong, cgps, body, surf, dart)
+   call get_data(strong, cgnss, body, surf, dart)
    call wavelets_set_data_properties()
    call misfit_eval_set_data_properties()
    call retrievegf_set_data_properties()
@@ -212,11 +212,11 @@ contains
    call annealing_set_data_properties()
    call allocate_forward()
    call get_source_fun()
-   call get_gf(strong, cgps, body, surf, dart, many_events)
+   call get_gf(strong, cgnss, body, surf, dart, many_events)
    call initial_model(slip, rake, rupt_time, t_rise, t_fall)
    t = t_mid
    if (start_annealing .eq. 0) t = t0
-   if (static) call initial_gps(slip, rake, many_events)
+   if (static) call initial_gnss(slip, rake, many_events)
    if (insar) call get_insar_gf()
    if (insar) call get_insar_data()
    if (insar) call is_ramp(ramp_gf_file)
@@ -292,8 +292,8 @@ contains
       call initial_insar(slip, rake, ramp)
    end if
    call write_forward(slip, rake, rupt_time, t_rise, t_fall, &
-        &  strong, cgps, body, surf, dart)
-   if (static) call initial_gps(slip, rake, many_events)
+        &  strong, cgnss, body, surf, dart)
+   if (static) call initial_gnss(slip, rake, many_events)
    call write_model(slip, rake, rupt_time, t_rise, t_fall, use_waveforms)
    call deallocate_source()
    call deallocate_forward()
@@ -307,7 +307,7 @@ contains
 !  Args:
 !  slip: array with model slip values for all subfaults
 !  rake: array with model rake values for all subfaults
-!  static: True if static GPS data used in modelling, False otherwise
+!  static: True if static GNSS data used in modelling, False otherwise
 !  insar: True if insar data used in modelling, False otherwise
 !  many_events: True if more than one event to be modelled, False otherwise
 !
@@ -326,7 +326,7 @@ contains
    call insardata_set_fault_parameters()
    t = t_mid
    if (start_annealing .eq. 0) t = t0
-   if (static) call initial_gps(slip, rake, many_events)
+   if (static) call initial_gnss(slip, rake, many_events)
    if (insar) call get_insar_gf()
    if (insar) call get_insar_data()
    if (insar) call is_ramp(ramp_gf_file)
@@ -364,7 +364,7 @@ contains
       call print_static_summary(slip, rake, static, insar, get_coeff, ramp)
       call initial_insar(slip, rake, ramp)
    end if
-   if (static) call initial_gps(slip, rake, many_events)
+   if (static) call initial_gnss(slip, rake, many_events)
    call write_model(slip, rake, rupt_time0, t_rise0, t_fall0, use_waveforms)
    if (insar) call deallocate_insar_gf()
    end subroutine static_ffm
