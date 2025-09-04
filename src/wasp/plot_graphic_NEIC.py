@@ -80,8 +80,8 @@ def plot_ffm_sol(
     max_val: Optional[float] = None,
     mr_time: int = False,
     files_str: Optional[dict] = None,
-    stations_gps: Optional[zip] = None,
-    stations_cgps: Optional[str] = None,
+    stations_gnss: Optional[zip] = None,
+    stations_cgnss: Optional[str] = None,
     legend_len: Optional[float] = None,
     scale: Optional[float] = None,
     limits: List[Optional[float]] = [None, None, None, None],
@@ -111,10 +111,10 @@ def plot_ffm_sol(
     :type mr_time: int, optional
     :param files_str: The stations file properties, defaults to None
     :type files_str:Optional[dict], optional
-    :param stations_gps: The gps stations description, defaults to None
-    :type stations_gps:  Optional[zip], optional
-    :param stations_cgps: The cgps stations description, defaults to None
-    :type stations_cgps: Optional[str], optional
+    :param stations_gnss: The gnss stations description, defaults to None
+    :type stations_gnss:  Optional[zip], optional
+    :param stations_cgnss: The cgnss stations description, defaults to None
+    :type stations_cgnss: Optional[str], optional
     :param legend_len: The length of the legend, defaults to None
     :type legend_len: Optional[float], optional
     :param scale: The scale, defaults to None
@@ -166,8 +166,8 @@ def plot_ffm_sol(
         solution,
         default_dirs,
         files_str=files_str,
-        stations_gps=stations_gps,
-        stations_cgps=stations_cgps,
+        stations_gnss=stations_gnss,
+        stations_cgnss=stations_cgnss,
         max_slip=max_val,
         legend_len=legend_len,
         scale=scale,
@@ -238,19 +238,19 @@ def plot_misfit(
             start_margin=10,
             plot_directory=directory,
         )
-    if "cgps" in used_data_type:
-        if not os.path.isfile(directory / "cgps_waves.json"):
+    if "cgnss" in used_data_type:
+        if not os.path.isfile(directory / "cgnss_waves.json"):
             raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "cgps_waves.json"
+                errno.ENOENT, os.strerror(errno.ENOENT), "cgnss_waves.json"
             )
-        with open(directory / "cgps_waves.json") as t:
+        with open(directory / "cgnss_waves.json") as t:
             traces_info = json.load(t)
         traces_info = get_outputs.get_data_dict(
-            traces_info, syn_file="synthetics_cgps.txt", directory=directory
+            traces_info, syn_file="synthetics_cgnss.txt", directory=directory
         )
         values = [["LXZ", "LHZ", "LYZ"], ["LXE", "LHE", "LYE"], ["LXN", "LHN", "LYN"]]
         plot_waveform_fits(
-            traces_info, values, "cgps", start_margin=10, plot_directory=directory
+            traces_info, values, "cgnss", start_margin=10, plot_directory=directory
         )
     return
 
@@ -1349,8 +1349,8 @@ def PlotMap(
     solution: dict,
     default_dirs: dict,
     files_str: Optional[dict] = None,
-    stations_gps: Optional[zip] = None,
-    stations_cgps: Optional[str] = None,
+    stations_gnss: Optional[zip] = None,
+    stations_cgnss: Optional[str] = None,
     max_slip: Optional[float] = None,
     legend_len: Optional[float] = None,
     scale: Optional[float] = None,
@@ -1372,10 +1372,10 @@ def PlotMap(
     :type default_dirs: dict
     :param files_str: The stations file properties, defaults to None
     :type files_str:Optional[dict], optional
-    :param stations_gps: The gps stations description, defaults to None
-    :type stations_gps:  Optional[zip], optional
-    :param stations_cgps: The cgps stations description, defaults to None
-    :type stations_cgps: Optional[str], optional
+    :param stations_gnss: The gnss stations description, defaults to None
+    :type stations_gnss:  Optional[zip], optional
+    :param stations_cgnss: The cgnss stations description, defaults to None
+    :type stations_cgnss: Optional[str], optional
     :param max_slip: Specify maximum slip, defaults to None
     :type max_slip: Optional[float], optional
     :param legend_len: The length of the legend, defaults to None
@@ -1418,23 +1418,25 @@ def PlotMap(
             max_lat = max(max_lat, latp)
             min_lon = min(min_lon, lonp)
             max_lon = max(max_lon, lonp)
-    if stations_cgps is not None:
-        for file in stations_cgps:
+    if stations_cgnss is not None:
+        for file in stations_cgnss:
             name = file["name"]
             latp, lonp = file["location"]
             min_lat = min(min_lat, latp)
             max_lat = max(max_lat, latp)
             min_lon = min(min_lon, lonp)
             max_lon = max(max_lon, lonp)
-    if stations_gps is not None:
+    if stations_gnss is not None:
         max_obs = np.zeros(3)
-        stations_gps2: list = []
-        for name, sta_lat, sta_lon, obs, syn, error in stations_gps:
+        stations_gnss2: list = []
+        for name, sta_lat, sta_lon, obs, syn, error in stations_gnss:
             min_lat = min(min_lat, sta_lat)
             max_lat = max(max_lat, sta_lat)
             min_lon = min(min_lon, sta_lon)
             max_lon = max(max_lon, sta_lon)
-            stations_gps2 = stations_gps2 + [[name, sta_lat, sta_lon, obs, syn, error]]
+            stations_gnss2 = stations_gnss2 + [
+                [name, sta_lat, sta_lon, obs, syn, error]
+            ]
             max_obs = np.maximum([abs(float(v)) for v in obs], max_obs)
         max_obs = np.max(max_obs)  # type:ignore
         if legend_len == None:
@@ -1756,9 +1758,9 @@ def PlotMap(
         fig.shift_origin(xshift="2.5c", yshift="2.3c")
 
     ### HIGH-RATE GNSS ###
-    if stations_cgps is not None:
-        print("...Plotting cGPS Stations")
-        for file in stations_cgps:
+    if stations_cgnss is not None:
+        print("...Plotting cGNSS Stations")
+        for file in stations_cgnss:
             name = file["name"]
             latp, lonp = file["location"]
             weight = file["trace_weight"]
@@ -1795,11 +1797,11 @@ def PlotMap(
         fig.shift_origin(xshift="-0.4c", yshift="2.3c")
 
     ### STATIC GNSS ####
-    if stations_gps is not None:
-        print("...Plotting Static GPS Stations")
-        for name, sta_lat, sta_lon, obs, syn, error in stations_gps2:
-            gps_z_obs, gps_n_obs, gps_e_obs = obs
-            gps_z_syn, gps_n_syn, gps_e_syn = syn
+    if stations_gnss is not None:
+        print("...Plotting Static GNSS Stations")
+        for name, sta_lat, sta_lon, obs, syn, error in stations_gnss2:
+            gnss_z_obs, gnss_n_obs, gnss_e_obs = obs
+            gnss_z_syn, gnss_n_syn, gnss_e_syn = syn
             err_z, err_n, err_e = error
             if label_stations == True:
                 fig.text(x=sta_lon, y=sta_lat, text=name, justify="TR", font="7p")
@@ -1807,8 +1809,8 @@ def PlotMap(
                 data={
                     "x": [sta_lon],
                     "y": [sta_lat],
-                    "east_velocity": [float(gps_e_obs) / max_obs],
-                    "north_velocity": [float(gps_n_obs) / max_obs],
+                    "east_velocity": [float(gnss_e_obs) / max_obs],
+                    "north_velocity": [float(gnss_n_obs) / max_obs],
                     "east_sigma": [float(err_e) / max_obs],
                     "north_sigma": [float(err_n) / max_obs],
                     "correlation_EN": [0.0],
@@ -1837,8 +1839,8 @@ def PlotMap(
                 data={
                     "x": [sta_lon],
                     "y": [sta_lat],
-                    "east_velocity": [float(gps_e_syn) / max_obs],
-                    "north_velocity": [float(gps_n_syn) / max_obs],
+                    "east_velocity": [float(gnss_e_syn) / max_obs],
+                    "north_velocity": [float(gnss_n_syn) / max_obs],
                     "east_sigma": [0.0],
                     "north_sigma": [0.0],
                     "correlation_EN": [0.0],
@@ -2954,9 +2956,9 @@ def _plot_waveforms(
         obs = np.array(file["observed"])
         if nstart >= 0:
             obs = np.concatenate((np.zeros(nstart), obs))
-        if type_str in ["body", "strong", "cgps"]:
+        if type_str in ["body", "strong", "cgnss"]:
             obs = obs[nstart - margin :]
-        if type_str == "cgps":
+        if type_str == "cgnss":
             obs = obs - obs[10]
         if type_str == "surf":
             if nstart >= 0:
@@ -3011,13 +3013,13 @@ def _plot_waveforms(
         ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=3, min_n_ticks=3))
         ax.yaxis.set_major_locator(ticker.MaxNLocator(nbins=3, min_n_ticks=3))
 
-    if type_str == "cgps":
+    if type_str == "cgnss":
         if "LXZ" in components:
-            plot_name = "LXZ_cgps_waves.png"
+            plot_name = "LXZ_cgnss_waves.png"
         if "LXN" in components:
-            plot_name = "LXN_cgps_waves.png"
+            plot_name = "LXN_cgnss_waves.png"
         if "LXE" in components:
-            plot_name = "LXE_cgps_waves.png"
+            plot_name = "LXE_cgnss_waves.png"
 
     if type_str == "strong":
         if "HNZ" in components:

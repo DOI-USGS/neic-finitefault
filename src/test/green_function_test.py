@@ -16,7 +16,7 @@ from .testutils import (
 )
 
 
-def test_gf_retrieve_gps():
+def test_gf_retrieve_gnss():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
         shutil.copyfile(
@@ -30,15 +30,15 @@ def test_gf_retrieve_gps():
         )
         shutil.copyfile(RESULTS_DIR / "static_data.txt", tempdir / "static_data.txt")
         os.mkdir(tempdir / "logs")
-        with open(tempdir / "logs" / "green_gps_log", "w"):
+        with open(tempdir / "logs" / "green_gnss_log", "w"):
             pass
         fdir = pathlib.Path(__file__).parent.parent.parent / "fortran_code"
         gf_retrieve(
-            ["gps"],
+            ["gnss"],
             {
                 "tele_gf": fdir / "bin_inversion_gfortran_f95" / "green_tele",
                 "strong_motion_gf": fdir / "bin_str_f95" / "get_strong_motion",
-                "gps_gf": fdir / "src_dc_f95" / "gf_static_f95",
+                "gnss_gf": fdir / "src_dc_f95" / "gf_static_f95",
             },
             tempdir,
         )
@@ -82,7 +82,7 @@ def test_gf_retrieve_tele():
             {
                 "tele_gf": fdir / "bin_inversion_gfortran_f95" / "green_tele",
                 "strong_motion_gf": fdir / "bin_str_f95" / "get_strong_motion",
-                "gps_gf": fdir / "src_dc_f95" / "gf_static_f95",
+                "gnss_gf": fdir / "src_dc_f95" / "gf_static_f95",
             },
             tempdir,
         )
@@ -99,13 +99,13 @@ def test_gf_retrieve_tele():
 def test_fk_green_fun1():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        cgps = fk_green_fun1(
-            get_sampling_filter(), get_tensor_info(), "test_location", cgps=True
+        cgnss = fk_green_fun1(
+            get_sampling_filter(), get_tensor_info(), "test_location", cgnss=True
         )
-        gps = fk_green_fun1(
-            get_sampling_filter(), get_tensor_info(), "test_location", cgps=False
+        gnss = fk_green_fun1(
+            get_sampling_filter(), get_tensor_info(), "test_location", cgnss=False
         )
-        assert cgps == {
+        assert cgnss == {
             "location": "test_location",
             "min_depth": 1,
             "max_depth": 49.8,
@@ -114,7 +114,7 @@ def test_fk_green_fun1():
             "dt": 0.4,
             "time_corr": 25,
         }
-        assert gps == {
+        assert gnss == {
             "location": "test_location",
             "min_depth": 1,
             "max_depth": 49.8,

@@ -14,7 +14,7 @@ module annealing_static
                        &   insar_add_ramp, ramp_length
    use omp_lib
    implicit none
-   real :: coef_moment, coef_slip, coef_gps, coef_insar
+   real :: coef_moment, coef_slip, coef_gnss, coef_insar
    real :: current_value, min_value, min_dt, area
    real :: insar_misfit0
    real :: moment_input, smooth_moment, smooth_slip, smooth_time, emin0
@@ -57,7 +57,7 @@ contains
 !  Args:
 !  slip: array with model slip values for all subfaults
 !  rake: array with model rake values for all subfaults
-!  static: True if static GPS data used in modelling, False otherwise
+!  static: True if static GNSS data used in modelling, False otherwise
 !  insar: True if insar data used in modelling, False otherwise
 !  get_coeff: get regularization coefficients if and only if this is True
 !  ramp: Value of insar ramp, optional
@@ -65,7 +65,7 @@ contains
    implicit none
    real*8, optional :: ramp(:)
    real :: slip(:), rake(:)
-   real amp, moment, moment_reg, dt, value1, er0, slip_reg, gps_misfit, insar_misfit
+   real amp, moment, moment_reg, dt, value1, er0, slip_reg, gnss_misfit, insar_misfit
    real :: delta_freq, delta_freq0, moment0, kahan_y, kahan_t, kahan_c
    integer :: i, segment, channel, isl, isr, ixs, iys, jf, k, subfault, subfault_seg 
    real*8 :: misfit2
@@ -74,7 +74,7 @@ contains
    do segment = 1, segments
       subfaults_segment(segment) = nys_sub(segment)*nxs_sub(segment)
    end do
-   gps_misfit = 0.0
+   gnss_misfit = 0.0
    insar_misfit = 0.0
 !
 ! Compute synthetics given current fault model
@@ -107,10 +107,10 @@ contains
    call define_slip_field(slip, rake)
    call slip_laplace(slip_reg)
  
-   coef_gps = 0.0
+   coef_gnss = 0.0
    coef_insar = 0.0
    insar_misfit0 = 0.0
-   if (static) call static_synthetic(slip, rake, gps_misfit)
+   if (static) call static_synthetic(slip, rake, gnss_misfit)
    if (insar) then
       if (present(ramp)) then
          call insar_synthetic(slip, rake, insar_misfit, ramp)
@@ -119,7 +119,7 @@ contains
       endif
       insar_misfit0 = insar_misfit
    endif
-   misfit2 = insar_misfit + gps_misfit
+   misfit2 = insar_misfit + gnss_misfit
 
    if (get_coeff) then
       coef_moment=smooth_moment*(misfit2 - current_value)
@@ -128,7 +128,7 @@ contains
       coef_slip = min(0.003, coef_slip)
 !      coef_time = smooth_time*misfit2/(time_reg*amp)
 !      if (static) then       !! update!
-!         coef_gps = misfit2/(gps_misfit*amp)
+!         coef_gnss = misfit2/(gnss_misfit*amp)
 !      endif
 !      if (insar) then
 !         coef_insar = misfit2/(insar_misfit*amp)
@@ -136,17 +136,17 @@ contains
    endif
 
    value1 = misfit2 + coef_moment*moment_reg+coef_slip*slip_reg*amp
-!   value1 = value1+coef_gps*gps_misfit+coef_insar*insar_misfit
+!   value1 = value1+coef_gnss*gnss_misfit+coef_insar*insar_misfit
    write(*,'()')
    write(*,*)'averaged misfit error', misfit2
    write(*,*)'moment error', moment_reg
    write(*,*)'slip smoothness penalization', slip_reg
-   if (static) write(*,*)'static data misfit', gps_misfit
+   if (static) write(*,*)'static data misfit', gnss_misfit
    if (insar) write(*,*)'insar data misfit', insar_misfit
    write(*,*)'total moment of the inversion', moment
    write(*,'(/A, F10.7)')'moment error coefficient', coef_moment
    write(*,*)'slip smoothness penalization coefficient', coef_slip
-!   if (static) write(*,*)'static data penalization coefficient', coef_gps
+!   if (static) write(*,*)'static data penalization coefficient', coef_gnss
 !   if (insar) write(*,*)'insar data penalization coefficient', coef_insar
    write(*,'(/A, I4)')'Amount of variables: ', 5 * subfaults
 !   write(*,*)'Amount of data values: ', used_data
@@ -157,13 +157,13 @@ contains
    write(12,*)'averaged misfit error', misfit2
    write(12,*)'moment error', moment_reg
    write(12,*)'slip smoothness penalization', slip_reg
-   if (static) write(12,*)'static data misfit', gps_misfit
+   if (static) write(12,*)'static data misfit', gnss_misfit
    if (insar) write(12,*)'insar data misfit', insar_misfit
    write(12,*)'objective function value', value1
    write(12,*)'total moment of the inversion', moment
    write(12,'(/A, F10.7)')'moment error coefficient', coef_moment
    write(12,*)'slip smoothness penalization coefficient', coef_slip
-!   if (static) write(12,*)'static data penalization coefficient', coef_gps
+!   if (static) write(12,*)'static data penalization coefficient', coef_gnss
 !   if (insar) write(12,*)'insar data penalization coefficient', coef_insar
    write(12,'(/A, I4)')'Amount of variables: ', 5 * subfaults
 !   write(12,*)'Amount of data values: ', used_data
@@ -177,7 +177,7 @@ contains
 !  slip: array with model slip values for all subfaults
 !  rake: array with model rake values for all subfaults
 !  t: Current temperature of the annealing method
-!  static: True if static GPS data used in modelling, False otherwise
+!  static: True if static GNSS data used in modelling, False otherwise
 !  insar: True if insar data used in modelling, False otherwise
 !  ramp: Value of insar ramp, optional
 !
@@ -187,7 +187,7 @@ contains
    & ixs, n_total, j
    real*8, optional :: ramp(:)
    real slip(:), rake(:), t, slip1, rake1, &
-   & diff, random0, aux, delta0, amp, moment_reg, value1, gps_misfit, insar_misfit, &
+   & diff, random0, aux, delta0, amp, moment_reg, value1, gnss_misfit, insar_misfit, &
    & moment, slip0, rake0, slip_reg, kahan_y, kahan_c, kahan_t, &
    & time_reg, moment0, &
    & slip_beg, slip_max, slip_end, angle_beg, angle_end, angle_max
@@ -198,7 +198,7 @@ contains
    logical :: static, insar
 !
    value1 = 0.0
-   gps_misfit = 0.0
+   gnss_misfit = 0.0
    insar_misfit = 0.0
 !
 !  ++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -207,7 +207,7 @@ contains
 !
    subfault = 0
 
-   if (static) call static_synthetic(slip, rake, gps_misfit)
+   if (static) call static_synthetic(slip, rake, gnss_misfit)
    if (insar) then
       if (present(ramp)) then
          call insar_synthetic(slip, rake, insar_misfit, ramp)
@@ -215,7 +215,7 @@ contains
          call insar_synthetic(slip, rake, insar_misfit)
       endif
    endif
-   misfit2 = insar_misfit + gps_misfit
+   misfit2 = insar_misfit + gnss_misfit
    moment0 = 0.0
    kahan_y = 0.0
    kahan_t = 0.0
@@ -331,17 +331,17 @@ contains
          endif
 !         moment_reg = (moment/moment_input)
          amp = 1.0
-         if (static) call static_modify_subfault(slip1, rake1, subfault, gps_misfit)
+         if (static) call static_modify_subfault(slip1, rake1, subfault, gnss_misfit)
          if (insar) call insar_modify_subfault(slip1, rake1, subfault, insar_misfit)
          call modify_slip_field(subfault, slip1, rake1)
          call slip_laplace(slip_reg)
 
          misfit2 = 0.d0
-         if (static) misfit2 = misfit2 + gps_misfit
+         if (static) misfit2 = misfit2 + gnss_misfit
          if (insar) misfit2 = misfit2 + insar_misfit
-!         misfit2 = insar_misfit + gps_misfit
+!         misfit2 = insar_misfit + gnss_misfit
          value1 = misfit2 + moment_reg*coef_moment+amp*slip_reg*coef_slip
-!         value1 = value1+coef_gps*gps_misfit+coef_insar*insar_misfit
+!         value1 = value1+coef_gnss*gnss_misfit+coef_insar*insar_misfit
          moment0 = moment0-slip1*shear(subfault)
          diff = value1-current_value
 !  

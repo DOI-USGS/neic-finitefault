@@ -529,7 +529,7 @@ def input_chen_tele_surf(
 def input_chen_near_field(
     tensor_info: dict,
     data_prop: dict,
-    data_type: Literal["cgps", "strong"],
+    data_type: Literal["cgnss", "strong"],
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> Optional[str]:
     """Write text files, which are inputs for Chen's scripts, with information
@@ -540,7 +540,7 @@ def input_chen_near_field(
     :param data_prop: The sampling/filtering properties (from sampling_filter.json)
     :type data_prop: dict
     :param data_type: The data type
-    :type data_type: Literal[&quot;cgps&quot;, &quot;strong_motion&quot;]
+    :type data_type: Literal[&quot;cgnss&quot;, &quot;strong_motion&quot;]
     :param directory: The directory to read/write to, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     :return: The data type
@@ -560,14 +560,14 @@ def input_chen_near_field(
         filename3 = directory / "wavelets_strong.txt"
         filename4 = directory / "waveforms_strong.txt"
         filename5 = directory / "Wavelets_strong_motion.txt"
-    elif data_type == "cgps":
-        dict1 = directory / "cgps_waves.json"
-        filename1 = directory / "filter_cgps.txt"
-        filter_info = data_prop["cgps_filter"]
-        filename2 = directory / "channels_cgps.txt"
-        filename3 = directory / "wavelets_cgps.txt"
-        filename4 = directory / "waveforms_cgps.txt"
-        filename5 = directory / "Wavelets_cgps.txt"
+    elif data_type == "cgnss":
+        dict1 = directory / "cgnss_waves.json"
+        filename1 = directory / "filter_cgnss.txt"
+        filter_info = data_prop["cgnss_filter"]
+        filename2 = directory / "channels_cgnss.txt"
+        filename3 = directory / "wavelets_cgnss.txt"
+        filename4 = directory / "waveforms_cgnss.txt"
+        filename5 = directory / "Wavelets_cgnss.txt"
     else:
         return
 
@@ -632,7 +632,7 @@ def input_chen_static(
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """Write text files, which are inputs for Chen's scripts, with information
-       about the static gps data
+       about the static gnss data
 
     :param directory: The directory to read/write to, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
@@ -739,7 +739,7 @@ def input_chen_dart(
         write_files_wavelet_observed(
             file1, file2, dt_dart, data_prop, traces_info, dart=True, zero_start=True
         )
-    return "cgps"
+    return "cgnss"
 
 
 def input_chen_insar(
@@ -1073,7 +1073,7 @@ def from_synthetic_to_obs(
     :param files: List of dictionaries with data file properties
     :type files: List[dict]
     :param data_type: The data type
-    :type data_type: Literal[&quot;dart&quot;, &quot;cgps&quot;, &quot;gps&quot;, &quot;strong_motion&quot;, &quot;surf_tele&quot;, &quot;tele_body&quot;]
+    :type data_type: Literal[&quot;dart&quot;, &quot;cgnss&quot;, &quot;gnss&quot;, &quot;strong_motion&quot;, &quot;surf_tele&quot;, &quot;tele_body&quot;]
     :param data_prop: The sampling/filtering properties (from sampling_filter.json)
     :type data_prop: dict
     :param add_error: Whether to add error, defaults to False
@@ -1084,11 +1084,11 @@ def from_synthetic_to_obs(
     directory = pathlib.Path(directory)
     dt = files[0]["dt"]
     filter_strong = data_prop["strong_filter"]
-    filter_cgps = data_prop["strong_filter"]
-    if "cgps_filter" in data_prop:
-        filter_cgps = data_prop["cgps_filter"]
+    filter_cgnss = data_prop["strong_filter"]
+    if "cgnss_filter" in data_prop:
+        filter_cgnss = data_prop["cgnss_filter"]
     filter_tele = data_prop["tele_filter"]
-    nyq = 0.5 / dt if not data_type == "gps" else 10000
+    nyq = 0.5 / dt if not data_type == "gnss" else 10000
     std_shift: Union[float, int] = 0
     if data_type == "strong":
         max_val = 0.1
@@ -1100,13 +1100,13 @@ def from_synthetic_to_obs(
         corners = [low_freq / nyq, high_freq / nyq]
         filters = ["highpass", "lowpass"]
         orders = [4]
-    if data_type == "cgps":
+    if data_type == "cgnss":
         max_val = 0.1
-        syn_file = directory / "synthetics_cgps.txt"
-        obser_file = directory / "waveforms_cgps.txt"
+        syn_file = directory / "synthetics_cgnss.txt"
+        obser_file = directory / "waveforms_cgnss.txt"
         std_shift = 0.5
         low_freq = 0
-        high_freq = filter_cgps["high_freq"]
+        high_freq = filter_cgnss["high_freq"]
         corners = [high_freq / nyq]
         filters = ["lowpass"]
         orders = [4]
@@ -1145,14 +1145,14 @@ def from_synthetic_to_obs(
     string_fun = lambda i, name, lat, lon, a, b, c, d, e, f: string.format(
         i, name, lat, lon, a, b, c, d, e, f
     )
-    if not data_type == "gps":
+    if not data_type == "gnss":
         files = get_outputs.get_data_dict(files, syn_file=syn_file)
         with open(obser_file, "w") as outfile:
             for file in files:
                 dt = file["dt"]
                 channel = file["component"]
                 max_val0 = max_val
-                if data_type == "cgps" and channel[-1] == "Z":
+                if data_type == "cgnss" and channel[-1] == "Z":
                     max_val0 = 5 * max_val
                 waveform = 0 * np.array(file["synthetic"])
                 shift = np.random.randn(1) * std_shift
@@ -1182,7 +1182,7 @@ def from_synthetic_to_obs(
             observed,
             synthetic,
             error,
-        ) = get_outputs.retrieve_gps()  # type:ignore
+        ) = get_outputs.retrieve_gnss()  # type:ignore
         with open(directory / "static_data.txt", "r") as infile:
             orig_lines = [line.split() for line in infile]
         with open(directory / "static_data.txt", "w") as outfile:
@@ -1352,16 +1352,16 @@ def model_space(
 
 def write_green_file(
     green_dict: dict,
-    cgps: bool = False,
+    cgnss: bool = False,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """Write the file needed to run fortran code and retrieve strong motion GF
 
     :param green_dict: Dictionary with Greens Function (GF) properties
     :type green_dict: dict
-    :param cgps: Whether the data is cGPS data (otherwise strong motion),
+    :param cgnss: Whether the data is cGNSS data (otherwise strong motion),
                 defaults to False
-    :type cgps: bool, optional
+    :type cgnss: bool, optional
     :param directory: The directory to read/write to, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     """
@@ -1373,7 +1373,9 @@ def write_green_file(
     max_dist = green_dict["max_dist"]
     location = green_dict["location"]
     time_corr = green_dict["time_corr"]
-    name = directory / "Green_strong.txt" if not cgps else directory / "Green_cgps.txt"
+    name = (
+        directory / "Green_strong.txt" if not cgnss else directory / "Green_cgnss.txt"
+    )
     with open(name, "w") as green_file:
         green_file.write(
             "vel_model.txt\n{} {} 1\n{} {} 1\n".format(

@@ -1,10 +1,10 @@
 {
-    "cgps_filter": {
+    "cgnss_filter": {
         "high_freq": 0.3,
         "low_freq": 0.01
     },
     "sampling": {
-        "dt_cgps": 0.4,
+        "dt_cgnss": 0.4,
         "dt_strong": 0.4,
         "dt_tele": 0.2
     },

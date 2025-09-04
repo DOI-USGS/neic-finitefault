@@ -140,26 +140,26 @@ def static_to_fsp(
         strong_az = np.sort(strong_data["azimuth"].values.tolist())
         strong_az = np.append(strong_az, strong_az[0] + 360)
         strong_phimx = max(np.diff(strong_az))
-    quantity_cgps = 0
-    cgps_phimx = 0
-    cgps_r = 0
-    if "cgps" in used_data:
-        cgps_data = pd.read_json(directory / "cgps_waves.json")
-        quantity_cgps = int(len(cgps_data) / 3)
-        cgps_r = min(cgps_data["distance"])
-        cgps_az = np.sort(cgps_data["azimuth"].values.tolist())
-        cgps_az = np.append(cgps_az, cgps_az[0] + 360)
-        cgps_phimx = max(np.diff(cgps_az))
-    quantity_gps = 0
-    gps_phimx = 0
-    gps_r = 0
-    if "gps" in used_data:
-        gps_data = pd.read_json(directory / "static_data.json")
-        quantity_gps = len(gps_data)
-        gps_r = min(gps_data["distance"])
-        gps_az = np.sort(gps_data["azimuth"].values.tolist())
-        gps_az = np.append(gps_az, gps_az[0] + 360)
-        gps_phimx = max(np.diff(gps_az))
+    quantity_cgnss = 0
+    cgnss_phimx = 0
+    cgnss_r = 0
+    if "cgnss" in used_data:
+        cgnss_data = pd.read_json(directory / "cgnss_waves.json")
+        quantity_cgnss = int(len(cgnss_data) / 3)
+        cgnss_r = min(cgnss_data["distance"])
+        cgnss_az = np.sort(cgnss_data["azimuth"].values.tolist())
+        cgnss_az = np.append(cgnss_az, cgnss_az[0] + 360)
+        cgnss_phimx = max(np.diff(cgnss_az))
+    quantity_gnss = 0
+    gnss_phimx = 0
+    gnss_r = 0
+    if "gnss" in used_data:
+        gnss_data = pd.read_json(directory / "static_data.json")
+        quantity_gnss = len(gnss_data)
+        gnss_r = min(gnss_data["distance"])
+        gnss_az = np.sort(gnss_data["azimuth"].values.tolist())
+        gnss_az = np.append(gnss_az, gnss_az[0] + 360)
+        gnss_phimx = max(np.diff(gnss_az))
     quantity_tele = 0
     tele_phimx = 0
     tele_r = 0
@@ -282,15 +282,15 @@ def static_to_fsp(
         )
 
         outfile.write(
-            "%\n% Data :\tBODY\tSURF\tSTRONG\tcGPS\tGPS\tInSAR\tDART\tTRIL\tLEVEL\tOTHER\n"
+            "%\n% Data :\tBODY\tSURF\tSTRONG\tcGNSS\tGNSS\tInSAR\tDART\tTRIL\tLEVEL\tOTHER\n"
         )
         outfile.write(
             "% NoS  :\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t0\t0\t0\n".format(
                 quantity_tele,
                 quantity_surf,
                 quantity_strong,
-                quantity_cgps,
-                quantity_gps,
+                quantity_cgnss,
+                quantity_gnss,
                 quantity_insar_points,
                 quantity_dart,
             )
@@ -300,15 +300,15 @@ def static_to_fsp(
                 tele_phimx,
                 surf_phimx,
                 strong_phimx,
-                cgps_phimx,
-                gps_phimx,
+                cgnss_phimx,
+                gnss_phimx,
                 quantity_insar_scenes,
                 dart_phimx,
             )
         )
         outfile.write(
             "% Rmin :\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t--\t{:.2f}\t0.0\t0.0\t0.0\n".format(
-                tele_r, surf_r, strong_r, cgps_r, gps_r, insar_r, dart_r
+                tele_r, surf_r, strong_r, cgnss_r, gnss_r, insar_r, dart_r
             )  # type:ignore
         )
 

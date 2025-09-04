@@ -178,13 +178,13 @@ def plot_waveform_fits(
     }
     axes2 = add_metadata(axes2, **dict)
 
-    if type_str == "cgps":
+    if type_str == "cgnss":
         if "LXZ" in components:
-            plot_name = "LXZ_cgps_waves"
+            plot_name = "LXZ_cgnss_waves"
         if "LXN" in components:
-            plot_name = "LXN_cgps_waves"
+            plot_name = "LXN_cgnss_waves"
         if "LXE" in components:
-            plot_name = "LXE_cgps_waves"
+            plot_name = "LXE_cgnss_waves"
 
     if type_str == "strong":
         if "HNZ" in components:

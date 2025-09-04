@@ -16,7 +16,7 @@
 % Invs : LEN = 1.6 s  SHF = 0.8 s    (time-window length and time-shift)
 % SVF  : Asymetriccosine    (type of slip-velocity function used)
 %
-% Data : SGM TELE TRIL LEVEL GPS INSAR SURF OTHER
+% Data : SGM TELE TRIL LEVEL GNSS INSAR SURF OTHER
 % Data : 0 44 0 0 0 0 44 0
 % Data : 0 129.29 0 0 0 0 129.29 0
 % Data : 0 32.05 0 0 0 0 32.05 0

@@ -91,7 +91,7 @@ def test_plot_waveform_fits():
         plot_waveform_fits(
             files,
             ["LXZ", "LXN", "LXE"],
-            "cgps",
+            "cgnss",
             start_margin=10,
             plot_directory=tempdir,
         )

@@ -18,7 +18,7 @@ def gf_retrieve(
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """Compute and store (in binary files) Green functions for each station, both
-    for teleseismic body waves, as for strong motion, cGPS and static data
+    for teleseismic body waves, as for strong motion, cGNSS and static data
 
     :param used_data_type: List of data types to process
     :type used_data_type: List[str]
@@ -31,7 +31,7 @@ def gf_retrieve(
     directory = pathlib.Path(directory)
     green_fun_tele = default_dirs["tele_gf"]
     green_fun_str = default_dirs["strong_motion_gf"]
-    green_fun_gps = default_dirs["gps_gf"]
+    green_fun_gnss = default_dirs["gnss_gf"]
 
     processes: List[subprocess.Popen] = []
     loggers: List[logging.Logger] = []
@@ -67,36 +67,36 @@ def gf_retrieve(
         processes = processes + [p2]
         loggers = loggers + [logger2]
         data_types = data_types + ["strong motion"]
-    if "cgps" in used_data_type:
-        print("Computing cGPS GFs")
-        logger3 = ml.create_log("get_cgps_GF", directory / "logs" / "green_cgps_log")
+    if "cgnss" in used_data_type:
+        print("Computing cGNSS GFs")
+        logger3 = ml.create_log("get_cgnss_GF", directory / "logs" / "green_cgnss_log")
         logger3.addHandler(ch)
         p3 = subprocess.Popen(
-            [green_fun_str, "cgps", f"{str(directory)}/"],
+            [green_fun_str, "cgnss", f"{str(directory)}/"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
         processes = processes + [p3]
         loggers = loggers + [logger3]
-        data_types = data_types + ["cgps"]
-    if "gps" in used_data_type:
-        print("Computing static GPS GFs")
-        logger4 = ml.create_log("GPS_GF", directory / "logs" / "green_gps_log")
+        data_types = data_types + ["cgnss"]
+    if "gnss" in used_data_type:
+        print("Computing static GNSS GFs")
+        logger4 = ml.create_log("GNSS_GF", directory / "logs" / "green_gnss_log")
         logger4.addHandler(ch)
         p4 = subprocess.Popen(
-            [green_fun_gps, "gps", f"{str(directory)}/"],
+            [green_fun_gnss, "gnss", f"{str(directory)}/"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
         processes = processes + [p4]
         loggers = loggers + [logger4]
-        data_types = data_types + ["gps"]
+        data_types = data_types + ["gnss"]
     if "insar" in used_data_type:
         print("Computing InSAR GFs")
         logger5 = ml.create_log("INSAR_GF", directory / "logs" / "green_insar_log")
         logger5.addHandler(ch)
         p5 = subprocess.Popen(
-            [green_fun_gps, "insar", f"{str(directory)}/"],
+            [green_fun_gnss, "insar", f"{str(directory)}/"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
@@ -121,7 +121,7 @@ def fk_green_fun1(
     data_prop: dict,
     tensor_info: dict,
     location: Union[pathlib.Path, str],
-    cgps: bool = False,
+    cgnss: bool = False,
     max_depth: Optional[Union[float, int]] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> dict:
@@ -133,8 +133,8 @@ def fk_green_fun1(
     :type tensor_info: dict
     :param location: The file location
     :type location: Union[pathlib.Path, str]
-    :param cgps: Whether cgps data is included, defaults to False
-    :type cgps: bool, optional
+    :param cgnss: Whether cgnss data is included, defaults to False
+    :type cgnss: bool, optional
     :param max_depth: The max depth, defaults to None
     :type max_depth: Optional[Union[float,int]], optional
     :param directory: The directory to read/write at, defaults to pathlib.Path()
@@ -144,7 +144,7 @@ def fk_green_fun1(
     """
     directory = pathlib.Path(directory)
     sampling = data_prop["sampling"]
-    dt = sampling["dt_strong"] if not cgps else sampling["dt_cgps"]
+    dt = sampling["dt_strong"] if not cgnss else sampling["dt_cgnss"]
     depth = tensor_info["depth"]
     time_shift = tensor_info["time_shift"]
     min_depth = max(1, depth - 100)
@@ -154,7 +154,7 @@ def fk_green_fun1(
     max_depth = max_depth + 5  # type:ignore
     min_dist = 0
     max_dist = 600 if time_shift < 40 else 1000
-    time_corr = 10 if not cgps else 25
+    time_corr = 10 if not cgnss else 25
 
     green_dict = {
         "location": str(location),
@@ -166,7 +166,7 @@ def fk_green_fun1(
         "time_corr": time_corr,
     }
 
-    name = "strong_motion_gf.json" if not cgps else "cgps_gf.json"
+    name = "strong_motion_gf.json" if not cgnss else "cgnss_gf.json"
     with open(directory / name, "w") as f:
         json.dump(
             green_dict,

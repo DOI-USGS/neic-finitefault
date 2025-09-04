@@ -28,14 +28,14 @@ def nyquist_frequency(dt: float) -> float:
 
 def sampling(
     tensor_info: Dict[str, Union[UTCDateTime, float, str]],
-    dt_cgps: Optional[float] = None,
+    dt_cgnss: Optional[float] = None,
 ) -> Dict[str, float]:
     """Set data sampling properties
 
     :param tensor_info: The tensor information
     :type tensor_info: Dict[str, Union[UTCDateTime, float, str]]
-    :param dt_cgps: The dt of cgps, defaults to None
-    :type dt_cgps: Optional[float], optional
+    :param dt_cgnss: The dt of cgnss, defaults to None
+    :type dt_cgnss: Optional[float], optional
     :return: The sampling properties
     :rtype: Dict[str, float]
     """
@@ -60,8 +60,8 @@ def sampling(
     else:
         dt_strong = 0.8
     dt_strong = dt_strong if depth < 500 else 0.8
-    dt_cgps = dt_strong if not dt_cgps else dt_cgps
-    return {"dt_tele": dt_tele, "dt_strong": dt_strong, "dt_cgps": dt_cgps}
+    dt_cgnss = dt_strong if not dt_cgnss else dt_cgnss
+    return {"dt_tele": dt_tele, "dt_strong": dt_strong, "dt_cgnss": dt_cgnss}
 
 
 def filter_tele(
@@ -111,14 +111,14 @@ def filter_surf() -> Dict[str, float]:
 
 
 def filter_strong(
-    tensor_info: Dict[str, Union[UTCDateTime, float, str]], cgps: bool = False
+    tensor_info: Dict[str, Union[UTCDateTime, float, str]], cgnss: bool = False
 ) -> Dict[str, float]:
     """Set filter properties for strong motion data
 
     :param tensor_info: The tensor information
     :type tensor_info: Dict[str, Union[UTCDateTime, float, str]]
-    :param cgps: Whether cgps, defaults to False
-    :type cgps: bool, optional
+    :param cgnss: Whether cgnss, defaults to False
+    :type cgnss: bool, optional
     :return: The filter properties
     :rtype: Dict[str, float]
     """
@@ -137,7 +137,7 @@ def filter_strong(
     min_freq = max(min_freq, 1 / 100)
 
     max_freq = 0.125  # if tensor_info['time_shift'] > 10 else 0.25
-    if cgps:
+    if cgnss:
         max_freq = 0.3
     max_freq = max_freq if float(tensor_info["depth"]) < 300 else 0.05
     filter_info = {"low_freq": min_freq, "high_freq": max_freq}
@@ -146,33 +146,33 @@ def filter_strong(
 
 def properties_json(
     tensor_info: Dict[str, Union[UTCDateTime, float, str]],
-    dt_cgps: Optional[float],
+    dt_cgnss: Optional[float],
     data_directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> Dict[str, Union[List[int], Dict[str, float]]]:
     """Set sampling and filtering properties in sampling_filtering.json
 
     :param tensor_info: The tensor information
     :type tensor_info: Dict[str, Union[UTCDateTime, float, str]]
-    :param dt_cgps: The dt for cgps data
-    :type dt_cgps: Optional[float]
+    :param dt_cgnss: The dt for cgnss data
+    :type dt_cgnss: Optional[float]
     :param data_directory: The data directory , defaults to pathlib.Path()
     :type data_directory: Union[pathlib.Path, str], optional
     :return: The sampling and filtering properties
     :rtype: Dict[str, Union[List[int], Dict[str, float]]]
     """
     data_directory = pathlib.Path(data_directory)
-    dict1 = sampling(tensor_info, dt_cgps)
+    dict1 = sampling(tensor_info, dt_cgnss)
     dict2 = filter_tele(tensor_info)
     dict3 = filter_surf()
     dict4 = filter_strong(tensor_info)
-    dict5 = filter_strong(tensor_info, cgps=True)
+    dict5 = filter_strong(tensor_info, cgnss=True)
     scales = wavelet_scales()
     dict6: Dict[str, Union[List[int], Dict[str, float]]] = {
         "sampling": dict1,
         "tele_filter": dict2,
         "surf_filter": dict3,
         "strong_filter": dict4,
-        "cgps_filter": dict5,
+        "cgnss_filter": dict5,
         "wavelet_scales": scales,
     }
     with open(data_directory / "sampling_filter.json", "w") as f:

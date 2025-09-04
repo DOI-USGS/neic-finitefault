@@ -1,5 +1,5 @@
 !
-!	GPS, we need use geometry coordanation directly.
+!	GNSS, we need use geometry coordanation directly.
 !
 program gf_static
 
@@ -38,23 +38,23 @@ program gf_static
    real :: kahan_y(6, max_stk_subfaults), kahan_t(6, max_stk_subfaults), kahan_c(6, max_stk_subfaults)
    real c_depth
    integer io_seg
-   logical :: disp, gps, insar
+   logical :: disp, gnss, insar
    allocate(fau_mod(7, max_stk_psources, max_dip_psources, max_stk_subfaults, max_dip_subfaults, max_seg))
 !   allocate(green_dip(3, max_stk_subfaults, max_dip_subfaults, max_seg, 1000))
 !   allocate(green_stk(3, max_stk_subfaults, max_dip_subfaults, max_seg, 1000))
    
    call getarg(1, input)
    call getarg(2, directory)
-   gps = (input.eq.'gps')
+   gnss = (input.eq.'gnss')
    insar = (input.eq.'insar')
-   if (gps) filename = trim(directory)//'static_data.txt'
+   if (gnss) filename = trim(directory)//'static_data.txt'
    if (insar) filename = trim(directory)//'insar_data.txt'
-   if (gps) filename2 = trim(directory)//'Green_static_subfault.txt'
+   if (gnss) filename2 = trim(directory)//'Green_static_subfault.txt'
    if (insar) filename2 = trim(directory)//'Insar_static_subfault.txt'
    
    disp = .False.
 !
-! input position of gps stations
+! input position of gnss stations
 !
 !	pause
    write(*,'(/A/)')'PROGRAM TO COMPUTE STATIC GF WITH FK METHOD'

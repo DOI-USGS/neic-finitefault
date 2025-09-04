@@ -16,7 +16,7 @@
 % Invs : LEN = 3.0 s SHF = 1.5 s    (time-window length and time-shift)
 % SVF  : Asymetriccosine    (type of slip-velocity function used)
 %
-% Data :	BODY	SURF	STRONG	cGPS	GPS	InSAR	DART	TRIL	LEVEL	OTHER
+% Data :	BODY	SURF	STRONG	cGNSS	GNSS	InSAR	DART	TRIL	LEVEL	OTHER
 % NoS  :	78	61	2	0	0	3927	0	0	0	0
 % PHImx :	18.59	20.55	283.48	0.00	0.00	4	0.00	0.0	0.0	0.0
 % Rmin :	32.18	31.58	3.45	0.00	0.00	--	0.00	0.0	0.0	0.0

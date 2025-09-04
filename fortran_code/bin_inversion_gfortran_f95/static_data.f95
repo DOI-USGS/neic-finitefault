@@ -15,7 +15,7 @@ module static_data
    integer, parameter, private :: n_stations = 500
    integer :: n_chan
    real*8 :: synm_whole(n_stations, 3), weight_sum
-   real :: lat(n_stations), lon(n_stations), max_gps
+   real :: lat(n_stations), lon(n_stations), max_gnss
    real :: green(n_stations, 6, max_subfaults), syn_disp(n_stations, 3)
    real :: obse(n_stations, 3), weight(n_stations, 3)
    character(len=6) :: sta_name(n_stations)
@@ -38,7 +38,7 @@ contains
    end subroutine staticdata_set_fault_parameters
    
 
-   subroutine initial_gps(slip, rake, many_events)
+   subroutine initial_gnss(slip, rake, many_events)
 !
 !  Args:
 !  slip: array with model slip values for all subfaults
@@ -66,7 +66,7 @@ contains
             weight_sum = weight_sum + weight(i, k)
          end do
       end do
-      max_gps = maxval(abs(obse(:, :)))
+      max_gnss = maxval(abs(obse(:, :)))
       close(9)
 
       event_file = 'static_events.txt'
@@ -119,7 +119,7 @@ contains
       end do
       close(10)
    end if
-   end subroutine initial_gps
+   end subroutine initial_gnss
    
    
 !
@@ -130,7 +130,7 @@ contains
 !  Args:
 !  slip: array with model slip values for all subfaults
 !  rake: array with model rake values for all subfaults
-!  err: static GPS misfit
+!  err: static GNSS misfit
 !
    implicit none
    real slip(:), rake(:)!, err
@@ -153,7 +153,7 @@ contains
          end do
          synm_whole(channel, k) = disp
          dif = synm_whole(channel, k) - obse(channel, k)
-         err2 = err2 + weight(channel, k) * dif * dif / max_gps / max_gps!100.0
+         err2 = err2 + weight(channel, k) * dif * dif / max_gnss / max_gnss!100.0
       end do
    end do
    err2 = sqrt((err2/weight_sum))
@@ -203,7 +203,7 @@ contains
 !  slip: slip value for this subfault
 !  rake: rake value for this subfault
 !  subfault: value of current subfault
-!  err: static GPS misfit
+!  err: static GNSS misfit
 !
    implicit none
    real, intent(in) :: slip, rake
@@ -224,7 +224,7 @@ contains
          disp = slip &
        & *(sinal*green(channel, j, subfault)+cosal*green(channel, j+1, subfault))
          dif = (synm_whole(channel, k) + disp) - obse(channel, k)
-         err2 = err2 + weight(channel, k) * dif * dif / max_gps / max_gps!100.0
+         err2 = err2 + weight(channel, k) * dif * dif / max_gnss / max_gnss!100.0
       end do
    end do
    err2 = sqrt(err2/weight_sum)

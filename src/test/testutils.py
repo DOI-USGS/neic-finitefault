@@ -11,20 +11,22 @@ END_TO_END_DIR = DATA_DIR / "end_to_end"
 RESULTS_DIR = END_TO_END_DIR / "results"
 
 
-def get_cgps_json(min: int = 0, max: int = 3, all: bool = False):
-    """Get cgps_waves.json"""
-    with open(RESULTS_DIR / "NP1" / "cgps_waves.json", "r") as f:
+def get_cgnss_json(min: int = 0, max: int = 3, all: bool = False):
+    """Get cgnss_waves.json"""
+    with open(RESULTS_DIR / "NP1" / "cgnss_waves.json", "r") as f:
         d = json.load(f)
         if not all:
             d = d[min:max]
-        cgps_waves = cgps_waves = update_manager_file_locations(d, RESULTS_DIR / "data")
-    return cgps_waves
+        cgnss_waves = cgnss_waves = update_manager_file_locations(
+            d, RESULTS_DIR / "data"
+        )
+    return cgnss_waves
 
 
 def get_insar_json():
     """Get insar_data.json"""
     with open(RESULTS_DIR / "NP1" / "insar_data.json", "r") as f:
-        insar_data = cgps_waves = update_manager_file_locations(
+        insar_data = cgnss_waves = update_manager_file_locations(
             json.load(f), RESULTS_DIR / "NP1", file_key="name"
         )
     return insar_data

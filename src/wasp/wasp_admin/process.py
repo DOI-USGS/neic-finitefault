@@ -9,7 +9,7 @@ from typing import Any, List
 import typer
 
 from wasp.data_processing import (
-    select_process_cgps,
+    select_process_cgnss,
     select_process_strong,
     select_process_surf_tele,
     select_process_tele_body,
@@ -63,9 +63,9 @@ def greens(
     sampling_filtering_file = directory / "sampling_filter.json"
     tensor_file = directory / "tensor_info.json"
     files_to_validate += [sampling_filtering_file.resolve(), tensor_file]
-    if "cgps" in chosen_data_types:
-        gf_bank_cgps = directory / "GF_cgps"
-        files_to_validate += [gf_bank_cgps]
+    if "cgnss" in chosen_data_types:
+        gf_bank_cgnss = directory / "GF_cgnss"
+        files_to_validate += [gf_bank_cgnss]
     if "strong" in chosen_data_types:
         gf_bank_strong = directory / "GF_strong"
         files_to_validate += [gf_bank_strong]
@@ -103,19 +103,19 @@ def greens(
                 stdout=out_gf_strong,
             )
         p2.wait()
-    if "cgps" in chosen_data_types:
+    if "cgnss" in chosen_data_types:
         green_dict = fk_green_fun1(
             data_prop=data_prop,
             tensor_info=tensor_info,
-            location=gf_bank_cgps,
-            cgps=True,
+            location=gf_bank_cgnss,
+            cgnss=True,
             max_depth=max_depth,
             directory=directory,
         )
-        write_green_file(green_dict, cgps=True, directory=directory)
-        with open(os.path.join(directory / "logs", "GF_cgps_log"), "w") as out_gf_cgps:
+        write_green_file(green_dict, cgnss=True, directory=directory)
+        with open(os.path.join(directory / "logs", "GF_cgnss_log"), "w") as out_gf_cgnss:
             p1 = subprocess.Popen(
-                [get_gf_bank, "cgps", f"{(directory)}/"], stdout=out_gf_cgps
+                [get_gf_bank, "cgnss", f"{(directory)}/"], stdout=out_gf_cgnss
             )
         p1.wait()
     gf_retrieve(chosen_data_types, default_directories, directory=directory)
@@ -181,9 +181,9 @@ def process_all(
             remove_response=remove_response,
             directory=directory,
         )
-    if data_type == "cgps":
-        cgps_files = glob(dir_str + "/**.L[HXY]*SAC") + glob(dir_str + "/**.L[HXY]*sac")
-        select_process_cgps(cgps_files, tensor_info, data_prop, directory=directory)
+    if data_type == "cgnss":
+        cgnss_files = glob(dir_str + "/**.L[HXY]*SAC") + glob(dir_str + "/**.L[HXY]*sac")
+        select_process_cgnss(cgnss_files, tensor_info, data_prop, directory=directory)
 
 
 @app.command(help="Perform wang baseline removal")
@@ -240,7 +240,7 @@ def shift_match(
         [],
         "-ss",
         "--station-shift",
-        help=f'Station to shift in format "STATION:CHANNEL:SHIFT" for body and surf or format "STATION:SHIFT" for strong or cgps (all strong and cgps station channels must shift the same amount. Shift amount is given in seconds and can be positive or negative.',
+        help=f'Station to shift in format "STATION:CHANNEL:SHIFT" for body and surf or format "STATION:SHIFT" for strong or cgnss (all strong and cgnss station channels must shift the same amount. Shift amount is given in seconds and can be positive or negative.',
     ),
 ):
     # validate files
@@ -299,7 +299,7 @@ def shift_match(
                 split_station_string = station.split(":")
                 if len(split_station_string) != 2:
                     print(
-                        f'Incorrect number of inputs. Input for strong/cgps data must be `-ss "STATION:SHIFT"'
+                        f'Incorrect number of inputs. Input for strong/cgnss data must be `-ss "STATION:SHIFT"'
                     )
                     return
                 station = split_station_string[0]

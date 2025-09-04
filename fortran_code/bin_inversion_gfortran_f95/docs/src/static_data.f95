@@ -25,7 +25,7 @@ module static_data
 contains
 
 
-   subroutine initial_gps(dd, aa)
+   subroutine initial_gnss(dd, aa)
    !!
    !!   Load static GF and compute synthetic displacements from a fault model.
    !!
@@ -94,7 +94,7 @@ contains
       end do
       close(10)
    end if
-   end subroutine initial_gps
+   end subroutine initial_gnss
    
    
    subroutine static_synthetic(dd, aa, nxys, err)

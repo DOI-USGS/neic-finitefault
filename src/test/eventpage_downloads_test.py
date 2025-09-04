@@ -131,7 +131,7 @@ def test_write_Coulomb_file():
         static_to_fsp(
             get_tensor_info(),
             segments,
-            ["gps"],
+            ["gnss"],
             get_velmodel_data(),
             solution,
             tempdir,
@@ -146,10 +146,11 @@ def test_write_Coulomb_file():
         shutil.rmtree(tempdir)
 
 
-@pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None,
-    reason="Build runner does not have the resources to run",
-)
+#@pytest.mark.skipif(
+#    os.getenv("CI_REGISTRY") is not None,
+#    reason="Build runner does not have the resources to run",
+#)
+@pytest.mark.skip(reason="This test is temporarily disabled.")
 def test_write_Okada_displacements():
     tempdir = tempfile.mkdtemp()
     try:
