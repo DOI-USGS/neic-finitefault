@@ -576,7 +576,7 @@ def neic(
                     directory=directory,
                 )
     if polygon:
-        fspfiles = list(pathlib.Path(directory).glob("*.fsp"))
+        fspfiles = list(pathlib.Path(directory).glob("fsp*"))
         if not len(fspfiles):
             raise FileNotFoundError(f"Could not find FSP file in output directory.")
         shake_rupture = ShakeRupture(event_id, fspfiles[0])

@@ -1492,7 +1492,7 @@ def PlotMap(
     pygmt.config(
         PS_MEDIA="A0",
         MAP_FRAME_TYPE="plain",
-        MAP_FRAME_AXES="WSen",
+        MAP_FRAME_AXES="WseN",
         FORMAT_GEO_OUT="F",
         FORMAT_GEO_MAP="ddd:mm:ss",
         FONT_ANNOT_PRIMARY="10p,Helvetica,black",
@@ -1505,7 +1505,7 @@ def PlotMap(
         FONT_TITLE="22p,Helvetica,black",
         MAP_ANNOT_OFFSET_PRIMARY="3p",
     )
-    fig.basemap(region=region, projection=projection, frame=["WSne", "afg"])
+    fig.basemap(region=region, projection=projection, frame=["WseN", "afg"])
     fig.grdimage(grid=grid, cmap="oleron", shading=True, transparency=20)
     fig.shift_origin(xshift="-0.45c", yshift="0.75c")
     fig.colorbar(
@@ -1526,7 +1526,7 @@ def PlotMap(
         region=region,
         pen="1p,white",
     )
-    fig.basemap(region=region, projection=projection, frame="ag1", map_scale=map_scale)
+    fig.basemap(region=region, projection=projection, frame="ag1")
     fig.coast(resolution="h", shorelines=True)
 
     ###############################
