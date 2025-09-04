@@ -113,7 +113,9 @@ def greens(
             directory=directory,
         )
         write_green_file(green_dict, cgnss=True, directory=directory)
-        with open(os.path.join(directory / "logs", "GF_cgnss_log"), "w") as out_gf_cgnss:
+        with open(
+            os.path.join(directory / "logs", "GF_cgnss_log"), "w"
+        ) as out_gf_cgnss:
             p1 = subprocess.Popen(
                 [get_gf_bank, "cgnss", f"{(directory)}/"], stdout=out_gf_cgnss
             )
@@ -182,7 +184,9 @@ def process_all(
             directory=directory,
         )
     if data_type == "cgnss":
-        cgnss_files = glob(dir_str + "/**.L[HXY]*SAC") + glob(dir_str + "/**.L[HXY]*sac")
+        cgnss_files = glob(dir_str + "/**.L[HXY]*SAC") + glob(
+            dir_str + "/**.L[HXY]*sac"
+        )
         select_process_cgnss(cgnss_files, tensor_info, data_prop, directory=directory)
 
 
