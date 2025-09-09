@@ -94,6 +94,8 @@ contains
       do i = 1, tracks
          ramp_type = trim(ramp_types(i))
          select case (ramp_type)
+         case ('static')
+            ramp_length = ramp_length + 1
          case ('linear')
             ramp_length = ramp_length + 3
          case ('bilinear')

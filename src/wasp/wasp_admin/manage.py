@@ -51,7 +51,7 @@ from .fileutils import validate_files
 app = typer.Typer(help="Manage WASP data, faults, and property files")
 
 
-VALID_INSAR_RAMPS = ["bilinear", "linear", "quadratic"]
+VALID_INSAR_RAMPS = ["static", "bilinear", "linear", "quadratic"]
 
 
 def _get_correction(correction_string: str) -> Tuple[str, List[str], float]:
