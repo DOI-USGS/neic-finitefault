@@ -2120,12 +2120,12 @@ def PlotInsar(
         "Ramp",
     ]
     legends = [
-        "Observed LOS (cm)",
-        "Modeled LOS (cm)",
+        "Observed LOS Displacement (cm)",
+        "Modeled LOS Displacement (cm)",
         "Residual (cm)",
-        "Observed LOS (cm)",
-        "Modeled LOS (cm)",
-        "Modeled Ramp LOS (cm)",
+        "Observed LOS Displacement (cm)",
+        "Modeled LOS Displacement (cm)",
+        "Modeled Ramp (cm)",
     ]
     values = [observed, synthetic, diffs, obs_no_ramp, syn_no_ramp, ramp]
     xshift = [
@@ -2136,18 +2136,18 @@ def PlotInsar(
         map_width + 2,
         map_width + 2,
     ]
-    yshift = [23, 0, 0, -(3.5 + map_height), 0, 0]
+    yshift = [23, 0, 0, -(5 + map_height), 0, 0]
 
     sub = 0
     for subplot in range(6):
-        title = '+t"' + titles[subplot] + '"'
-        print(f"...Subplot {title}")
+        title = "+t" + titles[subplot]
+        print(f"...Subplot {titles[subplot]}")
         fig.shift_origin(xshift=xshift[sub], yshift=yshift[sub])
         fig.basemap(
             region=region,
             projection=projection,
             frame=["a", title],
-            map_scale=map_scale,
+            # map_scale=map_scale,
         )
         fig.coast(resolution="h", shorelines=True)
         fig.grdimage(grid=grid, cmap="oleron", shading=True, transparency=80)
@@ -2169,7 +2169,7 @@ def PlotInsar(
 
         fig.colorbar(
             position="jBC",
-            frame='x+l"' + legends[subplot] + '"',
+            frame="x+l" + legends[subplot],
             # box="+p2p,black+ggray80"
         )
 
