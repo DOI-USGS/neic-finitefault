@@ -848,11 +848,16 @@ def input_chen_insar(
     start = 0
     for ramp, length in zip(ramps, sizes):
         if ramp is not None:
-            size1 = 3
-            if ramp == "bilinear":
+            if ramp == "static":
+                size1 = 1
+            elif ramp == "linear":
+                size1 = 3
+            elif ramp == "bilinear":
                 size1 = 6
             elif ramp == "quadratic":
                 size1 = 5
+            else:
+                raise ValueError(f"The insar ramp provided ({ramp}) is not valid.")
             east1 = np.array(eastings[start : start + length]) - min_easting
             north1 = np.array(northings[start : start + length]) - min_northing
             east1 = east1 / np.max(np.abs(east1))
@@ -863,15 +868,16 @@ def input_chen_insar(
             north2 = north2 / np.max(north2)
             east_north = east1 * north1
             east_north = east_north / np.max(east_north)
-            if ramp == "linear":
-                size1 = 3
-                zipped = zip(east1, north1)
+            if ramp == "static":
                 gf_ramp2: Union[np.ndarray[Any, np.dtype[Any]], List[List[float]]] = [
-                    [east, north, 1] for east, north in zipped
+                    [1.0] for e1, n1 in zip(east1, north1)
                 ]
                 gf_ramp2 = np.array(gf_ramp2)
+            elif ramp == "linear":
+                zipped = zip(east1, north1)
+                gf_ramp2 = [[east, north, 1] for east, north in zipped]
+                gf_ramp2 = np.array(gf_ramp2)
             elif ramp == "bilinear":
-                size1 = 3
                 gf_ramp2 = [
                     [e1, n1, 1, en, e2, n2]
                     for e1, n1, en, e2, n2 in zip(

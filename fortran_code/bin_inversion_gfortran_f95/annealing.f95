@@ -1293,9 +1293,9 @@ contains
 !
 !  ramp parameters extreme values
 !  
-         ramp_beg = -50
-         ramp_end = 50
-         ramp_max = 100
+         ramp_beg = -150
+         ramp_end = 150
+         ramp_max = 250
          do i = 1, max_move
 !
 !       Save values before the perturbation

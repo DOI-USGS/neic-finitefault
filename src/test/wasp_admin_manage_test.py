@@ -198,7 +198,7 @@ def test_fill_dicts():
         assert result1.exit_code == 1
         assert (
             "The insar ramp provided (invalid) is not valid. "
-            "Must be one of ['bilinear', 'linear', 'quadratic']."
+            "Must be one of ['static', 'bilinear', 'linear', 'quadratic']."
         ) in str(result1.exception)
 
         # test insar values (invalid ramp)
@@ -212,7 +212,7 @@ def test_fill_dicts():
                 "-ind",
                 f"{str(dummy_insard)}",
                 "-ina",
-                f"{str(dummy_insar)}:quadratic",
+                f"{str(dummy_insar)}:static",
                 "-ind",
                 f"{str(dummy_insard)}:quadratic",
             ],
@@ -228,7 +228,7 @@ def test_fill_dicts():
                 },
                 {
                     "name": f"{str(tempdir)}/insar_ascending.txt",
-                    "ramp": "quadratic",
+                    "ramp": "static",
                     "weight": 1.0,
                 },
             ],
