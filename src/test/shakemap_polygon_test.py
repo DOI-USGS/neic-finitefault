@@ -3,7 +3,7 @@
 import pathlib
 import tempfile
 
-from wasp.shakemap_polygon import ShakeRupture
+from ffm.shakemap_polygon import ShakeRupture
 
 SINGLE_SEGMENT_POLYGON = """# Source: USGS NEIC Rapid Finite Fault
 # Eventid: us70004bn0
