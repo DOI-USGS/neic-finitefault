@@ -84,4 +84,4 @@ source "${INSTALL_DIR}/data_dependencies.sh" "${FINITEFAULT_DIR}" --fd-bank "${F
 
 # get back to top level directly and message completion of installation
 cd "${FINITEFAULT_DIR}" || echo "Failed to return to finite fault top level directly";
-echo "WAFFLES installation completed!";
+echo "WISP installation completed!";

@@ -48,7 +48,7 @@ from .datautils import (
 )
 from .fileutils import validate_files
 
-app = typer.Typer(help="Manage WAFFLES data, faults, and property files")
+app = typer.Typer(help="Manage WISP data, faults, and property files")
 
 
 VALID_Imagery_RAMPS = ["static", "bilinear", "linear", "quadratic"]

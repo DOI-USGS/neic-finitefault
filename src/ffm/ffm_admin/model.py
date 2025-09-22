@@ -24,7 +24,7 @@ from ffm.velocity_models import model2dict
 
 from .datautils import ManagedDataTypes
 
-app = typer.Typer(help="WAFFLES modelling scripts")
+app = typer.Typer(help="WISP modelling scripts")
 
 
 class ModellingOption(str, Enum):

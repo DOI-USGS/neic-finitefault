@@ -36,7 +36,7 @@ from .datautils import (
 )
 from .fileutils import validate_files
 
-app = typer.Typer(help="WAFFLES data processing")
+app = typer.Typer(help="WISP data processing")
 
 
 @app.command(help="Recalculate Green's functions")

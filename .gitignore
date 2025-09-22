@@ -29,6 +29,6 @@ config.ini
 examples/*
 examples/.ipynb_checkpoints
 !examples/Tutorial_Figures
-!examples/WASP_Tutorial.ipynb
+!examples/WISP_Tutorial.ipynb
 !examples/Multisegment_Example
 

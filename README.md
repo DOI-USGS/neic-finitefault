@@ -1,21 +1,21 @@
-- [Wavelet Annealing Finite Fault nonLinear Earthquake Slip (WAFFLES)](#wavelet-annealing-finite-fault-nonlinear-earthquake-slip-inversion-waffles)
+- [Wavelet Inversion for SliP (WISP)](#wavelet-inversion-for-slip-wisp)
   - [Suggested Citation](#suggested-citation)
   - [Authors](#authors)
   - [References](#references)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
-  - [WAFFLES Installation Scripts](#waffles-installation-scripts)
+  - [WISP Installation Scripts](#wisp-installation-scripts)
 - [Local Testing](#local-testing)
 - [Using the Docker Image](#using-the-docker-image)
   - [Building the docker image locally](#building-the-docker-image-locally)
   - [Run the docker image interactively](#run-the-docker-image-interactively)
   - [Run full end to end tests in the container](#run-full-end-to-end-tests-in-the-container)
 
-# Wavelet Annealing Finite Fault nonLinear Earthquake Slip (WAFFLES)
+# Wavelet Inversion for SliP (WISP)
 
 ---
 
-This code uses a nonlinear simulated annealing inversion method to model slip amplitude, rake, rupture time, and rise time on a discretized fault plane, finding the solution that best fits the observations in the wavelet domain. WAFFLES currently accomodates observations from (1) teleseismic broadband stations, (2) regional strong-motion accelerometer stations, (3) static and high-rate Global Navigation Satellite Systems stations, and (4) Interferometric Synthetic Aperture Radar.
+This code uses a nonlinear simulated annealing inversion method to model slip amplitude, rake, rupture time, and rise time on a discretized fault plane, finding the solution that best fits the observations in the wavelet domain. WISP currently accomodates observations from (1) teleseismic broadband stations, (2) regional strong-motion accelerometer stations, (3) static and high-rate Global Navigation Satellite Systems stations, and (4) Interferometric Synthetic Aperture Radar.
 
 The inversion approach is based on the method of Ji et al. (2002, 2003) and Shao et al. (2011). The original inversion package was developed by Dr. Chen Ji. Koch et al. (2019) modified the heuristic rules used to automatically define the search ranges for finite-fault inversions based on the moment tensor solution, and incorporated regional strong-motion waveforms into the workflow. They also converted the codebase of the software package from Fortran 77 to Fortran 95, improving its flexibility. Goldberg et al. (2022) enabled the integration of satellite geodetic observations into the inversion framework.
 
@@ -23,7 +23,7 @@ The Regional Green's functions are calculated using the method of Zhu & Rivera (
 
 ## Suggested Citation
 
-Koch, P., Goldberg, D.E., Hunsinger, H., Melgar, D., Riquelme, S., Yeck, W.L., and Haynie, K.L., 2025, Wavelet Annealing Finite Fault nonLinear Earthquake Slip (WAFFLES), version 1.0.1: U.S. Geological Survey software release, https://doi.org/10.5066/P1EKKUNW.
+Koch, P., Goldberg, D.E., Hunsinger, H., Melgar, D., Riquelme, S., Yeck, W.L., and Haynie, K.L., 2025, Wavelet Inversion for SliP (WISP), version 1.0.1: U.S. Geological Survey software release, https://doi.org/10.5066/P1EKKUNW.
 
 ## Authors
 
@@ -61,7 +61,7 @@ In order to compile and/or install the source code there are a number of prerequ
 3. gcc: To provide support to miniforge/conda for compiling c code
 4. miniforge/conda: To install python dependencies. Miniforge can be installed using the provided script: [miniforge_install.sh](./miniforge_install.sh)
 
-## WAFFLES Installation Scripts
+## WISP Installation Scripts
 
 Automated installation of the dependencies and fortran code has been provided in the form of the install script [install.sh](./install.sh). Currently this install script only supports installation on linux systems as the fortran code cannot be compiled on MacOS. To instal the code please ensure that all of the [prerequisites](#prerequisites) are available and miniforge/miniconda/anaconda environment has been initialized
 
