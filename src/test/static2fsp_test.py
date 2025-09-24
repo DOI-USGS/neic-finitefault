@@ -73,7 +73,9 @@ def test_static_to_fsp_single_segment():
 def test_static_to_fsp_multi_segment():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        shutil.copyfile(RESULTS_DIR / "NP1" / "Solution_multisegment.txt", tempdir / "Solution.txt")
+        shutil.copyfile(
+            RESULTS_DIR / "NP1" / "Solution_multisegment.txt", tempdir / "Solution.txt"
+        )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "strong_motion_waves.json",
             tempdir / "strong_motion_waves.json",
