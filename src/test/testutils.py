@@ -43,6 +43,11 @@ def get_segments_data():
         segments = json.load(f)
     return segments
 
+def get_multisegments_data():
+    """Get multisegments_data.json"""
+    with open(RESULTS_DIR / "NP1" / "multisegments_data.json", "r") as f:
+        segments = json.load(f)
+    return segments
 
 def get_static_json(min: int = 0, max: int = 3, all: bool = False):
     """Get static_data.json"""

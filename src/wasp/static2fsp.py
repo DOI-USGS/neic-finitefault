@@ -263,9 +263,10 @@ def static_to_fsp(
             "%\n% Invs : Nx = {}  Nz = {} Fmin = {} Hz  "
             "Fmax = {} Hz\n".format(stk_subfaults, dip_subfaults, 0.01, 0.125)
         )
-        outfile.write(
-            "% Invs : Dx = {} km  Dz = {} " "km\n".format(delta_strike, delta_dip)
-        )
+        if len(segments) == 1: # Include subfault dimensions only if this is a single segment model
+            outfile.write(
+                "% Invs : Dx = {} km  Dz = {} " "km\n".format(delta_strike, delta_dip)
+            )
         outfile.write(
             "% Invs : Ntw = {}  Nsg = {}     "
             "(# of time-windows,# of fault segments)"
@@ -429,6 +430,7 @@ def static_to_fsp(
                     "deg\n".format(i_segment + 1, strike, dip)
                 )
                 outfile.write("% LEN = {} km WID = {} km\n".format(length, width))
+                outfile.write("% Dx = {} km  Dz = {} " "km\n".format(delta_strike, delta_dip))
                 outfile.write("% depth to top: Z2top = {:6.2f} km\n".format(min_dep))
                 outfile.write("% coordinates of top-center\n")
                 outfile.write("% LAT = {}, LON = {}\n".format(lat0, lon0))
