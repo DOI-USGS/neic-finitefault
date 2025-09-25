@@ -1,0 +1,48 @@
+{
+    "rise_time": {
+        "delta_rise": 1.5,
+        "min_rise": 1.5,
+        "windows": 10
+    },
+    "segments": [
+        {
+            "delay_segment": 0,
+            "delta_dip": 15,
+            "delta_strike": 15,
+            "dip": 16,
+            "dip_subfaults": 5,
+            "hyp_dip": 5,
+            "hyp_stk": 9,
+            "max_vel": 3.0,
+            "min_vel": 1.8,
+            "neighbours": [],
+            "rake": 109,
+            "rupture_vel": 2.5,
+            "stk_subfaults": 23,
+            "strike": 6.6
+        },
+        {
+            "delay_segment": 0,
+            "delta_dip": 15,
+            "delta_strike": 15,
+            "dip": 22,
+            "dip_subfaults": 4,
+            "hypocenter": {"lon": -71.67, "lat": -31.57, "depth": 22.4},
+            "hyp_dip": -1,
+            "hyp_stk": 9,
+            "neighbours": [],
+            "rake": 109,
+            "rupture_vel": 2.5,
+            "stk_subfaults": 23,
+            "strike": 6.6
+        }
+    ],
+    "connections": [
+        {
+            "segment1": 1,
+            "segment2": 2,
+            "segment1_subfault": [12,6],
+            "segment2_subfault": [12,1]
+        }
+    ]
+}
