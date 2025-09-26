@@ -184,10 +184,7 @@ def fill_dicts(
         [],
         "-im",
         "--imagery-info",
-        help=(
-            "Path, ramp of imagery file. "
-            "Example: -im <path>:<ramp>"
-        ),
+        help=("Path, ramp of imagery file. " "Example: -im <path>:<ramp>"),
     ),
 ):
     # set default data type
@@ -197,7 +194,6 @@ def fill_dicts(
         chosen_data_types += ["imagery"]
 
     # Parse files and ramps
-    imagery_files: Optional[List[Union[str, pathlib.Path]]]
     if not len(imagery_files):
         imagery_filepath = None
         imagery_ramps = None

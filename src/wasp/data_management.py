@@ -621,7 +621,7 @@ def static_data(
 
 
 def imagery_data(
-    imagery_files: Optional[List[Union[pathlib.Path, str]]] = None,
+    imagery_files: Optional[List[Union[pathlib.Path]]] = None,
     ramp_types: Optional[List[Union[str, None]]] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> dict:
@@ -846,7 +846,7 @@ def filling_data_dicts(
     data_types: List[str],
     data_prop: dict,
     data_folder: Union[pathlib.Path, str],
-    imagery_files: Optional[List[Union[pathlib.Path, str]]] = None,
+    imagery_files: Optional[List[Union[pathlib.Path]]] = None,
     ramp_types: Optional[List[Union[str, None]]] = None,
     working_directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
@@ -863,7 +863,7 @@ def filling_data_dicts(
                         files should be written
     :type data_folder: Union[pathlib.Path, str]
     :param imagery_files: The paths to imagery files, defaults to None
-    :type imagery_files: Optional[List[Union[pathlib.Path, str]]], optional
+    :type imagery_files: Optional[List[Union[pathlib.Path]]], optional
     :param ramp_types: The imagery ramp options, defaults to None
     :type ramp_types: Optional[List[Union[str, None]]], optional
     :param working_directory: The working directory, defaults to pathlib.Path()
