@@ -11,7 +11,7 @@ from wasp.get_outputs import (
     __get_channel,
     __is_number,
     get_data_dict,
-    get_insar,
+    get_imagery,
     read_solution_fsp_format,
     read_solution_static_format,
     retrieve_gnss,
@@ -22,7 +22,7 @@ from .testutils import (
     END_TO_END_DIR,
     RESULTS_DIR,
     get_cgnss_json,
-    get_insar_json,
+    get_imagery_json,
     get_segments_data,
     get_static_json,
     get_tensor_info,
@@ -94,27 +94,27 @@ def test_get_channel():
     assert __get_channel("dart") == ["dart"]
 
 
-def test_get_insar():
+def test_get_imagery():
     ## just run without failing
     tempdir = pathlib.Path(mkdtemp())
     try:
-        insar_data = get_insar_json()
-        new_insar = update_manager_file_locations(
-            insar_data,
+        imagery_data = get_imagery_json()
+        new_imagery = update_manager_file_locations(
+            imagery_data,
             tempdir,
             replace_dir=str(RESULTS_DIR / "NP1"),
             file_key="name",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "insar_synthetics.txt",
-            tempdir / "insar_synthetics.txt",
+            RESULTS_DIR / "NP1" / "imagery_synthetics.txt",
+            tempdir / "imagery_synthetics.txt",
         )
-        with open(tempdir / "insar_data.json", "w") as i:
-            json.dump(new_insar, i)
-        for key in ["ascending", "descending"]:
-            for o, n in zip(insar_data[key], new_insar[key]):
+        with open(tempdir / "imagery_data.json", "w") as i:
+            json.dump(new_imagery, i)
+        for key in ["insar_ascending", "insar_descending"]:
+            for o, n in zip(imagery_data[key], new_imagery[key]):
                 shutil.copyfile(o["name"], n["name"])
-        get_insar(tempdir)
+        get_imagery(tempdir)
     finally:
         shutil.rmtree(tempdir)
 

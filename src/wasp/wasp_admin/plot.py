@@ -21,7 +21,7 @@ from wasp.load_ffm_model import load_ffm_model
 from wasp.management import default_dirs
 from wasp.plot_graphic_NEIC import (
     PlotComparisonMap,
-    PlotInsar,
+    PlotImagery,
     PlotSlipDist_Compare,
     calculate_cumulative_moment_tensor,
     plot_ffm_sol,
@@ -547,19 +547,18 @@ def neic(
             label_stations=label,
             directory=directory,
         )
-    if ManagedDataTypes.insar in chosen_data_types:
+    if ManagedDataTypes.imagery in chosen_data_types:
         imagery_data = get_imagery(data_dir=directory)
         for key, scenes in imagery_data.items():
             for scene in range(len(scenes)):
                 imagery_points = imagery_data[key][scene]["points"]
-                PlotInsar(
+                PlotImagery(
                     tensor_info=tensor_info,
                     segments=segments,
                     point_sources=point_sources,
                     solution=solution,
-                    insar_points=imagery_points,
-                    scene=str(scene),
-                    los="test",
+                    imagery_points=imagery_points,
+                    datafile=key,
                     directory=directory,
                 )
     if polygon:

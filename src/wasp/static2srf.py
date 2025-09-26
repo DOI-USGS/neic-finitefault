@@ -145,20 +145,16 @@ def static_to_srf(
         surf_az = np.sort(surf_data["azimuth"].values.tolist())
         surf_az = np.append(surf_az, surf_az[0] + 360)
         surf_phimx = max(np.diff(surf_az))
-    quantity_insar_scenes = 0
-    quantity_insar_points = 0
-    insar_r = 0
-    if "insar" in used_data:
-        insar_data = pd.read_json(directory / "imagery_data.json")
-        if "ascending" in insar_data:
-            asc_insar = len(insar_data["ascending"])
-            quantity_insar_scenes += asc_insar
-        if "descending" in insar_data:
-            desc_insar = len(insar_data["descending"])
-            quantity_insar_scenes += desc_insar
-        with open(directory / "insar_data.txt") as f:
+    quantity_imagery_scenes = 0
+    quantity_imagery_points = 0
+    imagery_r = 0
+    if "imagery" in used_data:
+        imagery_data = pd.read_json(directory / "imagery_data.json")
+        for im in imagery_data:
+            quantity_imagery_scenes += 1
+        with open(directory / "imagery_data.txt") as f:
             first_line = f.readline().strip("\n")
-            quantity_insar_points = int(first_line)
+            quantity_imagery_points = int(first_line)
     quantity_dart = 0
     dart_phimx = 0
     dart_r = 0
@@ -198,7 +194,7 @@ def static_to_srf(
         outfile.write("2.0\n")
 
         outfile.write(
-            "#\n# Data :\tBODY\tSURF\tSTRONG\tcGNSS\tGNSS\tInSAR\tDART\tTRIL\tLEVEL\tOTHER\n"
+            "#\n# Data :\tBODY\tSURF\tSTRONG\tcGNSS\tGNSS\tIMAGERY\tDART\tTRIL\tLEVEL\tOTHER\n"
         )
         outfile.write(
             "# NoS  :\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t0\t0\t0\n".format(
@@ -207,7 +203,7 @@ def static_to_srf(
                 quantity_strong,
                 quantity_cgnss,
                 quantity_gnss,
-                quantity_insar_points,
+                quantity_imagery_points,
                 quantity_dart,
             )
         )
@@ -218,7 +214,7 @@ def static_to_srf(
                 strong_phimx,
                 cgnss_phimx,
                 gnss_phimx,
-                quantity_insar_scenes,
+                quantity_imagery_scenes,
                 dart_phimx,
             )
         )
@@ -229,7 +225,7 @@ def static_to_srf(
                 strong_r,
                 cgnss_r,
                 gnss_r,
-                insar_r,
+                imagery_r,
                 dart_r,  # type:ignore
             )
         )

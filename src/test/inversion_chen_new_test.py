@@ -107,12 +107,9 @@ def _end_to_end(
     if "gnss" in data_type:
         if os.path.isfile(os.path.join(directory, "data", "gnss_data")):
             shutil.copy2(os.path.join(directory, "data", "gnss_data"), directory)
-    if "insar" in data_type:
-        insar_files = glob.glob(os.path.join(directory, "data", "insar_a*txt"))
-        insar_files = insar_files + glob.glob(
-            os.path.join(directory, "data", "insar_d*txt")
-        )
-        for file in insar_files:
+    if "imagery" in data_type:
+        imagery_files = glob.glob(os.path.join(directory, "data", "insar_*.txt"))
+        for file in imagery_files:
             if os.path.isfile(file):
                 shutil.copy2(file, directory)
     data_dir = directory / "data"
@@ -123,17 +120,14 @@ def _end_to_end(
         tensor_info, data_type, data_prop, st_response=st_response, directory=data_dir
     )
     data_folder = os.path.join(directory, "data")
-    insar_asc = glob.glob(str(directory) + "/insar_asc*txt")
-    insar_asc = None if len(insar_asc) == 0 else insar_asc  # type:ignore
-    insar_desc = glob.glob(str(directory) + "/insar_desc*txt")
-    insar_desc = None if len(insar_desc) == 0 else insar_desc  # type:ignore
+    imagery_files = glob.glob(str(directory) + "/insar_*.txt")
+    imagery_files = None if len(imagery_files) == 0 else imagery_files  # type:ignore
     filling_data_dicts(
         tensor_info,
         data_type,
         data_prop,
         data_folder,
-        insar_asc=insar_asc,  # type:ignore
-        insar_desc=insar_desc,  # type:ignore
+        imagery_files=imagery_files,  # type:ignore
         working_directory=directory,
     )
     writing_inputs0(
@@ -189,7 +183,7 @@ def _end_to_end(
         directory / "instrumental_response.txt",
         directory / "body_wave_weight.txt",
     ]
-    files9 = glob.glob(str(directory) + "/insar*")
+    files9 = glob.glob(str(directory) + "/imagery*")
     files = (
         files
         + files2
@@ -249,7 +243,7 @@ def test_automatic_usgs():
             data_type=[
                 "cgnss",
                 "gnss",
-                "insar",
+                "imagery",
                 "strong",
                 "surf",
                 "body",
@@ -267,9 +261,9 @@ def test_automatic_usgs():
             "static_data.json",
             "sampling_filter.json",
             "strong_motion_gf.json",
-            "insar_data.json",
             "cgnss_waves.json",
             "cgnss_gf.json",
+            "imagery_data.json",
         ]:
             with open(RESULTS_DIR / "NP1" / f) as td:
                 target = json.load(td)
@@ -477,7 +471,7 @@ def test_automatic_gnss():
     os.getenv("CI_REGISTRY") is not None or os.getenv("RUN_ALL", False) == False,
     reason="Takes 18+ minutes to run",
 )
-def test_automatic_insar():
+def test_automatic_imagery():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     _handle_lowin()
     try:
@@ -499,7 +493,7 @@ def test_automatic_insar():
         )
         automatic_usgs(
             tensor_info=TENSOR,
-            data_type=["insar"],
+            data_type=["imagery"],
             dt_cgnss=None,
             default_dirs=updated_default_dirs,
             config_path=tempdir / "config.ini",
@@ -507,7 +501,7 @@ def test_automatic_insar():
         )
         # compare json files
         for f in [
-            "insar_data.json",
+            "imagery_data.json",
         ]:
             _compare(
                 RESULTS_DIR / "NP1" / f,
@@ -517,7 +511,7 @@ def test_automatic_insar():
         # compare solucion
         with open(tempdir / "20150916225432" / "ffm.0" / "NP1" / "Solution.txt") as f:
             solucion = f.read()
-        with open(RESULTS_DIR / "NP1" / "Solution_insar.txt", "r") as f:
+        with open(RESULTS_DIR / "NP1" / "Solution_imagery.txt", "r") as f:
             target_solucion = f.read()
         assert solucion == target_solucion
     finally:

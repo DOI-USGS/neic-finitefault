@@ -15,7 +15,7 @@ from .testutils import (
     HOME,
     RESULTS_DIR,
     get_cgnss_json,
-    get_insar_json,
+    get_imagery_json,
     get_sampling_filter,
     get_static_json,
     get_strong_motion_json,
@@ -50,7 +50,7 @@ CHANNELS = [
 ]
 CGNSS_WAVES = get_cgnss_json()
 CMT = get_tensor_info()
-INSAR_DATA = get_insar_json()
+IMAGERY_DATA = get_imagery_json()
 SAMPLING_FILTER = get_sampling_filter()
 STATIC_DATA = get_static_json()
 STRONG_WAVES = get_strong_motion_json()
@@ -179,9 +179,9 @@ def test_fill_dicts():
         )
         assert result.exit_code == 0
 
-        # test insar values (invalid ramp)
-        dummy_insar = tempdir / "insar_ascending.txt"
-        with open(dummy_insar, "w"):
+        # test imagery values (invalid ramp)
+        dummy_insara = tempdir / "insar_ascending.txt"
+        with open(dummy_insara, "w"):
             pass
         dummy_insard = tempdir / "insar_descending.txt"
         with open(dummy_insard, "w"):
@@ -191,56 +191,42 @@ def test_fill_dicts():
             [
                 "fill-dicts",
                 str(tempdir),
-                "-ina",
-                f"{str(dummy_insar)}:invalid",
+                "-im",
+                f"{str(dummy_insara)}:invalid",
             ],
         )
         assert result1.exit_code == 1
         assert (
-            "The insar ramp provided (invalid) is not valid. "
+            "The imagery ramp provided (invalid) is not valid. "
             "Must be one of ['static', 'bilinear', 'linear', 'quadratic']."
         ) in str(result1.exception)
 
-        # test insar values (invalid ramp)
+        # test imagery values (invalid ramp)
         result2 = runner.invoke(
             app,
             [
                 "fill-dicts",
                 str(tempdir),
-                "-ina",
-                f"{str(dummy_insar)}:linear",
-                "-ind",
-                f"{str(dummy_insard)}",
-                "-ina",
-                f"{str(dummy_insar)}:static",
-                "-ind",
-                f"{str(dummy_insard)}:quadratic",
+                "-im",
+                f"{str(dummy_insara)}:linear",
+                "-im",
+                f"{str(dummy_insard)}:static",
             ],
         )
-        with open(tempdir / "insar_data.json") as f:
-            insar_dict = json.load(f)
-        assert insar_dict == {
-            "ascending": [
+        with open(tempdir / "imagery_data.json") as f:
+            imagery_dict = json.load(f)
+        assert imagery_dict == {
+            "insar_ascending": [
                 {
                     "name": f"{str(tempdir)}/insar_ascending.txt",
                     "ramp": "linear",
                     "weight": 1.0,
                 },
-                {
-                    "name": f"{str(tempdir)}/insar_ascending.txt",
-                    "ramp": "static",
-                    "weight": 1.0,
-                },
             ],
-            "descending": [
+            "insar_descending": [
                 {
                     "name": f"{str(tempdir)}/insar_descending.txt",
-                    "ramp": None,
-                    "weight": 1.0,
-                },
-                {
-                    "name": f"{str(tempdir)}/insar_descending.txt",
-                    "ramp": "quadratic",
+                    "ramp": "static",
                     "weight": 1.0,
                 },
             ],
@@ -248,7 +234,9 @@ def test_fill_dicts():
         assert result2.exit_code == 0
     finally:
         print("Cleaning up test directory.")
-        shutil.rmtree(tempdir)
+
+
+#        shutil.rmtree(tempdir)
 
 
 def test_fill_dicts_missing_file():
@@ -352,7 +340,7 @@ def test_many_events():
                 "-t",
                 "gnss",
                 "-t",
-                "insar",
+                "imagery",
                 "-t",
                 "strong",
                 "-t",
@@ -391,7 +379,7 @@ def test_model_props():
                 "-t",
                 "cgnss",
                 "-t",
-                "insar",
+                "imagery",
                 "-t",
                 "surf",
                 "-t",
@@ -634,12 +622,12 @@ def test_static_srf():
             tempdir / "surf_waves.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "insar_data.json",
-            tempdir / "insar_data.json",
+            RESULTS_DIR / "NP1" / "imagery_data.json",
+            tempdir / "imagery_data.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "insar_data.txt",
-            tempdir / "insar_data.txt",
+            RESULTS_DIR / "NP1" / "imagery_data.txt",
+            tempdir / "imagery_data.txt",
         )
         shutil.copyfile(
             END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
@@ -662,7 +650,7 @@ def test_static_srf():
                 "-t",
                 "gnss",
                 "-t",
-                "insar",
+                "imagery",
                 "-t",
                 "strong",
                 "-t",
@@ -682,7 +670,7 @@ def test_static_srf():
                 "-t",
                 "gnss",
                 "-t",
-                "insar",
+                "imagery",
                 "-t",
                 "strong",
                 "-t",
@@ -702,7 +690,7 @@ def test_static_srf():
         target = [
             "2.0\n",
             "#\n",
-            "# Data :\tBODY\tSURF\tSTRONG\tcGNSS\tGNSS\tInSAR\tDART\tTRIL\tLEVEL\tOTHER\n",
+            "# Data :\tBODY\tSURF\tSTRONG\tcGNSS\tGNSS\tIMAGERY\tDART\tTRIL\tLEVEL\tOTHER\n",
             "# NoS  :\t19\t19\t3\t3\t10\t2166\t0\t0\t0\t0\n",
             "# PHImx :\t186.81\t186.81\t246.51\t312.71\t183.06\t2\t0.00\t0.0\t0.0\t0.0\n",
             "# Rmin :\t40.80\t40.80\t1.11\t0.89\t0.36\t--\t0.00\t0.0\t0.0\t0.0\n",
@@ -776,12 +764,12 @@ def test_static_fsp():
             tempdir / "surf_waves.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "insar_data.json",
-            tempdir / "insar_data.json",
+            RESULTS_DIR / "NP1" / "imagery_data.json",
+            tempdir / "imagery_data.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "insar_data.txt",
-            tempdir / "insar_data.txt",
+            RESULTS_DIR / "NP1" / "imagery_data.txt",
+            tempdir / "imagery_data.txt",
         )
         shutil.copyfile(
             END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
@@ -820,7 +808,7 @@ def test_static_fsp():
                 "-t",
                 "gnss",
                 "-t",
-                "insar",
+                "imagery",
                 "-t",
                 "strong",
                 "-t",
@@ -840,7 +828,7 @@ def test_static_fsp():
                 "-t",
                 "gnss",
                 "-t",
-                "insar",
+                "imagery",
                 "-t",
                 "strong",
                 "-t",
@@ -883,8 +871,8 @@ def test_update_inputs():
         new_cgnss_waves = update_manager_file_locations(
             CGNSS_WAVES, tempdir, replace_dir=str(RESULTS_DIR / "data")
         )
-        new_insar = update_manager_file_locations(
-            INSAR_DATA, tempdir, replace_dir=str(RESULTS_DIR / "NP1"), file_key="name"
+        new_imagery = update_manager_file_locations(
+            IMAGERY_DATA, tempdir, replace_dir=str(RESULTS_DIR / "NP1"), file_key="name"
         )
         with open(tempdir / "tele_waves.json", "w") as f:
             json.dump(new_tele_waves, f)
@@ -894,8 +882,8 @@ def test_update_inputs():
             json.dump(new_strong_waves, f)
         with open(tempdir / "cgnss_waves.json", "w") as f:
             json.dump(new_cgnss_waves, f)
-        with open(tempdir / "insar_data.json", "w") as f:
-            json.dump(new_insar, f)
+        with open(tempdir / "imagery_data.json", "w") as f:
+            json.dump(new_imagery, f)
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "insar_ascending.txt",
             tempdir / "insar_ascending.txt",
@@ -955,7 +943,7 @@ def test_update_inputs():
                 "-t",
                 "gnss",
                 "-t",
-                "insar",
+                "imagery",
                 "-t",
                 "strong",
                 "-t",
@@ -1000,12 +988,12 @@ def test_velmodel_from_tensor():
             tempdir / "surf_waves.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "insar_data.json",
-            tempdir / "insar_data.json",
+            RESULTS_DIR / "NP1" / "imagery_data.json",
+            tempdir / "imagery_data.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "insar_data.txt",
-            tempdir / "insar_data.txt",
+            RESULTS_DIR / "NP1" / "imagery_data.txt",
+            tempdir / "imagery_data.txt",
         )
         shutil.copyfile(
             END_TO_END_DIR / "info" / "20003k7a_cmt_CMT", tempdir / "20003k7a_cmt_CMT"
@@ -1044,7 +1032,7 @@ def test_velmodel_from_tensor():
                 "-t",
                 "gnss",
                 "-t",
-                "insar",
+                "imagery",
                 "-t",
                 "strong",
                 "-t",
@@ -1064,7 +1052,7 @@ def test_velmodel_from_tensor():
                 "-t",
                 "gnss",
                 "-t",
-                "insar",
+                "imagery",
                 "-t",
                 "strong",
                 "-t",

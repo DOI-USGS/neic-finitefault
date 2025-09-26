@@ -14,7 +14,7 @@ from wasp.data_management import filling_data_dicts
 from wasp.fault_plane import create_finite_fault
 from wasp.get_outputs import read_solution_static_format, synthetics_to_SAC
 from wasp.input_files import (
-    input_chen_insar,
+    input_chen_imagery,
     input_chen_near_field,
     input_chen_static,
     input_chen_tele_body,
@@ -51,7 +51,7 @@ from .fileutils import validate_files
 app = typer.Typer(help="Manage WASP data, faults, and property files")
 
 
-VALID_INSAR_RAMPS = ["static", "bilinear", "linear", "quadratic"]
+VALID_Imagery_RAMPS = ["static", "bilinear", "linear", "quadratic"]
 
 
 def _get_correction(correction_string: str) -> Tuple[str, List[str], float]:
@@ -64,8 +64,8 @@ def _get_correction(correction_string: str) -> Tuple[str, List[str], float]:
     return station, channels, correction
 
 
-def _parse_insar(value: str) -> Tuple[pathlib.Path, Optional[str]]:
-    """Parse an insar file string in format <path>:<ramp>"""
+def _parse_imagery(value: str) -> Tuple[pathlib.Path, Optional[str]]:
+    """Parse an imagery file string in format <path>:<ramp>"""
     if ":" not in value:
         return pathlib.Path(value), None
     else:
@@ -73,13 +73,12 @@ def _parse_insar(value: str) -> Tuple[pathlib.Path, Optional[str]]:
         filepath = pathlib.Path(parts[0])
         validate_files([filepath])
         ramp = parts[1]
-        description = parts[-1]
-        if ramp not in VALID_INSAR_RAMPS:
+        if ramp not in VALID_Imagery_RAMPS:
             raise ValueError(
-                f"The insar ramp provided ({ramp}) is not valid. "
-                f"Must be one of {VALID_INSAR_RAMPS}."
+                f"The imagery ramp provided ({ramp}) is not valid. "
+                f"Must be one of {VALID_Imagery_RAMPS}."
             )
-        return filepath, ramp, description
+        return filepath, ramp
 
 
 @app.command(help="Acquire strong motion and teleseismic bodywave data")
@@ -185,32 +184,30 @@ def fill_dicts(
         [],
         "-im",
         "--imagery-info",
-        help=("Path, ramp, and description of imagery file. " "Example: -im <path>:<ramp>:<description>"),
+        help=(
+            "Path, ramp of imagery file. "
+            "Example: -im <path>:<ramp>"
+        ),
     ),
 ):
     # set default data type
     chosen_data_types: List[str]
     chosen_data_types = [d.value for d in data_types]
-    if (
-        imagery_files is not None
-    ) and "insar" not in data_types:
-        chosen_data_types += ["insar"]
+    if (imagery_files is not None) and "imagery" not in data_types:
+        chosen_data_types += ["imagery"]
 
     # Parse files and ramps
     imagery_files: Optional[List[Union[str, pathlib.Path]]]
     if not len(imagery_files):
         imagery_filepath = None
         imagery_ramps = None
-        imagery_desc = None
     else:
         imagery_filepath = []
         imagery_ramps = []
-        imagery_desc = []
         for ia in imagery_files:
-            filepath, ramp, description = _parse_insar(ia)
+            filepath, ramp = _parse_imagery(ia)
             imagery_filepath += [filepath]
             imagery_ramps += [ramp]
-            imagery_desc += [description]
 
     # validate files
     files_to_validate = []
@@ -238,7 +235,6 @@ def fill_dicts(
         directory,
         imagery_files=imagery_filepath,
         ramp_types=imagery_ramps,
-        imagery_description=imagery_desc,
         working_directory=directory,
     )
 
@@ -283,7 +279,7 @@ def many_events(
         # validate files
         files_to_validate = []
         for d in chosen_data_types:
-            if d not in ["insar"]:
+            if d not in ["imagery"]:
                 files_to_validate += [event_folder / DEFAULT_MANAGEMENT_FILES[d]]
         sampling_filtering_file = event_folder / "sampling_filter.json"
         files_to_validate += [sampling_filtering_file.resolve()]
@@ -589,7 +585,7 @@ def static_to_srf(
     chosen_data_types: List[str]
     chosen_data_types = [d.value for d in data_types]
     for d in data_types:
-        if d not in ["insar", "gnss"]:
+        if d not in ["imagery", "gnss"]:
             validate_files([directory / DEFAULT_MANAGEMENT_FILES[d]])
 
     # get tensor information
@@ -669,7 +665,7 @@ def static_to_fsp(
     chosen_data_types: List[str]
     chosen_data_types = [d.value for d in data_types]
     for d in data_types:
-        if d not in ["insar", "gnss"]:
+        if d not in ["imagery", "gnss"]:
             validate_files([directory / DEFAULT_MANAGEMENT_FILES[d]])
 
     # get tensor information
@@ -861,9 +857,9 @@ def update_inputs(
     if "gnss" in chosen_data_types:
         validate_files([directory / "static_data.json"])
         input_chen_static(directory=directory)
-    if "insar" in chosen_data_types:
+    if "imagery" in chosen_data_types:
         validate_files([directory / "imagery_data.json"])
-        input_chen_insar(directory=directory)
+        input_chen_imagery(directory=directory)
     if model_space:
         validate_files([directory / "model_space.json"])
         with open(directory / "model_space.json") as mf:

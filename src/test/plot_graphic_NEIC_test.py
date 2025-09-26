@@ -6,7 +6,7 @@ import tempfile
 from test.testutils import (
     RESULTS_DIR,
     get_cgnss_json,
-    get_insar_json,
+    get_imagery_json,
     get_segments_data,
     get_strong_motion_json,
     get_surf_waves_json,
@@ -19,10 +19,10 @@ from test.testutils import (
 import pytest
 
 from wasp.fault_plane import point_sources_param, shear_modulous
-from wasp.get_outputs import get_insar, read_solution_static_format, retrieve_gnss
+from wasp.get_outputs import get_imagery, read_solution_static_format, retrieve_gnss
 from wasp.plot_graphic_NEIC import (
     PlotComparisonMap,
-    PlotInsar,
+    PlotImagery,
     PlotSlipDist_Compare,
     _plot_vel_model,
     _PlotCumulativeSlip,
@@ -265,12 +265,12 @@ def test___PlotCumulativeSlip():
         shutil.rmtree(tempdir)
 
 
-def test_PlotInsar():
+def test_PlotImagery():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "insar_synthetics.txt",
-            tempdir / "insar_synthetics.txt",
+            RESULTS_DIR / "NP1" / "imagery_synthetics.txt",
+            tempdir / "imagery_synthetics.txt",
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "insar_ascending.txt", tempdir / "insar_ascending.txt"
@@ -279,38 +279,36 @@ def test_PlotInsar():
             RESULTS_DIR / "NP1" / "insar_descending.txt",
             tempdir / "insar_descending.txt",
         )
-        new_insar = update_manager_file_locations(
-            get_insar_json(),
+        new_imagery = update_manager_file_locations(
+            get_imagery_json(),
             tempdir,
             replace_dir=str(RESULTS_DIR / "NP1"),
             file_key="name",
         )
-        with open(tempdir / "insar_data.json", "w") as f:
-            json.dump(new_insar, f)
+        with open(tempdir / "imagery_data.json", "w") as f:
+            json.dump(new_imagery, f)
 
-        insar_data = get_insar(data_dir=tempdir)
-        PlotInsar(
+        imagery_data = get_imagery(data_dir=tempdir)
+        PlotImagery(
             TENSOR,
             SEGMENTS["segments"],
             POINT_SOURCES,
             SOLUTION,
-            insar_data["ascending"][0]["points"],
-            "0",
-            "ascending",
+            imagery_data["insar_ascending"][0]["points"],
+            "insar_ascending",
             directory=tempdir,
         )
-        PlotInsar(
+        PlotImagery(
             TENSOR,
             SEGMENTS["segments"],
             POINT_SOURCES,
             SOLUTION,
-            insar_data["descending"][0]["points"],
-            "0",
-            "descending",
+            imagery_data["insar_descending"][0]["points"],
+            "insar_descending",
             directory=tempdir,
         )
-        assert (tempdir / "InSAR_ascending_fit_0.png").exists()
-        assert (tempdir / "InSAR_descending_fit_0.png").exists()
+        assert (tempdir / "Imagery_insar_ascending_fit.png").exists()
+        assert (tempdir / "Imagery_insar_descending_fit.png").exists()
     finally:
         shutil.rmtree(tempdir)
 

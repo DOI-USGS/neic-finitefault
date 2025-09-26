@@ -14,7 +14,7 @@ def test_modelling_prop():
         dict, model_space = modelling_prop(
             get_tensor_info(),
             get_segments_data(),
-            ["cgnss", "insar", "surf_waves", "strong_waves", "tele_waves"],
+            ["cgnss", "imagery", "surf_waves", "strong_waves", "tele_waves"],
             directory=tempdir,
         )
         # compare annealing_prop

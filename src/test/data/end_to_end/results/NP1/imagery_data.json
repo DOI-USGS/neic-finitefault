@@ -1,12 +1,12 @@
 {
-  "ascending": [
+  "insar_ascending": [
     {
       "name": "insar_ascending.txt",
       "ramp": null,
       "weight": 1.0
     }
   ],
-  "descending": [
+  "insar_descending": [
     {
       "name": "insar_descending.txt",
       "ramp": null,

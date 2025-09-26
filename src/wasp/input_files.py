@@ -742,7 +742,7 @@ def input_chen_dart(
     return "cgnss"
 
 
-def input_chen_insar(
+def input_chen_imagery(
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """Write text files, which are inputs for Chen's scripts, with information
@@ -841,7 +841,7 @@ def input_chen_insar(
             elif ramp == "quadratic":
                 size1 = 5
             else:
-                raise ValueError(f"The insar ramp provided ({ramp}) is not valid.")
+                raise ValueError(f"The imagery ramp provided ({ramp}) is not valid.")
             east1 = np.array(eastings[start : start + length]) - min_easting
             north1 = np.array(northings[start : start + length]) - min_northing
             east1 = east1 / np.max(np.abs(east1))

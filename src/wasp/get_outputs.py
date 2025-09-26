@@ -260,7 +260,6 @@ def synthetics_to_SAC(
         fwd_directory = directory / "forward_model/BODY"
         if not fwd_directory.exists():
             os.mkdir(fwd_directory)
-        print(directory / "tele_waves.json")
         if not (directory / "tele_waves.json").exists():
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), "tele_waves.json"
@@ -575,7 +574,7 @@ def get_imagery(data_dir: Union[str, pathlib.Path] = pathlib.Path()) -> dict:
             lines_im = [line for line in lines_im if not "#" in "".join(line)]
             lines1 = lines0 + len(lines_im)
             ramp_track = [[0] * 5] * len(lines_im)
-            if ramps:
+            if any(ramps):
                 ramp_track = lines_ramp[lines0 + 1 : lines1]
             zipped = zip(lines_im[:], lines_syn[lines0 + 1 : lines1], ramp_track[:])
             for line1, line2, line3 in zipped:
@@ -594,36 +593,6 @@ def get_imagery(data_dir: Union[str, pathlib.Path] = pathlib.Path()) -> dict:
                 imagery_points = imagery_points + [new_dict]
             imagery_data[key][item]["points"] = imagery_points
             lines0 = lines0 + len(lines_im)
-#    if "descending" in insar_data:
-#        desc_properties = insar_data["descending"]
-#        for desc_property in desc_properties:
-#            insar_points = []
-#            insar_desc = desc_property["name"]
-#            ramp_desc = desc_property["ramp"]
-#            with open(insar_desc, "r") as desc_file:
-#                lines_desc = [line.split() for line in desc_file]
-#            lines_desc = [line for line in lines_desc if not "#" in "".join(line)]
-#            lines1 = lines0 + len(lines_desc)
-#            ramp_track = [[0] * 5] * len(lines_desc)
-#            if ramp_desc:
-#                ramp_track = lines_ramp[lines0 + 1 : lines1]
-#            zipped = zip(lines_desc[:], lines_syn[lines0 + 1 : lines1], ramp_track[:])
-#            for line1, line2, line3 in zipped:
-#                lat = float(line1[1])
-#                lon = float(line1[0])
-#                observed = 100 * float(line1[2])
-#                synthetic = float(line2[4])
-#                ramp = float(line3[4])
-#                new_dict = {
-#                    "lat": lat,
-#                    "lon": lon,
-#                    "observed": observed,
-#                    "synthetic": synthetic,
-#                    "ramp": ramp,
-#                }
-#                insar_points = insar_points + [new_dict]
-#            desc_property["points"] = insar_points
-#            lines0 = lines0 + len(lines_desc)
     return imagery_data
 
 

@@ -1993,17 +1993,16 @@ def PlotMap(
     fig.savefig(directory / "Map.pdf")
 
 
-def PlotInsar(
+def PlotImagery(
     tensor_info: dict,
     segments: List[dict],
     point_sources: list,
     solution: dict,
-    insar_points: List[dict],
-    scene: str,
-    los: str = "ascending",
+    imagery_points: List[dict],
+    datafile: str,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Plot InSAR observation and model fits
+    """Plot Imagery observation and model fits
 
     :param tensor_info: The tensor information
     :type tensor_info: dict
@@ -2013,17 +2012,15 @@ def PlotInsar(
     :type point_sources: list
     :param solution: The kinematic solution read from Solution.txt
     :type solution: dict
-    :param insar_points: List of insar data
-    :type insar_points: List[dict]
-    :param scene: The scene name or number
-    :type scene: str
-    :param los: The direction of the path, defaults to "ascending"
-    :type los: str, optional
+    :param imagery_points: List of imagery data
+    :type imagery_points: List[dict]
+    :param datafile: The filename of the resampled imagery data
+    :type datafile: str, optional
     :param directory: The location where plots should be written, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     """
     directory = pathlib.Path(directory)
-    print(f"Creating InSAR plots: {los}")
+    print(f"Creating Imagery plots: {datafile}")
     plane_info = segments[0]
     (
         stk_subfaults,
@@ -2047,15 +2044,15 @@ def PlotInsar(
 
     max_diff = -1
     min_diff = 1
-    lats = [point["lat"] for point in insar_points]
-    lons = [point["lon"] for point in insar_points]
+    lats = [point["lat"] for point in imagery_points]
+    lons = [point["lon"] for point in imagery_points]
     min_lat = min(min_lat, np.min(lats))
     max_lat = max(max_lat, np.max(lats))
     min_lon = min(min_lon, np.min(lons))
     max_lon = max(max_lon, np.max(lons))
-    observed = [point["observed"] for point in insar_points]
-    synthetic = [point["synthetic"] for point in insar_points]
-    ramp = [point["ramp"] for point in insar_points]
+    observed = [point["observed"] for point in imagery_points]
+    synthetic = [point["synthetic"] for point in imagery_points]
+    ramp = [point["ramp"] for point in imagery_points]
     diffs = [obs - syn for obs, syn in zip(observed, synthetic)]
     obs_no_ramp = [obs - ramp for obs, ramp in zip(observed, ramp)]
     syn_no_ramp = [syn - ramp for syn, ramp in zip(synthetic, ramp)]
@@ -2242,8 +2239,8 @@ def PlotInsar(
             fig.plot(x=corners[0, :], y=corners[1, :], pen="1p,black")
             fig.plot(x=updip[0, :], y=updip[1, :], pen="1p,red")
         sub += 1
-    fig.savefig(directory / "InSAR_{}_fit_{}.png".format(los, scene))
-    fig.savefig(directory / "InSAR_{}_fit_{}.pdf".format(los, scene))
+    fig.savefig(directory / "Imagery_{}_fit.png".format(datafile))
+    fig.savefig(directory / "Imagery_{}_fit.pdf".format(datafile))
     plt.close()
     return
 
