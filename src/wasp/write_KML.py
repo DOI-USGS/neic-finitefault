@@ -250,8 +250,8 @@ def PlotMap_KML(
     solution: dict,
     default_dirs: dict,
     stations_str: Optional[dict] = None,
-    stations_gps: Optional[zip] = None,
-    stations_cgps: Optional[str] = None,
+    stations_gnss: Optional[zip] = None,
+    stations_cgnss: Optional[str] = None,
     max_slip: Optional[float] = None,
     legend_len: Optional[float] = None,
     scale: Optional[float] = None,
@@ -273,10 +273,10 @@ def PlotMap_KML(
     :type default_dirs: dict
     :param stations_str: The stations file properties, defaults to None
     :type stations_str:Optional[dict], optional
-    :param stations_gps: The gps stations description, defaults to None
-    :type stations_gps:  Optional[zip], optional
-    :param stations_cgps: The cgps stations description, defaults to None
-    :type stations_cgps: Optional[str], optional
+    :param stations_gnss: The gnss stations description, defaults to None
+    :type stations_gnss:  Optional[zip], optional
+    :param stations_cgnss: The cgnss stations description, defaults to None
+    :type stations_cgnss: Optional[str], optional
     :param max_slip: A specified maximum slip, defaults to None
     :type max_slip: Optional[float], optional
     :param legend_len: The length of the legend, defaults to None
@@ -368,8 +368,8 @@ def PlotMap_KML(
                 transform=dictn["transform"],
                 zorder=4,
             )
-    if stations_cgps is not None:
-        for file in stations_cgps:
+    if stations_cgnss is not None:
+        for file in stations_cgnss:
             name = file["name"]
             latp, lonp = file["location"]
             min_lat = min(min_lat, latp)
@@ -389,26 +389,28 @@ def PlotMap_KML(
                 transform=dictn["transform"],
                 zorder=4,
             )
-    if stations_gps is not None:
+    if stations_gnss is not None:
         max_obs = np.zeros(3)
-        stations_gps2: List[List[Union[float, np.ndarray, str]]] = []
-        for name, sta_lat, sta_lon, obs, syn, error in stations_gps:
+        stations_gnss2: List[List[Union[float, np.ndarray, str]]] = []
+        for name, sta_lat, sta_lon, obs, syn, error in stations_gnss:
             min_lat = min(min_lat, sta_lat)
             max_lat = max(max_lat, sta_lat)
             min_lon = min(min_lon, sta_lon)
             max_lon = max(max_lon, sta_lon)
-            stations_gps2 = stations_gps2 + [[name, sta_lat, sta_lon, obs, syn, error]]
+            stations_gnss2 = stations_gnss2 + [
+                [name, sta_lat, sta_lon, obs, syn, error]
+            ]
             max_obs = np.maximum([abs(float(v)) for v in obs], max_obs)
             distance = max(np.abs(sta_lat - lat0), np.abs(sta_lon - lon0))
             margin = max(margin, 1.2 * distance)
         max_obs = np.max(max_obs)  # type:ignore
-        for name, sta_lat, sta_lon, obs, syn, error in stations_gps2:  # type:ignore
+        for name, sta_lat, sta_lon, obs, syn, error in stations_gnss2:  # type:ignore
             if scale == None:
                 scale = 2  # bigger number here makes arrows look longer
             scale2 = 2
-            gps_z, gps_n, gps_e = syn
-            east_west = float(gps_e) / max_obs / (1.0 / scale)  # type:ignore
-            north_south = float(gps_n) / max_obs / (1.0 / scale)  # type:ignore
+            gnss_z, gnss_n, gnss_e = syn
+            east_west = float(gnss_e) / max_obs / (1.0 / scale)  # type:ignore
+            north_south = float(gnss_n) / max_obs / (1.0 / scale)  # type:ignore
             plt.arrow(
                 sta_lon,
                 sta_lat,
@@ -423,9 +425,9 @@ def PlotMap_KML(
                 transform=dictn["transform"],
                 edgecolor="k",
             )
-            gps_z, gps_n, gps_e = obs
-            east_west = float(gps_e) / max_obs / (1.0 / scale)  # type:ignore
-            north_south = float(gps_n) / max_obs / (1.0 / scale)  # type:ignore
+            gnss_z, gnss_n, gnss_e = obs
+            east_west = float(gnss_e) / max_obs / (1.0 / scale)  # type:ignore
+            north_south = float(gnss_n) / max_obs / (1.0 / scale)  # type:ignore
             plt.arrow(
                 sta_lon,
                 sta_lat,

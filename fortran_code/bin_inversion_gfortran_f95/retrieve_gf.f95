@@ -55,11 +55,11 @@ contains
    end subroutine retrievegf_set_fault_parameters
 
 
-   subroutine get_gf(strong, cgps, body, surf, dart, many_events)
+   subroutine get_gf(strong, cgnss, body, surf, dart, many_events)
 !
 !  Args:
 !  strong: True if strong motion data are used, False otherwise
-!  cgps: True if cGPS data are used, False otherwise
+!  cgnss: True if cGNSS data are used, False otherwise
 !  body: True if body wave data are used, False otherwise
 !  surf: True if surface wave data are used, False otherwise
 !  dart: True if DART data are used, False otherwise
@@ -68,7 +68,7 @@ contains
    implicit none
 !
    integer first, last
-   logical :: strong, cgps, body, surf, dart, many_events
+   logical :: strong, cgnss, body, surf, dart, many_events
    allocate(green_dip(npuse, max_stations, max_subfaults))
    allocate(green_stk(npuse, max_stations, max_subfaults))
 
@@ -82,8 +82,8 @@ contains
       call get_near_field_gf(first, last, many_events, strong, .False.)
       first = last
    end if
-   if (cgps) then
-      call get_near_field_gf(first, last, many_events, .False., cgps)
+   if (cgnss) then
+      call get_near_field_gf(first, last, many_events, .False., cgnss)
       first = last
    end if
    if (body) then
@@ -101,14 +101,14 @@ contains
    end subroutine get_gf
 
 
-   subroutine get_near_field_gf(first, last, many_events, strong, cgps)
+   subroutine get_near_field_gf(first, last, many_events, strong, cgnss)
 !
 !  Args:
 !  first: number of initial channel
 !  last: number of final channel
 !  many_events: True if more than one event to be modelled, False otherwise
 !  strong: True if strong motion data are used, False otherwise
-!  cgps: True if cGPS data are used, False otherwise
+!  cgnss: True if cGNSS data are used, False otherwise
 !
    implicit none
    integer :: first, last, channel, subfault, &
@@ -120,10 +120,10 @@ contains
    character(len=3) comp
    character(len=1) channel2
    character(len=2) event2
-   logical :: many_events, strong, cgps
+   logical :: many_events, strong, cgnss
    
    if (strong) write(*,*)'Store strong motion GF in memory...'
-   if (cgps) write(*,*)'Store cGPS GF in memory...'
+   if (cgnss) write(*,*)'Store cGNSS GF in memory...'
    z0 = cmplx(0.0, 0.0)
 !
 !  suppose the ni = u3e+11, then then moment of 1cm*1km^2 
@@ -132,7 +132,7 @@ contains
    factor = dxs * dys * (1.e-10) 
 
    filename = 'channels_strong.txt'
-   if (cgps) filename = 'channels_cgps.txt'
+   if (cgnss) filename = 'channels_cgnss.txt'
    filename = trim(filename)
    open(9, file=filename, status='old')
 

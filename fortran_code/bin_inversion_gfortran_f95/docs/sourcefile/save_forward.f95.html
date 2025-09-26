@@ -280,14 +280,14 @@
 <a name="ln-17"></a><span class="k">contains</span>
 <a name="ln-18"></a>
 <a name="ln-19"></a>
-<a name="ln-20"></a><span class="k">   subroutine </span><span class="n">write_forward</span><span class="p">(</span><span class="n">slip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">rupt_time</span><span class="p">,</span> <span class="n">tl</span><span class="p">,</span> <span class="n">tr</span><span class="p">,</span> <span class="n">strong</span><span class="p">,</span> <span class="n">cgps</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">surf</span><span class="p">,</span> <span class="n">dart</span><span class="p">)</span>
+<a name="ln-20"></a><span class="k">   subroutine </span><span class="n">write_forward</span><span class="p">(</span><span class="n">slip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">rupt_time</span><span class="p">,</span> <span class="n">tl</span><span class="p">,</span> <span class="n">tr</span><span class="p">,</span> <span class="n">strong</span><span class="p">,</span> <span class="n">cgnss</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">surf</span><span class="p">,</span> <span class="n">dart</span><span class="p">)</span>
 <a name="ln-21"></a>   <span class="c">!!</span>
 <a name="ln-22"></a>   <span class="c">!!  We save the forward solution given a kinematic model, for all specified </span>
 <a name="ln-23"></a>   <span class="c">!!  data types.</span>
 <a name="ln-24"></a>   <span class="c">!!  </span>
 <a name="ln-25"></a>   <span class="k">implicit none</span>
 <a name="ln-26"></a><span class="k">   </span><span class="kt">integer </span><span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span>
-<a name="ln-27"></a>   <span class="kt">logical</span> <span class="kd">::</span> <span class="n">strong</span><span class="p">,</span> <span class="n">cgps</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">surf</span><span class="p">,</span> <span class="n">dart</span>
+<a name="ln-27"></a>   <span class="kt">logical</span> <span class="kd">::</span> <span class="n">strong</span><span class="p">,</span> <span class="n">cgnss</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">surf</span><span class="p">,</span> <span class="n">dart</span>
 <a name="ln-28"></a>   <span class="kt">real </span><span class="n">slip</span><span class="p">(</span><span class="n">nnxy</span><span class="p">,</span> <span class="n">max_seg</span><span class="p">),</span> <span class="n">rake</span><span class="p">(</span><span class="n">nnxy</span><span class="p">,</span> <span class="n">max_seg</span><span class="p">),</span> <span class="n">rupt_time</span><span class="p">(</span><span class="n">nnxy</span><span class="p">,</span> <span class="n">max_seg</span><span class="p">),</span> <span class="n">tr</span><span class="p">(</span><span class="n">nnxy</span><span class="p">,</span> <span class="n">max_seg</span><span class="p">),</span> <span class="p">&amp;</span>
 <a name="ln-29"></a>   <span class="p">&amp;</span>  <span class="n">tl</span><span class="p">(</span><span class="n">nnxy</span><span class="p">,</span> <span class="n">max_seg</span><span class="p">),</span> <span class="n">erm</span><span class="p">,</span> <span class="n">ermin</span>
 <a name="ln-30"></a>   <span class="kt">complex </span><span class="n">z0</span>
@@ -302,8 +302,8 @@
 <a name="ln-39"></a><span class="k">      call </span><span class="n">write_strong_motion_forward</span><span class="p">(</span><span class="n">slip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">rupt_time</span><span class="p">,</span> <span class="n">tl</span><span class="p">,</span> <span class="n">tr</span><span class="p">,</span> <span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span><span class="p">)</span>
 <a name="ln-40"></a>      <span class="n">ll_in</span> <span class="o">=</span> <span class="n">ll_out</span>
 <a name="ln-41"></a>   <span class="k">end if</span>
-<a name="ln-42"></a><span class="k">   if</span> <span class="p">(</span><span class="n">cgps</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-43"></a><span class="k">      call </span><span class="n">write_cgps_forward</span><span class="p">(</span><span class="n">slip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">rupt_time</span><span class="p">,</span> <span class="n">tl</span><span class="p">,</span> <span class="n">tr</span><span class="p">,</span> <span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span><span class="p">)</span>
+<a name="ln-42"></a><span class="k">   if</span> <span class="p">(</span><span class="n">cgnss</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-43"></a><span class="k">      call </span><span class="n">write_cgnss_forward</span><span class="p">(</span><span class="n">slip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">rupt_time</span><span class="p">,</span> <span class="n">tl</span><span class="p">,</span> <span class="n">tr</span><span class="p">,</span> <span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span><span class="p">)</span>
 <a name="ln-44"></a>      <span class="n">ll_in</span> <span class="o">=</span> <span class="n">ll_out</span>
 <a name="ln-45"></a>   <span class="k">end if</span>
 <a name="ln-46"></a><span class="k">   if</span> <span class="p">(</span><span class="n">body</span><span class="p">)</span> <span class="k">then</span>
@@ -320,7 +320,7 @@
 <a name="ln-57"></a>   <span class="k">end if</span>
 <a name="ln-58"></a><span class="c">!   select case (io_data)</span>
 <a name="ln-59"></a><span class="c">!      case (1)</span>
-<a name="ln-60"></a><span class="c">!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
+<a name="ln-60"></a><span class="c">!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-61"></a><span class="c">!      case (2)</span>
 <a name="ln-62"></a><span class="c">!         call write_strong_motion_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-63"></a><span class="c">!      case (3)</span>
@@ -328,11 +328,11 @@
 <a name="ln-65"></a><span class="c">!      case (4)</span>
 <a name="ln-66"></a><span class="c">!         call write_strong_motion_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-67"></a><span class="c">!         lL_in = ll_out</span>
-<a name="ln-68"></a><span class="c">!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
+<a name="ln-68"></a><span class="c">!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-69"></a><span class="c">!      case (5)</span>
 <a name="ln-70"></a><span class="c">!         call write_body_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-71"></a><span class="c">!         ll_in = ll_out</span>
-<a name="ln-72"></a><span class="c">!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
+<a name="ln-72"></a><span class="c">!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-73"></a><span class="c">!      case (6)</span>
 <a name="ln-74"></a><span class="c">!         call write_body_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-75"></a><span class="c">!         ll_in = ll_out</span>
@@ -342,7 +342,7 @@
 <a name="ln-79"></a><span class="c">!         ll_in = ll_out</span>
 <a name="ln-80"></a><span class="c">!         call write_surface_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-81"></a><span class="c">!      case (8)</span>
-<a name="ln-82"></a><span class="c">!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
+<a name="ln-82"></a><span class="c">!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-83"></a><span class="c">!         ll_in = ll_out</span>
 <a name="ln-84"></a><span class="c">!         call write_surface_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-85"></a><span class="c">!      case (9)</span>
@@ -354,13 +354,13 @@
 <a name="ln-91"></a><span class="c">!         ll_in = ll_out</span>
 <a name="ln-92"></a><span class="c">!         call write_strong_motion_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-93"></a><span class="c">!         ll_in = lL_out</span>
-<a name="ln-94"></a><span class="c">!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
+<a name="ln-94"></a><span class="c">!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-95"></a><span class="c">!      case (11)</span>
 <a name="ln-96"></a><span class="c">!         call write_body_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-97"></a><span class="c">!         ll_in = ll_out</span>
 <a name="ln-98"></a><span class="c">!         call write_surface_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-99"></a><span class="c">!         ll_in = ll_out</span>
-<a name="ln-100"></a><span class="c">!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
+<a name="ln-100"></a><span class="c">!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-101"></a><span class="c">!      case (12)</span>
 <a name="ln-102"></a><span class="c">!         call write_body_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-103"></a><span class="c">!         ll_in = ll_out</span>
@@ -372,13 +372,13 @@
 <a name="ln-109"></a><span class="c">!         ll_in = ll_out</span>
 <a name="ln-110"></a><span class="c">!         call write_surface_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-111"></a><span class="c">!         lL_in = ll_out</span>
-<a name="ln-112"></a><span class="c">!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
+<a name="ln-112"></a><span class="c">!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-113"></a><span class="c">!      case (14)</span>
 <a name="ln-114"></a><span class="c">!         call write_body_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-115"></a><span class="c">!         ll_in = ll_out</span>
 <a name="ln-116"></a><span class="c">!         call write_strong_motion_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-117"></a><span class="c">!         ll_in = ll_out</span>
-<a name="ln-118"></a><span class="c">!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
+<a name="ln-118"></a><span class="c">!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-119"></a><span class="c">!      case (15)</span>
 <a name="ln-120"></a><span class="c">!         call write_body_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-121"></a><span class="c">!         ll_in = ll_out</span>
@@ -386,7 +386,7 @@
 <a name="ln-123"></a><span class="c">!         ll_in = ll_out</span>
 <a name="ln-124"></a><span class="c">!         call write_surface_waves_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-125"></a><span class="c">!         ll_in = ll_out</span>
-<a name="ln-126"></a><span class="c">!         call write_cgps_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
+<a name="ln-126"></a><span class="c">!         call write_cgnss_forward(slip, rake, rupt_time, tl, tr, ll_in, ll_out)</span>
 <a name="ln-127"></a><span class="c">!   endselect</span>
 <a name="ln-128"></a>   <span class="k">end subroutine </span><span class="n">write_forward</span>
 <a name="ln-129"></a>   
@@ -521,7 +521,7 @@
 <a name="ln-258"></a>   <span class="k">end subroutine </span><span class="n">write_strong_motion_forward</span>
 <a name="ln-259"></a>   
 <a name="ln-260"></a>   
-<a name="ln-261"></a>   <span class="k">subroutine </span><span class="n">write_cgps_forward</span><span class="p">(</span><span class="n">slip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">rupt_time</span><span class="p">,</span> <span class="n">tl</span><span class="p">,</span> <span class="n">tr</span><span class="p">,</span> <span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span><span class="p">)</span>
+<a name="ln-261"></a>   <span class="k">subroutine </span><span class="n">write_cgnss_forward</span><span class="p">(</span><span class="n">slip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">rupt_time</span><span class="p">,</span> <span class="n">tl</span><span class="p">,</span> <span class="n">tr</span><span class="p">,</span> <span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span><span class="p">)</span>
 <a name="ln-262"></a>   <span class="k">implicit none</span>
 <a name="ln-263"></a><span class="k">   </span><span class="kt">integer </span><span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span><span class="p">,</span> <span class="n">ll_g</span><span class="p">,</span> <span class="n">isl</span><span class="p">,</span> <span class="n">isr</span><span class="p">,</span> <span class="n">ll</span><span class="p">,</span> <span class="n">n_chan3</span><span class="p">,</span> <span class="n">int1</span><span class="p">,</span> <span class="n">int2</span><span class="p">,</span> <span class="n">int3</span><span class="p">,</span> <span class="p">&amp;</span>
 <a name="ln-264"></a>   <span class="p">&amp;</span>  <span class="n">jf</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">ll_s</span><span class="p">,</span> <span class="n">i_s</span><span class="p">,</span> <span class="n">ir</span><span class="p">,</span> <span class="n">n_chan</span><span class="p">,</span> <span class="n">ixs</span><span class="p">,</span> <span class="n">iys</span><span class="p">,</span> <span class="n">ir_max</span>
@@ -536,7 +536,7 @@
 <a name="ln-273"></a>   <span class="n">z0</span> <span class="o">=</span> <span class="nb">cmplx</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
 <a name="ln-274"></a>   <span class="n">n_chan3</span> <span class="o">=</span> <span class="mi">0</span>
 <a name="ln-275"></a>   
-<a name="ln-276"></a>   <span class="k">open</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="s1">&#39;Readlp.cgps&#39;</span><span class="p">,</span><span class="n">status</span><span class="o">=</span><span class="s1">&#39;old&#39;</span><span class="p">)</span>
+<a name="ln-276"></a>   <span class="k">open</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="s1">&#39;Readlp.cgnss&#39;</span><span class="p">,</span><span class="n">status</span><span class="o">=</span><span class="s1">&#39;old&#39;</span><span class="p">)</span>
 <a name="ln-277"></a>   <span class="k">read</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="o">*</span><span class="p">)</span>
 <a name="ln-278"></a>   <span class="k">read</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="o">*</span><span class="p">)</span>
 <a name="ln-279"></a>   <span class="k">read</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="o">*</span><span class="p">)</span>
@@ -567,7 +567,7 @@
 <a name="ln-304"></a><span class="c">!</span>
 <a name="ln-305"></a><span class="c">!  end of rise time </span>
 <a name="ln-306"></a><span class="c">!       </span>
-<a name="ln-307"></a>   <span class="k">open</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="s1">&#39;synm.cgps&#39;</span><span class="p">)</span>
+<a name="ln-307"></a>   <span class="k">open</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="s1">&#39;synm.cgnss&#39;</span><span class="p">)</span>
 <a name="ln-308"></a>   <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
 <a name="ln-309"></a><span class="c">!       </span>
 <a name="ln-310"></a><span class="c">!  set up the green function for every subfault</span>
@@ -620,7 +620,7 @@
 <a name="ln-357"></a><span class="k">   end do   </span>
 <a name="ln-358"></a><span class="k">   close</span><span class="p">(</span><span class="mi">18</span><span class="p">)</span>
 <a name="ln-359"></a>   <span class="n">ll_out</span> <span class="o">=</span> <span class="n">ll_out</span><span class="o">+</span><span class="n">n_chan</span>
-<a name="ln-360"></a>   <span class="k">end subroutine </span><span class="n">write_cgps_forward</span>
+<a name="ln-360"></a>   <span class="k">end subroutine </span><span class="n">write_cgnss_forward</span>
 <a name="ln-361"></a>
 <a name="ln-362"></a>
 <a name="ln-363"></a>   <span class="k">subroutine </span><span class="n">write_body_waves_forward</span><span class="p">(</span><span class="n">slip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">rupt_time</span><span class="p">,</span> <span class="n">tl</span><span class="p">,</span> <span class="n">tr</span><span class="p">,</span> <span class="n">ll_in</span><span class="p">,</span> <span class="n">ll_out</span><span class="p">)</span>

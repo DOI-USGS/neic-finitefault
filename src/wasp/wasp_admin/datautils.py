@@ -2,8 +2,8 @@ from enum import Enum
 from typing import List
 
 DEFAULT_MANAGEMENT_FILES = {
-    "cgps": "cgps_waves.json",
-    "gps": "static_data.json",
+    "cgnss": "cgnss_waves.json",
+    "gnss": "static_data.json",
     "insar": "insar_data.json",
     "strong": "strong_motion_waves.json",
     "surf": "surf_waves.json",
@@ -17,8 +17,8 @@ class AcquireDataTypes(str, Enum):
 
 
 class ManagedDataTypes(str, Enum):
-    cgps = "cgps"
-    gps = "gps"
+    cgnss = "cgnss"
+    gnss = "gnss"
     insar = "insar"
     strong = "strong"
     surf = "surf"
@@ -26,8 +26,8 @@ class ManagedDataTypes(str, Enum):
 
 
 class ModifiableDataTypes(str, Enum):
-    cgps = "cgps"
-    gps = "gps"
+    cgnss = "cgnss"
+    gnss = "gnss"
     strong_motion = "strong"
     surf = "surf"
     body = "body"
@@ -37,7 +37,7 @@ ProcessDataTypes = ManagedDataTypes
 
 
 class ShiftMatchDataTypes(str, Enum):
-    cgps = "cgps"
+    cgnss = "cgnss"
     strong = "strong"
     surf = "surf"
     body = "body"

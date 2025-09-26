@@ -43,7 +43,7 @@ def modelling_prop(
     directory = pathlib.Path(directory)
     moment_mag = tensor_info["moment_mag"] if not moment_mag else moment_mag
     time_shift = tensor_info["time_shift"]
-    data_type2 = set(data_type) - {"gps"}
+    data_type2 = set(data_type) - {"gnss"}
 
     syn_len = int(2.5 * time_shift)
     #    factor = 1 / len(data_type2)

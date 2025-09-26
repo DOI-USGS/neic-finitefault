@@ -1,5 +1,5 @@
 c
-c	GPS, we need use geometry coordanation directly.
+c	GNSS, we need use geometry coordanation directly.
 c
 	implicit none
         include 'omp_lib.h'
@@ -57,7 +57,7 @@ c	dimension fau_mod(7,nnpx,nnpy,nnxs,nnys,max_seg)
         allocate(green_dip2(3, 300, nnxs))
         allocate(green_stk2(3, 300, nnxs))
 c
-c input position of gps stations
+c input position of gnss stations
 c
 c	pause
 	open(12,file='Readlp.static')

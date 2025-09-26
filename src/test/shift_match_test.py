@@ -8,7 +8,7 @@ from wasp.shift_match import print_arrival, shift_match2, shift_match_regional
 
 from .testutils import (
     RESULTS_DIR,
-    get_cgps_json,
+    get_cgnss_json,
     get_strong_motion_json,
     get_surf_waves_json,
     get_tele_waves_json,
@@ -82,8 +82,8 @@ def test_shift_match_regional():
             tempdir / "data",
             replace_dir=str(RESULTS_DIR / "data"),
         )
-        new_cgps = update_manager_file_locations(
-            get_cgps_json(),
+        new_cgnss = update_manager_file_locations(
+            get_cgnss_json(),
             tempdir / "data",
             replace_dir=str(RESULTS_DIR / "data"),
         )
@@ -92,20 +92,21 @@ def test_shift_match_regional():
             tempdir / "synthetics_strong.txt",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "synthetics_cgps.txt", tempdir / "synthetics_cgps.txt"
+            RESULTS_DIR / "NP1" / "synthetics_cgnss.txt",
+            tempdir / "synthetics_cgnss.txt",
         )
         for f, d in zip(
             [
                 "strong_motion_waves.json",
-                "cgps_waves.json",
+                "cgnss_waves.json",
             ],
-            [new_strong, new_cgps],
+            [new_strong, new_cgnss],
         ):
             with open(tempdir / f, "w") as w:
                 json.dump(d, w)
         os.mkdir(tempdir / "data")
         os.mkdir(tempdir / "data" / "STR")
-        os.mkdir(tempdir / "data" / "cGPS")
+        os.mkdir(tempdir / "data" / "cGNSS")
         for (
             a,
             b,
@@ -114,8 +115,8 @@ def test_shift_match_regional():
         ) in zip(
             get_strong_motion_json(),
             new_strong,
-            get_cgps_json(),
-            new_cgps,
+            get_cgnss_json(),
+            new_cgnss,
         ):
             shutil.copyfile(a["file"], b["file"])
             shutil.copyfile(c["file"], d["file"])
@@ -125,9 +126,11 @@ def test_shift_match_regional():
             assert (
                 tempdir / "strong_shift" / f"{d['name']}_{d['component']}.png"
             ).exists
-        shift_match_regional("cgps", plot=True, directory=tempdir)
-        for d in new_cgps:
-            assert (tempdir / "cgps_shift" / f"{d['name']}_{d['component']}.png").exists
+        shift_match_regional("cgnss", plot=True, directory=tempdir)
+        for d in new_cgnss:
+            assert (
+                tempdir / "cgnss_shift" / f"{d['name']}_{d['component']}.png"
+            ).exists
     finally:
         shutil.rmtree(tempdir)
 

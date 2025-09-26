@@ -63,7 +63,7 @@ def test_filter_strong():
     assert filter_strong(
         {"time_shift": 65, "depth": 22.4},
     ) == {"high_freq": 0.125, "low_freq": 0.01}
-    assert filter_strong({"time_shift": 105, "depth": 22.4}, cgps=True) == {
+    assert filter_strong({"time_shift": 105, "depth": 22.4}, cgnss=True) == {
         "high_freq": 0.3,
         "low_freq": 0.01,
     }
@@ -84,7 +84,7 @@ def test_properties_json():
             data_directory=tempdir,
         )
         target = {
-            "sampling": {"dt_tele": 0.4, "dt_strong": 0.2, "dt_cgps": 0.2},
+            "sampling": {"dt_tele": 0.4, "dt_strong": 0.2, "dt_cgnss": 0.2},
             "tele_filter": {
                 "freq0": 0.003,
                 "low_freq": 0.01,
@@ -98,7 +98,7 @@ def test_properties_json():
                 "freq4": 0.007,
             },
             "strong_filter": {"low_freq": 0.02, "high_freq": 0.125},
-            "cgps_filter": {"low_freq": 0.02, "high_freq": 0.3},
+            "cgnss_filter": {"low_freq": 0.02, "high_freq": 0.3},
             "wavelet_scales": [1, 8],
         }
         with open(pathlib.Path(tempdir) / "sampling_filter.json", "r") as f:
@@ -110,32 +110,32 @@ def test_properties_json():
 
 def test_sampling():
     assert sampling({"moment_mag": 2.9e21, "depth": 22.4, "time_shift": 10}) == {
-        "dt_cgps": 0.2,
+        "dt_cgnss": 0.2,
         "dt_strong": 0.2,
         "dt_tele": 0.2,
     }
     assert sampling({"moment_mag": 2.9e21, "depth": 300, "time_shift": 10}) == {
-        "dt_cgps": 0.2,
+        "dt_cgnss": 0.2,
         "dt_strong": 0.2,
         "dt_tele": 0.4,
     }
     assert sampling({"moment_mag": 2.9e21, "depth": 500, "time_shift": 10}) == {
-        "dt_cgps": 0.8,
+        "dt_cgnss": 0.8,
         "dt_strong": 0.8,
         "dt_tele": 0.5,
     }
     assert sampling({"moment_mag": 2.9e21, "depth": 22.4, "time_shift": 10}, 20) == {
-        "dt_cgps": 20,
+        "dt_cgnss": 20,
         "dt_strong": 0.2,
         "dt_tele": 0.2,
     }
     assert sampling({"moment_mag": 2.9e21, "depth": 22.4, "time_shift": 50}) == {
-        "dt_cgps": 0.4,
+        "dt_cgnss": 0.4,
         "dt_strong": 0.4,
         "dt_tele": 0.2,
     }
     assert sampling({"moment_mag": 2.9e21, "depth": 22.4, "time_shift": 100}) == {
-        "dt_cgps": 0.8,
+        "dt_cgnss": 0.8,
         "dt_strong": 0.8,
         "dt_tele": 0.2,
     }

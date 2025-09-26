@@ -14,7 +14,7 @@ from wasp.data_management import (
     __used_stations,
     __wavelets_dart,
     _dict_trace,
-    cgps_traces,
+    cgnss_traces,
     duration_dart,
     duration_strong_motion,
     duration_tele_waves,
@@ -34,7 +34,7 @@ from wasp.management import _distazbaz
 
 from .testutils import (
     RESULTS_DIR,
-    get_cgps_json,
+    get_cgnss_json,
     get_insar_json,
     get_sampling_filter,
     get_static_json,
@@ -45,7 +45,7 @@ from .testutils import (
     update_manager_file_locations,
 )
 
-CGPS_WAVES = get_cgps_json()
+CGNSS_WAVES = get_cgnss_json()
 CMT = get_tensor_info()
 INSAR_DATA = get_insar_json()
 SAMPLING_FILTER = get_sampling_filter()
@@ -55,28 +55,28 @@ SURF_WAVES = get_surf_waves_json()
 TELE_WAVES = get_tele_waves_json()
 
 
-def test_cgps_traces():
+def test_cgnss_traces():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        new_cgps_waves = update_manager_file_locations(
-            CGPS_WAVES, tempdir, replace_dir=str(RESULTS_DIR / "data")
+        new_cgnss_waves = update_manager_file_locations(
+            CGNSS_WAVES, tempdir, replace_dir=str(RESULTS_DIR / "data")
         )
-        os.mkdir(tempdir / "cGPS")
-        for o, n in zip(CGPS_WAVES, new_cgps_waves):
+        os.mkdir(tempdir / "cGNSS")
+        for o, n in zip(CGNSS_WAVES, new_cgnss_waves):
             shutil.copyfile(o["file"], n["file"])
 
-        cgps_info = cgps_traces(
-            [f["file"] for f in new_cgps_waves],
+        cgnss_info = cgnss_traces(
+            [f["file"] for f in new_cgnss_waves],
             CMT,
             SAMPLING_FILTER,
             tempdir,
         )
-        with open(tempdir / "cgps_waves.json", "r") as f:
-            cgps_json = json.load(f)
-        print(json.dumps(cgps_json, indent=4))
-        for idx, d in enumerate(new_cgps_waves):
+        with open(tempdir / "cgnss_waves.json", "r") as f:
+            cgnss_json = json.load(f)
+        print(json.dumps(cgnss_json, indent=4))
+        for idx, d in enumerate(new_cgnss_waves):
             for key, target_values in d.items():
-                test_values = cgps_info[idx][key]
+                test_values = cgnss_info[idx][key]
                 if isinstance(target_values, float):
                     np.testing.assert_almost_equal(
                         target_values, test_values, decimal=5
@@ -128,15 +128,15 @@ def test_filling_data_dicts():
             tempdir / "data",
             replace_dir=str(RESULTS_DIR / "data"),
         )
-        new_cgps_waves = update_manager_file_locations(
-            CGPS_WAVES, tempdir / "data", replace_dir=str(RESULTS_DIR / "data")
+        new_cgnss_waves = update_manager_file_locations(
+            CGNSS_WAVES, tempdir / "data", replace_dir=str(RESULTS_DIR / "data")
         )
         new_insar = update_manager_file_locations(
             INSAR_DATA, tempdir, replace_dir=str(RESULTS_DIR / "NP1"), file_key="name"
         )
         os.mkdir(tempdir / "data")
         os.mkdir(tempdir / "data" / "STR")
-        os.mkdir(tempdir / "data" / "cGPS")
+        os.mkdir(tempdir / "data" / "cGNSS")
         os.mkdir(tempdir / "data" / "SH")
         os.mkdir(tempdir / "data" / "P")
         os.mkdir(tempdir / "data" / "LOVE")
@@ -148,8 +148,8 @@ def test_filling_data_dicts():
             new_tele_waves,
             STRONG_WAVES,
             new_strong_waves,
-            CGPS_WAVES,
-            new_cgps_waves,
+            CGNSS_WAVES,
+            new_cgnss_waves,
         ):
             shutil.copyfile(a["file"], b["file"])
             shutil.copyfile(c["file"], d["file"])
@@ -158,10 +158,10 @@ def test_filling_data_dicts():
         for key in ["ascending", "descending"]:
             for o, n in zip(INSAR_DATA[key], new_insar[key]):
                 shutil.copyfile(o["name"], n["name"])
-        shutil.copyfile(RESULTS_DIR / "NP1" / "gps_data", tempdir / "gps_data")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "gnss_data", tempdir / "gnss_data")
         filling_data_dicts(
             CMT,
-            ["cgps", "gps", "insar", "strong", "surf", "body"],
+            ["cgnss", "gnss", "insar", "strong", "surf", "body"],
             SAMPLING_FILTER,
             tempdir / "data",
             [w["name"] for w in new_insar["ascending"]],
@@ -173,7 +173,7 @@ def test_filling_data_dicts():
                 "surf_waves.json",
                 "tele_waves.json",
                 "strong_motion_waves.json",
-                "cgps_waves.json",
+                "cgnss_waves.json",
                 "insar_data.json",
                 "static_data.json",
             ],
@@ -181,7 +181,7 @@ def test_filling_data_dicts():
                 new_surf_waves,
                 new_tele_waves,
                 new_strong_waves,
-                new_cgps_waves,
+                new_cgnss_waves,
                 new_insar,
                 STATIC_DATA,
             ],
@@ -265,32 +265,32 @@ def test_get_traces_files():
         "processed_vel_CO03_HNZ_C1.sac",
     ]:
         assert target in sm_files
-    cgps_files = [
-        f.split("/")[-1] for f in get_traces_files("cgps", RESULTS_DIR / "data")
+    cgnss_files = [
+        f.split("/")[-1] for f in get_traces_files("cgnss", RESULTS_DIR / "data")
     ]
-    assert len(cgps_files) == 9
+    assert len(cgnss_files) == 9
     for target in [
         "processed_ovll_LXZ.sac",
         "processed_pedr_LXZ.sac",
         "processed_pfrj_LXE.sac",
     ]:
-        assert target in cgps_files
+        assert target in cgnss_files
 
 
 def test_failsafe():
-    # test cgps
+    # test cgnss
     __failsafe(
-        SAMPLING_FILTER["cgps_filter"], SACTrace.read(CGPS_WAVES[0]["file"]), True
+        SAMPLING_FILTER["cgnss_filter"], SACTrace.read(CGNSS_WAVES[0]["file"]), True
     )
 
-    # test not cgps
+    # test not cgnss
     __failsafe(SAMPLING_FILTER["tele_filter"], SACTrace.read(TELE_WAVES[0]["file"]))
 
     # test bad match
     try:
         __failsafe(
             {"low_freq": 1000000, "high_freq": 1000000},
-            SACTrace.read(CGPS_WAVES[0]["file"]),
+            SACTrace.read(CGNSS_WAVES[0]["file"]),
             True,
         )
         raise Exception("This should have failed!")
@@ -444,15 +444,15 @@ def test_s2nr():
 def test_static_data():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        new_cgps_waves = update_manager_file_locations(
-            CGPS_WAVES, tempdir, replace_dir=str(RESULTS_DIR / "data")
+        new_cgnss_waves = update_manager_file_locations(
+            CGNSS_WAVES, tempdir, replace_dir=str(RESULTS_DIR / "data")
         )
-        os.mkdir(tempdir / "cGPS")
-        for o, n in zip(CGPS_WAVES, new_cgps_waves):
+        os.mkdir(tempdir / "cGNSS")
+        for o, n in zip(CGNSS_WAVES, new_cgnss_waves):
             shutil.copyfile(o["file"], n["file"])
 
-        with open(tempdir / "cgps_waves.json", "w") as f:
-            json.dump(new_cgps_waves, f)
+        with open(tempdir / "cgnss_waves.json", "w") as f:
+            json.dump(new_cgnss_waves, f)
 
         static_info1 = static_data(
             CMT,
@@ -460,7 +460,7 @@ def test_static_data():
         )
         with open(tempdir / "static_data.json", "r") as f:
             static_json1 = json.load(f)
-        target_no_gps_data = [
+        target_no_gnss_data = [
             {
                 "azimuth": None,
                 "component": None,
@@ -514,7 +514,7 @@ def test_static_data():
             },
         ]
 
-        for idx, d in enumerate(target_no_gps_data):
+        for idx, d in enumerate(target_no_gnss_data):
             match1 = False
             match2 = False
             for idy, props in enumerate(static_json1):
@@ -524,7 +524,7 @@ def test_static_data():
             if not match:
                 raise Exception(f"No data from name, {d['name']}, found!")
 
-        shutil.copyfile(RESULTS_DIR / "NP1" / "gps_data", tempdir / "gps_data")
+        shutil.copyfile(RESULTS_DIR / "NP1" / "gnss_data", tempdir / "gnss_data")
 
         static_info2 = static_data(
             CMT,

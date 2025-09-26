@@ -23,10 +23,10 @@ program green_bank_fk
    character(len=100) gf_file, vel_model, gf_bank, input
 !
    call getarg(1, input)
-   disp = (input.eq.'cgps')
+   disp = (input.eq.'cgnss')
 
    gf_file = 'Green.in'
-   if (disp) gf_file = 'Green_cgps.in'
+   if (disp) gf_file = 'Green_cgnss.in'
    call get_gf_data(gf_file, vel_model, gf_bank)
    npt=2**lnpt
 !

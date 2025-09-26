@@ -98,15 +98,15 @@ def _end_to_end(
     data_type,
     default_dirs,
     velmodel=None,
-    dt_cgps=1.0,
+    dt_cgnss=1.0,
     st_response=True,
     config_path=None,
     directory=pathlib.Path(),
 ):
     directory = pathlib.Path(directory)
-    if "gps" in data_type:
-        if os.path.isfile(os.path.join(directory, "data", "gps_data")):
-            shutil.copy2(os.path.join(directory, "data", "gps_data"), directory)
+    if "gnss" in data_type:
+        if os.path.isfile(os.path.join(directory, "data", "gnss_data")):
+            shutil.copy2(os.path.join(directory, "data", "gnss_data"), directory)
     if "insar" in data_type:
         insar_files = glob.glob(os.path.join(directory, "data", "insar_a*txt"))
         insar_files = insar_files + glob.glob(
@@ -116,7 +116,9 @@ def _end_to_end(
             if os.path.isfile(file):
                 shutil.copy2(file, directory)
     data_dir = directory / "data"
-    data_prop = properties_json(tensor_info, dt_cgps=dt_cgps, data_directory=directory)
+    data_prop = properties_json(
+        tensor_info, dt_cgnss=dt_cgnss, data_directory=directory
+    )
     processing(
         tensor_info, data_type, data_prop, st_response=st_response, directory=data_dir
     )
@@ -141,16 +143,16 @@ def _end_to_end(
         velmodel = select_velmodel(tensor_info, default_dirs)
     write_velmodel(velmodel, directory=directory)
     gf_bank_str = os.path.join(directory, "GF_strong")
-    gf_bank_cgps = os.path.join(directory, "GF_cgps")
+    gf_bank_cgnss = os.path.join(directory, "GF_cgnss")
     get_gf_bank = default_dirs["strong_motion_gf_bank2"]
-    if "cgps" in data_type:
+    if "cgnss" in data_type:
         green_dict = fk_green_fun1(
-            data_prop, tensor_info, gf_bank_cgps, cgps=True, directory=directory
+            data_prop, tensor_info, gf_bank_cgnss, cgnss=True, directory=directory
         )
-        write_green_file(green_dict, cgps=True, directory=directory)
-        with open(os.path.join(directory, "logs", "GF_cgps_log"), "w") as out_gf_cgps:
+        write_green_file(green_dict, cgnss=True, directory=directory)
+        with open(os.path.join(directory, "logs", "GF_cgnss_log"), "w") as out_gf_cgnss:
             p1 = subprocess.Popen(
-                [get_gf_bank, "cgps", f"{(directory)}/"], stdout=out_gf_cgps
+                [get_gf_bank, "cgnss", f"{(directory)}/"], stdout=out_gf_cgnss
             )
         p1.wait()
     if "strong" in data_type:
@@ -168,11 +170,11 @@ def _end_to_end(
         p2.wait()
     files = [
         directory / "Green_strong.txt",
-        directory / "Green_cgps.txt",
+        directory / "Green_cgnss.txt",
         directory / "modelling_stats.json",
-        directory / "gps_data",
+        directory / "gnss_data",
         directory / "strong_motion_gf.json",
-        directory / "cgps_gf.json",
+        directory / "cgnss_gf.json",
         directory / "sampling_filter.json",
     ]
     files2 = glob.glob(str(directory) + "/channels_*txt")
@@ -245,14 +247,14 @@ def test_automatic_usgs():
         _end_to_end(
             tensor_info=TENSOR,
             data_type=[
-                "cgps",
-                "gps",
+                "cgnss",
+                "gnss",
                 "insar",
                 "strong",
                 "surf",
                 "body",
             ],
-            dt_cgps=None,
+            dt_cgnss=None,
             default_dirs=updated_default_dirs,
             config_path=tempdir / "config.ini",
             directory=tempdir / "20150916225432" / "ffm.0",
@@ -266,8 +268,8 @@ def test_automatic_usgs():
             "sampling_filter.json",
             "strong_motion_gf.json",
             "insar_data.json",
-            "cgps_waves.json",
-            "cgps_gf.json",
+            "cgnss_waves.json",
+            "cgnss_gf.json",
         ]:
             with open(RESULTS_DIR / "NP1" / f) as td:
                 target = json.load(td)
@@ -310,13 +312,13 @@ def test_automatic_usgs():
         with open(RESULTS_DIR / "NP1" / "Solution.txt") as t:
             target = t.read()
         assert solucion == target
-        # compare processed cGPS waveforms
+        # compare processed cGNSS waveforms
         data_dir = RESULTS_DIR / "data"
-        waveforms = glob.glob(str(data_dir / "cGPS") + "/*.sac")
+        waveforms = glob.glob(str(data_dir / "cGNSS") + "/*.sac")
         for target_file in waveforms:
             basename = os.path.basename(target_file)
             stream = read(
-                str(tempdir / "20150916225432" / "ffm.0" / "data" / "cGPS" / basename)
+                str(tempdir / "20150916225432" / "ffm.0" / "data" / "cGNSS" / basename)
             )
             target_stream = read(str(target_file))
             np.testing.assert_array_almost_equal(
@@ -358,7 +360,7 @@ def test_automatic_usgs():
     os.getenv("CI_REGISTRY") is not None or os.getenv("RUN_ALL", False) == False,
     reason="Takes 25+ minutes to run",
 )
-def test_automatic_cgps():
+def test_automatic_cgnss():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     _handle_lowin()
     try:
@@ -380,16 +382,16 @@ def test_automatic_cgps():
         )
         automatic_usgs(
             tensor_info=TENSOR,
-            data_type=["cgps"],
-            dt_cgps=None,
+            data_type=["cgnss"],
+            dt_cgnss=None,
             default_dirs=updated_default_dirs,
             config_path=tempdir / "config.ini",
             directory=tempdir / "20150916225432" / "ffm.0",
         )
         # compare json files
         for f in [
-            "cgps_waves.json",
-            "cgps_gf.json",
+            "cgnss_waves.json",
+            "cgnss_gf.json",
         ]:
             _compare(
                 RESULTS_DIR / "NP1" / f,
@@ -399,16 +401,16 @@ def test_automatic_cgps():
         # compare solucion
         with open(tempdir / "20150916225432" / "ffm.0" / "NP1" / "Solution.txt") as f:
             solucion = f.read()
-        with open(RESULTS_DIR / "NP1" / "Solution_cgps.txt", "r") as f:
+        with open(RESULTS_DIR / "NP1" / "Solution_cgnss.txt", "r") as f:
             target_solucion = f.read()
         assert solucion == target_solucion
         # compare processed waveforms
         data_dir = RESULTS_DIR / "data"
-        waveforms = glob.glob(str(data_dir / "cGPS") + "/*.sac")
+        waveforms = glob.glob(str(data_dir / "cGNSS") + "/*.sac")
         for target_file in waveforms:
             basename = os.path.basename(target_file)
             stream = read(
-                str(tempdir / "20150916225432" / "ffm.0" / "data" / "cGPS" / basename)
+                str(tempdir / "20150916225432" / "ffm.0" / "data" / "cGNSS" / basename)
             )
             target_stream = read(str(target_file))
             np.testing.assert_array_almost_equal(
@@ -422,7 +424,7 @@ def test_automatic_cgps():
     os.getenv("CI_REGISTRY") is not None,
     reason="Pipeline does not have the required memory",
 )
-def test_automatic_gps():
+def test_automatic_gnss():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     _handle_lowin()
     try:
@@ -445,9 +447,9 @@ def test_automatic_gps():
         automatic_usgs(
             tensor_info=TENSOR,
             data_type=[
-                "gps",
+                "gnss",
             ],
-            dt_cgps=None,
+            dt_cgnss=None,
             default_dirs=updated_default_dirs,
             config_path=tempdir / "config.ini",
             directory=tempdir / "20150916225432" / "ffm.0",
@@ -464,7 +466,7 @@ def test_automatic_gps():
         # compare solucion
         with open(tempdir / "20150916225432" / "ffm.0" / "NP1" / "Solution.txt") as f:
             solucion = f.read()
-        with open(RESULTS_DIR / "NP1" / "Solution_gps.txt", "r") as f:
+        with open(RESULTS_DIR / "NP1" / "Solution_gnss.txt", "r") as f:
             target_solucion = f.read()
         assert solucion == target_solucion
     finally:
@@ -498,7 +500,7 @@ def test_automatic_insar():
         automatic_usgs(
             tensor_info=TENSOR,
             data_type=["insar"],
-            dt_cgps=None,
+            dt_cgnss=None,
             default_dirs=updated_default_dirs,
             config_path=tempdir / "config.ini",
             directory=tempdir / "20150916225432" / "ffm.0",
@@ -551,7 +553,7 @@ def test_automatic_strong_motion():
             data_type=[
                 "strong",
             ],
-            dt_cgps=None,
+            dt_cgnss=None,
             default_dirs=updated_default_dirs,
             config_path=tempdir / "config.ini",
             directory=tempdir / "20150916225432" / "ffm.0",
@@ -618,7 +620,7 @@ def test_automatic_tele():
                 "surf",
                 "body",
             ],
-            dt_cgps=None,
+            dt_cgnss=None,
             default_dirs=updated_default_dirs,
             config_path=tempdir / "config.ini",
             directory=tempdir / "20150916225432" / "ffm.0",

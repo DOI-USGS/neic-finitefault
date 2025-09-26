@@ -32,8 +32,8 @@ def PlotMap(
     solution: dict,
     default_dirs: dict,
     files_str: Optional[dict] = None,
-    stations_gps: Optional[zip] = None,
-    stations_cgps: Optional[str] = None,
+    stations_gnss: Optional[zip] = None,
+    stations_cgnss: Optional[str] = None,
     max_slip: Optional[float] = None,
     legend_len: Optional[float] = None,
     scale: Optional[float] = None,
@@ -54,10 +54,10 @@ def PlotMap(
     :type default_dirs: dict
     :param files_str: The stations file properties, defaults to None
     :type files_str:Optional[dict], optional
-    :param stations_gps: The gps stations description, defaults to None
-    :type stations_gps:  Optional[zip], optional
-    :param stations_cgps: The cgps stations description, defaults to None
-    :type stations_cgps: Optional[str], optional
+    :param stations_gnss: The gnss stations description, defaults to None
+    :type stations_gnss:  Optional[zip], optional
+    :param stations_cgnss: The cgnss stations description, defaults to None
+    :type stations_cgnss: Optional[str], optional
     :param max_slip: A specified maximum slip, defaults to None
     :type max_slip: Optional[float], optional
     :param legend_len: The length of the legend, defaults to None
@@ -97,23 +97,25 @@ def PlotMap(
             max_lat = max(max_lat, latp)
             min_lon = min(min_lon, lonp)
             max_lon = max(max_lon, lonp)
-    if stations_cgps is not None:
-        for file in stations_cgps:
+    if stations_cgnss is not None:
+        for file in stations_cgnss:
             name = file["name"]
             latp, lonp = file["location"]
             min_lat = min(min_lat, latp)
             max_lat = max(max_lat, latp)
             min_lon = min(min_lon, lonp)
             max_lon = max(max_lon, lonp)
-    if stations_gps is not None:
+    if stations_gnss is not None:
         max_obs = np.zeros(3)
-        stations_gps2: List[List[Union[float, np.ndarray, str]]] = []
-        for name, sta_lat, sta_lon, obs, syn, error in stations_gps:
+        stations_gnss2: List[List[Union[float, np.ndarray, str]]] = []
+        for name, sta_lat, sta_lon, obs, syn, error in stations_gnss:
             min_lat = min(min_lat, sta_lat)
             max_lat = max(max_lat, sta_lat)
             min_lon = min(min_lon, sta_lon)
             max_lon = max(max_lon, sta_lon)
-            stations_gps2 = stations_gps2 + [[name, sta_lat, sta_lon, obs, syn, error]]
+            stations_gnss2 = stations_gnss2 + [
+                [name, sta_lat, sta_lon, obs, syn, error]
+            ]
             max_obs = np.maximum([abs(float(v)) for v in obs], max_obs)
         max_obs = np.max(max_obs)  # type:ignore
         if legend_len == None:
@@ -401,9 +403,9 @@ def PlotMap(
         )
 
     ### HIGH-RATE GNSS ###
-    if stations_cgps is not None:
-        print("...Plotting cGPS Stations")
-        for file in stations_cgps:
+    if stations_cgnss is not None:
+        print("...Plotting cGNSS Stations")
+        for file in stations_cgnss:
             name = file["name"]
             latp, lonp = file["location"]
             fig.plot(x=lonp, y=latp, style="t10p", fill="navy", pen="black")
@@ -434,19 +436,19 @@ def PlotMap(
         )
 
     ### STATIC GNSS ####
-    if stations_gps is not None:
-        print("...Plotting Static GPS Stations")
-        for name, sta_lat, sta_lon, obs, syn, error in stations_gps2:
-            gps_z_obs, gps_n_obs, gps_e_obs = obs
-            gps_z_syn, gps_n_syn, gps_e_syn = syn
+    if stations_gnss is not None:
+        print("...Plotting Static GNSS Stations")
+        for name, sta_lat, sta_lon, obs, syn, error in stations_gnss2:
+            gnss_z_obs, gnss_n_obs, gnss_e_obs = obs
+            gnss_z_syn, gnss_n_syn, gnss_e_syn = syn
             err_z, err_n, err_e = error
 
             staticv_obs = pd.DataFrame(
                 data={
                     "x": [sta_lon],
                     "y": [sta_lat],
-                    "east_velocity": [float(gps_e_obs) / max_obs],
-                    "north_velocity": [float(gps_n_obs) / max_obs],
+                    "east_velocity": [float(gnss_e_obs) / max_obs],
+                    "north_velocity": [float(gnss_n_obs) / max_obs],
                     "east_sigma": [float(err_e) / max_obs],
                     "north_sigma": [float(err_n) / max_obs],
                     "correlation_EN": [0.0],
@@ -475,8 +477,8 @@ def PlotMap(
                 data={
                     "x": [sta_lon],
                     "y": [sta_lat],
-                    "east_velocity": [float(gps_e_syn) / max_obs],
-                    "north_velocity": [float(gps_n_syn) / max_obs],
+                    "east_velocity": [float(gnss_e_syn) / max_obs],
+                    "north_velocity": [float(gnss_n_syn) / max_obs],
                     "east_sigma": [0.0],
                     "north_sigma": [0.0],
                     "correlation_EN": [0.0],

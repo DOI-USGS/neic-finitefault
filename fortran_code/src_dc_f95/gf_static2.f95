@@ -1,5 +1,5 @@
 !
-!	GPS, we need use geometry coordanation directly.
+!	GNSS, we need use geometry coordanation directly.
 !
 program gf_static
 
@@ -38,7 +38,7 @@ program gf_static
    logical :: disp
    disp = .False.
 !
-! input position of gps stations
+! input position of gnss stations
 !
 !	pause
    open(12,file='Readlp.static')

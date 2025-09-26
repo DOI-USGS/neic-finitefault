@@ -14,14 +14,14 @@ module get_stations_data
 contains
 
 
-   subroutine get_data(strong, cgps, body, surf, dart)
+   subroutine get_data(strong, cgnss, body, surf, dart)
    implicit none
    !!
    !!  We load into memory, wavelet transform of observed data, and 
    !!  other properties of stations
    !!
    integer :: ll_in, ll_out
-   logical :: strong, cgps, body, surf, dart
+   logical :: strong, cgnss, body, surf, dart
    real erm
    complex z0
 
@@ -35,8 +35,8 @@ contains
       call get_strong_motion_stations(ll_in, ll_out)
       ll_in = ll_out
    end if
-   if (cgps) then
-      call get_cgps_stations(ll_in, ll_out)
+   if (cgnss) then
+      call get_cgnss_stations(ll_in, ll_out)
       ll_in = ll_out
    end if
    if (body) then
@@ -53,7 +53,7 @@ contains
    end if
 !   select case (io_data)
 !      case (1)
-!         call get_cgps_stations(ll_in, ll_out)
+!         call get_cgnss_stations(ll_in, ll_out)
 !      case (2)
 !         call get_strong_motion_stations(ll_in, ll_out)
 !      case (3)
@@ -61,11 +61,11 @@ contains
 !      case (4)
 !         call get_strong_motion_stations(ll_in, ll_out)
 !         lL_in = ll_out
-!         call get_cgps_stations(ll_in, ll_out)
+!         call get_cgnss_stations(ll_in, ll_out)
 !      case (5)
 !         call get_body_waves_stations(ll_in, ll_out)
 !         ll_in = ll_out
-!         call get_cgps_stations(ll_in, ll_out)
+!         call get_cgnss_stations(ll_in, ll_out)
 !      case (6)
 !         call get_body_waves_stations(ll_in, ll_out)
 !         ll_in = ll_out
@@ -75,7 +75,7 @@ contains
 !         ll_in = ll_out
 !         call get_surface_waves_stations(ll_in, ll_out)
 !      case (8)
-!         call get_cgps_stations(ll_in, ll_out)
+!         call get_cgnss_stations(ll_in, ll_out)
 !         ll_in = ll_out
 !         call get_surface_waves_stations(ll_in, ll_out)
 !      case (9)
@@ -87,13 +87,13 @@ contains
 !         ll_in = ll_out
 !         call get_strong_motion_stations(ll_in, ll_out)
 !         ll_in = lL_out
-!         call get_cgps_stations(ll_in, ll_out)
+!         call get_cgnss_stations(ll_in, ll_out)
 !      case (11)
 !         call get_body_waves_stations(ll_in, ll_out)
 !         ll_in = ll_out
 !         call get_surface_waves_stations(ll_in, ll_out)
 !         ll_in = ll_out
-!         call get_cgps_stations(ll_in, ll_out)
+!         call get_cgnss_stations(ll_in, ll_out)
 !      case (12)
 !         call get_body_waves_stations(ll_in, ll_out)
 !         ll_in = ll_out
@@ -105,13 +105,13 @@ contains
 !         ll_in = ll_out
 !         call get_surface_waves_stations(ll_in, ll_out)
 !         lL_in = ll_out
-!         call get_cgps_stations(ll_in, ll_out)
+!         call get_cgnss_stations(ll_in, ll_out)
 !      case (14)
 !         call get_body_waves_stations(ll_in, ll_out)
 !         ll_in = ll_out
 !         call get_strong_motion_stations(ll_in, ll_out)
 !         ll_in = ll_out
-!         call get_cgps_stations(ll_in, ll_out)
+!         call get_cgnss_stations(ll_in, ll_out)
 !      case (15)
 !         call get_body_waves_stations(ll_in, ll_out)
 !         ll_in = ll_out
@@ -119,7 +119,7 @@ contains
 !         ll_in = ll_out
 !         call get_surface_waves_stations(ll_in, ll_out)
 !         ll_in = ll_out
-!         call get_cgps_stations(ll_in, ll_out)
+!         call get_cgnss_stations(ll_in, ll_out)
 !   endselect   
    end subroutine get_data
 
@@ -239,7 +239,7 @@ contains
    end subroutine get_strong_motion_stations
 
    
-   subroutine get_cgps_stations(ll_in, ll_out)
+   subroutine get_cgnss_stations(ll_in, ll_out)
    implicit none
    integer ll_in, ll_out, ll_g, &
    &  nstb, io_chan, nm, j_con(11), i, k, ir, no, &
@@ -258,9 +258,9 @@ contains
 !  suppose the ni = u3e+11, then then moment of 1cm*1km^2 
 !       subfault is 3e+21. The gfs is for Mo = 1e+20
 !
-   open(9,file='Readlp.cgps',status='old')
-   open(13,file='Obser.cgps',status='unknown')
-   open(15,file='Wave.cgps')
+   open(9,file='Readlp.cgnss',status='old')
+   open(13,file='Obser.cgnss',status='unknown')
+   open(15,file='Wave.cgnss')
    read(15,*) jmin, jmax, jfmax
    read(15,*)
    read(15,*) n_wave_weight
@@ -350,7 +350,7 @@ contains
    close(13)
    close(15)
    ll_out = ll_in + n_chan
-   end subroutine get_cgps_stations
+   end subroutine get_cgnss_stations
 
    
    subroutine get_body_waves_stations(ll_in, ll_out)

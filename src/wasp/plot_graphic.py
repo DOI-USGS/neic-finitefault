@@ -107,7 +107,7 @@ def plot_ffm_sol(
         To plot the results of the FFM modelling, we need to run this code
         in a folder whih contains files Solution.txt, Fault.time, Fault.pos,
         Event_mult.in, and some among the files synm.tele, synm.str_low,
-        synm.str and synm.cgps.
+        synm.str and synm.cgnss.
 
     .. note::
 
@@ -282,18 +282,18 @@ def plot_misfit(
                 plot_directory=directory,
             )
     print(1)
-    if "cgps" in used_data_type:
-        if not os.path.isfile(directory / "cgps_waves.json"):
+    if "cgnss" in used_data_type:
+        if not os.path.isfile(directory / "cgnss_waves.json"):
             raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "cgps_waves.json"
+                errno.ENOENT, os.strerror(errno.ENOENT), "cgnss_waves.json"
             )
         print(2)
-        with open(directory / "cgps_waves.json") as cw:
+        with open(directory / "cgnss_waves.json") as cw:
             traces_info = json.load(cw)
         print(3)
         traces_info = get_outputs.get_data_dict(
             traces_info,
-            syn_file="synthetics_cgps.txt",
+            syn_file="synthetics_cgnss.txt",
             directory=directory,
         )
         print(4)
@@ -309,7 +309,7 @@ def plot_misfit(
             plot_waveform_fits(
                 traces_info,
                 components,
-                "cgps",
+                "cgnss",
                 event=event,
                 plot_directory=directory,
             )
@@ -672,7 +672,7 @@ def PlotMap(
     solution: dict,
     default_dirs: dict,
     files_str: Optional[dict] = None,
-    stations_gps: Optional[zip] = None,
+    stations_gnss: Optional[zip] = None,
     max_slip: Optional[float] = None,
     event: Optional[str] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
@@ -691,8 +691,8 @@ def PlotMap(
     :type default_dirs: dict
     :param files_str: The stations file properties, defaults to None
     :type files_str:Optional[dict], optional
-    :param stations_gps: The gps stations description, defaults to None
-    :type stations_gps:  Optional[zip], optional
+    :param stations_gnss: The gnss stations description, defaults to None
+    :type stations_gnss:  Optional[zip], optional
     :param max_slip: Specify maximum slip, defaults to None
     :type max_slip: Optional[float], optional
     :param event: The event, defaults to None
@@ -781,15 +781,17 @@ def PlotMap(
                 transform=ccrs.PlateCarree(),
                 zorder=4,
             )
-    if stations_gps is not None:
+    if stations_gnss is not None:
         max_obs = np.zeros(3)
-        stations_gps2: list = []
-        for name, sta_lat, sta_lon, obs, syn, error in stations_gps:
+        stations_gnss2: list = []
+        for name, sta_lat, sta_lon, obs, syn, error in stations_gnss:
             min_lat = min(min_lat, sta_lat)
             max_lat = max(max_lat, sta_lat)
             min_lon = min(min_lon, sta_lon)
             max_lon = max(max_lon, sta_lon)
-            stations_gps2 = stations_gps2 + [[name, sta_lat, sta_lon, obs, syn, error]]
+            stations_gnss2 = stations_gnss2 + [
+                [name, sta_lat, sta_lon, obs, syn, error]
+            ]
             max_obs = np.maximum([abs(float(v)) for v in obs], max_obs)
             distance = max(np.abs(sta_lat - lat0), np.abs(sta_lon - lon0))
             margin = max(margin, 1.2 * distance)
@@ -806,13 +808,13 @@ def PlotMap(
             "{:.2f} cm".format(max_obs),  # type:ignore
             transform=ccrs.PlateCarree(),
         )
-        for name, sta_lat, sta_lon, obs, syn, error in stations_gps2:
+        for name, sta_lat, sta_lon, obs, syn, error in stations_gnss2:
             plt.plot(
                 sta_lon, sta_lat, "ks", transform=ccrs.PlateCarree(), markersize=14
             )
-            gps_z, gps_n, gps_e = syn
-            east_west = float(gps_e) / max_obs
-            north_south = float(gps_n) / max_obs
+            gnss_z, gnss_n, gnss_e = syn
+            east_west = float(gnss_e) / max_obs
+            north_south = float(gnss_n) / max_obs
             plt.arrow(
                 sta_lon,
                 sta_lat,
@@ -825,7 +827,7 @@ def PlotMap(
                 head_length=0.05,
                 transform=ccrs.PlateCarree(),
             )
-            up_down = float(gps_z) / max_obs
+            up_down = float(gnss_z) / max_obs
             plt.arrow(
                 sta_lon,
                 sta_lat,
@@ -838,9 +840,9 @@ def PlotMap(
                 head_length=0.05,
                 transform=ccrs.PlateCarree(),
             )
-            gps_z, gps_n, gps_e = obs
-            east_west = float(gps_e) / max_obs
-            north_south = float(gps_n) / max_obs
+            gnss_z, gnss_n, gnss_e = obs
+            east_west = float(gnss_e) / max_obs
+            north_south = float(gnss_n) / max_obs
             plt.arrow(
                 sta_lon,
                 sta_lat,
@@ -852,7 +854,7 @@ def PlotMap(
                 head_length=0.05,
                 transform=ccrs.PlateCarree(),
             )
-            up_down = float(gps_z) / max_obs
+            up_down = float(gnss_z) / max_obs
             plt.arrow(
                 sta_lon,
                 sta_lat,

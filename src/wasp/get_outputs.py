@@ -243,7 +243,7 @@ def synthetics_to_SAC(
 ):
     """Save synthetic data in SAC format for each station/channel
 
-    :param data_type: The type of data (e.g., surf, cgps)
+    :param data_type: The type of data (e.g., surf, cgnss)
     :type data_type: str
     :param start_margin: waveform start margin, defaults to 10
     :type start_margin: int
@@ -296,21 +296,21 @@ def synthetics_to_SAC(
         files = get_outputs.get_data_dict(
             traces_info, syn_file="synthetics_strong.txt", directory=directory
         )
-    elif data_type == "cgps":
-        fwd_directory = directory / "forward_model/cGPS"
+    elif data_type == "cgnss":
+        fwd_directory = directory / "forward_model/cGNSS"
         if not fwd_directory.exists():
             os.mkdir(fwd_directory)
-        if not (directory / "cgps_waves.json").exists():
+        if not (directory / "cgnss_waves.json").exists():
             raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "cgps_waves.json"
+                errno.ENOENT, os.strerror(errno.ENOENT), "cgnss_waves.json"
             )
-        with open(directory / "cgps_waves.json") as t:
+        with open(directory / "cgnss_waves.json") as t:
             traces_info = json.load(t)
         files = get_outputs.get_data_dict(
-            traces_info, syn_file="synthetics_cgps.txt", directory=directory
+            traces_info, syn_file="synthetics_cgnss.txt", directory=directory
         )
     else:
-        raise ValueError("Data type must be waveform (body, surf, strong, or cgps)")
+        raise ValueError("Data type must be waveform (body, surf, strong, or cgnss)")
 
     start_waveform: List[float] = []
     for file in files:
@@ -492,7 +492,7 @@ def __get_channel(channel: str) -> List[str]:
     return channels
 
 
-def retrieve_gps(
+def retrieve_gnss(
     syn_name="static_synthetics.txt",
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> Tuple[
@@ -503,7 +503,7 @@ def retrieve_gps(
     List[List[float]],
     List[List[float]],
 ]:
-    """Get the inverted and observed GPS data and station location
+    """Get the inverted and observed GNSS data and station location
 
     :param syn_name: The name of the synthetic data file, defaults to "static_synthetics.txt"
     :type syn_name: str, optional
@@ -529,10 +529,10 @@ def retrieve_gps(
     name_synthetic = [[line[1], line[4:]] for line in lines[1:]]
     synthetic: list = []
     for index, name in enumerate(names):
-        synthetic_gps = [
-            gps_syn for gps_name, gps_syn in name_synthetic if gps_name == name
+        synthetic_gnss = [
+            gnss_syn for gnss_name, gnss_syn in name_synthetic if gnss_name == name
         ]
-        synthetic = synthetic + synthetic_gps
+        synthetic = synthetic + synthetic_gnss
     return names, lats, lons, observed, synthetic, error
 
 

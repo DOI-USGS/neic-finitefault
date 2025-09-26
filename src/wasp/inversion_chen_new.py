@@ -40,7 +40,7 @@ def automatic_usgs(
     data_type: List[str],
     default_dirs: dict,
     velmodel: Optional[dict] = None,
-    dt_cgps: Optional[float] = 1.0,
+    dt_cgnss: Optional[float] = 1.0,
     st_response: bool = True,
     config_path: Optional[Union[str, pathlib.Path]] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
@@ -55,8 +55,8 @@ def automatic_usgs(
     :type default_dirs: dict
     :param velmodel: The velocity model, defaults to None
     :type velmodel: Optional[dict], optional
-    :param dt_cgps: The time delta for cgps data, defaults to 1.0
-    :type dt_cgps: Optional[float], optional
+    :param dt_cgnss: The time delta for cgnss data, defaults to 1.0
+    :type dt_cgnss: Optional[float], optional
     :param st_response: Whether to remove paz response of strong motion, defaults to True
     :type st_response: bool, optional
     :param config_path: The path to the config file, defaults to None
@@ -71,9 +71,9 @@ def automatic_usgs(
     logger = ml.add_console_handler(logger)
     logger.info("Starting fff program")
     time0 = time.time()
-    if "gps" in data_type:
-        if os.path.isfile(os.path.join(directory, "data", "gps_data")):
-            copy2(os.path.join(directory, "data", "gps_data"), directory)
+    if "gnss" in data_type:
+        if os.path.isfile(os.path.join(directory, "data", "gnss_data")):
+            copy2(os.path.join(directory, "data", "gnss_data"), directory)
     if "insar" in data_type:
         insar_files = glob.glob(os.path.join(directory, "data", "insar_a*txt"))
         insar_files = insar_files + glob.glob(
@@ -84,7 +84,7 @@ def automatic_usgs(
                 copy2(file, directory)
     data_dir = directory / "data"
     data_prop = tp.properties_json(
-        tensor_info, dt_cgps=dt_cgps, data_directory=directory
+        tensor_info, dt_cgnss=dt_cgnss, data_directory=directory
     )
     time2 = time.time()
     logger.info("Process data")
@@ -115,17 +115,17 @@ def automatic_usgs(
         velmodel = mv.select_velmodel(tensor_info, default_dirs, directory=directory)
     input_files.write_velmodel(velmodel, directory=directory)
     gf_bank_str = os.path.join(directory, "GF_strong")
-    gf_bank_cgps = os.path.join(directory, "GF_cgps")
+    gf_bank_cgnss = os.path.join(directory, "GF_cgnss")
     get_gf_bank = default_dirs["strong_motion_gf_bank2"]
-    if "cgps" in data_type:
-        logger.info("Compute cGPS GF bank")
+    if "cgnss" in data_type:
+        logger.info("Compute cGNSS GF bank")
         green_dict = gf.fk_green_fun1(
-            data_prop, tensor_info, gf_bank_cgps, cgps=True, directory=directory
+            data_prop, tensor_info, gf_bank_cgnss, cgnss=True, directory=directory
         )
-        input_files.write_green_file(green_dict, cgps=True, directory=directory)
-        with open(os.path.join(directory, "logs", "GF_cgps_log"), "w") as out_gf_cgps:
+        input_files.write_green_file(green_dict, cgnss=True, directory=directory)
+        with open(os.path.join(directory, "logs", "GF_cgnss_log"), "w") as out_gf_cgnss:
             p1 = subprocess.Popen(
-                [get_gf_bank, "cgps", f"{(directory)}/"], stdout=out_gf_cgps
+                [get_gf_bank, "cgnss", f"{(directory)}/"], stdout=out_gf_cgnss
             )
         p1.wait()
     if "strong" in data_type:
@@ -144,11 +144,11 @@ def automatic_usgs(
         p2.wait()
     files = [
         directory / "Green_strong.txt",
-        directory / "Green_cgps.txt",
+        directory / "Green_cgnss.txt",
         directory / "modelling_stats.json",
-        directory / "gps_data",
+        directory / "gnss_data",
         directory / "strong_motion_gf.json",
-        directory / "cgps_gf.json",
+        directory / "cgnss_gf.json",
         directory / "sampling_filter.json",
     ]
     files2 = glob.glob(str(directory) + "/channels_*txt")
@@ -400,8 +400,8 @@ def modelling_new_data(
     :type directory: Union[pathlib.Path, str], optional
     """
     directory = pathlib.Path(directory)
-    if os.path.isfile(os.path.join(data_folder, "gps_data")):
-        copy2(os.path.join(data_folder, "gps_data"), directory)
+    if os.path.isfile(os.path.join(data_folder, "gnss_data")):
+        copy2(os.path.join(data_folder, "gnss_data"), directory)
     insar_asc = glob.glob(os.path.join(data_folder, "insar_a*txt"))
     insar_desc = glob.glob(os.path.join(data_folder, "insar_d*txt"))
     insar_files = insar_asc + insar_desc
@@ -428,7 +428,7 @@ def modelling_new_data(
         working_directory=directory,
     )
     gf_bank_str = os.path.join(directory, "GF_strong")
-    gf_bank_cgps = os.path.join(directory, "GF_cgps")
+    gf_bank_cgnss = os.path.join(directory, "GF_cgnss")
     get_gf_bank = default_dirs["strong_motion_gf_bank2"]
     segments = segments_data["segments"]
     rise_time = segments_data["rise_time"]
@@ -441,19 +441,21 @@ def modelling_new_data(
     depths = [ps[:, :, :, :, 2] for ps in point_sources]
     max_depths = [np.max(depth1.flatten()) for depth1 in depths]
     max_depth = np.max(max_depths)
-    if "cgps" in data_type:
+    if "cgnss" in data_type:
         green_dict = gf.fk_green_fun1(
             data_prop,
             tensor_info,
-            gf_bank_cgps,
+            gf_bank_cgnss,
             max_depth=max_depth,
-            cgps=True,
+            cgnss=True,
             directory=directory,
         )
-        input_files.write_green_file(green_dict, cgps=True, directory=directory)
-        with open(os.path.join(directory / "logs", "GF_cgps_log"), "w") as out_gf_cgps:
+        input_files.write_green_file(green_dict, cgnss=True, directory=directory)
+        with open(
+            os.path.join(directory / "logs", "GF_cgnss_log"), "w"
+        ) as out_gf_cgnss:
             p1 = subprocess.Popen(
-                [get_gf_bank, "cgps", f"{(directory)}/"], stdout=out_gf_cgps
+                [get_gf_bank, "cgnss", f"{(directory)}/"], stdout=out_gf_cgnss
             )
         p1.wait()
     if "strong" in data_type:
@@ -480,10 +482,10 @@ def modelling_new_data(
         data_type2 = data_type2 + ["surf"]
     if os.path.isfile(directory / "strong_motion_waves.json"):
         data_type2 = data_type2 + ["strong"]
-    if os.path.isfile(directory / "cgps_waves.json"):
-        data_type2 = data_type2 + ["cgps"]
+    if os.path.isfile(directory / "cgnss_waves.json"):
+        data_type2 = data_type2 + ["cgnss"]
     if os.path.isfile(directory / "static_data.json"):
-        data_type2 = data_type2 + ["gps"]
+        data_type2 = data_type2 + ["gnss"]
     if os.path.isfile(directory / "insar_data.json"):
         data_type2 = data_type2 + ["insar"]
     if os.path.isfile(directory / "dart_waves.json"):
@@ -723,9 +725,9 @@ def checkerboard(
             json_dict = "surf_waves.json"
         if data_type0 == "strong":
             json_dict = "strong_motion_waves.json"
-        if data_type0 == "cgps":
-            json_dict = "cgps_waves.json"
-        if data_type0 == "gps":
+        if data_type0 == "cgnss":
+            json_dict = "cgnss_waves.json"
+        if data_type0 == "gnss":
             json_dict = "static_data.json"
         if data_type0 == "dart":
             json_dict = "dart_waves.json"
@@ -774,7 +776,7 @@ def set_directory_structure(
     os.mkdir(sol_folder2)
     folders = [
         "data",
-        os.path.join("data", "cGPS"),
+        os.path.join("data", "cGNSS"),
         os.path.join("data", "STR"),
         os.path.join("data", "P"),
         os.path.join("data", "SH"),
@@ -838,7 +840,7 @@ def processing(
         + glob.glob(os.path.join(directory, "*_HL*sac*"))
         + glob.glob(os.path.join(directory, "*HG*sac*"))
     )
-    cgps_files = glob.glob(os.path.join(directory, "*L[HXY][ENZ].sac")) + glob.glob(
+    cgnss_files = glob.glob(os.path.join(directory, "*L[HXY][ENZ].sac")) + glob.glob(
         os.path.join(directory, "*L[HXY][ENZ].SAC")
     )
     if "body" in data_type:
@@ -857,9 +859,9 @@ def processing(
             remove_response=st_response,
             directory=directory,
         )
-    if "cgps" in data_type:
-        proc.select_process_cgps(
-            cgps_files, tensor_info, data_prop, directory=directory
+    if "cgnss" in data_type:
+        proc.select_process_cgnss(
+            cgnss_files, tensor_info, data_prop, directory=directory
         )
 
 
@@ -898,11 +900,11 @@ def writing_inputs0(
         input_files.input_chen_near_field(
             tensor_info, data_prop, "strong", directory=directory
         )
-    if "cgps" in data_type:
+    if "cgnss" in data_type:
         input_files.input_chen_near_field(
-            tensor_info, data_prop, "cgps", directory=directory
+            tensor_info, data_prop, "cgnss", directory=directory
         )
-    if "gps" in data_type:
+    if "gnss" in data_type:
         input_files.input_chen_static(directory=directory)
     if "insar" in data_type:
         input_files.input_chen_insar(directory=directory)
@@ -969,14 +971,14 @@ def writing_inputs(
     if moment_mag:
         dictionary["seismic_moment"] = moment_mag
     input_files.inputs_simmulated_annealing(dictionary, directory=directory)
-    if "cgps" in data_type:
-        if not os.path.isfile(directory / "cgps_gf.json"):
+    if "cgnss" in data_type:
+        if not os.path.isfile(directory / "cgnss_gf.json"):
             raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "cgps_gf.json"
+                errno.ENOENT, os.strerror(errno.ENOENT), "cgnss_gf.json"
             )
-        with open(directory / "cgps_gf.json") as cg:
+        with open(directory / "cgnss_gf.json") as cg:
             green_dict = json.load(cg)
-        input_files.write_green_file(green_dict, cgps=True, directory=directory)
+        input_files.write_green_file(green_dict, cgnss=True, directory=directory)
     if "strong" in data_type:
         if not os.path.isfile(directory / "strong_motion_gf.json"):
             raise FileNotFoundError(
@@ -1029,10 +1031,10 @@ def inversion(
     time3 = time.time()
     args = ["auto"]
     args = args + ["strong"] if "strong" in data_type else args
-    args = args + ["cgps"] if "cgps" in data_type else args
+    args = args + ["cgnss"] if "cgnss" in data_type else args
     args = args + ["body"] if "body" in data_type else args
     args = args + ["surf"] if "surf" in data_type else args
-    args = args + ["gps"] if "gps" in data_type else args
+    args = args + ["gnss"] if "gnss" in data_type else args
     args = args + ["dart"] if "dart" in data_type else args
     args = args + ["insar"] if "insar" in data_type else args
     if not forward:
@@ -1110,19 +1112,19 @@ def execute_plot(
         directory=directory,
     )
     plot.plot_misfit(data_type, directory=directory)
-    traces_info, stations_gps, traces_info_cgps = [None, None, None]
+    traces_info, stations_gnss, traces_info_cgnss = [None, None, None]
     if "strong" in data_type:
         with open(directory / "strong_motion_waves.json") as smw:
             traces_info = json.load(smw)
-    if "cgps" in data_type:
-        with open(directory / "cgps_waves.json") as cgpsw:
-            traces_info_cgps = json.load(cgpsw)
-    if "gps" in data_type:
-        names, lats, lons, observed, synthetic, error = get_outputs.retrieve_gps(
+    if "cgnss" in data_type:
+        with open(directory / "cgnss_waves.json") as cgnssw:
+            traces_info_cgnss = json.load(cgnssw)
+    if "gnss" in data_type:
+        names, lats, lons, observed, synthetic, error = get_outputs.retrieve_gnss(
             directory=directory
         )
-        stations_gps = zip(names, lats, lons, observed, synthetic, error)
-    if "strong" in data_type or "cgps" in data_type or "gps" in data_type:
+        stations_gnss = zip(names, lats, lons, observed, synthetic, error)
+    if "strong" in data_type or "cgnss" in data_type or "gnss" in data_type:
         plot.PlotMap(
             tensor_info,
             segments,
@@ -1130,8 +1132,8 @@ def execute_plot(
             solution,
             default_dirs,
             files_str=traces_info,
-            stations_gps=stations_gps,
-            stations_cgps=traces_info_cgps,
+            stations_gnss=stations_gnss,
+            stations_cgnss=traces_info_cgnss,
             directory=directory,
         )
     if "insar" in data_type:

@@ -59,7 +59,7 @@ program get_strong_motion
 
    call getarg(1, input)
    call getarg(2, directory)
-   disp = (input.eq.'cgps')
+   disp = (input.eq.'cgnss')
    write(*,'(/A/)')'METHOD TO STORE NEAR-FIELD GF'
 !
 !	Input fault data
@@ -98,8 +98,8 @@ program get_strong_motion
    close(22)
 
    filter_file = 'filter_strong.txt'
-   inquire( file = trim(directory)//'filter_cgps.txt', exist = is_file )
-   if (is_file .and. disp) filter_file = 'filter_cgps.txt'
+   inquire( file = trim(directory)//'filter_cgnss.txt', exist = is_file )
+   if (is_file .and. disp) filter_file = 'filter_cgnss.txt'
    filterfile=trim(directory)//filter_file
    open(1, file=filterfile, status='old')
    read(1,*)string1, low_freq, high_freq
@@ -111,7 +111,7 @@ program get_strong_motion
 ! 
    gf_file = trim(directory)//'Green_strong.txt'
    vel_file = trim(directory)//'vel_model.txt'
-   if (disp) gf_file = trim(directory)//'Green_cgps.txt'
+   if (disp) gf_file = trim(directory)//'Green_cgnss.txt'
    call get_gf_data(gf_file, vel_model, gf_bank)
    write(*,*)'Get velocity model...'
    call read_vel_model(vel_file)
@@ -134,7 +134,7 @@ program get_strong_motion
    call get_gf(gf_bank, dep_min, dep_max)
 !
    wave_file = 'wavelets_strong.txt'
-   if (disp) wave_file = 'wavelets_cgps.txt'
+   if (disp) wave_file = 'wavelets_cgnss.txt'
    waveformsfile=trim(directory)//wave_file
    open(13, file=waveformsfile, status='old')
    read(13,*)integer1, integer2, jfmax
@@ -150,7 +150,7 @@ program get_strong_motion
 ! 
    write(*,*)'Get near field stations data...'
    stat_file = 'channels_strong.txt'
-   if (disp) stat_file = 'channels_cgps.txt'
+   if (disp) stat_file = 'channels_cgnss.txt'
    channelsfile=trim(directory)//stat_file
    open(12, file=channelsfile, status='old')
    read(12,*)
