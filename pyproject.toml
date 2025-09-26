@@ -10,6 +10,9 @@ authors = [
   {name = "Pablo Koch",  email = "pkoch@csn.uchile.cl"}, 
   {name = "Dara Goldberg", email = "degoldberg@usgs.gov"},
   {name = "Heather Hunsinger", email = "hhunsinger@usgs.gov"},
+  {name = "Diego Melgar", email = "dmelgarm@uoregon.edu"},
+  {name = "Sebastian Riquelme", email = "sebastian@dgf.uchile.cl"},
+  {name = "William Yeck", email "wyeck@usgs.gov"},
   {name = "Kirstie Haynie", email = "khaynie@usgs.gov"}
 ]
 maintainers = [
@@ -20,7 +23,7 @@ keywords = ["usgs", "neic", "earthquake", "slip", "finitefault"]
 license = {file = "LICENSE.md"}
 name = "neic-finitefault"
 requires-python = ">=3.10"
-version = "1.0.0"
+version = "1.1.0"
 
 [project.urls]
 Repository = "https://code.usgs.gov/ghsc/neic/algorithms/neic-finitefault"
