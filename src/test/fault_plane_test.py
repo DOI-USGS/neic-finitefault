@@ -44,7 +44,7 @@ def test_create_finite_fault():
         data = create_finite_fault(
             TENSOR,
             info_np1["plane_info"],
-            ["cgnss", "gnss", "insar", "strong", "body", "surf_waves"],
+            ["cgnss", "gnss", "imagery", "strong", "body", "surf_waves"],
             directory=tempdir,
         )
         for i, key in data["segments"][0].items():

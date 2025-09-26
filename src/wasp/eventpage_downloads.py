@@ -133,9 +133,9 @@ def temporary_file_reorganization_for_publishing(
     for wp in range(len(wave_plots)):
         orig_wp = wave_plots[wp]
         shutil.copy(orig_wp, wave_plots_pub_directory)
-    insar_plots = glob(str(directory / "plots") + "/InSAR_*_fit.png")
-    for ip in range(len(insar_plots)):
-        orig_ip = insar_plots[ip]
+    imagery_plots = glob(str(directory / "plots") + "/Imagery_*_fit.png")
+    for ip in range(len(imagery_plots)):
+        orig_ip = imagery_plots[ip]
         shutil.copy(orig_ip, wave_plots_pub_directory)
 
     shutil.make_archive(
@@ -143,27 +143,24 @@ def temporary_file_reorganization_for_publishing(
         "zip",
         wave_plots_pub_directory,
     )
-    #######################
-    ### RESAMPLED INSAR ###
-    #######################
-    resampled_insar_data_asc = glob(str(directory) + "/*ascending.txt")
-    resampled_insar_data_desc = glob(str(directory) + "/*descending.txt")
-    interferograms_pub_directory = pub_directory / "resampled_interferograms"
+    #########################
+    ### RESAMPLED Imagery ###
+    #########################
+    imagery_pub_directory = pub_directory / "resampled_interferograms"
 
-    if len(resampled_insar_data_asc) > 0 or len(resampled_insar_data_desc) > 0:
-        if not os.path.exists(interferograms_pub_directory):
-            os.makedirs(interferograms_pub_directory)
-    for asc in range(len(resampled_insar_data_asc)):
-        orig_asc = resampled_insar_data_asc[asc]
-        shutil.copy(orig_asc, interferograms_pub_directory)
-    for desc in range(len(resampled_insar_data_desc)):
-        orig_desc = resampled_insar_data_desc[desc]
-        shutil.copy(orig_desc, interferograms_pub_directory)
-    if os.path.exists(interferograms_pub_directory):
+    if os.path.exists(directory / "imagery_data.json"):
+        if not os.path.exists(imagery_pub_directory):
+            os.makedirs(imagery_pub_directory)
+        with open(directory / "imagery_data.json") as im:
+            im_files = json.load(im)
+            for files in im_files:
+                file_path = im_files[files][0]["name"]
+                shutil.copy(file_path, imagery_pub_directory)
+    if os.path.exists(imagery_pub_directory):
         shutil.make_archive(
             str(pub_directory / "resampled_interferograms"),
             "zip",
-            interferograms_pub_directory,
+            imagery_pub_directory,
         )
 
 

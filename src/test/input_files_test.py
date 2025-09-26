@@ -10,7 +10,7 @@ from wasp.input_files import (
     forward_model,
     from_synthetic_to_obs,
     input_chen_dart,
-    input_chen_insar,
+    input_chen_imagery,
     input_chen_near_field,
     input_chen_static,
     input_chen_tele_body,
@@ -25,7 +25,7 @@ from wasp.input_files import (
 from .testutils import (
     RESULTS_DIR,
     get_cgnss_json,
-    get_insar_json,
+    get_imagery_json,
     get_sampling_filter,
     get_segments_data,
     get_static_json,
@@ -101,17 +101,17 @@ def test_input_chen_dart():
         shutil.rmtree(tempdir)
 
 
-def test_input_chen_insar():
+def test_input_chen_imagery():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
-        new_insar = update_manager_file_locations(
-            get_insar_json(),
+        new_imagery = update_manager_file_locations(
+            get_imagery_json(),
             tempdir,
             replace_dir=str(RESULTS_DIR / "NP1"),
             file_key="name",
         )
-        with open(tempdir / "insar_data.json", "w") as tw:
-            json.dump(new_insar, tw)
+        with open(tempdir / "imagery_data.json", "w") as tw:
+            json.dump(new_imagery, tw)
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "insar_ascending.txt", tempdir / "insar_ascending.txt"
         )
@@ -120,8 +120,8 @@ def test_input_chen_insar():
             tempdir / "insar_descending.txt",
         )
 
-        input_chen_insar(tempdir)
-        for f in ["insar_data.txt", "insar_weights.txt"]:
+        input_chen_imagery(tempdir)
+        for f in ["imagery_data.txt", "imagery_weights.txt"]:
             with open(tempdir / f, "r") as nd:
                 new_data = nd.read()
             with open(RESULTS_DIR / f, "r") as t:

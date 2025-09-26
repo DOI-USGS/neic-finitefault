@@ -91,18 +91,18 @@ def gf_retrieve(
         processes = processes + [p4]
         loggers = loggers + [logger4]
         data_types = data_types + ["gnss"]
-    if "insar" in used_data_type:
-        print("Computing InSAR GFs")
-        logger5 = ml.create_log("INSAR_GF", directory / "logs" / "green_insar_log")
+    if "imagery" in used_data_type:
+        print("Computing Imagery GFs")
+        logger5 = ml.create_log("Imagery_GF", directory / "logs" / "green_imagery_log")
         logger5.addHandler(ch)
         p5 = subprocess.Popen(
-            [green_fun_gnss, "insar", f"{str(directory)}/"],
+            [green_fun_gps, "imagery", f"{str(directory)}/"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
         processes = processes + [p5]
         loggers = loggers + [logger5]
-        data_types = data_types + ["insar"]
+        data_types = data_types + ["imagery"]
 
     for p, log, data_type in zip(processes, loggers, data_types):
         out, err = p.communicate(timeout=100000)

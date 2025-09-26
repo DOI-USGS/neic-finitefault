@@ -23,13 +23,13 @@ def get_cgnss_json(min: int = 0, max: int = 3, all: bool = False):
     return cgnss_waves
 
 
-def get_insar_json():
-    """Get insar_data.json"""
-    with open(RESULTS_DIR / "NP1" / "insar_data.json", "r") as f:
-        insar_data = cgnss_waves = update_manager_file_locations(
+def get_imagery_json():
+    """Get imagery_data.json"""
+    with open(RESULTS_DIR / "NP1" / "imagery_data.json", "r") as f:
+        imagery_data = cgnss_waves = update_manager_file_locations(
             json.load(f), RESULTS_DIR / "NP1", file_key="name"
         )
-    return insar_data
+    return imagery_data
 
 
 def get_sampling_filter():

@@ -4,7 +4,7 @@ from typing import List
 DEFAULT_MANAGEMENT_FILES = {
     "cgnss": "cgnss_waves.json",
     "gnss": "static_data.json",
-    "insar": "imagery_data.json",
+    "imagery": "imagery_data.json",
     "strong": "strong_motion_waves.json",
     "surf": "surf_waves.json",
     "body": "tele_waves.json",
@@ -19,7 +19,7 @@ class AcquireDataTypes(str, Enum):
 class ManagedDataTypes(str, Enum):
     cgnss = "cgnss"
     gnss = "gnss"
-    insar = "insar"
+    imagery = "imagery"
     strong = "strong"
     surf = "surf"
     body = "body"

@@ -620,10 +620,9 @@ def static_data(
     return info_traces
 
 
-def insar_data(
+def imagery_data(
     imagery_files: Optional[List[Union[pathlib.Path, str]]] = None,
     ramp_types: Optional[List[Union[str, None]]] = None,
-    imagery_description: Optional[List[Union[str, None]]] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> dict:
     """Write json dictionary with properties for imagery data
@@ -632,8 +631,6 @@ def insar_data(
     :type imagery_files: Optional[List[Union[pathlib.Path, str]]], optional
     :param ramp_types: The ramp options, defaults to None
     :type ramp_types: Optional[List[Union[str, None]]], optional
-    :param imagery_description: The description of the imagery (e.g., InSAR, optical, etc.)
-    :type imagery_description: Optional[List[Union[str, None]]], optional
     :param directory: The directory where the data is located, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     :raises ValueError: If the length of ramps, files, and descriptions are different
@@ -652,24 +649,15 @@ def insar_data(
             raise ValueError(
                 "You need to input a ramp type (linear, bilinear, quadratic) for each imagery file"
             )
-        if not len(imagery_description) == len(imagery_files):
-            raise ValueError(
-                "Must input an imagery description (e.g., insar, optical) for each imagery file)"
-            )
-        zipped = zip(imagery_files, ramp_types, imagery_description)
-#        properties: List[dict] = []
-        for track, ramp, description in zipped:
+        zipped = zip(imagery_files, ramp_types)
+        for track, ramp in zipped:
+            filename_only = pathlib.Path(track).stem
             new_dict = {
                 "name": str(pathlib.Path(track).resolve()),
                 "weight": 1.0,
                 "ramp": ramp,
             }
-            if description in imagery_dict:
-                imagery_dict[description] += [new_dict]
-            else:
-                imagery_dict[description] = [new_dict]
-#            properties = properties + [new_dict]
-#        insar_dict["ascending"] = properties
+            imagery_dict[filename_only] = [new_dict]
 
     with open(directory / "imagery_data.json", "w") as f:
         json.dump(
@@ -860,7 +848,6 @@ def filling_data_dicts(
     data_folder: Union[pathlib.Path, str],
     imagery_files: Optional[List[Union[pathlib.Path, str]]] = None,
     ramp_types: Optional[List[Union[str, None]]] = None,
-    imagery_description: Optional[List[Union[str, None]]] = None,
     working_directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """Routine to fill JSON dictionaries containing data properties, for all
@@ -879,8 +866,6 @@ def filling_data_dicts(
     :type imagery_files: Optional[List[Union[pathlib.Path, str]]], optional
     :param ramp_types: The imagery ramp options, defaults to None
     :type ramp_types: Optional[List[Union[str, None]]], optional
-    :param imagery_description: The description of the imagery (e.g., insar, optical, etc.), defaults to None
-    :type imagery_description: Optional[List[Union[str, None]]], optional
     :param working_directory: The working directory, defaults to pathlib.Path()
     :type working_directory: Union[pathlib.Path, str], optional
 
@@ -949,11 +934,10 @@ def filling_data_dicts(
             )
     if "gnss" in data_types:
         static_data(tensor_info, unit="m", directory=working_directory)
-    if "insar" in data_types:
-        insar_data(
+    if "imagery" in data_types:
+        imagery_data(
             imagery_files=imagery_files,
             ramp_types=ramp_types,
-            imagery_description=imagery_description,
             directory=working_directory,
         )
 

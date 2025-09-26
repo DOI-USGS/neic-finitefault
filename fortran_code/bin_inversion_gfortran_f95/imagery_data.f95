@@ -7,7 +7,7 @@
 !
 !
 !
-module insar_data
+module imagery_data
 
 
    use constants, only : max_subf, max_seg, max_subfaults, dpi
@@ -30,22 +30,22 @@ module insar_data
 contains
 
 
-   subroutine get_insar_gf()
+   subroutine get_imagery_gf()
    implicit none
    allocate(green(6, max_points, max_subfaults))
-   end subroutine get_insar_gf
+   end subroutine get_imagery_gf
   
 
-   subroutine insardata_set_fault_parameters()
+   subroutine imagerydata_set_fault_parameters()
    use model_parameters, only : get_segments
    implicit none
    real :: dip(max_seg), strike(max_seg), delay_seg(max_seg)
    integer :: cum_subfaults(max_seg)
    call get_segments(nxs_sub, nys_sub, dip, strike, delay_seg, segments, subfaults, cum_subfaults)
-   end subroutine insardata_set_fault_parameters
+   end subroutine imagerydata_set_fault_parameters
    
 
-   subroutine get_insar_data()
+   subroutine get_imagery_data()
    implicit none
    integer i, no, k, points2, track
    integer cum_points(6)!point_tracks(6)
@@ -53,7 +53,7 @@ contains
 
    points2 = 0
    weight_sum = 0.0
-   open(9, file='insar_weights.txt', status='old')
+   open(9, file='imagery_weights.txt', status='old')
    read(9,*) tracks
    do track = 1, tracks
       read(9,*) point_tracks(track), weight_tracks(track)
@@ -63,7 +63,7 @@ contains
    enddo
    
 !
-   open(9, file='insar_data.txt', status='old')
+   open(9, file='imagery_data.txt', status='old')
    read(9,*) points
    read(9,*)
    track = 1
@@ -74,7 +74,7 @@ contains
    end do
    close(9) 
    max_los = maxval(abs(obse(:)))
-   end subroutine get_insar_data
+   end subroutine get_imagery_data
 
 
    subroutine is_ramp(ramp_gf_file)
@@ -125,7 +125,7 @@ contains
    subroutine initial_ramp(ramp)
 ! 
 !  Args: 
-!  ramp: Value of insar ramp
+!  ramp: Value of imagery ramp
 !
    implicit none
    real*8 :: ramp(36)
@@ -140,12 +140,12 @@ contains
    end subroutine initial_ramp
 
 
-   subroutine initial_insar(slip, rake, ramp)
+   subroutine initial_imagery(slip, rake, ramp)
 !
 !  Args:
 !  slip: array with model slip values for all subfaults
 !  rake: array with model rake values for all subfaults
-!  ramp: Value of insar ramp, optional
+!  ramp: Value of imagery ramp, optional
 !
    implicit none
    real*8, optional :: ramp(36)
@@ -194,7 +194,7 @@ contains
          syn_disp(point) = syn_disp(point) + ramp2
       endif
    end do
-   open(10,file='insar_synthetics.txt')
+   open(10,file='imagery_synthetics.txt')
    write(10,*) points
    do point = 1, points
       write(10,*) point, sta_name(point), lat(point), lon(point), syn_disp(point)
@@ -206,7 +206,7 @@ contains
       write(11,*) ramp(:)
       close(11)
    
-      open(12,file='insar_ramp.txt')
+      open(12,file='imagery_ramp.txt')
       write(12,*) points
       do point = 1, points
          ramp2 = 0.d0 
@@ -217,19 +217,19 @@ contains
       end do
       close(12)
    end if
-   end subroutine initial_insar
+   end subroutine initial_imagery
   
 
 !
 ! routine for loading static synthetic seismograms, given a rupture model
 !
-   subroutine insar_synthetic(slip, rake, err, ramp)
+   subroutine imagery_synthetic(slip, rake, err, ramp)
 !
 !  Args:
 !  slip: array with model slip values for all subfaults
 !  rake: array with model rake values for all subfaults
-!  err: insar misfit
-!  ramp: Value of insar ramp, optional
+!  err: imagery misfit
+!  ramp: Value of imagery ramp, optional
 !
    implicit none
    real*8, optional :: ramp(36)
@@ -266,13 +266,13 @@ contains
    end do
    err2 = sqrt(err2/weight_sum)
    err = real(err2)
-   end subroutine insar_synthetic
+   end subroutine imagery_synthetic
             
 
 !  
 ! subroutine for removing the static response of current subfault for all static stations
 !  
-   subroutine insar_remove_subfault(slip, rake, subfault)
+   subroutine imagery_remove_subfault(slip, rake, subfault)
 !
 !  Args:
 !  slip: slip value for this subfault
@@ -299,20 +299,20 @@ contains
       synm_whole(point) = synm_whole(point)-disp
    end do
 
-   end subroutine insar_remove_subfault
+   end subroutine imagery_remove_subfault
 
 
 !
 ! subroutine for testing the new response of the current subfault, for all stations
 ! we also give the misfit error of static data
 !
-   pure subroutine insar_modify_subfault(slip, rake, subfault, err)
+   pure subroutine imagery_modify_subfault(slip, rake, subfault, err)
 !
 !  Args:
 !  slip: slip value for this subfault
 !  rake: rake value for this subfault
 !  subfault: value of current subfault
-!  err: insar misfit
+!  err: imagery misfit
 !
    implicit none
    real, intent(in) :: slip, rake
@@ -340,14 +340,14 @@ contains
    err2 = sqrt(err2/weight_sum)
    err = real(err2)
 
-   end subroutine insar_modify_subfault
+   end subroutine imagery_modify_subfault
 
 
 !
 ! subroutine for asliping response of current subfault, for all stations.
 ! we also give the misfit error of static data
 !
-   subroutine insar_add_subfault(slip, rake, subfault)
+   subroutine imagery_add_subfault(slip, rake, subfault)
 !
 !  Args:
 !  slip: slip value for this subfault
@@ -374,16 +374,16 @@ contains
       synm_whole(point) = synm_whole(point)+disp
    end do
 
-   end subroutine insar_add_subfault
+   end subroutine imagery_add_subfault
 
 
 !  
 ! subroutine for removing the static response of current subfault for all static stations
 !  
-   subroutine insar_remove_ramp(ramp)
+   subroutine imagery_remove_ramp(ramp)
 !
 !  Args:
-!  ramp: Value of insar ramp
+!  ramp: Value of imagery ramp
 !
    implicit none
    real*8, intent(in) :: ramp(36)
@@ -398,18 +398,18 @@ contains
       synm_whole(point) = synm_whole(point)-ramp2
    end do
 
-   end subroutine insar_remove_ramp
+   end subroutine imagery_remove_ramp
 
 
 !
 ! subroutine for testing the new response of the current subfault, for all stations
 ! we also give the misfit error of static data
 !
-   pure subroutine insar_modify_ramp(ramp, err)
+   pure subroutine imagery_modify_ramp(ramp, err)
 !
 !  Args:
-!  ramp: Value of insar ramp
-!  err: insar misfit
+!  ramp: Value of imagery ramp
+!  err: imagery misfit
 !
    implicit none
    real*8, intent(in) :: ramp(36)
@@ -429,17 +429,17 @@ contains
    err2 = sqrt(err2/weight_sum)
    err = real(err2)
 
-   end subroutine insar_modify_ramp
+   end subroutine imagery_modify_ramp
 
 
 !
 ! subroutine for asliping response of current subfault, for all stations.
 ! we also give the misfit error of static data
 !
-   subroutine insar_add_ramp(ramp)
+   subroutine imagery_add_ramp(ramp)
 !
 !  Args:
-!  ramp: Value of insar ramp
+!  ramp: Value of imagery ramp
 !
    implicit none
    real*8, intent(in) :: ramp(36)
@@ -454,13 +454,13 @@ contains
       synm_whole(point) = synm_whole(point)+ramp2
    end do
 
-   end subroutine insar_add_ramp
+   end subroutine imagery_add_ramp
 
 
-   subroutine deallocate_insar_gf()
+   subroutine deallocate_imagery_gf()
    implicit none
    deallocate(green)
-   end subroutine deallocate_insar_gf
+   end subroutine deallocate_imagery_gf
 
 
-end module insar_data
+end module imagery_data

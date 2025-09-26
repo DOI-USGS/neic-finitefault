@@ -74,12 +74,9 @@ def automatic_usgs(
     if "gnss" in data_type:
         if os.path.isfile(os.path.join(directory, "data", "gnss_data")):
             copy2(os.path.join(directory, "data", "gnss_data"), directory)
-    if "insar" in data_type:
-        insar_files = glob.glob(os.path.join(directory, "data", "insar_a*txt"))
-        insar_files = insar_files + glob.glob(
-            os.path.join(directory, "data", "insar_d*txt")
-        )
-        for file in insar_files:
+    if "imagery" in data_type:
+        imagery_files = glob.glob(os.path.join(directory, "data", "imagery*txt"))
+        for file in imagery_files:
             if os.path.isfile(file):
                 copy2(file, directory)
     data_dir = directory / "data"
@@ -94,17 +91,14 @@ def automatic_usgs(
     time2 = time.time() - time2
     logger.info("Time spent processing traces: {}".format(time2))
     data_folder = os.path.join(directory, "data")
-    insar_asc = glob.glob(str(directory) + "/insar_asc*txt")
-    insar_asc = None if len(insar_asc) == 0 else insar_asc  # type:ignore
-    insar_desc = glob.glob(str(directory) + "/insar_desc*txt")
-    insar_desc = None if len(insar_desc) == 0 else insar_desc  # type:ignore
+    imagery_files = glob.glob(str(directory) + "/imagery*txt")
+    imagery_files = None if len(imagery_files) == 0 else imagery_files  # type:ignore
     dm.filling_data_dicts(
         tensor_info,
         data_type,
         data_prop,
         data_folder,
-        insar_asc=insar_asc,  # type:ignore
-        insar_desc=insar_desc,  # type:ignore
+        imagery_files=imagery_files,  # type:ignore
         working_directory=directory,
     )
     writing_inputs0(
@@ -163,7 +157,7 @@ def automatic_usgs(
         directory / "instrumental_response.txt",
         directory / "body_wave_weight.txt",
     ]
-    files9 = glob.glob(str(directory) + "/insar*")
+    files9 = glob.glob(str(directory) + "/imagery*")
     files = (
         files
         + files2
@@ -294,17 +288,14 @@ def _automatic2(
         velmodel = mv.select_velmodel(tensor_info, default_dirs, directory=directory)
     np_plane_info = plane_data["plane_info"]
     data_folder = os.path.join(directory.parent.parent, "data")
-    insar_asc = glob.glob(str(directory) + "/insar_asc*txt")
-    insar_asc = None if len(insar_asc) == 0 else insar_asc  # type:ignore
-    insar_desc = glob.glob(str(directory) + "/insar_desc*txt")
-    insar_desc = None if len(insar_desc) == 0 else insar_desc  # type:ignore
+    imagery_files = glob.glob(str(directory) + "/imagery*txt")
+    imagery_files = None if len(imagery_files) == 0 else imagery_files  # type:ignore
     dm.filling_data_dicts(
         tensor_info,
         data_type,
         data_prop,
         data_folder,
-        insar_asc=insar_asc,  # type:ignore
-        insar_desc=insar_desc,  # type:ignore
+        imagery_files=imagery_files,  # type:ignore
         working_directory=directory,
     )
     segments_data = pf.create_finite_fault(
@@ -402,10 +393,8 @@ def modelling_new_data(
     directory = pathlib.Path(directory)
     if os.path.isfile(os.path.join(data_folder, "gnss_data")):
         copy2(os.path.join(data_folder, "gnss_data"), directory)
-    insar_asc = glob.glob(os.path.join(data_folder, "insar_a*txt"))
-    insar_desc = glob.glob(os.path.join(data_folder, "insar_d*txt"))
-    insar_files = insar_asc + insar_desc
-    for file in insar_files:
+    imagery_files = glob.glob(os.path.join(data_folder, "imagery*txt"))
+    for file in imagery_files:
         if os.path.isfile(file):
             copy2(file, directory)
     with open(directory / "sampling_filter.json") as sf:
@@ -423,8 +412,7 @@ def modelling_new_data(
         data_type,
         data_prop,
         data_folder,
-        insar_asc=insar_asc,  # type:ignore
-        insar_desc=insar_desc,  # type:ignore
+        imagery_files=imagery_files,  # type:ignore
         working_directory=directory,
     )
     gf_bank_str = os.path.join(directory, "GF_strong")
@@ -487,7 +475,7 @@ def modelling_new_data(
     if os.path.isfile(directory / "static_data.json"):
         data_type2 = data_type2 + ["gnss"]
     if os.path.isfile(directory / "imagery_data.json"):
-        data_type2 = data_type2 + ["insar"]
+        data_type2 = data_type2 + ["imagery"]
     if os.path.isfile(directory / "dart_waves.json"):
         data_type2 = data_type2 + ["dart"]
     manual_modelling(
@@ -906,8 +894,8 @@ def writing_inputs0(
         )
     if "gnss" in data_type:
         input_files.input_chen_static(directory=directory)
-    if "insar" in data_type:
-        input_files.input_chen_insar(directory=directory)
+    if "imagery" in data_type:
+        input_files.input_chen_imagery(directory=directory)
     if "dart" in data_type:
         input_files.input_chen_dart(tensor_info, data_prop, directory=directory)
 
@@ -1036,7 +1024,7 @@ def inversion(
     args = args + ["surf"] if "surf" in data_type else args
     args = args + ["gnss"] if "gnss" in data_type else args
     args = args + ["dart"] if "dart" in data_type else args
-    args = args + ["insar"] if "insar" in data_type else args
+    args = args + ["imagery"] if "imagery" in data_type else args
     if not forward:
         logger.info("Inversion at folder {}".format(directory))
         finite_fault = default_dirs["finite_fault"]
@@ -1136,19 +1124,18 @@ def execute_plot(
             stations_cgnss=traces_info_cgnss,
             directory=directory,
         )
-    if "insar" in data_type:
+    if "imagery" in data_type:
         imagery_data = get_outputs.get_imagery(data_dir=directory)
         for key, scenes in imagery_data.items():
             for scene in range(len(scenes)):
                 imagery_points = imagery_data[key][scene]["points"]
-                plot.PlotInsar(
+                plot.PlotImagery(
                     tensor_info,
                     segments,
                     point_sources,
                     solution,
                     imagery_points,
-                    str(scene),
-                    los="ascending",
+                    datafile=key,
                     directory=directory,
                 )
     if plot_input:

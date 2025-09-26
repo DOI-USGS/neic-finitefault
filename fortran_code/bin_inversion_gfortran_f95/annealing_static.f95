@@ -8,15 +8,15 @@ module annealing_static
    use regularization, only : slip_laplace, define_slip_field, modify_slip_field
    use static_data, only : static_synthetic, static_remove_subfault, &
                        &   static_modify_subfault, static_add_subfault
-   use insar_data, only : insar_synthetic, insar_remove_subfault, &
-                       &   insar_modify_subfault, insar_add_subfault, &
-                       &   insar_remove_ramp, insar_modify_ramp, &
-                       &   insar_add_ramp, ramp_length
+   use imagery_data, only : imagery_synthetic, imagery_remove_subfault, &
+                       &   imagery_modify_subfault, imagery_add_subfault, &
+                       &   imagery_remove_ramp, imagery_modify_ramp, &
+                       &   imagery_add_ramp, ramp_length
    use omp_lib
    implicit none
-   real :: coef_moment, coef_slip, coef_gnss, coef_insar
+   real :: coef_moment, coef_slip, coef_gnss, coef_imagery
    real :: current_value, min_value, min_dt, area
-   real :: insar_misfit0
+   real :: imagery_misfit0
    real :: moment_input, smooth_moment, smooth_slip, smooth_time, emin0
    integer :: subfaults_segment(max_seg)
    integer, parameter :: double = kind(1.d0)
@@ -52,30 +52,30 @@ contains
    end subroutine annealingstatic_set_procedure_param
 
 
-   subroutine print_static_summary(slip, rake, static, insar, get_coeff, ramp)
+   subroutine print_static_summary(slip, rake, static, imagery, get_coeff, ramp)
 !
 !  Args:
 !  slip: array with model slip values for all subfaults
 !  rake: array with model rake values for all subfaults
 !  static: True if static GNSS data used in modelling, False otherwise
-!  insar: True if insar data used in modelling, False otherwise
+!  imagery: True if imagery data used in modelling, False otherwise
 !  get_coeff: get regularization coefficients if and only if this is True
-!  ramp: Value of insar ramp, optional
+!  ramp: Value of imagery ramp, optional
 !
    implicit none
    real*8, optional :: ramp(:)
    real :: slip(:), rake(:)
-   real amp, moment, moment_reg, dt, value1, er0, slip_reg, gnss_misfit, insar_misfit
+   real amp, moment, moment_reg, dt, value1, er0, slip_reg, gnss_misfit, imagery_misfit
    real :: delta_freq, delta_freq0, moment0, kahan_y, kahan_t, kahan_c
    integer :: i, segment, channel, isl, isr, ixs, iys, jf, k, subfault, subfault_seg 
    real*8 :: misfit2
-   logical :: static, get_coeff, insar
+   logical :: static, get_coeff, imagery
 
    do segment = 1, segments
       subfaults_segment(segment) = nys_sub(segment)*nxs_sub(segment)
    end do
    gnss_misfit = 0.0
-   insar_misfit = 0.0
+   imagery_misfit = 0.0
 !
 ! Compute synthetics given current fault model
 !
@@ -108,18 +108,18 @@ contains
    call slip_laplace(slip_reg)
  
    coef_gnss = 0.0
-   coef_insar = 0.0
-   insar_misfit0 = 0.0
+   coef_imagery = 0.0
+   imagery_misfit0 = 0.0
    if (static) call static_synthetic(slip, rake, gnss_misfit)
-   if (insar) then
+   if (imagery) then
       if (present(ramp)) then
-         call insar_synthetic(slip, rake, insar_misfit, ramp)
+         call imagery_synthetic(slip, rake, imagery_misfit, ramp)
       else
-         call insar_synthetic(slip, rake, insar_misfit)
+         call imagery_synthetic(slip, rake, imagery_misfit)
       endif
-      insar_misfit0 = insar_misfit
+      imagery_misfit0 = imagery_misfit
    endif
-   misfit2 = insar_misfit + gnss_misfit
+   misfit2 = imagery_misfit + gnss_misfit
 
    if (get_coeff) then
       coef_moment=smooth_moment*(misfit2 - current_value)
@@ -130,24 +130,24 @@ contains
 !      if (static) then       !! update!
 !         coef_gnss = misfit2/(gnss_misfit*amp)
 !      endif
-!      if (insar) then
-!         coef_insar = misfit2/(insar_misfit*amp)
+!      if (imagery) then
+!         coef_imagery = misfit2/(imagery_misfit*amp)
 !      endif
    endif
 
    value1 = misfit2 + coef_moment*moment_reg+coef_slip*slip_reg*amp
-!   value1 = value1+coef_gnss*gnss_misfit+coef_insar*insar_misfit
+!   value1 = value1+coef_gnss*gnss_misfit+coef_imagery*imagery_misfit
    write(*,'()')
    write(*,*)'averaged misfit error', misfit2
    write(*,*)'moment error', moment_reg
    write(*,*)'slip smoothness penalization', slip_reg
    if (static) write(*,*)'static data misfit', gnss_misfit
-   if (insar) write(*,*)'insar data misfit', insar_misfit
+   if (imagery) write(*,*)'imagery data misfit', imagery_misfit
    write(*,*)'total moment of the inversion', moment
    write(*,'(/A, F10.7)')'moment error coefficient', coef_moment
    write(*,*)'slip smoothness penalization coefficient', coef_slip
 !   if (static) write(*,*)'static data penalization coefficient', coef_gnss
-!   if (insar) write(*,*)'insar data penalization coefficient', coef_insar
+!   if (imagery) write(*,*)'imagery data penalization coefficient', coef_imagery
    write(*,'(/A, I4)')'Amount of variables: ', 5 * subfaults
 !   write(*,*)'Amount of data values: ', used_data
    current_value = value1
@@ -158,28 +158,28 @@ contains
    write(12,*)'moment error', moment_reg
    write(12,*)'slip smoothness penalization', slip_reg
    if (static) write(12,*)'static data misfit', gnss_misfit
-   if (insar) write(12,*)'insar data misfit', insar_misfit
+   if (imagery) write(12,*)'imagery data misfit', imagery_misfit
    write(12,*)'objective function value', value1
    write(12,*)'total moment of the inversion', moment
    write(12,'(/A, F10.7)')'moment error coefficient', coef_moment
    write(12,*)'slip smoothness penalization coefficient', coef_slip
 !   if (static) write(12,*)'static data penalization coefficient', coef_gnss
-!   if (insar) write(12,*)'insar data penalization coefficient', coef_insar
+!   if (imagery) write(12,*)'imagery data penalization coefficient', coef_imagery
    write(12,'(/A, I4)')'Amount of variables: ', 5 * subfaults
 !   write(12,*)'Amount of data values: ', used_data
    close(12)
    end subroutine print_static_summary
 
    
-   subroutine annealing_iter(slip, rake, t, static, insar, ramp)
+   subroutine annealing_iter(slip, rake, t, static, imagery, ramp)
 !
 !  Args:
 !  slip: array with model slip values for all subfaults
 !  rake: array with model rake values for all subfaults
 !  t: Current temperature of the annealing method
 !  static: True if static GNSS data used in modelling, False otherwise
-!  insar: True if insar data used in modelling, False otherwise
-!  ramp: Value of insar ramp, optional
+!  imagery: True if imagery data used in modelling, False otherwise
+!  ramp: Value of imagery ramp, optional
 !
    implicit none
    integer isl, isr, n_subfault(max_subfaults), n_accept, &
@@ -187,7 +187,7 @@ contains
    & ixs, n_total, j
    real*8, optional :: ramp(:)
    real slip(:), rake(:), t, slip1, rake1, &
-   & diff, random0, aux, delta0, amp, moment_reg, value1, gnss_misfit, insar_misfit, &
+   & diff, random0, aux, delta0, amp, moment_reg, value1, gnss_misfit, imagery_misfit, &
    & moment, slip0, rake0, slip_reg, kahan_y, kahan_c, kahan_t, &
    & time_reg, moment0, &
    & slip_beg, slip_max, slip_end, angle_beg, angle_end, angle_max
@@ -195,11 +195,11 @@ contains
    real*8 :: ramp0(36), ramp1(36)
    real*8 :: omega, misfit2, ex
    real :: delta_freq, delta_freq0!, ex
-   logical :: static, insar
+   logical :: static, imagery
 !
    value1 = 0.0
    gnss_misfit = 0.0
-   insar_misfit = 0.0
+   imagery_misfit = 0.0
 !
 !  ++++++++++++++++++++++++++++++++++++++++++++++++++++
 !  Here, we compute the value of the objective function, 
@@ -208,14 +208,14 @@ contains
    subfault = 0
 
    if (static) call static_synthetic(slip, rake, gnss_misfit)
-   if (insar) then
+   if (imagery) then
       if (present(ramp)) then
-         call insar_synthetic(slip, rake, insar_misfit, ramp)
+         call imagery_synthetic(slip, rake, imagery_misfit, ramp)
       else
-         call insar_synthetic(slip, rake, insar_misfit)
+         call imagery_synthetic(slip, rake, imagery_misfit)
       endif
    endif
-   misfit2 = insar_misfit + gnss_misfit
+   misfit2 = imagery_misfit + gnss_misfit
    moment0 = 0.0
    kahan_y = 0.0
    kahan_t = 0.0
@@ -273,7 +273,7 @@ contains
 !  make up unchange graph
 !
       if (static) call static_remove_subfault(slip0, rake0, subfault)
-      if (insar) call insar_remove_subfault(slip0, rake0, subfault)
+      if (imagery) call imagery_remove_subfault(slip0, rake0, subfault)
       kahan_y = -slip(subfault)*shear(subfault)-kahan_c 
       kahan_t = moment0+kahan_y
       kahan_c = (kahan_t-moment0)-kahan_y
@@ -332,16 +332,16 @@ contains
 !         moment_reg = (moment/moment_input)
          amp = 1.0
          if (static) call static_modify_subfault(slip1, rake1, subfault, gnss_misfit)
-         if (insar) call insar_modify_subfault(slip1, rake1, subfault, insar_misfit)
+         if (imagery) call imagery_modify_subfault(slip1, rake1, subfault, imagery_misfit)
          call modify_slip_field(subfault, slip1, rake1)
          call slip_laplace(slip_reg)
 
          misfit2 = 0.d0
          if (static) misfit2 = misfit2 + gnss_misfit
-         if (insar) misfit2 = misfit2 + insar_misfit
-!         misfit2 = insar_misfit + gnss_misfit
+         if (imagery) misfit2 = misfit2 + imagery_misfit
+!         misfit2 = imagery_misfit + gnss_misfit
          value1 = misfit2 + moment_reg*coef_moment+amp*slip_reg*coef_slip
-!         value1 = value1+coef_gnss*gnss_misfit+coef_insar*insar_misfit
+!         value1 = value1+coef_gnss*gnss_misfit+coef_imagery*imagery_misfit
          moment0 = moment0-slip1*shear(subfault)
          diff = value1-current_value
 !  
@@ -352,7 +352,7 @@ contains
          aux = exp(-diff/t)
          if (aux .gt. random0) then
             current_value = value1
-            insar_misfit0 = insar_misfit
+            imagery_misfit0 = imagery_misfit
             slip(subfault) = slip1
             rake(subfault) = rake1
             n_accept = n_accept+1
@@ -375,15 +375,15 @@ contains
       rake0 = rake(subfault)
       call modify_slip_field(subfault, slip0, rake0)
       if (static) call static_add_subfault(slip0, rake0, subfault)
-      if (insar) call insar_add_subfault(slip0, rake0, subfault)
+      if (imagery) call imagery_add_subfault(slip0, rake0, subfault)
    end do
 
 !
-! For insar, now we add ramp perturbation
+! For imagery, now we add ramp perturbation
 !
-   if (insar) then
+   if (imagery) then
       if (present(ramp)) then 
-         call insar_remove_ramp(ramp)
+         call imagery_remove_ramp(ramp)
          n_accept = 0
 !
 !  ramp parameters extreme values
@@ -409,8 +409,8 @@ contains
                ramp1(j) = ramp_use
             end do
             
-            call insar_modify_ramp(ramp1, insar_misfit)
-            diff = insar_misfit-insar_misfit0
+            call imagery_modify_ramp(ramp1, imagery_misfit)
+            diff = imagery_misfit-imagery_misfit0
 !  
 !  Now, we update the ramp.
 ! 
@@ -418,8 +418,8 @@ contains
             random0 = ran1()
             aux = exp(-diff/t)
             if (aux .gt. random0) then
-               current_value = current_value + (insar_misfit - insar_misfit0)
-               insar_misfit0 = insar_misfit
+               current_value = current_value + (imagery_misfit - imagery_misfit0)
+               imagery_misfit0 = imagery_misfit
                ramp(:) = ramp1(:)
                n_accept = n_accept+1
             else
@@ -432,7 +432,7 @@ contains
 !  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 !  finish the perturbation of ramp
 !
-         call insar_add_ramp(ramp)
+         call imagery_add_ramp(ramp)
       end if
    end if
 

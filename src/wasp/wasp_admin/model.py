@@ -89,12 +89,12 @@ def run(
     qcmt_tensor_file: pathlib.Path = typer.Option(
         None, "-q", "--qcmt", help="Path to the QuakeML moment tensor file"
     ),
-    insar_ascending: pathlib.Path = typer.Option(
-        None, "-ina", "--insar-ascending", help="Path to an ascending insar file"
+    imagery_file: pathlib.Path = typer.Option(
+        None, "-im", "--imagery-info", help="Path, ramp of  imagery file"
     ),
-    insar_descending: pathlib.Path = typer.Option(
-        None, "-ind", "--insar-descending", help="Path to an descending insar file"
-    ),
+#    imagery_descending: pathlib.Path = typer.Option(
+#        None, "-ind", "--imagery-descending", help="Path to an descending imagery file"
+#    ),
     max_slip: float = typer.Option(
         None,
         "-m",
@@ -130,9 +130,9 @@ def run(
     chosen_data_types: List[str]
     chosen_data_types = [d.value for d in data_types]
     if (
-        insar_ascending is not None or insar_descending is not None
-    ) and "insar" not in data_types:
-        chosen_data_types += ["insar"]
+        imagery_file is not None
+    ) and "imagery" not in data_types:
+        chosen_data_types += ["imagery"]
 
     # Set and validate files
     paths_to_validate = []
@@ -150,10 +150,10 @@ def run(
             )
         tensor_file = gcmt_tensor_file or qcmt_tensor_file
     paths_to_validate += [tensor_file]
-    if insar_ascending is not None:
-        paths_to_validate += [insar_ascending]
-    if insar_descending is not None:
-        paths_to_validate += [insar_descending]
+    if imagery_file is not None:
+        paths_to_validate += [imagery_file]
+#    if imagery_descending is not None:
+#        paths_to_validate += [imagery_descending]
     if velocity_model_file is not None:
         paths_to_validate += [velocity_model_file]
     if modelling_routine != ModellingRoutine.auto_model:
@@ -268,12 +268,12 @@ def run_multiple(
     qcmt_tensor_file: pathlib.Path = typer.Option(
         None, "-q", "--qcmt", help="Path to the QuakeML moment tensor file"
     ),
-    insar_ascending: pathlib.Path = typer.Option(
-        None, "-ina", "--insar-ascending", help="Path to an ascending insar file"
+    imagery_file: pathlib.Path = typer.Option(
+        None, "-im", "--imagery-file", help="Path, ramp of an imagery file"
     ),
-    insar_descending: pathlib.Path = typer.Option(
-        None, "-ind", "--insar-descending", help="Path to an descending insar file"
-    ),
+#    imagery_descending: pathlib.Path = typer.Option(
+#        None, "-ind", "--imagery-descending", help="Path to an descending imagery file"
+#    ),
     rupture_velocities: List[float] = typer.Option(
         [],
         "-vr",
@@ -301,9 +301,9 @@ def run_multiple(
     chosen_data_types: List[str]
     chosen_data_types = [d.value for d in data_types]
     if (
-        insar_ascending is not None or insar_descending is not None
-    ) and "insar" not in data_types:
-        chosen_data_types += ["insar"]
+        imagery_file is not None
+    ) and "imagery" not in data_types:
+        chosen_data_types += ["imagery"]
 
     # Set and validate files
     paths_to_validate: list[pathlib.Path] = []
@@ -313,10 +313,10 @@ def run_multiple(
         raise ValueError("Either gcmt_tensor_file or qcmt_tensor_file must be defined.")
     tensor_file = gcmt_tensor_file or qcmt_tensor_file
     paths_to_validate += [tensor_file]
-    if insar_ascending is not None:
-        paths_to_validate += [insar_ascending]
-    if insar_descending is not None:
-        paths_to_validate += [insar_descending]
+    if imagery_file is not None:
+        paths_to_validate += [imagery_file]
+#    if imagery_descending is not None:
+#        paths_to_validate += [imagery_descending]
     if velocity_model_file is not None:
         paths_to_validate += velocity_model_file
     tensor_info = get_tensor(cmt_file=gcmt_tensor_file or qcmt_tensor_file)
