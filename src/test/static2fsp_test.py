@@ -81,8 +81,8 @@ def test_static_to_fsp_multi_segment():
             tempdir / "strong_motion_waves.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "cgps_waves.json",
-            tempdir / "cgps_waves.json",
+            RESULTS_DIR / "NP1" / "cgnss_waves.json",
+            tempdir / "cgnss_waves.json",
         )
         shutil.copyfile(
             RESULTS_DIR / "NP1" / "static_data.json",
@@ -111,7 +111,7 @@ def test_static_to_fsp_multi_segment():
         static_to_fsp(
             get_tensor_info(),
             segments,
-            ["cgps", "gps", "insar", "strong", "surf", "body"],
+            ["cgnss", "gnss", "insar", "strong", "surf", "body"],
             get_velmodel_data(),
             solution,
             tempdir,
