@@ -96,7 +96,7 @@ def gf_retrieve(
         logger5 = ml.create_log("Imagery_GF", directory / "logs" / "green_imagery_log")
         logger5.addHandler(ch)
         p5 = subprocess.Popen(
-            [green_fun_gps, "imagery", f"{str(directory)}/"],
+            [green_fun_gnss, "imagery", f"{str(directory)}/"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
