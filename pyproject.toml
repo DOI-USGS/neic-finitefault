@@ -12,7 +12,7 @@ authors = [
   {name = "Heather Hunsinger", email = "hhunsinger@usgs.gov"},
   {name = "Diego Melgar", email = "dmelgarm@uoregon.edu"},
   {name = "Sebastian Riquelme", email = "sebastian@dgf.uchile.cl"},
-  {name = "William Yeck", email "wyeck@usgs.gov"},
+  {name = "William Yeck", email = "wyeck@usgs.gov"},
   {name = "Kirstie Haynie", email = "khaynie@usgs.gov"}
 ]
 maintainers = [
