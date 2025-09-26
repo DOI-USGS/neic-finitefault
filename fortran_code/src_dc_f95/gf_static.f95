@@ -38,7 +38,7 @@ program gf_static
    real :: kahan_y(6, max_stk_subfaults), kahan_t(6, max_stk_subfaults), kahan_c(6, max_stk_subfaults)
    real c_depth
    integer io_seg
-   logical :: disp, gnss, insar
+   logical :: disp, gnss, imagery
    allocate(fau_mod(7, max_stk_psources, max_dip_psources, max_stk_subfaults, max_dip_subfaults, max_seg))
 !   allocate(green_dip(3, max_stk_subfaults, max_dip_subfaults, max_seg, 1000))
 !   allocate(green_stk(3, max_stk_subfaults, max_dip_subfaults, max_seg, 1000))
@@ -46,11 +46,11 @@ program gf_static
    call getarg(1, input)
    call getarg(2, directory)
    gnss = (input.eq.'gnss')
-   insar = (input.eq.'insar')
+   imagery = (input.eq.'imagery')
    if (gnss) filename = trim(directory)//'static_data.txt'
-   if (insar) filename = trim(directory)//'insar_data.txt'
+   if (imagery) filename = trim(directory)//'imagery_data.txt'
    if (gnss) filename2 = trim(directory)//'Green_static_subfault.txt'
-   if (insar) filename2 = trim(directory)//'Insar_static_subfault.txt'
+   if (imagery) filename2 = trim(directory)//'Insar_static_subfault.txt'
    
    disp = .False.
 !

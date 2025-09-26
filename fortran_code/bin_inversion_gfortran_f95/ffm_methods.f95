@@ -13,9 +13,9 @@ module ffm_methods
                     &   saveforward_set_data_properties
    use rise_time, only : get_source_fun, deallocate_source
    use static_data, only : initial_gnss, staticdata_set_fault_parameters
-   use insar_data, only : initial_insar, get_insar_gf, deallocate_insar_gf, &
-                    &   get_insar_data, is_ramp, initial_ramp, &
-                    &   insardata_set_fault_parameters
+   use imagery_data, only : initial_imagery, get_imagery_gf, deallocate_imagery_gf, &
+                    &   get_imagery_data, is_ramp, initial_ramp, &
+                    &   imagerydata_set_fault_parameters
    use annealing, only : initial_model, print_summary, print_summary2, &
                     &   annealing_iter3, annealing_iter4, n_threads, &
                     &   annealing_iter5, annealing_iter6, &
@@ -68,18 +68,18 @@ contains
    end subroutine check_waveforms
 
 
-   subroutine check_static(static, insar, use_static)
+   subroutine check_static(static, imagery, use_static)
 !
 !  Args:
 !  static: True if static GNSS data used in modelling, False otherwise
-!  insar: True if insar data used in modelling, False otherwise
+!  imagery: True if imagery data used in modelling, False otherwise
 !  use_static: True if some static data used in modelling, False otherwise
 !
    implicit none
-   logical :: static, insar, use_static
+   logical :: static, imagery, use_static
    use_static = .False.
    if (static) use_static = .True.
-   if (insar) use_static = .True.
+   if (imagery) use_static = .True.
    end subroutine check_static
 
 
@@ -103,12 +103,12 @@ contains
    real :: slip(:), rake(:), rupt_time(:)
    real :: t_rise(:), t_fall(:)
    logical :: strong, cgnss, dart, body, surf
-   logical :: get_coeff, static, insar
+   logical :: get_coeff, static, imagery
    logical :: use_waveforms, many_events
    use_waveforms = .True.
    get_coeff = .True.
    static = .False.
-   insar = .False.
+   imagery = .False.
    call annealing_set_procedure_param()
    call retrievegf_set_fault_parameters()
    call annealing_set_fault_parameters()
@@ -131,10 +131,10 @@ contains
    if (many_events) then
       call annealing_set_events()
       call print_summary2(slip, rake, rupt_time, t_rise, t_fall, static, &
-        &  insar, get_coeff)
+        &  imagery, get_coeff)
    else
       call print_summary(slip, rake, rupt_time, t_rise, t_fall, static, &
-        &  insar, get_coeff)
+        &  imagery, get_coeff)
    endif
    write(*,*)'Start simmulated annealing...'
    do i = 1, n_iter
@@ -153,10 +153,10 @@ contains
    get_coeff = .False.
    if (many_events) then
       call print_summary2(slip, rake, rupt_time, t_rise, t_fall, static, &
-        &  insar, get_coeff)
+        &  imagery, get_coeff)
    else
       call print_summary(slip, rake, rupt_time, t_rise, t_fall, static, &
-        &  insar, get_coeff)
+        &  imagery, get_coeff)
    endif
    call write_forward(slip, rake, rupt_time, t_rise, t_fall, &
            &  strong, cgnss, body, surf, dart)
@@ -168,7 +168,7 @@ contains
    
 
    subroutine mixed_ffm(strong, cgnss, body, surf, dart, &
-       & static, insar, slip, rake, rupt_time, t_rise, t_fall, many_events)
+       & static, imagery, slip, rake, rupt_time, t_rise, t_fall, many_events)
 !
 !  Args:
 !  strong: True if strong motion data are used, False otherwise
@@ -177,7 +177,7 @@ contains
 !  surf: True if surface wave data are used, False otherwise
 !  dart: True if DART data are used, False otherwise
 !  static: True if static GNSS data used in modelling, False otherwise
-!  insar: True if insar data used in modelling, False otherwise
+!  imagery: True if imagery data used in modelling, False otherwise
 !  slip: array with model slip values for all subfaults
 !  rake: array with model rake values for all subfaults
 !  rupt_time: array with model rupture time values for all subfaults
@@ -189,7 +189,7 @@ contains
    real :: slip(:), rake(:), rupt_time(:)
    real :: t_rise(:), t_fall(:)
    logical :: static, strong, cgnss, dart, body, surf
-   logical :: get_coeff, insar, ramp_gf_file
+   logical :: get_coeff, imagery, ramp_gf_file
    logical :: use_waveforms, many_events
    use_waveforms = .True.
    ramp_gf_file = .False.
@@ -200,7 +200,7 @@ contains
    call annealingstatic_set_fault_properties()
    call saveforward_set_fault_parameters()
    call staticdata_set_fault_parameters()
-   call insardata_set_fault_parameters()
+   call imagerydata_set_fault_parameters()
    call fourier_coefs()
    call meyer_yamada()
    call get_data(strong, cgnss, body, surf, dart)
@@ -217,27 +217,27 @@ contains
    t = t_mid
    if (start_annealing .eq. 0) t = t0
    if (static) call initial_gnss(slip, rake, many_events)
-   if (insar) call get_insar_gf()
-   if (insar) call get_insar_data()
-   if (insar) call is_ramp(ramp_gf_file)
+   if (imagery) call get_imagery_gf()
+   if (imagery) call get_imagery_data()
+   if (imagery) call is_ramp(ramp_gf_file)
    if (ramp_gf_file .eqv. .False.) then
-      if (insar) call initial_insar(slip, rake)
+      if (imagery) call initial_imagery(slip, rake)
       if (many_events) then
          call annealing_set_events()
          call print_summary2(slip, rake, rupt_time, t_rise, t_fall, static, &
-          &  insar, get_coeff)
+          &  imagery, get_coeff)
       else
          call print_summary(slip, rake, rupt_time, t_rise, t_fall, static, &
-          &  insar, get_coeff)
+          &  imagery, get_coeff)
       endif
       write(*,*)'Start simmulated annealing...'
       do i = 1, n_iter
          if (many_events) then
             call annealing_iter6(slip, rake, rupt_time, t_rise, &
-            & t_fall, t, static, insar)
+            & t_fall, t, static, imagery)
          else
             call annealing_iter4(slip, rake, rupt_time, t_rise, t_fall, &
-            &  t, static, insar)
+            &  t, static, imagery)
          endif
          write(*,*)'iter: ', i
          if (t .lt. t_stop) then
@@ -249,30 +249,30 @@ contains
       get_coeff = .False.
       if (many_events) then
          call print_summary2(slip, rake, rupt_time, t_rise, t_fall, static, &
-          &  insar, get_coeff)
+          &  imagery, get_coeff)
       else
          call print_summary(slip, rake, rupt_time, t_rise, t_fall, static, &
-          &  insar, get_coeff)
+          &  imagery, get_coeff)
       endif
-      if (insar) call initial_insar(slip, rake)
+      if (imagery) call initial_imagery(slip, rake)
    else
       call initial_ramp(ramp) 
-      call initial_insar(slip, rake, ramp)
+      call initial_imagery(slip, rake, ramp)
       if (many_events) then
          call print_summary2(slip, rake, rupt_time, t_rise, t_fall, static, &
-          &  insar, get_coeff, ramp)
+          &  imagery, get_coeff, ramp)
       else
          call print_summary(slip, rake, rupt_time, t_rise, t_fall, static, &
-          &  insar, get_coeff, ramp)
+          &  imagery, get_coeff, ramp)
       endif
       write(*,*)'Start simmulated annealing...'
       do i = 1, n_iter
          if (many_events) then
             call annealing_iter6(slip, rake, rupt_time, t_rise, t_fall, &
-            &  t, static, insar, ramp)
+            &  t, static, imagery, ramp)
          else
             call annealing_iter4(slip, rake, rupt_time, t_rise, t_fall, &
-            &  t, static, insar, ramp)
+            &  t, static, imagery, ramp)
          endif
          write(*,*)'iter: ', i
          if (t .lt. t_stop) then
@@ -284,12 +284,12 @@ contains
       get_coeff = .False.
       if (many_events) then
          call print_summary2(slip, rake, rupt_time, t_rise, t_fall, static, &
-          &  insar, get_coeff, ramp)
+          &  imagery, get_coeff, ramp)
       else
          call print_summary(slip, rake, rupt_time, t_rise, t_fall, static, &
-          &  insar, get_coeff, ramp)
+          &  imagery, get_coeff, ramp)
       endif
-      call initial_insar(slip, rake, ramp)
+      call initial_imagery(slip, rake, ramp)
    end if
    call write_forward(slip, rake, rupt_time, t_rise, t_fall, &
         &  strong, cgnss, body, surf, dart)
@@ -298,22 +298,22 @@ contains
    call deallocate_source()
    call deallocate_forward()
    call deallocate_gf()
-   if (insar) call deallocate_insar_gf()
+   if (imagery) call deallocate_imagery_gf()
    end subroutine mixed_ffm
 
 
-   subroutine static_ffm(slip, rake, static, insar, many_events)
+   subroutine static_ffm(slip, rake, static, imagery, many_events)
 !
 !  Args:
 !  slip: array with model slip values for all subfaults
 !  rake: array with model rake values for all subfaults
 !  static: True if static GNSS data used in modelling, False otherwise
-!  insar: True if insar data used in modelling, False otherwise
+!  imagery: True if imagery data used in modelling, False otherwise
 !  many_events: True if more than one event to be modelled, False otherwise
 !
    implicit none
    real :: slip(:), rake(:)
-   logical :: static, get_coeff, insar, ramp_gf_file
+   logical :: static, get_coeff, imagery, ramp_gf_file
    logical :: use_waveforms, many_events
    use_waveforms = .False.
    get_coeff = .True.
@@ -323,19 +323,19 @@ contains
    call annealingstatic_set_fault_properties()
    call initial_model(slip, rake, rupt_time0, t_rise0, t_fall0)
    call staticdata_set_fault_parameters()
-   call insardata_set_fault_parameters()
+   call imagerydata_set_fault_parameters()
    t = t_mid
    if (start_annealing .eq. 0) t = t0
    if (static) call initial_gnss(slip, rake, many_events)
-   if (insar) call get_insar_gf()
-   if (insar) call get_insar_data()
-   if (insar) call is_ramp(ramp_gf_file)
+   if (imagery) call get_imagery_gf()
+   if (imagery) call get_imagery_data()
+   if (imagery) call is_ramp(ramp_gf_file)
    if (ramp_gf_file .eqv. .False.) then
-      if (insar) call initial_insar(slip, rake)
-      call print_static_summary(slip, rake, static, insar, get_coeff)
+      if (imagery) call initial_imagery(slip, rake)
+      call print_static_summary(slip, rake, static, imagery, get_coeff)
       write(*,*)'Start simmulated annealing...'
       do i = 1, n_iter
-         call annealing_iter(slip, rake, t, static, insar)
+         call annealing_iter(slip, rake, t, static, imagery)
          write(*,*)'iter: ', i
          if (t .lt. t_stop) then
             t = t*0.995
@@ -344,15 +344,15 @@ contains
          end if
       end do
       get_coeff = .False.
-      call print_static_summary(slip, rake, static, insar, get_coeff)
-      if (insar) call initial_insar(slip, rake)
+      call print_static_summary(slip, rake, static, imagery, get_coeff)
+      if (imagery) call initial_imagery(slip, rake)
    else
       call initial_ramp(ramp) 
-      call initial_insar(slip, rake, ramp)
-      call print_static_summary(slip, rake, static, insar, get_coeff, ramp)
+      call initial_imagery(slip, rake, ramp)
+      call print_static_summary(slip, rake, static, imagery, get_coeff, ramp)
       write(*,*)'Start simmulated annealing...'
       do i = 1, n_iter
-         call annealing_iter(slip, rake, t, static, insar, ramp)
+         call annealing_iter(slip, rake, t, static, imagery, ramp)
          write(*,*)'iter: ', i
          if (t .lt. t_stop) then
             t = t*0.995
@@ -361,12 +361,12 @@ contains
          end if
       end do
       get_coeff = .False.
-      call print_static_summary(slip, rake, static, insar, get_coeff, ramp)
-      call initial_insar(slip, rake, ramp)
+      call print_static_summary(slip, rake, static, imagery, get_coeff, ramp)
+      call initial_imagery(slip, rake, ramp)
    end if
    if (static) call initial_gnss(slip, rake, many_events)
    call write_model(slip, rake, rupt_time0, t_rise0, t_fall0, use_waveforms)
-   if (insar) call deallocate_insar_gf()
+   if (imagery) call deallocate_imagery_gf()
    end subroutine static_ffm
 
 

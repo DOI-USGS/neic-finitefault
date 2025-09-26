@@ -939,16 +939,16 @@ def PlotMap(
     return
 
 
-def PlotInsar(
+def PlotImagery(
     tensor_info: dict,
     segments: List[dict],
     point_sources: list,
     default_dirs: dict,
-    insar_points: List[dict],
-    los: str = "ascending",
+    imagery_points: List[dict],
+    datafile: str,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
-    """Compare insar data with insar produced by the inverted earthquake model
+    """Compare imagery data with imagery produced by the inverted earthquake model
 
     :param tensor_info: The tensor information
     :type tensor_info: dict
@@ -958,10 +958,10 @@ def PlotInsar(
     :type point_sources: list
     :param default_dirs: The location of default directories
     :type default_dirs: dict
-    :param insar_points: List of insar data
-    :type insar_points: List[dict]
-    :param los: The direction of the path, defaults to "ascending"
-    :type los: str, optional
+    :param imagery_points: List of imagery data
+    :type imagery_points: List[dict]
+    :param scene: The filename of the reampled imagery data
+    :type scene: str, optional
     :param directory: The location where plots should be written, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     """
@@ -1013,15 +1013,15 @@ def PlotInsar(
 
     max_diff = -1
     min_diff = 1
-    lats = [point["lat"] for point in insar_points]
-    lons = [point["lon"] for point in insar_points]
+    lats = [point["lat"] for point in imagery_points]
+    lons = [point["lon"] for point in imagery_points]
     min_lat = min(min_lat, np.min(lats))
     max_lat = max(max_lat, np.max(lats))
     min_lon = min(min_lon, np.min(lons))
     max_lon = max(max_lon, np.max(lons))
-    observed = [point["observed"] for point in insar_points]
-    synthetic = [point["synthetic"] for point in insar_points]
-    ramp = [point["ramp"] for point in insar_points]
+    observed = [point["observed"] for point in imagery_points]
+    synthetic = [point["synthetic"] for point in imagery_points]
+    ramp = [point["ramp"] for point in imagery_points]
     diffs = [obs - syn for obs, syn in zip(observed, synthetic)]
     obs_no_ramp = [obs - ramp for obs, ramp in zip(observed, ramp)]
     syn_no_ramp = [syn - ramp for syn, ramp in zip(synthetic, ramp)]
@@ -1077,7 +1077,7 @@ def PlotInsar(
         ax.set_aspect("auto", adjustable=None)
 
     fig.tight_layout()
-    plt.savefig(directory / "Insar_{}_fit.png".format(los), bbox_inches="tight")
+    plt.savefig(directory / "Imagery_{}_fit.png".format(datafile), bbox_inches="tight")
     plt.close()
     return
 

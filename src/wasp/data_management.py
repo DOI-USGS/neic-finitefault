@@ -620,85 +620,55 @@ def static_data(
     return info_traces
 
 
-def insar_data(
-    insar_asc: Optional[List[Union[pathlib.Path, str]]] = None,
-    insar_desc: Optional[List[Union[pathlib.Path, str]]] = None,
-    ramp_asc: Optional[List[Union[str, None]]] = None,
-    ramp_desc: Optional[List[Union[str, None]]] = None,
+def imagery_data(
+    imagery_files: Optional[List[Union[pathlib.Path]]] = None,
+    ramp_types: Optional[List[Union[str, None]]] = None,
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> dict:
-    """Write json dictionary with properties for InSar data
+    """Write json dictionary with properties for imagery data
 
-    :param insar_asc: The paths to ascending InSar files, defaults to None
-    :type insar_asc: Optional[List[Union[pathlib.Path, str]]], optional
-    :param insar_desc: The paths to descending InSar files, defaults to None
-    :type insar_desc: Optional[List[Union[pathlib.Path, str]]], optional
-    :param ramp_asc: The ascending ramp options, defaults to None
-    :type ramp_asc: Optional[List[Union[str, None]]], optional
-    :param ramp_desc: The descending ramp options, defaults to None
-    :type ramp_desc: Optional[List[Union[str, None]]], optional
+    :param imagery_files: The paths to imagery files, defaults to None
+    :type imagery_files: Optional[List[Union[pathlib.Path, str]]], optional
+    :param ramp_types: The ramp options, defaults to None
+    :type ramp_types: Optional[List[Union[str, None]]], optional
     :param directory: The directory where the data is located, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
-    :raises ValueError: If the length of ascending ramps and files are different
-    :raises ValueError: If the length of descending ramps and files are different
-    :return: The InSar properties written to cgnss_waves.json
+    :raises ValueError: If the length of ramps, files, and descriptions are different
+    :return: The imagery properties written to imagery_data.json
     :rtype: List[dict]
     """
     directory = pathlib.Path(directory)
-    print("InSAR data")
-    print(f"insar_asc: {insar_asc}")
-    print(f"insar_desc: {insar_desc}")
-    if not insar_asc and not insar_desc:
+    if not imagery_files:
         return {}
 
-    insar_dict = {}
-    if insar_asc:
-        if not ramp_asc or len(ramp_asc) == 0 or ramp_asc == None:
-            ramp_asc = [None] * len(insar_asc)
-        if not len(ramp_asc) == len(insar_asc):
+    imagery_dict = {}
+    if imagery_files:
+        if not ramp_types or len(ramp_types) == 0 or ramp_types == None:
+            ramp_types = [None] * len(imagery_files)
+        if not len(ramp_types) == len(imagery_files):
             raise ValueError(
-                "You need to input the same amount of input to"
-                + " both the amount of ascending tracks and their ramp-types"
+                "You need to input a ramp type (linear, bilinear, quadratic) for each imagery file"
             )
-        zipped = zip(insar_asc, ramp_asc)
-        properties: List[dict] = []
+        zipped = zip(imagery_files, ramp_types)
         for track, ramp in zipped:
+            filename_only = pathlib.Path(track).stem
             new_dict = {
                 "name": str(pathlib.Path(track).resolve()),
                 "weight": 1.0,
                 "ramp": ramp,
             }
-            properties = properties + [new_dict]
-        insar_dict["ascending"] = properties
+            imagery_dict[filename_only] = [new_dict]
 
-    if insar_desc:
-        if not ramp_desc or len(ramp_desc) == 0 or ramp_desc == None:
-            ramp_desc = [None] * len(insar_desc)
-        if not len(ramp_desc) == len(insar_desc):
-            raise ValueError(
-                "You need to input the same amount of input to"
-                + " both the amount of descending tracks and their ramp-types"
-            )
-        zipped = zip(insar_desc, ramp_desc)
-        properties = []
-        for track, ramp in zipped:
-            new_dict = {
-                "name": str(pathlib.Path(track).resolve()),
-                "weight": 1.0,
-                "ramp": ramp,
-            }
-            properties = properties + [new_dict]
-        insar_dict["descending"] = properties
-    with open(directory / "insar_data.json", "w") as f:
+    with open(directory / "imagery_data.json", "w") as f:
         json.dump(
-            insar_dict,
+            imagery_dict,
             f,
             sort_keys=True,
             indent=4,
             separators=(",", ": "),
             ensure_ascii=False,
         )
-    return insar_dict
+    return imagery_dict
 
 
 def select_tele_stations(
@@ -876,10 +846,8 @@ def filling_data_dicts(
     data_types: List[str],
     data_prop: dict,
     data_folder: Union[pathlib.Path, str],
-    insar_asc: Optional[List[Union[pathlib.Path, str]]] = None,
-    insar_desc: Optional[List[Union[pathlib.Path, str]]] = None,
-    ramp_asc: Optional[List[Union[str, None]]] = None,
-    ramp_desc: Optional[List[Union[str, None]]] = None,
+    imagery_files: Optional[List[Union[pathlib.Path]]] = None,
+    ramp_types: Optional[List[Union[str, None]]] = None,
     working_directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """Routine to fill JSON dictionaries containing data properties, for all
@@ -894,14 +862,10 @@ def filling_data_dicts(
     :param data_folder: The path to the folder where the data exists and property
                         files should be written
     :type data_folder: Union[pathlib.Path, str]
-    :param insar_asc: List , defaults to None
-    :param insar_asc: The paths to ascending InSar files, defaults to None
-    :type insar_asc: Optional[List[Union[pathlib.Path, str]]], optional
-    :param insar_desc: The paths to descending InSar files, defaults to None
-    :type insar_desc: Optional[List[Union[str, None]]], optional
-    :param ramp_asc: The ascending ramp options, defaults to None
-    :type ramp_asc: Optional[List[Union[str, None]]], optional
-    :param ramp_desc: The descending ramp options, defaults to None
+    :param imagery_files: The paths to imagery files, defaults to None
+    :type imagery_files: Optional[List[Union[pathlib.Path]]], optional
+    :param ramp_types: The imagery ramp options, defaults to None
+    :type ramp_types: Optional[List[Union[str, None]]], optional
     :param working_directory: The working directory, defaults to pathlib.Path()
     :type working_directory: Union[pathlib.Path, str], optional
 
@@ -970,12 +934,10 @@ def filling_data_dicts(
             )
     if "gnss" in data_types:
         static_data(tensor_info, unit="m", directory=working_directory)
-    if "insar" in data_types:
-        insar_data(
-            insar_asc=insar_asc,
-            insar_desc=insar_desc,
-            ramp_asc=ramp_asc,
-            ramp_desc=ramp_desc,
+    if "imagery" in data_types:
+        imagery_data(
+            imagery_files=imagery_files,
+            ramp_types=ramp_types,
             directory=working_directory,
         )
 

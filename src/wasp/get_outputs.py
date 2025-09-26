@@ -260,7 +260,6 @@ def synthetics_to_SAC(
         fwd_directory = directory / "forward_model/BODY"
         if not fwd_directory.exists():
             os.mkdir(fwd_directory)
-        print(directory / "tele_waves.json")
         if not (directory / "tele_waves.json").exists():
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), "tele_waves.json"
@@ -536,50 +535,48 @@ def retrieve_gnss(
     return names, lats, lons, observed, synthetic, error
 
 
-def get_insar(data_dir: Union[str, pathlib.Path] = pathlib.Path()) -> dict:
+def get_imagery(data_dir: Union[str, pathlib.Path] = pathlib.Path()) -> dict:
     """_summary_
 
     :param data_dir: The path to the data directory, defaults to pathlib.Path()
     :type data_dir: Union[str, pathlib.Path], optional
-    :return: The insar data
+    :return: The imagery data
     :rtype: dict
     """
     data_dir = pathlib.Path(data_dir)
-    insar_file = data_dir / "insar_data.json"
-    with open(insar_file, "r") as f:
-        insar_data = json.load(f)
-    insar_synthetics_file = data_dir / "insar_synthetics.txt"
-    with open(insar_synthetics_file, "r") as syn_file:
+    imagery_file = data_dir / "imagery_data.json"
+    with open(imagery_file, "r") as f:
+        imagery_data = json.load(f)
+    imagery_synthetics_file = data_dir / "imagery_synthetics.txt"
+    with open(imagery_synthetics_file, "r") as syn_file:
         lines_syn = [line.split() for line in syn_file]
 
     lines_ramp: list = []
     ramps: list = []
     lines0 = 0
     lines1 = 1
-    if "ascending" in insar_data:
-        asc_properties = insar_data["ascending"]
-        ramps = [asc_property["ramp"] for asc_property in asc_properties]
-    if "descending" in insar_data:
-        desc_properties = insar_data["descending"]
-        ramps = ramps + [desc_property["ramp"] for desc_property in desc_properties]
+    for key, items in imagery_data.items():
+        for item in range(len(items)):
+            track = imagery_data[key][item]["name"]
+            ramp = imagery_data[key][item]["ramp"]
+            ramps = ramps + [ramp]
     lines_ramp = []
     if any(ramps):
-        with open(data_dir / "insar_ramp.txt", "r") as ramp_file:
+        with open(data_dir / "imagery_ramp.txt", "r") as ramp_file:
             lines_ramp = [line.split() for line in ramp_file]
-    if "ascending" in insar_data:
-        asc_properties = insar_data["ascending"]
-        for asc_property in asc_properties:
-            insar_points: list = []
-            insar_asc = asc_property["name"]
-            ramp_asc = asc_property["ramp"]
-            with open(insar_asc, "r") as asc_file:
-                lines_asc = [line.split() for line in asc_file]
-            lines_asc = [line for line in lines_asc if not "#" in "".join(line)]
-            lines1 = lines0 + len(lines_asc)
-            ramp_track = [[0] * 5] * len(lines_asc)
-            if ramp_asc:
+    for key, items in imagery_data.items():
+        for item in range(len(items)):
+            imagery_points: list = []
+            imagery_file = imagery_data[key][item]["name"]
+            imagery_ramp = imagery_data[key][item]["ramp"]
+            with open(imagery_file, "r") as im_file:
+                lines_im = [line.split() for line in im_file]
+            lines_im = [line for line in lines_im if not "#" in "".join(line)]
+            lines1 = lines0 + len(lines_im)
+            ramp_track = [[0] * 5] * len(lines_im)
+            if any(ramps):
                 ramp_track = lines_ramp[lines0 + 1 : lines1]
-            zipped = zip(lines_asc[:], lines_syn[lines0 + 1 : lines1], ramp_track[:])
+            zipped = zip(lines_im[:], lines_syn[lines0 + 1 : lines1], ramp_track[:])
             for line1, line2, line3 in zipped:
                 lat = float(line1[1])
                 lon = float(line1[0])
@@ -593,40 +590,10 @@ def get_insar(data_dir: Union[str, pathlib.Path] = pathlib.Path()) -> dict:
                     "synthetic": synthetic,
                     "ramp": ramp,
                 }
-                insar_points = insar_points + [new_dict]
-            asc_property["points"] = insar_points
-            lines0 = lines0 + len(lines_asc)
-    if "descending" in insar_data:
-        desc_properties = insar_data["descending"]
-        for desc_property in desc_properties:
-            insar_points = []
-            insar_desc = desc_property["name"]
-            ramp_desc = desc_property["ramp"]
-            with open(insar_desc, "r") as desc_file:
-                lines_desc = [line.split() for line in desc_file]
-            lines_desc = [line for line in lines_desc if not "#" in "".join(line)]
-            lines1 = lines0 + len(lines_desc)
-            ramp_track = [[0] * 5] * len(lines_desc)
-            if ramp_desc:
-                ramp_track = lines_ramp[lines0 + 1 : lines1]
-            zipped = zip(lines_desc[:], lines_syn[lines0 + 1 : lines1], ramp_track[:])
-            for line1, line2, line3 in zipped:
-                lat = float(line1[1])
-                lon = float(line1[0])
-                observed = 100 * float(line1[2])
-                synthetic = float(line2[4])
-                ramp = float(line3[4])
-                new_dict = {
-                    "lat": lat,
-                    "lon": lon,
-                    "observed": observed,
-                    "synthetic": synthetic,
-                    "ramp": ramp,
-                }
-                insar_points = insar_points + [new_dict]
-            desc_property["points"] = insar_points
-            lines0 = lines0 + len(lines_desc)
-    return insar_data
+                imagery_points = imagery_points + [new_dict]
+            imagery_data[key][item]["points"] = imagery_points
+            lines0 = lines0 + len(lines_im)
+    return imagery_data
 
 
 def __is_number(value: str) -> bool:

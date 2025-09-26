@@ -14,7 +14,7 @@ from wasp.data_management import filling_data_dicts
 from wasp.fault_plane import create_finite_fault
 from wasp.get_outputs import read_solution_static_format, synthetics_to_SAC
 from wasp.input_files import (
-    input_chen_insar,
+    input_chen_imagery,
     input_chen_near_field,
     input_chen_static,
     input_chen_tele_body,
@@ -51,7 +51,7 @@ from .fileutils import validate_files
 app = typer.Typer(help="Manage WASP data, faults, and property files")
 
 
-VALID_INSAR_RAMPS = ["static", "bilinear", "linear", "quadratic"]
+VALID_Imagery_RAMPS = ["static", "bilinear", "linear", "quadratic"]
 
 
 def _get_correction(correction_string: str) -> Tuple[str, List[str], float]:
@@ -64,19 +64,19 @@ def _get_correction(correction_string: str) -> Tuple[str, List[str], float]:
     return station, channels, correction
 
 
-def _parse_insar(value: str) -> Tuple[pathlib.Path, Optional[str]]:
-    """Parse an insar file string in format <path>:<ramp>"""
+def _parse_imagery(value: str) -> Tuple[pathlib.Path, Optional[str]]:
+    """Parse an imagery file string in format <path>:<ramp>"""
     if ":" not in value:
         return pathlib.Path(value), None
     else:
         parts = value.split(":")
         filepath = pathlib.Path(parts[0])
         validate_files([filepath])
-        ramp = parts[-1]
-        if ramp not in VALID_INSAR_RAMPS:
+        ramp = parts[1]
+        if ramp not in VALID_Imagery_RAMPS:
             raise ValueError(
-                f"The insar ramp provided ({ramp}) is not valid. "
-                f"Must be one of {VALID_INSAR_RAMPS}."
+                f"The imagery ramp provided ({ramp}) is not valid. "
+                f"Must be one of {VALID_Imagery_RAMPS}."
             )
         return filepath, ramp
 
@@ -180,50 +180,30 @@ def fill_dicts(
         "--data-type",
         help=f"Type to add to the data_types list, default is []",
     ),
-    insar_ascending: List[str] = typer.Option(
+    imagery_files: List[str] = typer.Option(
         [],
-        "-ina",
-        "--insar-ascending",
-        help=("Path and ramp ascending insar file. " "Example: -ina <path>:<ramp>"),
-    ),
-    insar_descending: List[str] = typer.Option(
-        [],
-        "-ind",
-        "--insar-descending",
-        help=("Path and ramp descending insar file. " "Example: -ind <path>:<ramp>"),
+        "-im",
+        "--imagery-info",
+        help=("Path, ramp of imagery file. " "Example: -im <path>:<ramp>"),
     ),
 ):
     # set default data type
     chosen_data_types: List[str]
     chosen_data_types = [d.value for d in data_types]
-    if (
-        insar_ascending is not None or insar_descending is not None
-    ) and "insar" not in data_types:
-        chosen_data_types += ["insar"]
+    if (imagery_files is not None) and "imagery" not in data_types:
+        chosen_data_types += ["imagery"]
 
     # Parse files and ramps
-    insar_ascending_files: Optional[List[Union[str, pathlib.Path]]]
-    insar_descending_files: Optional[List[Union[str, pathlib.Path]]]
-    if not len(insar_ascending):
-        insar_ascending_files = None
-        insar_ascending_ramps = None
+    if not len(imagery_files):
+        imagery_filepath = None
+        imagery_ramps = None
     else:
-        insar_ascending_files = []
-        insar_ascending_ramps = []
-        for ia in insar_ascending:
-            filepath, ramp = _parse_insar(ia)
-            insar_ascending_files += [filepath]
-            insar_ascending_ramps += [ramp]
-    if not len(insar_descending):
-        insar_descending_files = None
-        insar_descending_ramps = None
-    else:
-        insar_descending_files = []
-        insar_descending_ramps = []
-        for id in insar_descending:
-            filepath, ramp = _parse_insar(id)
-            insar_descending_files += [filepath]
-            insar_descending_ramps += [ramp]
+        imagery_filepath = []
+        imagery_ramps = []
+        for ia in imagery_files:
+            filepath, ramp = _parse_imagery(ia)
+            imagery_filepath += [filepath]
+            imagery_ramps += [ramp]
 
     # validate files
     files_to_validate = []
@@ -249,10 +229,8 @@ def fill_dicts(
         chosen_data_types,
         data_prop,
         directory,
-        insar_asc=insar_ascending_files,
-        insar_desc=insar_descending_files,
-        ramp_asc=insar_ascending_ramps,
-        ramp_desc=insar_descending_ramps,
+        imagery_files=imagery_filepath,
+        ramp_types=imagery_ramps,
         working_directory=directory,
     )
 
@@ -297,7 +275,7 @@ def many_events(
         # validate files
         files_to_validate = []
         for d in chosen_data_types:
-            if d not in ["insar"]:
+            if d not in ["imagery"]:
                 files_to_validate += [event_folder / DEFAULT_MANAGEMENT_FILES[d]]
         sampling_filtering_file = event_folder / "sampling_filter.json"
         files_to_validate += [sampling_filtering_file.resolve()]
@@ -603,7 +581,7 @@ def static_to_srf(
     chosen_data_types: List[str]
     chosen_data_types = [d.value for d in data_types]
     for d in data_types:
-        if d not in ["insar", "gnss"]:
+        if d not in ["imagery", "gnss"]:
             validate_files([directory / DEFAULT_MANAGEMENT_FILES[d]])
 
     # get tensor information
@@ -683,7 +661,7 @@ def static_to_fsp(
     chosen_data_types: List[str]
     chosen_data_types = [d.value for d in data_types]
     for d in data_types:
-        if d not in ["insar", "gnss"]:
+        if d not in ["imagery", "gnss"]:
             validate_files([directory / DEFAULT_MANAGEMENT_FILES[d]])
 
     # get tensor information
@@ -875,9 +853,9 @@ def update_inputs(
     if "gnss" in chosen_data_types:
         validate_files([directory / "static_data.json"])
         input_chen_static(directory=directory)
-    if "insar" in chosen_data_types:
-        validate_files([directory / "insar_data.json"])
-        input_chen_insar(directory=directory)
+    if "imagery" in chosen_data_types:
+        validate_files([directory / "imagery_data.json"])
+        input_chen_imagery(directory=directory)
     if model_space:
         validate_files([directory / "model_space.json"])
         with open(directory / "model_space.json") as mf:

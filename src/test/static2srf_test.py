@@ -38,12 +38,12 @@ def test_static_to_srf():
             tempdir / "surf_waves.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "insar_data.json",
-            tempdir / "insar_data.json",
+            RESULTS_DIR / "NP1" / "imagery_data.json",
+            tempdir / "imagery_data.json",
         )
         shutil.copyfile(
-            RESULTS_DIR / "NP1" / "insar_data.txt",
-            tempdir / "insar_data.txt",
+            RESULTS_DIR / "NP1" / "imagery_data.txt",
+            tempdir / "imagery_data.txt",
         )
         segments = get_segments_data()
         solution = get_outputs.read_solution_static_format(
@@ -52,7 +52,7 @@ def test_static_to_srf():
         static_to_srf(
             get_tensor_info(),
             segments,
-            ["cgnss", "gnss", "insar", "strong", "surf", "body"],
+            ["cgnss", "gnss", "imagery", "strong", "surf", "body"],
             get_velmodel_data(),
             solution,
             directory=tempdir,
@@ -63,7 +63,7 @@ def test_static_to_srf():
         target = [
             "2.0\n",
             "#\n",
-            "# Data :\tBODY\tSURF\tSTRONG\tcGNSS\tGNSS\tInSAR\tDART\tTRIL\tLEVEL\tOTHER\n",
+            "# Data :\tBODY\tSURF\tSTRONG\tcGNSS\tGNSS\tIMAGERY\tDART\tTRIL\tLEVEL\tOTHER\n",
             "# NoS  :\t19\t19\t3\t3\t10\t2166\t0\t0\t0\t0\n",
             "# PHImx :\t186.81\t186.81\t246.51\t312.71\t183.06\t2\t0.00\t0.0\t0.0\t0.0\n",
             "# Rmin :\t40.80\t40.80\t1.11\t0.89\t0.36\t--\t0.00\t0.0\t0.0\t0.0\n",

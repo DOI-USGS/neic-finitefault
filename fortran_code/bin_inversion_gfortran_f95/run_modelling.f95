@@ -19,7 +19,7 @@ program run_modelling
    real :: t
    real*8 :: ramp(18)
    logical :: static, strong, cgnss, dart, body, surf, auto
-   logical :: insar, ramp_gf_file
+   logical :: imagery, ramp_gf_file
    logical :: use_waveforms, use_static, many_events
    integer :: int0, seed0, int1
    real :: real0, real1, real2, real3
@@ -27,7 +27,7 @@ program run_modelling
 
    write(*,'(/A/)')"CHEN-JI'S WAVELET KINEMATIC MODELLING METHOD"
    static = .False.
-   insar = .False.
+   imagery = .False.
    strong = .False.
    cgnss = .False.
    body = .False.
@@ -39,7 +39,7 @@ program run_modelling
       call getarg(i, input)
       input = trim(input)
       if (input .eq.'gnss') static = .True.
-      if (input .eq.'insar') insar = .True.
+      if (input .eq.'imagery') imagery = .True.
       if (input .eq.'strong') strong = .True.
       if (input .eq.'cgnss') cgnss = .True.
       if (input .eq.'body') body = .True.
@@ -49,7 +49,7 @@ program run_modelling
       if (input .eq.'many') many_events = .True.
    end do
    call check_waveforms(strong, cgnss, body, surf, dart, use_waveforms)
-   call check_static(static, insar, use_static)
+   call check_static(static, imagery, use_static)
    call n_threads(auto)
    call read_annealing_param()
    if (many_events) call moment_events()
@@ -68,10 +68,10 @@ program run_modelling
       call waveform_ffm(strong, cgnss, body, surf, dart, &
        & slip, rake, rupt_time, t_rise, t_fall, many_events)
    elseif ((use_static) .and. (use_waveforms .eqv. .False.)) then
-      call static_ffm(slip, rake, static, insar, many_events)
+      call static_ffm(slip, rake, static, imagery, many_events)
    elseif ((use_static) .and. (use_waveforms)) then
       call mixed_ffm(strong, cgnss, body, surf, dart, &
-       & static, insar, slip, rake, rupt_time, t_rise, t_fall, many_events)
+       & static, imagery, slip, rake, rupt_time, t_rise, t_fall, many_events)
    endif
    call deallocate_ps()
    write(*,'(/A/)')"END CHEN-JI'S WAVELET KINEMATIC MODELLING METHOD"
