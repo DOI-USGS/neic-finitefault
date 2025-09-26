@@ -483,7 +483,7 @@ contains
    if (time_reg .lt. 1.0e-9) time_reg = 1.0
  
    coef_gnss = 0.0
-   coef_magery = 0.0
+   coef_imagery = 0.0
    imagery_misfit0 = 0.0
    if (static) call static_synthetic(slip, rake, gnss_misfit)
    if (imagery) then
