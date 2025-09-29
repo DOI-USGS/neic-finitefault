@@ -28,6 +28,7 @@ config.ini
 # tutorial
 examples/*
 examples/.ipynb_checkpoints
+!examples/WISP_Tutorial.ipynb
 !examples/Tutorial_Figures
 !examples/Multisegment_Example
 
