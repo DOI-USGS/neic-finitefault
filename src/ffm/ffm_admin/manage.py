@@ -13,7 +13,7 @@ from ffm.data_acquisition import acquisition
 from ffm.data_management import filling_data_dicts
 from ffm.fault_plane import create_finite_fault
 from ffm.get_outputs import read_solution_static_format, synthetics_to_SAC
-from wasp.input_files import (
+from ffm.input_files import (
     input_chen_imagery,
     input_chen_near_field,
     input_chen_static,
