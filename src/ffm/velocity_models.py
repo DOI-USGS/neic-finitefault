@@ -382,10 +382,8 @@ def __litho_crust_velmodel(tensor_info: dict, default_dirs: dict) -> dict:
     rootgrp = Dataset(litho_model, "r", format="NETCDF4")
 
     vars = rootgrp.variables
-    latitudes = vars["latitude"]
-    latitudes = np.array([val for val in latitudes])
-    longitudes = vars["longitude"]
-    longitudes = np.array([val for val in longitudes])
+    latitudes = vars["latitude"][:]
+    longitudes = vars["longitude"][:]
 
     latitudes2 = (latitudes - lat) ** 2
     longitudes2 = (longitudes - lon) ** 2
@@ -405,62 +403,47 @@ def __litho_crust_velmodel(tensor_info: dict, default_dirs: dict) -> dict:
         "asthenospheric_mantle_top",
     ]
 
-    p_vel_crust: Union[np.ndarray, list] = [
-        vars[layer + "_vp"][index_lat, index_lon] for layer in layers
-    ]
-    p_vel_crust = np.array([val for val in p_vel_crust if not np.isnan(val)])
+    def extract_profile(var_name: str) -> np.ndarray:
+        data = np.array(
+            [vars[f"{layer}_{var_name}"][index_lat, index_lon] for layer in layers]
+        )
+        return data[~np.isnan(data)]
 
-    s_vel_crust: Union[np.ndarray, list] = [
-        vars[layer + "_vs"][index_lat, index_lon] for layer in layers
-    ]
-    s_vel_crust = np.array([val for val in s_vel_crust if not np.isnan(val)])
+    profiles = {}
+    new_names = {
+        "vp": "p_vel",
+        "vs": "s_vel",
+        "density": "dens",
+        "depth": "depth",
+        "qmu": "qa",
+    }
+    for var in ["vp", "vs", "density", "depth", "qmu"]:
+        var_new = new_names[var]
+        profiles[var_new] = extract_profile(var)
 
-    dens_crust: Union[np.ndarray, list] = [
-        vars[layer + "_density"][index_lat, index_lon] for layer in layers
-    ]
-    dens_crust = np.array([val for val in dens_crust if not np.isnan(val)]) / 1000
+    profiles["qb"] = 2.0 * profiles["qa"]
+    profiles["dens"] *= 0.001
 
-    depth_crust: Union[np.ndarray, list] = [
-        vars[layer + "_depth"][index_lat, index_lon] for layer in layers
-    ]
-    depth_crust = np.array([val for val in depth_crust if not np.isnan(val)])
+    mask = profiles["s_vel"] > 0.1
 
-    qb_crust: Union[np.ndarray, list] = [
-        vars[layer + "_qmu"][index_lat, index_lon] for layer in layers
-    ]
-    qb_crust = np.array([val for val in qb_crust if not np.isnan(val)])
-    qa_crust = 2 * qb_crust
-    #
-    # remove water layer
-    #
-    if s_vel_crust[0] <= 0.1:
-        p_vel_crust = p_vel_crust[1:]
-        s_vel_crust = s_vel_crust[1:]
-        dens_crust = dens_crust[1:]
-        depth_crust = depth_crust[1:]
+    for key in profiles:
+        profiles[key] = profiles[key][mask]
 
-    model = __depth2thick(
-        p_vel_crust, s_vel_crust, dens_crust, depth_crust, qa_crust, qb_crust
-    )
+    keys_order = ["p_vel", "s_vel", "dens", "depth", "qa", "qb"]
+    args = [profiles[k] for k in keys_order]
 
-    p_vel_crust = model["p_vel"][:-1]
-    s_vel_crust = model["s_vel"][:-1]
-    dens_crust = model["dens"][:-1]
-    thick_crust = model["thick"][:-1]
-    qa_crust = model["qa"][:-1]
-    qb_crust = model["qb"][:-1]
+    model = __depth2thick(*args)
 
-    indexes = [i for i, thick in enumerate(thick_crust) if float(thick) > 0.0001]
+    keys_order = ["p_vel", "s_vel", "dens", "thick", "qa", "qb"]
+    crust = {k: np.array(model[k][:-1], dtype=float) for k in keys_order}
 
-    p_vel_crust = np.array([p_vel_crust[i] for i in indexes])
-    s_vel_crust = np.array([s_vel_crust[i] for i in indexes])
-    dens_crust = np.array([dens_crust[i] for i in indexes])
-    thick_crust = np.array([thick_crust[i] for i in indexes])
-    qa_crust = np.array([qa_crust[i] for i in indexes])
-    qb_crust = np.array([qb_crust[i] for i in indexes])
-    crust_velmodel = __dict_velmodel(
-        p_vel_crust, s_vel_crust, dens_crust, thick_crust, qa_crust, qb_crust
-    )
+    mask = crust["thick"] > 0.0001
+    for k in crust:
+        crust[k] = crust[k][mask]
+
+    args = [crust[k] for k in keys_order]
+
+    crust_velmodel = __dict_velmodel(*args)
 
     return crust_velmodel
 
