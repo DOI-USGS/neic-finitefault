@@ -24,8 +24,8 @@ contains
 !  gf_bank: location of GF bank
 !
    implicit none
-   character(len=100), intent(in) :: gf_file
-   character(len=100), intent(out) :: vel_model, gf_bank
+   character(len=300), intent(in) :: gf_file
+   character(len=300), intent(out) :: vel_model, gf_bank
    open(1, file=gf_file, status='old')
    read(1, *)vel_model
    read(1, *)dep_max, dep_min, dep_step

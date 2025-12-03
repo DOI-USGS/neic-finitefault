@@ -81,7 +81,7 @@ contains
 !  disp: True if data to be used is cGNSS, False otherwise
 !  
    implicit none
-   character(len=100) :: filter_file, wave_file, stat_file, event_file
+   character(len=300) :: filter_file, wave_file, stat_file, event_file
    character(len=70) :: string1, string2
    real :: lat_e, lon_e, dep_e
    integer :: ir, no
