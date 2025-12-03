@@ -159,22 +159,6 @@ def plot_ffm_sol(
         max_val=max_val,
         directory=directory,
     )
-    PlotMap(
-        tensor_info,
-        segments,
-        point_sources,
-        solution,
-        default_dirs,
-        files_str=files_str,
-        stations_gnss=stations_gnss,
-        stations_cgnss=stations_cgnss,
-        max_slip=max_val,
-        legend_len=legend_len,
-        scale=scale,
-        limits=limits,
-        label_stations=label_stations,
-        directory=directory,
-    )
     PlotSlipTimes(segments, point_sources, solution, directory=directory)
 
 

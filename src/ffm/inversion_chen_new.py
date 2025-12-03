@@ -1112,18 +1112,17 @@ def execute_plot(
             directory=directory
         )
         stations_gnss = zip(names, lats, lons, observed, synthetic, error)
-    if "strong" in data_type or "cgnss" in data_type or "gnss" in data_type:
-        plot.PlotMap(
-            tensor_info,
-            segments,
-            point_sources,
-            solution,
-            default_dirs,
-            files_str=traces_info,
-            stations_gnss=stations_gnss,
-            stations_cgnss=traces_info_cgnss,
-            directory=directory,
-        )
+    plot.PlotMap(
+        tensor_info,
+        segments,
+        point_sources,
+        solution,
+        default_dirs,
+        files_str=traces_info,
+        stations_gnss=stations_gnss,
+        stations_cgnss=traces_info_cgnss,
+        directory=directory,
+    )
     if "imagery" in data_type:
         imagery_data = get_outputs.get_imagery(data_dir=directory)
         for key, scenes in imagery_data.items():
