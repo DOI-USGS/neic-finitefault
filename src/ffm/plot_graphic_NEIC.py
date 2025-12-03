@@ -189,6 +189,7 @@ def plot_misfit(
     :type directory: Union[pathlib.Path, str], optional
     :raises FileNotFoundError: When a data type's json file is not found
     """
+    print("Creating Plot Of Misfit Of Observed And Synthetic Data...")
     directory = pathlib.Path(directory)
     if "body" in used_data_type:
         if not os.path.isfile(directory / "tele_waves.json"):
@@ -1390,6 +1391,7 @@ def PlotMap(
     :type directory: Union[pathlib.Path, str], optional
     """
     directory = pathlib.Path(directory)
+    print("Creating Map...")
     g = Geod(ellps="WGS84")
     ################################
     ### GET DESIRED PLOT REGION ####
@@ -2618,6 +2620,7 @@ def _PlotSnapshotSlip(
     :type directory: Union[pathlib.Path,str], optional
     """
     directory = pathlib.Path(directory)
+    print("Creating Snapshots Of The Rupture Process...")
     plane_info = segments[0]
     dt = 0.01
     slip = solution["slip"]
@@ -2870,6 +2873,7 @@ def plot_beachball(
     :type directory: Union[pathlib.Path,str], optional
     """
     directory = pathlib.Path(directory)
+    print("Creating Beachball Plot...")
     #
     # Get the focal mechanism
     #
@@ -2940,6 +2944,7 @@ def _plot_waveforms(
     :type directory: Union[pathlib.Path,str], optional
     """
     directory = pathlib.Path(directory)
+    print("Creating Waveform Plot...")
     files = [file for file in files if file["component"] in components]
     files = sorted(files, key=lambda k: k["azimuth"])
     azimuth = [file["azimuth"] for file in files]
