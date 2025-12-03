@@ -818,16 +818,13 @@ def processing(
         + glob.glob(os.path.join(directory, "*_BH*sac"))
         + glob.glob(os.path.join(directory, "*_BH*sac"))
     )
-    strong_files = (
-        glob.glob(os.path.join(directory, "*.HN*SAC*"))
-        + glob.glob(os.path.join(directory, "*.HL*SAC*"))
-        + glob.glob(os.path.join(directory, "*.HN*sac*"))
-        + glob.glob(os.path.join(directory, "*.HL*sac*"))
-        + glob.glob(os.path.join(directory, "*.AH?.*"))
-        + glob.glob(os.path.join(directory, "*_HN*sac*"))
-        + glob.glob(os.path.join(directory, "*_HL*sac*"))
-        + glob.glob(os.path.join(directory, "*HG*sac*"))
-    )
+
+    strong_files = []
+    instrument_channels = ["HN", "HL", "AH", "HG"]
+    for ic in instrument_channels:
+        strong_files += glob.glob(os.path.join(directory, f"*_{ic}?.[Ss][Aa][Cc]"), recursive=True)
+        strong_files += glob.glob(os.path.join(directory, f"*.{ic}?.[Ss][Aa][Cc]"), recursive=True)
+
     cgnss_files = glob.glob(os.path.join(directory, "*L[HXY][ENZ].sac")) + glob.glob(
         os.path.join(directory, "*L[HXY][ENZ].SAC")
     )
