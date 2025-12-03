@@ -166,16 +166,14 @@ def process_all(
             tele_files, tensor_info, data_prop, directory=directory
         )
     if data_type == "strong":
-        strong_files = (
-            glob(dir_str + "/**.HN*SAC")
-            + glob(dir_str + "/**.HL*SAC")
-            + glob(dir_str + "/**.HN*sac")
-            + glob(dir_str + "/**.HL*sac")
-            + glob(dir_str + "/**.AH?.*")
-            + glob(dir_str + "/**.AH?.*")
-            + glob(dir_str + "/**_HN*sac")
-            + glob(dir_str + "/**_HL*sac")
-        )
+        strong_files = []
+
+        instrument_channels = ["HN", "HL", "AH"]
+        for ic in instrument_channels:
+            strong_files += glob(f"{dir_str}/**_{ic}?.[Ss][Aa][Cc]", recursive=True)
+
+        strong_files += glob(dir_str + "/**.AH?.*")
+
         select_process_strong(
             strong_files,
             tensor_info,
