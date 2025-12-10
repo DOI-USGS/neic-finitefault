@@ -722,9 +722,11 @@ def select_tele_stations(
         + (z - z0) / (20 - z0)
     )
 
+    # keeping the initial phase variable for a later print statement
+    # ([:] because immutable)
+    phase_name = phase[:]
     # Limiting the number of data. Choose one station for every degree in
     # azimuth
-
     phase = "LONG" if phase in ["Rayleigh", "Love"] else phase
     new_files: List[Union[pathlib.Path, str]] = []
 
@@ -761,7 +763,7 @@ def select_tele_stations(
 
     n_ini_files = len(files)
     n_selected = len(new_files)
-    print(f"{n_selected}/{n_ini_files} stations selected for phase {phase}")
+    print(f"{n_selected}/{n_ini_files} stations selected for phase {phase_name}")
     return new_files
 
 
