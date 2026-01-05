@@ -632,7 +632,7 @@ contains
    &  k, l, etc
    real :: omega, dt, df, dt_sample, start, tlen, real1, imag1, time
    complex :: z0, z
-   character(len=80) filename
+   character(len=80) filename, filename2
    
    write(*,*)'Store DART GF in memory...'
    z0 = cmplx(0.0, 0.0)
@@ -665,8 +665,10 @@ contains
    do i = 1, channel_max
 
       channel = first+i
-      filename = trim(sta_name(channel))//'_gf.txt'
+      filename = trim(sta_name(channel))//'_dip_gf.txt'
+      filename2 = trim(sta_name(channel))//'_stk_gf.txt'
       open(12, file=filename, status='old')
+      open(13, file=filename2, status='old')
 !
 !       Here, we read the green functions and derivate them
 !
@@ -679,9 +681,12 @@ contains
                green_dip(:,channel,subfault) = z0
                green_stk(:,channel,subfault) = z0
                read(12, *)etc, max_freq
+               read(13, *)etc, max_freq
                do j = 1, max_freq
                   read(12, *)real1, imag1
                   green_dip(j, channel, subfault) = cmplx(real1, imag1)
+                  read(13, *)real1, imag1
+                  green_stk(j, channel, subfault) = cmplx(real1, imag1)
                enddo
                do j = 1, max_freq
 !
@@ -692,11 +697,13 @@ contains
                   z = cmplx(0.0, start)
                   z = cexp(z)
                   green_dip(j, channel, subfault) = green_dip(j, channel, subfault)*z
+                  green_stk(j, channel, subfault) = green_stk(j, channel, subfault)*z
                end do
             end do
          end do
       end do
       close(12)
+      close(13)
    end do      
    last = first+n_chan
    end subroutine get_dart_gf
