@@ -4,7 +4,6 @@
 the inverse problem, and the synthetic waveforms produced by such model,
 """
 
-
 import errno
 import json
 import os
@@ -180,9 +179,9 @@ def read_solution_fsp_format(
     line0: List[int] = [
         i for i, line in enumerate(jk) if {"SOURCE", "MODEL", "PARAMETERS"} < set(line)
     ]
-    line0 = line0[0] + 9  # type:ignore
+    line0 = line0[0] + 9  # type: ignore
     if n_segments == 1:
-        for line in jk[line0:]:  # type:ignore
+        for line in jk[line0:]:  # type: ignore
             lat0 = float(line[0])
             lon0 = float(line[1])
             depth0 = float(line[4])
@@ -200,12 +199,12 @@ def read_solution_fsp_format(
             width = width + [0]
     else:
         for i_segment in range(n_segments):
-            width0 = 0 if not custom else float(jk[line0 + 2][7])  # type:ignore
+            width0 = 0 if not custom else float(jk[line0 + 2][7])  # type: ignore
             subfaults_seg: List[int] = [
                 int(jk[line0 + 6][3]) if not custom else int(jk[line0 + 7][3])  # type: ignore
             ]
-            line0 = line0 + 10 if not custom else line0 + 11  # type:ignore
-            for line in jk[line0 : line0 + subfaults_seg]:  # type:ignore
+            line0 = line0 + 10 if not custom else line0 + 11  # type: ignore
+            for line in jk[line0 : line0 + subfaults_seg]:  # type: ignore
                 lat0 = float(line[0])
                 lon0 = float(line[1])
                 depth0 = float(line[4])
@@ -221,7 +220,7 @@ def read_solution_fsp_format(
                 trup = trup + [trup0]
                 trise = trise + [trise0]
                 width = width + [width0]
-            line0 = line0 + subfaults_seg + 1  # type:ignore
+            line0 = line0 + subfaults_seg + 1  # type: ignore
 
     solution = {
         "slip": slip,

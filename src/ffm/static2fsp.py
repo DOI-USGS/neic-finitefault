@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Translate a solution file in static format, to a solution file in FSP format
-"""
-
+"""Translate a solution file in static format, to a solution file in FSP format"""
 
 import datetime
 import json
@@ -10,8 +8,8 @@ import pathlib
 from typing import List, Union
 
 import numpy as np
-import pandas as pd  # type:ignore
-from obspy.geodetics import flinnengdahl  # type:ignore
+import pandas as pd  # type: ignore
+from obspy.geodetics import flinnengdahl  # type: ignore
 
 import ffm.fault_plane as pf
 import ffm.plane_management as pl_mng
@@ -252,7 +250,7 @@ def static_to_fsp(
         )
         outfile.write(
             "% Rupt : HypX = {} km  Hypz = {} km  avTr = {:5.2f} s  avVr = {:5.2f} "
-            "km/s\n%\n".format(hyp_stk, hyp_dip, avg_time, avg_vel)  # type:ignore
+            "km/s\n%\n".format(hyp_stk, hyp_dip, avg_time, avg_vel)  # type: ignore
         )
         outfile.write("% {} inversion-related " "parameters{}\n".format(string, string))
         outfile.write(
@@ -308,7 +306,7 @@ def static_to_fsp(
         outfile.write(
             "% Rmin :\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t--\t{:.2f}\t0.0\t0.0\t0.0\n".format(
                 tele_r, surf_r, strong_r, cgnss_r, gnss_r, imagery_r, dart_r
-            )  # type:ignore
+            )  # type: ignore
         )
 
         outfile.write("%\n%{}{}\n".format(string, string))

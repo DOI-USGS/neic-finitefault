@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Routine for doing a time shift of observed data.
-"""
-
+"""Routine for doing a time shift of observed data."""
 
 import glob
 import json
@@ -11,10 +9,10 @@ import pathlib
 from copy import copy
 from typing import Any, List, Optional, Tuple, Union
 
-import matplotlib.pyplot as plt  # type:ignore
+import matplotlib.pyplot as plt  # type: ignore
 import numpy as np
 from matplotlib.axes import Axes
-from obspy import UTCDateTime, read  # type:ignore
+from obspy import UTCDateTime, read  # type: ignore
 
 import ffm.seismic_tensor as tensor
 from ffm import get_outputs
@@ -712,7 +710,7 @@ def get_observed(
         )
     else:
         waveform1 = np.array([val for i, val in enumerate(waveform) if i < length])
-        waveform1 = np.concatenate(([0] * -start, waveform1))  # type:ignore
+        waveform1 = np.concatenate(([0] * -start, waveform1))  # type: ignore
     time = np.arange(-start3, len(waveform1) - start3) * dt
     if zero_start:
         waveform1 = waveform1 - new_baseline

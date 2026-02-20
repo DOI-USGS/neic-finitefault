@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Translate a solution file in static format, to a solution file in FSP format
-"""
-
+"""Translate a solution file in static format, to a solution file in FSP format"""
 
 import datetime
 import json
@@ -10,9 +8,9 @@ import pathlib
 from typing import List, Tuple, Union
 
 import numpy as np
-import pandas as pd  # type:ignore
-from obspy.geodetics import flinnengdahl  # type:ignore
-from pyproj import Geod  # type:ignore
+import pandas as pd  # type: ignore
+from obspy.geodetics import flinnengdahl  # type: ignore
+from pyproj import Geod  # type: ignore
 
 import ffm.fault_plane as pf
 import ffm.plane_management as pl_mng
@@ -226,7 +224,7 @@ def static_to_srf(
                 cgnss_r,
                 gnss_r,
                 imagery_r,
-                dart_r,  # type:ignore
+                dart_r,  # type: ignore
             )
         )
 
@@ -462,7 +460,7 @@ def build_source_time_function(
     :rtype: Tuple[np.ndarray, np.ndarray]
     """
     from numpy import arange, cos, exp, isnan, pi, roll, sin, where, zeros
-    from scipy.integrate import trapezoid  # type:ignore
+    from scipy.integrate import trapezoid  # type: ignore
 
     # Initialize outputs
     t = arange(0, total_time + dt, dt)
@@ -495,6 +493,6 @@ def build_source_time_function(
     # Check for errors
     if isnan(Mdot[0]) == True:
         print("ERROR: whoops, STF has nan values!")
-        return  # type:ignore
+        return  # type: ignore
 
     return t, Mdot

@@ -9,7 +9,7 @@ import pathlib
 from typing import List, Union
 
 import numpy as np
-from netCDF4 import Dataset  # type:ignore
+from netCDF4 import Dataset  # type: ignore
 
 
 def select_velmodel(
@@ -383,9 +383,9 @@ def __litho_crust_velmodel(tensor_info: dict, default_dirs: dict) -> dict:
 
     vars = rootgrp.variables
     latitudes = vars["latitude"]
-    latitudes = np.array([val for val in latitudes])
+    latitudes = np.array([val for val in latitudes])  # type: ignore [assignment]
     longitudes = vars["longitude"]
-    longitudes = np.array([val for val in longitudes])
+    longitudes = np.array([val for val in longitudes])  # type: ignore [assignment]
 
     latitudes2 = (latitudes - lat) ** 2
     longitudes2 = (longitudes - lon) ** 2

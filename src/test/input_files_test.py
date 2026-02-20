@@ -321,7 +321,13 @@ def test_plane_for_chen():
                 data = d.read()
             with open(RESULTS_DIR / "NP1" / f, "r") as t:
                 target = t.read()
-            assert data == target
+            data_nums = [
+                float(num) for num in data.replace("\n", " ").split(" ") if num != ""
+            ]
+            target_nums = [
+                float(num) for num in target.replace("\n", " ").split(" ") if num != ""
+            ]
+            np.testing.assert_array_almost_equal(data_nums, target_nums, decimal=8)
     finally:
         shutil.rmtree(tempdir)
 

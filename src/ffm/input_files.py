@@ -3,7 +3,6 @@
 Chen's fortran scripts.
 """
 
-
 import errno
 import io
 import json
@@ -1146,7 +1145,7 @@ def from_synthetic_to_obs(
                     max_val0 = 5 * max_val
                 waveform = 0 * np.array(file["synthetic"])
                 shift = np.random.randn(1) * std_shift
-                shift = int(shift[0] / dt)  # type:ignore
+                shift = int(shift[0] / dt)  # type: ignore
                 length = len(waveform)
                 error = np.zeros(length)
                 if shift > 0:
@@ -1163,7 +1162,7 @@ def from_synthetic_to_obs(
                 waveform = waveform + error  # type: ignore
                 write_observed_file(
                     file, dt, outfile, waveform, dart=dart
-                )  # type:ignore
+                )  # type: ignore
     else:
         (
             names,
@@ -1172,7 +1171,7 @@ def from_synthetic_to_obs(
             observed,
             synthetic,
             error,
-        ) = get_outputs.retrieve_gnss()  # type:ignore
+        ) = get_outputs.retrieve_gnss()  # type: ignore
         with open(directory / "static_data.txt", "r") as infile:
             orig_lines = [line.split() for line in infile]
         with open(directory / "static_data.txt", "w") as outfile:

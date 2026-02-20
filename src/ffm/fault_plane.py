@@ -4,7 +4,6 @@
 of the fault plane.
 """
 
-
 import errno
 import json
 import os

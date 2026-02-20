@@ -3,7 +3,6 @@
 for teleseismic and near field data
 """
 
-
 import json
 import pathlib
 from typing import Dict, List, Optional, Union

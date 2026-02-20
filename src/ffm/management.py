@@ -61,7 +61,7 @@ def theoretic_arrivals(
 
 
 def default_dirs(
-    config_path: Optional[Union[str, pathlib.Path]] = None
+    config_path: Optional[Union[str, pathlib.Path]] = None,
 ) -> Dict[str, str]:
     """Get default path variables
 

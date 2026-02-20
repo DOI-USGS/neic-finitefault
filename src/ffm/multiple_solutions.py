@@ -8,7 +8,7 @@ from multiprocessing import Pool, cpu_count
 from typing import List, Optional, Union
 
 import numpy as np
-import pandas as pd  # type:ignore
+import pandas as pd  # type: ignore
 
 import ffm.fault_plane as pf
 import ffm.inversion_chen_new as inv
@@ -56,12 +56,12 @@ def multiple_solutions(
     with open(directory / "segments_data.json") as s:
         segments_data = json.load(s)
     segments = segments_data["segments"]
-    strike = strike if len(strike) > 0 else [segments[0]["strike"]]  # type:ignore
-    dip = dip if len(dip) > 0 else [segments[0]["dip"]]  # type:ignore
+    strike = strike if len(strike) > 0 else [segments[0]["strike"]]  # type: ignore
+    dip = dip if len(dip) > 0 else [segments[0]["dip"]]  # type: ignore
     rupt_vel = (
-        rupt_vel if len(rupt_vel) > 0 else [segments[0]["rupture_vel"]]  # type:ignore
+        rupt_vel if len(rupt_vel) > 0 else [segments[0]["rupture_vel"]]  # type: ignore
     )
-    new_iter = product(strike, dip, rupt_vel)  # type:ignore
+    new_iter = product(strike, dip, rupt_vel)  # type: ignore
     subfolders: list = []
     for i, (strike1, dip1, rupt_vel1) in enumerate(new_iter):
         subfolder = event_folder / f"{folders}.{i}"

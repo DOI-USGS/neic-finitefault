@@ -5,7 +5,6 @@ of simmulated annealing and its cooling rate, weight of regularization
 constraints, and boundaries of model space.
 """
 
-
 import argparse
 import json
 import os
@@ -78,10 +77,10 @@ def modelling_prop(
     # After Blaser et al (2010)
     #
     seismic_moment = moment_mag
-    moment_mag = (2.0 / 3) * (np.log10(seismic_moment) - 16.1)  # type:ignore
-    length = 10 ** (-2.31 + 0.57 * moment_mag - 0.2)  # type:ignore
-    width = 10 ** (-1.56 + 0.41 * moment_mag - 0.17)  # type:ignore
-    avg_slip = seismic_moment / length / width / (3 * 10**21)  # type:ignore
+    moment_mag = (2.0 / 3) * (np.log10(seismic_moment) - 16.1)  # type: ignore
+    length = 10 ** (-2.31 + 0.57 * moment_mag - 0.2)  # type: ignore
+    width = 10 ** (-1.56 + 0.41 * moment_mag - 0.17)  # type: ignore
+    avg_slip = seismic_moment / length / width / (3 * 10**21)  # type: ignore
     peak_slip = 2 * avg_slip
     peak_slip = int(peak_slip / 100) * 100
     step = 20

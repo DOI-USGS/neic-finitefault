@@ -2,6 +2,7 @@
   - [Suggested Citation](#suggested-citation)
   - [Authors](#authors)
   - [References](#references)
+  - [Disclaimer and License Information](#disclaimer-and-license-information)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
   - [WISP Installation Scripts](#wisp-installation-scripts)
@@ -29,7 +30,7 @@ Koch, P., Goldberg, D.E., Hunsinger, H., Melgar, D., Riquelme, S., Yeck, W.L., a
 
 - **[Pablo Koch](https://www.cmm.uchile.cl/?cmm_people=pablo-koch)** - [National Seismological Center, University of Chile](https://www.sismologia.cl/)
 - **[Dara E. Goldberg](https://www.usgs.gov/staff-profiles/dara-e-goldberg)** - [National Earthquake Information Center (NEIC) of the Geologic Hazards Science Center](https://www.usgs.gov/centers/geohazards)
-- **Heather Hunsinger** - [Geologic Hazards Science Center](https://www.usgs.gov/centers/geohazards)
+- **[Heather Hunsinger](https://www.usgs.gov/staff-profiles/heather-hunsinger)** - [Geologic Hazards Science Center](https://www.usgs.gov/centers/geohazards)
 - **[Diego Melgar](https://earthsciences.uoregon.edu/profile/dmelgarm/)** - [Department of Earth Sciences, University of Oregon](https://earthsciences.uoregon.edu)
 - **[Sebastian Riquelme](http://www.dgf.uchile.cl/academicas-y-academicos/profesores-expertos)** - [National Seismological Center, University of Chile](https://www.sismologia.cl/)
 - **[William L. Yeck](https://www.usgs.gov/staff-profiles/william-l-yeck)** - [National Earthquake Information Center (NEIC) of the Geologic Hazards Science Center](https://www.usgs.gov/centers/geohazards)
@@ -59,7 +60,6 @@ In order to compile and/or install the source code there are a number of prerequ
 1. gfortran: To compile the code in [fortran_code](./fortran_code/)
 2. cmake: To compile the code in [fortran_code](./fortran_code/)
 3. gcc: To provide support to miniforge/conda for compiling c code
-4. miniforge/conda: To install python dependencies. Miniforge can be installed using the provided script: [miniforge_install.sh](./miniforge_install.sh)
 
 ## WISP Installation Scripts
 
@@ -67,7 +67,8 @@ Automated installation of the dependencies and fortran code has been provided in
 
 1. `source install.sh <path to the local neic-finitefault repository>` (with other optional configurations available, run `sudo bash user_install.sh -h` for the help information)
    1. > NOTE: The scripts in [./install.d](./install.d/) may be run individually to suit the individuals needs. For example, to only rerun compilation of the fortran you can singularly run [ffm.sh](./install.d/ffm.sh).
-2. `conda activate ff-env`
+2. `pip install <path to the local neic-finitefault repository>`
+3. `conda activate ff-env`
 
 The following documents provide more information about the installation process:
 
@@ -96,8 +97,6 @@ This repository provides a Dockerfile to locally build a docker image for the de
 2. Build the image: `docker build .`
    - Useful Optional Flags (must come before specifying the location of the Dockerfile):
      - give the image a name: `-t <name>`
-     - build to a specific layer: `--target <layer name>`
-       - Available layers: packages, ffm-python, ffm-fortran, ffm-dependencies, ffm
      - add a build argument: `--build-arg <KEY>=<VALUE>`
        - Available argument keys: FROM_IMAGE
 

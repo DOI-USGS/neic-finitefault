@@ -5,7 +5,7 @@ import shutil
 import tempfile
 
 import numpy as np
-from obspy.io.sac import SACTrace  # type:ignore
+from obspy.io.sac import SACTrace  # type: ignore
 
 from ffm.data_management import (
     __failsafe,

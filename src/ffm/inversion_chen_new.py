@@ -3,7 +3,6 @@
 Chen-Ji.
 """
 
-
 import errno
 import glob
 import json
@@ -92,13 +91,13 @@ def automatic_usgs(
     logger.info("Time spent processing traces: {}".format(time2))
     data_folder = os.path.join(directory, "data")
     imagery_files = glob.glob(str(directory) + "/imagery*txt")
-    imagery_files = None if len(imagery_files) == 0 else imagery_files  # type:ignore
+    imagery_files = None if len(imagery_files) == 0 else imagery_files  # type: ignore
     dm.filling_data_dicts(
         tensor_info,
         data_type,
         data_prop,
         data_folder,
-        imagery_files=imagery_files,  # type:ignore
+        imagery_files=imagery_files,  # type: ignore
         working_directory=directory,
     )
     writing_inputs0(
@@ -167,17 +166,17 @@ def automatic_usgs(
         + files6
         + files7
         + files8
-        + files9  # type:ignore
+        + files9  # type: ignore
     )
     folders = [directory / "NP1", directory / "NP2"]
     for folder in folders:
-        for file in files:  # type:ignore
+        for file in files:  # type: ignore
             if os.path.isfile(file):
                 copy2(file, folder)
     info_np1, info_np2 = tensor.planes_from_tensor(tensor_info)
     plane1_folder = directory / "NP1"
     keywords = {"velmodel": velmodel, "directory": plane1_folder}
-    p1 = Process(  # type:ignore
+    p1 = Process(  # type: ignore
         target=_automatic2,
         args=(
             tensor_info,
@@ -189,10 +188,10 @@ def automatic_usgs(
         ),
         kwargs=keywords,
     )
-    p1.start()  # type:ignore
+    p1.start()  # type: ignore
     plane2_folder = directory / "NP2"
     keywords["directory"] = plane2_folder
-    p2 = Process(  # type:ignore
+    p2 = Process(  # type: ignore
         target=_automatic2,
         args=(
             tensor_info,
@@ -204,8 +203,8 @@ def automatic_usgs(
         ),
         kwargs=keywords,
     )
-    p2.start()  # type:ignore
-    [p.join() for p in [p1, p2]]  # type:ignore
+    p2.start()  # type: ignore
+    [p.join() for p in [p1, p2]]  # type: ignore
     logger.info("Time spent: {}".format(time.time() - time0))
     ml.close_log(logger)
     ### Make NP1 plots ###
@@ -289,13 +288,13 @@ def _automatic2(
     np_plane_info = plane_data["plane_info"]
     data_folder = os.path.join(directory.parent.parent, "data")
     imagery_files = glob.glob(str(directory) + "/imagery*txt")
-    imagery_files = None if len(imagery_files) == 0 else imagery_files  # type:ignore
+    imagery_files = None if len(imagery_files) == 0 else imagery_files  # type: ignore
     dm.filling_data_dicts(
         tensor_info,
         data_type,
         data_prop,
         data_folder,
-        imagery_files=imagery_files,  # type:ignore
+        imagery_files=imagery_files,  # type: ignore
         working_directory=directory,
     )
     segments_data = pf.create_finite_fault(
@@ -412,7 +411,7 @@ def modelling_new_data(
         data_type,
         data_prop,
         data_folder,
-        imagery_files=imagery_files,  # type:ignore
+        imagery_files=imagery_files,  # type: ignore
         working_directory=directory,
     )
     gf_bank_str = os.path.join(directory, "GF_strong")
@@ -1184,7 +1183,7 @@ def delete_binaries(directory: Union[pathlib.Path, str] = pathlib.Path()):
 
 
 def __ask_velrange(
-    directory: Union[pathlib.Path, str] = pathlib.Path()
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> Tuple[float, float]:
     """Get the velocity range from fault&rise_time.txt
 

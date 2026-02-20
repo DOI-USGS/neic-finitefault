@@ -12,10 +12,10 @@ from collections import Counter
 from glob import glob
 from typing import List, Optional, Union
 
-import cutde.halfspace as half_space  # type:ignore
+import cutde.halfspace as half_space  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
-import pandas as pd  # type:ignore
-import pygmt  # type:ignore
+import pandas as pd  # type: ignore
+import pygmt  # type: ignore
 import pyproj  # type: ignore
 from numpy import (
     array,

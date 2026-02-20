@@ -9,7 +9,7 @@ import tempfile
 
 import numpy as np
 import pytest
-from obspy import read  # type:ignore
+from obspy import read  # type: ignore
 
 from ffm.data_management import filling_data_dicts
 from ffm.green_functions import fk_green_fun1
@@ -121,13 +121,13 @@ def _end_to_end(
     )
     data_folder = os.path.join(directory, "data")
     imagery_files = glob.glob(str(directory) + "/insar_*.txt")
-    imagery_files = None if len(imagery_files) == 0 else imagery_files  # type:ignore
+    imagery_files = None if len(imagery_files) == 0 else imagery_files  # type: ignore
     filling_data_dicts(
         tensor_info,
         data_type,
         data_prop,
         data_folder,
-        imagery_files=imagery_files,  # type:ignore
+        imagery_files=imagery_files,  # type: ignore
         working_directory=directory,
     )
     writing_inputs0(
@@ -193,11 +193,11 @@ def _end_to_end(
         + files6
         + files7
         + files8
-        + files9  # type:ignore
+        + files9  # type: ignore
     )
     folders = [directory / "NP1", directory / "NP2"]
     for folder in folders:
-        for file in files:  # type:ignore
+        for file in files:  # type: ignore
             if os.path.isfile(file):
                 shutil.copy2(file, folder)
     info_np1, info_np2 = planes_from_tensor(tensor_info)

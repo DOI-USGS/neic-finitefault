@@ -878,7 +878,7 @@ def __select_cgnss_files(
             station_lon = stream[0].stats.sac.stlo
             delta = stream[0].stats.delta
             distance = locations2degrees(event_lat, event_lon, station_lat, station_lon)
-            distance = 111.11 * distance  # type:ignore
+            distance = 111.11 * distance  # type: ignore
             distance2 = np.sqrt(distance**2 + depth**2)
 
             index0 = distance2 / 5 / delta
@@ -1223,7 +1223,7 @@ def __convert_response_acc(
                 line for line in lines1 if "INPUT UNIT" in line
             ]
             if len(input_unit) > 0:
-                input_unit = input_unit[0]  # type:ignore
+                input_unit = input_unit[0]  # type: ignore
                 input_unit = str(input_unit).split()[-1]
                 input_unit = str(input_unit).lower()
                 if input_unit in ["m"]:
@@ -1355,7 +1355,7 @@ def __read_paz(paz_file: Union[pathlib.Path, str]) -> Tuple[Optional[dict], bool
         gain = float(lines2[gain_line][1])
     zeros = [
         float(real) + 1j * float(imag) for real, imag in lines2[1 : n_zeros + 1]
-    ]  # type:ignore
+    ]  # type: ignore
     poles = [
         float(real) + 1j * float(imag) for real, imag in lines2[n_zeros + 2 : gain_line]
     ]
@@ -1568,9 +1568,9 @@ def select_strong_stations(tensor_info: dict, files: List[str]) -> List[str]:
         station_lon = header.stlo
         dist, az, baz = mng._distazbaz(
             station_lat, station_lon, lat, lon
-        )  # type:ignore
+        )  # type: ignore
         azimuth0 = azimuth0 + [az]
-    azimuth0 = np.array(azimuth0)  # type:ignore
+    azimuth0 = np.array(azimuth0)  # type: ignore
     az0 = np.amin(azimuth0)
     az1 = np.amax(azimuth0)
     jump = int((az1 - az0) / 60) + 1

@@ -8,7 +8,7 @@ from os import mkdir
 from unittest import mock
 
 import numpy as np
-from obspy import read  # type:ignore
+from obspy import read  # type: ignore
 
 from ffm.modify_sacs import __is_number, correct_waveforms, plot_channels
 

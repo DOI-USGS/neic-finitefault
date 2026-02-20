@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-The routines here calcaulte the shakemap polygon from the FFM 
+The routines here calcaulte the shakemap polygon from the FFM
 """
+
 from typing import Tuple, Union
 
 import numpy as np

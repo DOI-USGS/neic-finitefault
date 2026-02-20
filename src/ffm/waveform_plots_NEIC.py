@@ -145,7 +145,7 @@ def plot_waveforms(
             ax.yaxis.set_major_locator(ticker.NullLocator())
         elif type_str == "cgnss" or type_str == "strong":
             ax.xaxis.set_major_locator(ticker.MultipleLocator(40))
-            ax.yaxis.get_major_locator().set_params(integer=True)  # type:ignore
+            ax.yaxis.get_major_locator().set_params(integer=True)  # type: ignore
         if nPlot > len(weights) - 3:
             ax.set_xlabel("Time After OT (s)")
         ax.grid(axis="x", which="both", linestyle="dotted", color="0.5")

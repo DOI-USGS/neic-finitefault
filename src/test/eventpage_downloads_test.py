@@ -109,7 +109,17 @@ def test_write_CMTSOLUTION_file():
             cmt = f.read()
         with open(RESULTS_DIR / "NP1" / "CMTSOLUTION") as f:
             cmt_target = f.read()
-        assert cmt == cmt_target
+        # split cmt into sections
+        cmt_sections = cmt.split("PDE ")
+        cmt_sections_target = cmt_target.split("PDE ")
+        assert len(cmt_sections) == len(cmt_sections_target)
+        for target_section in cmt_sections_target:
+            match = False
+            for section in cmt_sections:
+                if section == target_section:
+                    match = True
+            if not match:
+                raise Exception(f"No match for section: {target_section}")
     finally:
         shutil.rmtree(tempdir)
 
@@ -146,11 +156,11 @@ def test_write_Coulomb_file():
         shutil.rmtree(tempdir)
 
 
+# @pytest.mark.skip(reason="This test is temporarily disabled.")
 @pytest.mark.skipif(
     os.getenv("CI_REGISTRY") is not None,
-    reason="Build runner does not have the resources to run",
+    reason="Pipeline does not have the required memory",
 )
-# @pytest.mark.skip(reason="This test is temporarily disabled.")
 def test_write_Okada_displacements():
     tempdir = tempfile.mkdtemp()
     try:

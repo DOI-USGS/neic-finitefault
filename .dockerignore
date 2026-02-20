@@ -5,7 +5,6 @@
 !fortran_code
 !src
 !pyproject.toml
-!fd_bank
-!LITHO1.0.nc
 !pb2002_boundaries.gmt
 !examples
+!install.sh
