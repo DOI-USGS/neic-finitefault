@@ -15,6 +15,7 @@ runner = CliRunner()
 DETAIL = {
     "properties": {
         "mag": 6.4,
+        "place": "here, there",
         "time": 1771036057951,
         "products": {
             "moment-tensor": [
@@ -51,7 +52,7 @@ def test_app():
                 data = f.read()
             assert (
                 data
-                == """ US 2026 02 14 02 27 37.951000 -14.8934 166.6013 10.0  0.0 6.4 PlanetEarth
+                == """ US 2026 02 14 02 27 37.951000 -14.8934 166.6013 10.0  0.0 6.4 there
 event name: eventid
 time shift: 3.5
 half duration: 3.5

@@ -12,6 +12,7 @@ from test.testutils import DATA_DIR, MockResponse
 DETAIL = {
     "properties": {
         "mag": 6.4,
+        "place": "here, there",
         "time": 1771036057951,
         "products": {
             "moment-tensor": [
@@ -77,6 +78,7 @@ def test_cmt_from_id():
         assert detail_cmt.mtp == 3e18
         assert detail_cmt.mtt == -2e18
         assert detail_cmt.duration == 7
+        assert detail_cmt.place == "there"
         assert detail_cmt.time == datetime(
             2026, 2, 14, 2, 27, 37, 951000, tzinfo=timezone.utc
         )
@@ -97,6 +99,7 @@ def test_cmt_from_detail():
     assert detail_cmt.mtp == 3e18
     assert detail_cmt.mtt == -2e18
     assert detail_cmt.duration == 7
+    assert detail_cmt.place == "there"
     assert detail_cmt.time == datetime(
         2026, 2, 14, 2, 27, 37, 951000, tzinfo=timezone.utc
     )
@@ -110,6 +113,7 @@ def test_cmt_from_moment_tensor():
         longitude=166.6013,
         magnitude=6.4,
         moment_tensor=DETAIL["properties"]["products"]["moment-tensor"][1],
+        place="there",
         time=datetime(2026, 2, 14, 2, 27, 37, 951000, tzinfo=timezone.utc),
     )
     assert detail_cmt.depth == 10
@@ -125,6 +129,7 @@ def test_cmt_from_moment_tensor():
     assert detail_cmt.mtp == 3e18
     assert detail_cmt.mtt == -2e18
     assert detail_cmt.duration == 7
+    assert detail_cmt.place == "there"
     assert detail_cmt.time == datetime(
         2026, 2, 14, 2, 27, 37, 951000, tzinfo=timezone.utc
     )
@@ -142,7 +147,7 @@ def test_cmt_write():
             data = f.read()
         assert (
             data
-            == """ US 2026 02 14 02 27 37.951000 -14.8934 166.6013 10.0  0.0 6.4 PlanetEarth
+            == """ US 2026 02 14 02 27 37.951000 -14.8934 166.6013 10.0  0.0 6.4 there
 event name: eventid
 time shift: 3.5
 half duration: 3.5
