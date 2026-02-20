@@ -22,6 +22,7 @@ class Cmt(BaseModel):
     mrt: float
     mtp: float
     mtt: float
+    place: str
     time: datetime
 
     @classmethod
@@ -39,6 +40,7 @@ class Cmt(BaseModel):
         latitude = float(coordinates[1])
         longitude = float(coordinates[0])
         magnitude = float(props["mag"])
+        place = props["place"].split(",")[-1].strip()
         time = datetime.fromtimestamp(float(props["time"]) / 1000, tz=timezone.utc)
         return cls.from_moment_tensor(
             depth=depth,
@@ -47,6 +49,7 @@ class Cmt(BaseModel):
             longitude=longitude,
             magnitude=magnitude,
             moment_tensor=moment_tensor,
+            place=place,
             time=time,
         )
 
@@ -68,16 +71,12 @@ class Cmt(BaseModel):
         longitude: float,
         magnitude: float,
         moment_tensor: dict,
+        place: str,
         time: datetime,
     ):
         """CMT from moment-tensor product"""
         if time.tzinfo != timezone.utc:
             raise Exception("Datetimes should be in UTC timezone")
-        depth = depth
-        latitude = latitude
-        longitude = longitude
-        magnitude = magnitude
-        time = time
         props = moment_tensor["properties"]
         magnitude_type = props.get("derived-magnitude-type", "??")
         mpp = float(props["tensor-mpp"])
@@ -101,6 +100,7 @@ class Cmt(BaseModel):
             mrt=mrt,
             mtp=mtp,
             mtt=mtt,
+            place=place,
             time=time,
         )
 
@@ -109,7 +109,7 @@ class Cmt(BaseModel):
         with open(filepath, "w") as f:
             time = self.time.strftime("%Y %m %d %H %M %S.%f")
             f.write(
-                f" US {time} {self.latitude} {self.longitude} {self.depth}  0.0 {self.magnitude} PlanetEarth\n"
+                f" US {time} {self.latitude} {self.longitude} {self.depth}  0.0 {self.magnitude} {self.place}\n"
             )
             f.write(f"event name: {self.eventid}\n")
             f.write(f"time shift: {self.duration / 2.0}\n")
