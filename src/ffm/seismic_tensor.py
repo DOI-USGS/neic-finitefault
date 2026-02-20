@@ -4,7 +4,6 @@ Module for retrieving data from moment tensor files in CMTSOLUTION format, and
 retrieve the nodal planes from such a moment tensor.
 """
 
-
 import json
 import os
 import pathlib
@@ -14,8 +13,8 @@ from datetime import datetime
 from typing import Optional, Tuple, Union
 
 import numpy as np
-from obspy import read_events  # type:ignore
-from obspy.core.utcdatetime import UTCDateTime  # type:ignore
+from obspy import read_events  # type: ignore
+from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 
 
 def get_tensor(

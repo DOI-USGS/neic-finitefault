@@ -3,7 +3,6 @@
 as moment rate function, and waveform fits.
 """
 
-
 import argparse
 import errno
 import glob
@@ -399,7 +398,7 @@ def _PlotRuptTime(
         #
         # Plot the slip distribution
         #
-        indexes = np.where(slip_seg < 0.1 * max_slip)  # type:ignore
+        indexes = np.where(slip_seg < 0.1 * max_slip)  # type: ignore
         rupt_time_seg[indexes] = 0
         fig = plt.figure(figsize=(15, 8))
         ax = fig.add_subplot(111)
@@ -456,7 +455,7 @@ def _PlotRiseTime(
         #
         # Plot the slip distribution
         #
-        indexes = np.where(slip_seg < 0.1 * max_slip)  # type:ignore
+        indexes = np.where(slip_seg < 0.1 * max_slip)  # type: ignore
         trise_seg[indexes] = 0
         tfall_seg[indexes] = 0
         fig, axes = plt.subplots(1, 2, figsize=(20, 10), sharex=True, sharey=True)
@@ -472,7 +471,7 @@ def _PlotRiseTime(
             segment,
             ps_seg,
             a1,
-            max_val=max_trise,  # type:ignore
+            max_val=max_trise,  # type: ignore
             autosize=False,
         )
         a2.set_ylabel(y_label)
@@ -484,7 +483,7 @@ def _PlotRiseTime(
             segment,
             ps_seg,
             a2,
-            max_val=max_tfall,  # type:ignore
+            max_val=max_tfall,  # type: ignore
             autosize=False,
         )
         cbar_ax = fig.add_axes((0.1, 0.05, 0.8, 0.05))
@@ -549,7 +548,7 @@ def PlotSlipDistribution(
         if i_segment == 0:
             ax.plot(0, 0, "w*", ms=20)
         ax, im = __several_axes(
-            slip_seg, segment, ps_seg, ax, max_val=max_slip  # type:ignore
+            slip_seg, segment, ps_seg, ax, max_val=max_slip  # type: ignore
         )
         cbar_ax = fig.add_axes((0.85, 0.15, 0.05, 0.7))
         cb = fig.colorbar(im, cax=cbar_ax)
@@ -591,7 +590,7 @@ def PlotSlipDist_Compare(
     max_slip = np.max(max_slip)
     max_slip2 = [np.max(slip_seg2.flatten()) for slip_seg2 in slip2]
     max_slip2 = np.max(max_slip2)
-    max_slip = np.maximum(max_slip, max_slip2)  # type:ignore
+    max_slip = np.maximum(max_slip, max_slip2)  # type: ignore
     x_label = "Distance along strike $(km)$"
     y_label = "Distance along dip $(km)$"
     zipped = zip(segments, slip, rake, slip2, rake2, point_sources)
@@ -641,7 +640,7 @@ def PlotSlipDist_Compare(
             segment,
             ps_seg,
             ax0,
-            max_val=max_slip,  # type:ignore
+            max_val=max_slip,  # type: ignore
             autosize=False,
         )
         ax1, im = __several_axes(
@@ -649,7 +648,7 @@ def PlotSlipDist_Compare(
             segment,
             ps_seg,
             ax1,
-            max_val=max_slip,  # type:ignore
+            max_val=max_slip,  # type: ignore
             autosize=False,
         )
         ax0.set_title("Inverted model", fontsize=20)
@@ -721,7 +720,7 @@ def PlotMap(
         point_sources2 = [
             ps_seg
             for segment, ps_seg in zipped
-            if segment["event"] == event  # type:ignore
+            if segment["event"] == event  # type: ignore
         ]
         segments2 = [segment for segment in segments if segment["event"] == event]
     #
@@ -795,17 +794,17 @@ def PlotMap(
             max_obs = np.maximum([abs(float(v)) for v in obs], max_obs)
             distance = max(np.abs(sta_lat - lat0), np.abs(sta_lon - lon0))
             margin = max(margin, 1.2 * distance)
-        max_obs = np.max(max_obs)  # type:ignore
+        max_obs = np.max(max_obs)  # type: ignore
         plt.text(
             lon0 + margin - 2,
             lat0 + margin - 0.25,
-            "{:.2f} cm".format(max_obs),  # type:ignore
+            "{:.2f} cm".format(max_obs),  # type: ignore
             transform=ccrs.PlateCarree(),
         )
         plt.text(
             lon0 + margin - 2,
             lat0 + margin - 0.45,
-            "{:.2f} cm".format(max_obs),  # type:ignore
+            "{:.2f} cm".format(max_obs),  # type: ignore
             transform=ccrs.PlateCarree(),
         )
         for name, sta_lat, sta_lon, obs, syn, error in stations_gnss2:
@@ -818,8 +817,8 @@ def PlotMap(
             plt.arrow(
                 sta_lon,
                 sta_lat,
-                east_west,  # type:ignore
-                north_south,  # type:ignore
+                east_west,  # type: ignore
+                north_south,  # type: ignore
                 color="r",
                 zorder=3,
                 linewidth=2,
@@ -832,7 +831,7 @@ def PlotMap(
                 sta_lon,
                 sta_lat,
                 0.0,
-                up_down,  # type:ignore
+                up_down,  # type: ignore
                 color="r",
                 zorder=3,
                 linewidth=2,
@@ -846,8 +845,8 @@ def PlotMap(
             plt.arrow(
                 sta_lon,
                 sta_lat,
-                east_west,  # type:ignore
-                north_south,  # type:ignore
+                east_west,  # type: ignore
+                north_south,  # type: ignore
                 zorder=3,
                 linewidth=2,
                 head_width=0.05,
@@ -859,7 +858,7 @@ def PlotMap(
                 sta_lon,
                 sta_lat,
                 0.0,
-                up_down,  # type:ignore
+                up_down,  # type: ignore
                 zorder=3,
                 linewidth=2,
                 head_width=0.05,
@@ -877,8 +876,8 @@ def PlotMap(
             height = float(err_n) / max_obs  # / 100
             ellipse = patches.Ellipse(
                 (sta_lon + east_west, sta_lat + north_south),
-                width,  # type:ignore
-                height,  # type:ignore
+                width,  # type: ignore
+                height,  # type: ignore
                 zorder=4,
                 color="k",
                 linewidth=10,
@@ -920,8 +919,8 @@ def PlotMap(
     #
     ax, cs = plot_map(
         ax,
-        segments_lats,  # type:ignore
-        segments_lons,  # type:ignore
+        segments_lats,  # type: ignore
+        segments_lons,  # type: ignore
         slip,
         max_val=max_slip,
         transform=dictn["projection"],
@@ -1069,8 +1068,8 @@ def PlotImagery(
         ax.plot(lon0, lat0, "y*", markersize=15, transform=ccrs.PlateCarree(), zorder=4)
         ax = plot_borders(
             ax,
-            segments_lats,  # type:ignore
-            segments_lons,  # type:ignore
+            segments_lats,  # type: ignore
+            segments_lons,  # type: ignore
             transform=dictn["projection"],
         )
         fig.colorbar(cs, ax=ax, orientation="horizontal")
@@ -1156,16 +1155,16 @@ def PlotComparisonMap(
     #
     ax1, cs1 = plot_map(
         ax1,
-        segments_lats,  # type:ignore
-        segments_lons,  # type:ignore
+        segments_lats,  # type: ignore
+        segments_lons,  # type: ignore
         slip,
         max_val=max_slip,
         transform=dictn["projection"],
     )
     ax2, cs2 = plot_map(
         ax2,
-        segments_lats,  # type:ignore
-        segments_lons,  # type:ignore
+        segments_lats,  # type: ignore
+        segments_lons,  # type: ignore
         input_slip,
         max_val=max_slip,
         transform=dictn["projection"],
@@ -1280,7 +1279,7 @@ def plot_moment_rate_function(
         point_sources2 = [
             ps_seg
             for segment, ps_seg in zipped
-            if segment["event"] == event  # type:ignore
+            if segment["event"] == event  # type: ignore
         ]
         segments2 = [segment for segment in segments if segment["event"] == event]
 
@@ -1336,11 +1335,11 @@ def plot_moment_rate_function(
             time = i * dt
             mr[i] = mr[i] + moment_rate[i] * (delta_strike * 1000) * (delta_dip * 1000)
 
-    time = np.arange(nmax) * dt  # type:ignore
+    time = np.arange(nmax) * dt  # type: ignore
     with open(directory / "STF.txt", "w") as outf:
         outf.write("dt: {}\n".format(dt))
         outf.write("Time[s]     Moment_Rate [Nm/s]\n")
-        for t, val in zip(time, mr):  # type:ignore
+        for t, val in zip(time, mr):  # type: ignore
             outf.write("{:8.2f}:   {:8.4e}\n".format(t, val))
 
     seismic_moment = np.trapz(mr, dx=0.01)
@@ -1348,12 +1347,12 @@ def plot_moment_rate_function(
     plt.xlabel("Time $(s)$")
     plt.ylabel("Moment rate $(Nm/s)$")
     plt.text(
-        0.5 * max(time),  # type:ignore
+        0.5 * max(time),  # type: ignore
         0.95 * max(mr),
         "$M_0$: {:.2E} $Nm$".format(seismic_moment),
     )
     plt.text(
-        0.5 * max(time),  # type:ignore
+        0.5 * max(time),  # type: ignore
         0.85 * max(mr),
         "$M_w$: {:.2f}".format(magnitude),
     )
@@ -1418,8 +1417,8 @@ def _PlotSnapshotSlip(
 
     for ax in axes.flat:  # type: ignore
         time = i * step * dt
-        srate, cslip, broken = __rupture_process(  # type:ignore
-            time, slip, srmax, trup, tl, tr, tmid, tstop  # type:ignore
+        srate, cslip, broken = __rupture_process(  # type: ignore
+            time, slip, srmax, trup, tl, tr, tmid, tstop  # type: ignore
         )
         ax.set_yticklabels([])
         ax.set_xticklabels([])
@@ -1603,10 +1602,10 @@ def __several_axes(
     ax.set(adjustable="datalim")
     ax2.set(adjustable="datalim")
     if autosize:
-        ax.figure.set_size_inches(  # type:ignore
+        ax.figure.set_size_inches(  # type: ignore
             4 * stk_subfaults * delta_strike / dip_subfaults / delta_dip, 4
         )
-        ax2.figure.set_size_inches(  # type:ignore
+        ax2.figure.set_size_inches(  # type: ignore
             4 * stk_subfaults * delta_strike / dip_subfaults / delta_dip, 4
         )
     ax2.set_ylabel("Depth $(km)$")
