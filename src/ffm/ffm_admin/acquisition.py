@@ -4,7 +4,6 @@ import typer
 
 from ffm.acquisition.cmt import Cmt
 
-
 app = typer.Typer(help="Get data to use in modelling")
 
 

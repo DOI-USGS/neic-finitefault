@@ -1,10 +1,10 @@
 import typer
 
+from .acquisition import app as acquisition_app
 from .manage import app as manage_app
 from .model import app as model_app
 from .plot import app as plot_app
 from .process import app as process_app
-from .acquisition import app as acquisition_app
 
 app = typer.Typer(help="CLI for managing the WISP code")
 app.add_typer(acquisition_app, name="get-data")
