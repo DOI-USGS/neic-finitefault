@@ -5,6 +5,8 @@
 fd_bank
 LITHO1.0.nc
 tectonicplates
+fortran_code/gfs_nm/long/low.in
+low.in
 
 # python files
 __pycache__
@@ -15,6 +17,7 @@ __pycache__
 coverage.xml
 dist
 htmlcov
+src/neic_finitefault.egg-info
 
 # fortran files
 run_modelling

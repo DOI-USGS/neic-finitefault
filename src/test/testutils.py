@@ -11,6 +11,19 @@ END_TO_END_DIR = DATA_DIR / "end_to_end"
 RESULTS_DIR = END_TO_END_DIR / "results"
 
 
+class MockResponse:
+    def __init__(self, text: str, status: int):
+        self.text = text
+        self.status_code = status
+
+    def json(self):
+        return json.loads(self.text)
+
+    def raise_for_status(self):
+        if self.status_code != 200:
+            raise Exception()
+
+
 def get_cgnss_json(min: int = 0, max: int = 3, all: bool = False):
     """Get cgnss_waves.json"""
     with open(RESULTS_DIR / "NP1" / "cgnss_waves.json", "r") as f:
