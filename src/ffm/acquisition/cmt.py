@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 from pydantic import BaseModel
 
-from ffm.acquisition.event import get_event_detail, get_moment_tensor
+from ffm.acquisition.event import get_event_detail, get_product
 
 
 class Cmt(BaseModel):
@@ -29,7 +29,9 @@ class Cmt(BaseModel):
     def from_detail(cls, detail: dict, eventid: str, source: str = "us"):
         """Get CMT from USGS event detail"""
         # get moment_tensor
-        moment_tensor = get_moment_tensor(detail, source=source)
+        moment_tensor = get_product(
+            detail=detail, product_type="moment-tensor", source=source
+        )
         if moment_tensor is None:
             raise Exception(
                 f"No moment tensor with source '{source}' found. Try specifying a different source."

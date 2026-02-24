@@ -1,13 +1,13 @@
-from datetime import datetime, timezone
 import importlib
 import json
 import pathlib
+from datetime import datetime, timezone
 from shutil import rmtree
 from tempfile import mkdtemp
+from test.testutils import DATA_DIR, MockResponse
 from unittest import mock
 
 from ffm.acquisition.cmt import Cmt
-from test.testutils import DATA_DIR, MockResponse
 
 DETAIL = {
     "properties": {

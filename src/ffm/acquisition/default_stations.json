@@ -1,0 +1,285 @@
+{
+    "AU": {
+        "MAW": [
+            "BHZ"
+        ]
+    },
+    "G": {
+        "CAN": [
+            "BHE",
+            "BH2",
+            "BHN",
+            "BH1",
+            "BHZ"
+        ],
+        "DZM": [
+            "BHZ"
+        ],
+        "INU": [
+            "BHE",
+            "BH2",
+            "BHN",
+            "BH1",
+            "BHZ"
+        ],
+        "PAF": [
+            "BHZ"
+        ],
+        "PPTF": [
+            "BHE",
+            "BH2",
+            "BHN",
+            "BH1",
+            "BHZ"
+        ],
+        "TAOE": [
+            "BHZ"
+        ]
+    },
+    "PS": {
+        "PATS": [
+            "BHZ"
+        ],
+        "PSI": [
+            "BHZ"
+        ]
+    },
+    "IU": {
+        "AFI": [
+            "BHZ"
+        ],
+        "CASY": [
+            "BHZ"
+        ],
+        "CHTO": [
+            "BHZ"
+        ],
+        "COLA": [
+            "BHZ"
+        ],
+        "CTAO": [
+            "BHZ"
+        ],
+        "DAV": [
+            "BHZ"
+        ],
+        "GUMO": [
+            "BHZ"
+        ],
+        "INCN": [
+            "BHZ"
+        ],
+        "JOHN": [
+            "BHZ"
+        ],
+        "KIP": [
+            "BHZ"
+        ],
+        "MA2": [
+            "BHZ"
+        ],
+        "MAJO": [
+            "BHZ"
+        ],
+        "MBWA": [
+            "BHZ"
+        ],
+        "NWAO": [
+            "BHZ"
+        ],
+        "PET": [
+            "BHE",
+            "BH2",
+            "BHN",
+            "BH1",
+            "BHZ"
+        ],
+        "PMG": [
+            "BHZ"
+        ],
+        "POHA": [
+            "BHZ"
+        ],
+        "QSPA": [
+            "BHZ"
+        ],
+        "RAO": [
+            "BHZ"
+        ],
+        "RAR": [
+            "BHZ"
+        ],
+        "SNZO": [
+            "BHZ"
+        ],
+        "TARA": [
+            "BHZ"
+        ],
+        "TATO": [
+            "BHZ"
+        ],
+        "TIXI": [
+            "BHE",
+            "BH2",
+            "BHN",
+            "BH1",
+            "BHZ"
+        ],
+        "ULN": [
+            "BHZ"
+        ],
+        "YAK": [
+            "BHE",
+            "BH2"
+        ],
+        "YSS": [
+            "BHE",
+            "BH2",
+            "BHZ"
+        ]
+    },
+    "II": {
+        "KAPI": [
+            "BHZ"
+        ],
+        "KDAK": [
+            "BHZ"
+        ],
+        "MSVF": [
+            "BHZ"
+        ],
+        "PALK": [
+            "BHZ"
+        ],
+        "RPN": [
+            "BHZ"
+        ],
+        "TAU": [
+            "BHZ"
+        ],
+        "TLY": [
+            "BHE",
+            "BH2",
+            "BHN",
+            "BH1",
+            "BHZ"
+        ],
+        "WRAB": [
+            "BHZ"
+        ]
+    },
+    "IC": {
+        "BJT": [
+            "BHE",
+            "BH2",
+            "BHN",
+            "BH1",
+            "BHZ"
+        ],
+        "ENH": [
+            "BHE",
+            "BH2",
+            "BHN",
+            "BH1",
+            "BHZ"
+        ],
+        "HIA": [
+            "BHE",
+            "BH2",
+            "BHN",
+            "BH1",
+            "BHZ"
+        ],
+        "KMI": [
+            "BHZ"
+        ],
+        "MDJ": [
+            "BHE",
+            "BH2",
+            "BHN",
+            "BH1",
+            "BHZ"
+        ],
+        "QIZ": [
+            "BHE",
+            "BH2",
+            "BHN",
+            "BH1",
+            "BHZ"
+        ],
+        "SSE": [
+            "BHE",
+            "BH2",
+            "BHN",
+            "BH1"
+        ],
+        "WMQ": [
+            "BHN",
+            "BH1",
+            "BHZ"
+        ],
+        "XAN": [
+            "BHE",
+            "BH2",
+            "BHN",
+            "BH1",
+            "BHZ"
+        ]
+    },
+    "GE": {
+        "BKB": [
+            "BHZ"
+        ],
+        "GSI": [
+            "BHZ"
+        ],
+        "MMRI": [
+            "BHZ"
+        ],
+        "MNAI": [
+            "BHZ"
+        ],
+        "PMBI": [
+            "BHZ"
+        ],
+        "SMRI": [
+            "BHE",
+            "BH2",
+            "BHN",
+            "BH1"
+        ],
+        "UGM": [
+            "BHN",
+            "BH1",
+            "BHZ"
+        ]
+    },
+    "HK": {
+        "HKPS": [
+            "BHE",
+            "BH2",
+            "BHN",
+            "BH1",
+            "BHZ"
+        ]
+    },
+    "JP": {
+        "ASAJ": [
+            "BHZ"
+        ],
+        "JHJ2": [
+            "BHZ"
+        ],
+        "JNU": [
+            "BHZ"
+        ],
+        "JOW": [
+            "BHN",
+            "BH1",
+            "BHZ"
+        ],
+        "YOJ": [
+            "BHZ"
+        ]
+    }
+}

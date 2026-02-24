@@ -1,13 +1,16 @@
 import json
 import pathlib
+from glob import glob
 from shutil import rmtree
 from tempfile import mkdtemp
+from test.testutils import MockResponse
 from unittest import mock
 
+import numpy as np
+from obspy.core import Stream, Trace
 from typer.testing import CliRunner
 
 from ffm.ffm_admin.acquisition import app
-from test.testutils import MockResponse
 
 runner = CliRunner()
 
@@ -31,7 +34,18 @@ DETAIL = {
                         "sourcetime-duration": "7",
                     },
                 },
-            ]
+            ],
+            "origin": [
+                {
+                    "source": "us",
+                    "properties": {
+                        "depth": "10",
+                        "eventtime": "2026-02-14T02:27:37.951Z",
+                        "latitude": "-14.8934",
+                        "longitude": "166.6013",
+                    },
+                }
+            ],
         },
     },
     "geometry": {
@@ -41,31 +55,18 @@ DETAIL = {
 }
 
 
-def test_app():
+def test_teleseismic():
     with mock.patch(target="requests.get") as mock_requests:
         mock_requests.return_value = MockResponse(json.dumps(DETAIL), 200)
-        tempdir = pathlib.Path(mkdtemp())
-        try:
-            result = runner.invoke(app, ["eventid", "-d", str(tempdir)])
-            assert result.exit_code == 0
-            with open(tempdir / "eventid_cmt_CMT") as f:
-                data = f.read()
-            assert (
-                data
-                == """ US 2026 02 14 02 27 37.951000 -14.8934 166.6013 10.0  0.0 6.4 there
-event name: eventid
-time shift: 3.5
-half duration: 3.5
-latitude: -14.8934
-longitude: 166.6013
-depth: 10.0
-Mrr: 3e+25
-Mtt: -2e+25
-Mpp: -2e+24
-Mrt: 3e+25
-Mrp: -2e+25
-Mtp: 3e+25
-"""
-            )
-        finally:
-            rmtree(tempdir)
+        with mock.patch(
+            target="ffm.acquisition.irisquery.IrisQuery.from_id"
+        ) as mock_IrisQuery:
+            mock_IrisQuery.return_value = mock.MagicMock()
+            tempdir = pathlib.Path(mkdtemp())
+            try:
+                result = runner.invoke(
+                    app, ["teleseismic", "eventid", "-d", str(tempdir), "-n", "US"]
+                )
+                assert result.exit_code == 0
+            finally:
+                rmtree(tempdir)
