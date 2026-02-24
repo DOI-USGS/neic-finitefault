@@ -91,6 +91,7 @@ def acquisition(
             print(e)
         networks = "CX"
         try:
+            # HL = triggered strong motion data 80-100Hz
             inventory = inventory + client_gfz.get_stations(
                 starttime=event_time - strong_before * 60,
                 endtime=event_time + strong_after * 60,
