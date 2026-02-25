@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-""" """
+"""Script for loading model parameters from input"""
 
 import pathlib
 from random import randint
