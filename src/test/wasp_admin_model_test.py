@@ -8,7 +8,7 @@ from unittest import mock
 
 import numpy as np
 import pytest
-from obspy import read  # type:ignore
+from obspy import read  # type: ignore
 from typer.testing import CliRunner
 
 from .testutils import DATA_DIR, END_TO_END_DIR, HOME, RESULTS_DIR

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-"""
-
+""" """
 
 import json
 import logging
@@ -151,7 +149,7 @@ def fk_green_fun1(
     if max_depth is None:
         max_depth = max(30, 2 * depth)
         max_depth = min(max_depth, depth + 60)
-    max_depth = max_depth + 5  # type:ignore
+    max_depth = max_depth + 5  # type: ignore
     min_dist = 0
     max_dist = 600 if time_shift < 40 else 1000
     time_corr = 10 if not cgnss else 25

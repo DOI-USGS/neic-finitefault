@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Module for logger management
-"""
-
+"""Module for logger management"""
 
 import logging
 import pathlib

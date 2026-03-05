@@ -1,7 +1,7 @@
 ARG FROM_IMAGE=code.usgs.gov:5001/devops/images/usgs/ubuntu
 
 ### ubuntu packages
-FROM ${FROM_IMAGE} as packages
+FROM ${FROM_IMAGE} AS packages
 USER root
 
 RUN mkdir /neic-finitefault
@@ -14,46 +14,31 @@ RUN apt install -y \
     gfortran \
     && apt clean;
 
-### miniforge
-FROM packages as ffm-python
+### ffm
+FROM packages AS ffm-python
 
-WORKDIR /root
-SHELL ["/bin/bash", "-i", "-c"]
-RUN bash /neic-finitefault/install.d/miniforge.sh
-ENV PATH=/root/miniforge/bin:$PATH
-RUN bash /neic-finitefault/install.d/ff-env.sh /neic-finitefault
-RUN echo "conda activate ff-env" >> /root/.bashrc
-COPY pyproject.toml /neic-finitefault/pyproject.toml
+COPY . /neic-finitefault/
+RUN chmod -R 777 /neic-finitefault
+RUN chown usgs-user /neic-finitefault
 
-### ffm-fortran
-FROM ffm-python as ffm-fortran
-
+USER usgs-user
 WORKDIR /neic-finitefault
-COPY fortran_code /neic-finitefault/fortran_code
-RUN install.d/ffm.sh /neic-finitefault
-RUN chmod 777 -R /neic-finitefault
+RUN ls
+RUN bash install.sh /neic-finitefault
+SHELL ["/bin/bash", "-i", "-c"]
+RUN echo ". ${HOME}/miniforge/etc/profile.d/conda.sh" >> "${HOME}/.bashrc"
+RUN echo "conda activate ff-env" >> "${HOME}/.bashrc"
+RUN echo "source ${HOME}/.bashrc" >> "${HOME}/.bash_profile"
+ENV PATH="${HOME}/miniforge/bin:$PATH"
+ENV PATH="${HOME}/miniforge/envs/ff-env/bin:$PATH"
+RUN conda activate ff-env && pip install -e .
 
-### data dependencies
-FROM ffm-fortran as ffm-dependencies
 
-RUN apt install -y git
-RUN bash /neic-finitefault/install.d/data_dependencies.sh /neic-finitefault
-COPY pb2002_boundaries.gmt /neic-finitefault/pb2002_boundaries.gmt
-# cleanup
-RUN apt remove -y git
-RUN rm -rf /neic-finitefault/install.d
 
-### add python source code and install
-FROM ffm-dependencies as ffm
-ARG RUN_ALL
+FROM ffm-python AS ffm-test
 ARG CI_REGISTRY
-ENV RUN_ALL "${RUN_ALL:-True}"
-ENV CI_REGISTRY "${CI_REGISTRY}"
+ARG RUN_END_TO_END=False
+ENV CI_REGISTRY=$CI_REGISTRY
+ENV RUN_END_TO_END=$RUN_END_TO_END
 
-
-COPY src /neic-finitefault/src
-RUN pip install -e .
-ENV PATH /root/miniforge/envs/ff-env/bin:$PATH
-
-## by default the command is to run the test
-CMD ["conda", "run", "--no-capture-output", "-n", "ff-env", "poe", "end_to_end_test"]
+CMD ["/bin/bash", "-i", "-c", "poe test"]

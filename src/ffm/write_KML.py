@@ -5,6 +5,7 @@ Created on Mon Jul 11 11:21:45 2022
 
 @author: degoldberg
 """
+
 import collections
 import pathlib
 from glob import glob
@@ -251,7 +252,7 @@ def PlotMap_KML(
     default_dirs: dict,
     stations_str: Optional[dict] = None,
     stations_gnss: Optional[zip] = None,
-    stations_cgnss: Optional[str] = None,
+    stations_cgnss: Optional[List[dict]] = None,
     max_slip: Optional[float] = None,
     legend_len: Optional[float] = None,
     scale: Optional[float] = None,
@@ -276,7 +277,7 @@ def PlotMap_KML(
     :param stations_gnss: The gnss stations description, defaults to None
     :type stations_gnss:  Optional[zip], optional
     :param stations_cgnss: The cgnss stations description, defaults to None
-    :type stations_cgnss: Optional[str], optional
+    :type stations_cgnss: Optional[List[dict]], optional
     :param max_slip: A specified maximum slip, defaults to None
     :type max_slip: Optional[float], optional
     :param legend_len: The length of the legend, defaults to None
@@ -337,7 +338,7 @@ def PlotMap_KML(
         111, projection=dictn["projection"], facecolor=dictn["facecolor"], frameon=False
     )
     ax.spines["geo"].set_linewidth(2)
-    gl = ax.gridlines()  # type:ignore
+    gl = ax.gridlines()  # type: ignore
     gl.top_labels = False
     gl.bottom_labels = False
     gl.left_labels = False
@@ -403,19 +404,19 @@ def PlotMap_KML(
             max_obs = np.maximum([abs(float(v)) for v in obs], max_obs)
             distance = max(np.abs(sta_lat - lat0), np.abs(sta_lon - lon0))
             margin = max(margin, 1.2 * distance)
-        max_obs = np.max(max_obs)  # type:ignore
-        for name, sta_lat, sta_lon, obs, syn, error in stations_gnss2:  # type:ignore
+        max_obs = np.max(max_obs)  # type: ignore
+        for name, sta_lat, sta_lon, obs, syn, error in stations_gnss2:  # type: ignore
             if scale == None:
                 scale = 2  # bigger number here makes arrows look longer
             scale2 = 2
-            gnss_z, gnss_n, gnss_e = syn
-            east_west = float(gnss_e) / max_obs / (1.0 / scale)  # type:ignore
-            north_south = float(gnss_n) / max_obs / (1.0 / scale)  # type:ignore
+            gnss_z, gnss_n, gnss_e = syn  # type: ignore [misc]
+            east_west = float(gnss_e) / max_obs / (1.0 / scale)  # type: ignore
+            north_south = float(gnss_n) / max_obs / (1.0 / scale)  # type: ignore
             plt.arrow(
-                sta_lon,
-                sta_lat,
-                east_west,
-                north_south,
+                sta_lon,  # type: ignore [arg-type]
+                sta_lat,  # type: ignore [arg-type]
+                east_west,  # type: ignore [arg-type]
+                north_south,  # type: ignore [arg-type]
                 facecolor="r",
                 zorder=7,
                 linewidth=0.5,
@@ -425,14 +426,14 @@ def PlotMap_KML(
                 transform=dictn["transform"],
                 edgecolor="k",
             )
-            gnss_z, gnss_n, gnss_e = obs
-            east_west = float(gnss_e) / max_obs / (1.0 / scale)  # type:ignore
-            north_south = float(gnss_n) / max_obs / (1.0 / scale)  # type:ignore
+            gnss_z, gnss_n, gnss_e = obs  # type: ignore [misc]
+            east_west = float(gnss_e) / max_obs / (1.0 / scale)  # type: ignore
+            north_south = float(gnss_n) / max_obs / (1.0 / scale)  # type: ignore
             plt.arrow(
-                sta_lon,
-                sta_lat,
-                east_west,
-                north_south,
+                sta_lon,  # type: ignore [arg-type]
+                sta_lat,  # type: ignore [arg-type]
+                east_west,  # type: ignore [arg-type]
+                north_south,  # type: ignore [arg-type]
                 facecolor="k",
                 zorder=5,
                 linewidth=0.5,
@@ -446,7 +447,7 @@ def PlotMap_KML(
         plt.arrow(
             0.83 * (max_lon - min_lon) + (min_lon + 0.5),
             0.08 * (max_lat - min_lat) + (min_lat - 0.5),
-            legend_len / max_obs / (1.0 / scale),  # type:ignore
+            legend_len / max_obs / (1.0 / scale),  # type: ignore
             0,
             facecolor="k",
             edgecolor="k",
@@ -460,7 +461,7 @@ def PlotMap_KML(
         plt.arrow(
             0.83 * (max_lon - min_lon) + (min_lon + 0.5),
             0.04 * (max_lat - min_lat) + (min_lat - 0.5),
-            legend_len / max_obs / (1.0 / scale),  # type:ignore
+            legend_len / max_obs / (1.0 / scale),  # type: ignore
             0,
             facecolor="r",
             edgecolor="k",
@@ -474,7 +475,7 @@ def PlotMap_KML(
         plt.text(
             0.9,
             0.09,
-            f"{int(legend_len)} cm",  # type:ignore
+            f"{int(legend_len)} cm",  # type: ignore
             horizontalalignment="center",
             verticalalignment="center",
             transform=ax.transAxes,
@@ -520,7 +521,7 @@ def PlotMap_KML(
             zorder=3,
         )
     )
-    ax.set_extent(margins)  # type:ignore
+    ax.set_extent(margins)  # type: ignore
     ax = set_KML_map_cartopy(
         ax,
         margins,
@@ -647,7 +648,7 @@ def PlotMap_KML(
 
     cb_ax = ax.inset_axes((0.06, 0.03, 0.3, 0.02))
     cbar = plt.colorbar(sm, cax=cb_ax, orientation="horizontal")
-    cbar.outline.set_linewidth(3)  # type:ignore
+    cbar.outline.set_linewidth(3)  # type: ignore
     cbar.set_label("Slip (m)")
     cbar.ax.xaxis.set_ticks_position("top")
     cbar.ax.xaxis.set_label_position("top")

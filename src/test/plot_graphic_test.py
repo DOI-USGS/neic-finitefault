@@ -58,6 +58,10 @@ def __get_solution():
 POINT_SOURCES, SOLUTION = __get_solution()
 
 
+@pytest.mark.skipif(
+    os.getenv("CI_REGISTRY") is not None or os.getenv("RUN_ALL", False) == False,
+    reason="Takes 25+ minutes to run",
+)
 def test_plot():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -217,10 +221,6 @@ def test__plot_vel_model():
         shutil.rmtree(tempdir)
 
 
-@pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None,
-    reason="Build runner does not have the resources to run",
-)
 def test_PlotComparisonMap():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
@@ -237,6 +237,10 @@ def test_PlotComparisonMap():
         shutil.rmtree(tempdir)
 
 
+@pytest.mark.skipif(
+    os.getenv("CI_REGISTRY") is not None or os.getenv("RUN_ALL", False) == False,
+    reason="Takes 25+ minutes to run",
+)
 def test_PlotImagery():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
