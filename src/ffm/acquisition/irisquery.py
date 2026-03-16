@@ -1,4 +1,5 @@
 import json
+import math
 import multiprocessing
 import pathlib
 import time
@@ -19,7 +20,7 @@ from ffm.acquisition.event import get_event_detail, get_product
 
 
 def rate_limit_iris(until):
-    duration = int(round(until - time.time()))
+    duration = int(math.ceil(until - time.time()))
     print("Rate limited, sleeping for {:d} seconds".format(duration))
 
 
