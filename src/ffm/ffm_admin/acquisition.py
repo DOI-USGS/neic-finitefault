@@ -68,8 +68,7 @@ def teleseismic(
         help="How many seconds after the event time to search for waveforms",
     ),
     networks: List[str] = typer.Option(
-        # ["IU", "II", "GE", "G", "US"],
-        ["G"],
+        ["IU", "II", "GE", "G", "US"],
         "-n",
         "--networks",
         help=(
