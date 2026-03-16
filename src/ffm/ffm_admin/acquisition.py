@@ -114,6 +114,5 @@ def teleseismic(
     stream1 = waveform_query.get_data(
         networks=networks, stations=stations_data, debug=debug
     )
-    print("HERE", stream1)
     stream2 = waveform_query.get_responses(stream=stream1, debug=debug)
     waveform_query.write_data(directory=data_directory, stream=stream2)
