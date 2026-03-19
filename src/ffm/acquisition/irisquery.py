@@ -116,7 +116,7 @@ class IrisQuery(BaseModel):
         """Get data for specified networks (and optionally stations) from IRIS with Obspy"""
         client = Client("IRIS", debug=debug)
         # list of network, station
-        parallelized_params = []
+        traces = []
         for network in networks:
             print(f"Querying network: {network}")
             inventory: Inventory = client.get_stations(
@@ -131,7 +131,7 @@ class IrisQuery(BaseModel):
                 starttime=UTCDateTime(self.starttime),
             )
             for station in inventory.networks[0].stations:
-                parallelized_params += [(network, station.code, "BH*", debug)]
+                traces += self._get_data(network, station.code, "BH*", debug)
         if stations is not None:
             for network_key, network_stations in stations.items():
                 for station_key, channels in network_stations.items():
@@ -139,21 +139,13 @@ class IrisQuery(BaseModel):
                         print(
                             f"Querying station: {network_key} {station_key} {channel}"
                         )
-                        parallelized_params += [
-                            (
+                    traces += self._get_data(
                                 network_key,
                                 station_key,
                                 channel,
                                 debug,
                             )
-                        ]
-
-        with multiprocessing.Pool() as pool:
-            traces = pool.starmap(self._get_data, parallelized_params)
-        flat_traces = []
-        for trace in traces:
-            flat_traces += trace
-        stream = Stream(flat_traces)
+        stream = Stream(traces)
         stream.merge(-1)
         return stream
 
