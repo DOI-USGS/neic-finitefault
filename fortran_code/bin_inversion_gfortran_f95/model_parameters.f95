@@ -71,8 +71,8 @@ contains
          read(12,*) slip0(subfault), rake0(subfault), &
          & rupt_time0(subfault), t_rise0(subfault), t_fall0(subfault)
 !  magic
-         slip0(subfault) = int(slip0(subfault))
-         rake0(subfault) = int(rake0(subfault))
+!         slip0(subfault) = int(slip0(subfault))
+!         rake0(subfault) = int(rake0(subfault))
 !
       end do
    end do
