@@ -237,7 +237,7 @@ dependencies:
   - ratelimiter=1.2.0=pyhd8ed1ab_1003
   - readline=8.3=h853b02a_0
   - referencing=0.37.0=pyhcf101f3_0
-  - requests=2.32.5=pyhcf101f3_1
+  - requests=2.33.0=pyhcf101f3_0
   - rfc3339-validator=0.1.4=pyhd8ed1ab_1
   - rfc3986-validator=0.1.1=pyh9f0ad1d_0
   - rfc3987-syntax=1.1.0=pyhe01879c_1
