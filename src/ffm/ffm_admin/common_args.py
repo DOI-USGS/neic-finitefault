@@ -7,9 +7,7 @@ DATA_DIRECTORY: Optional[pathlib.Path] = typer.Option(
     None,
     "-d",
     "--data-dir",
-    help=(
-        "Path to where files will be read/written"
-    ),
+    help=("Path to where files will be read/written"),
 )
 QUERY_EVENTID: str = typer.Argument(
     ...,
