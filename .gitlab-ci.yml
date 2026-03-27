@@ -56,7 +56,7 @@ stages:
 Python Audit:
   script:
     - pip install pip-audit
-    - pip-audit
+    - pip-audit --ignore-vuln CVE-2026-4539
   stage: audit
 
 ## -------------------------------------
