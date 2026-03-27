@@ -2,7 +2,7 @@ program run_forward
 
 
    use model_parameters, only : get_faults_data, slip0, rake0, rupt_time0, &
-       &  t_rise0, t_fall0, write_model, deallocate_ps
+       &  t_rise0, t_fall0, write_model, deallocate_ps, modelparameters_set_procedure_param
    use modelling_inputs, only : read_annealing_param
    use get_stations_data, only : get_data
    use retrieve_gf, only : get_gf, deallocate_gf, retrievegf_set_data_properties, &
@@ -42,6 +42,7 @@ program run_forward
       if (input .eq.'many') many_events = .True.
    end do
    call read_annealing_param()
+   call modelparameters_set_procedure_param()
    call get_faults_data()
    call retrievegf_set_fault_parameters()
    call saveforward_set_fault_parameters()
