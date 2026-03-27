@@ -18,10 +18,10 @@ def get_event_detail(eventid: str, retries: int = 3) -> Optional[dict]:
     return response.json()
 
 
-def get_moment_tensor(detail: dict, source: str = "us") -> Optional[dict]:
-    """Get an moment-tensor product from an event detail. Default is preferred 'us' source moment tensor"""
+def get_product(detail: dict, product_type: str, source: str = "us"):
+    """Get product from event detail"""
     products = detail["properties"]["products"]
-    for moment_tensor_product in products.get("moment-tensor", []):
-        if moment_tensor_product["source"] == source:
-            return moment_tensor_product
+    for product in products.get(product_type, []):
+        if product["source"] == source:
+            return product
     return None

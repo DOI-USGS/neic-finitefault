@@ -34,6 +34,10 @@ where = ["src"]
 "ffm" = "ffm.ffm_admin.ffm:app"
 
 [tool.poe.tasks]
+fix = [
+  { shell = "black src" },
+  { shell = "isort src/ffm" }
+]
 lint = [
   { shell = "black --check src" },
   { shell = "isort --check src/ffm" },
