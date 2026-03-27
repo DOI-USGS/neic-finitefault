@@ -8,8 +8,7 @@ DATA_DIRECTORY: Optional[pathlib.Path] = typer.Option(
     "-d",
     "--data-dir",
     help=(
-        "Path to the data directory where the CMT file will be written, "
-        "otherwise <directory>/data"
+        "Path to where files will be read/written"
     ),
 )
 QUERY_EVENTID: str = typer.Argument(

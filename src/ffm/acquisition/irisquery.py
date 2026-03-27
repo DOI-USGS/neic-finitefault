@@ -140,11 +140,11 @@ class IrisQuery(BaseModel):
                             f"Querying station: {network_key} {station_key} {channel}"
                         )
                     traces += self._get_data(
-                                network_key,
-                                station_key,
-                                channel,
-                                debug,
-                            )
+                        network_key,
+                        station_key,
+                        channel,
+                        debug,
+                    )
         stream = Stream(traces)
         stream.merge(-1)
         return stream
