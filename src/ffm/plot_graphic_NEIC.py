@@ -662,13 +662,13 @@ def PlotSlipDistribution(
         if (
             autosize == True
         ):  # make sure that rake vectors are same scale for each segment
-            scale = (1.0 / 10) * (
+            scale = (1.0 / 5) * (
                 stk_subfaults * delta_strike
             )  # One-tenth of segment width
-            width = 1 / (scale * 25)  # quiver width
+            width = 1 / (scale * 20)  # quiver width
             ax.quiver(x, y, u, v, scale=scale, width=width, color="0.5", clip_on=False)
         else:  # will be plotted to default aspect ratio
-            ax.quiver(x, y, u, v, scale=20.0, width=0.002, color="0.5", clip_on=False)
+            ax.quiver(x, y, u, v, scale=30.0, width=0.002, color="0.5", clip_on=False)
         ax.plot(0, 0, "w*", ms=15, markeredgewidth=1.5, markeredgecolor="k")
         ax, im = __several_axes(
             grid_z_reshape, segment, ps_seg, ax, max_val=1.0, autosize=autosize
@@ -1560,7 +1560,7 @@ def PlotMap(
             slips = slip[segment].flatten()
             maxslip = np.max([maxslip, np.array(slips).max() / 100])
     else:
-        maxslip = max_slip  # type:ignore
+        maxslip = max_slip / 100  # type:ignore
     pygmt.makecpt(
         cmap=str(default_dirs["root_dir"]) + "/src/ffm/fault2.cpt", series=[0, maxslip]
     )
@@ -1616,11 +1616,11 @@ def PlotMap(
         for kafter in range(len(aftershocks)):
             print("...Adding aftershocks from: " + str(aftershocks[kafter]))
             aftershock = np.genfromtxt(
-                aftershocks[kafter], delimiter="\t", skip_header=1
+                aftershocks[kafter],
             )
-            aftershock_lat = aftershock[:, 3]
-            aftershock_lon = aftershock[:, 4]
-            aftershock_mag = aftershock[:, 6]
+            aftershock_lat = aftershock[:, 0]
+            aftershock_lon = aftershock[:, 1]
+            aftershock_mag = aftershock[:, 3]
             fig.plot(
                 x=aftershock_lon,
                 y=aftershock_lat,
@@ -1709,8 +1709,8 @@ def PlotMap(
                 min2 = corners[:, i]
         updip = np.c_[min1, min2]
         corners = np.c_[corners, cornerA]
-        fig.plot(x=corners[0, :], y=corners[1, :], pen="1p,black")
-        fig.plot(x=updip[0, :], y=updip[1, :], pen="1p,red")
+        fig.plot(x=corners[0, :], y=corners[1, :], pen="1p,black", straight_line=True)
+        fig.plot(x=updip[0, :], y=updip[1, :], pen="1p,red", straight_line=True)
 
         ######################
         # plot hypocenter(s) #
