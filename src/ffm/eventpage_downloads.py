@@ -336,7 +336,6 @@ def write_Coulomb_file(
     ##########################################################################
     ### GRAB RELEVANT SUBFAULT PARAMETER INFO FROM EVENT_MULT.IN, AND .FSP ###
     ##########################################################################
-
     with open(directory / "fsp_sol_file.txt", "r") as fsp:
         nft = 0
         for line in fsp:
@@ -404,6 +403,8 @@ def write_Coulomb_file(
         RAKE = []
         STRIKE = []
         DIP = []
+        SF_LENGTH_AS = []
+        SF_LENGTH_AD = []
 
         with open(directory / "Solution.txt") as param:
             for line in param:
@@ -431,6 +432,9 @@ def write_Coulomb_file(
         with open(directory / "fsp_sol_file.txt", "r") as fsp:
             for line in fsp:
                 if line.startswith("%"):
+                    if line.startswith("% Dx"):
+                        sf_length_as = float(line.split()[3])
+                        sf_length_ad = float(line.split()[7])
                     continue
                 else:
                     (
@@ -453,6 +457,8 @@ def write_Coulomb_file(
                         RAKE.append(float(rake) - 360)
                     else:
                         RAKE.append(float(rake))
+                    SF_LENGTH_AS.append(sf_length_as)
+                    SF_LENGTH_AD.append(sf_length_ad)
         ##########################################################################
         ######### CONVERT COORDINATE SUBFAULT CENTERS TO LOCAL CARTESIAN #########
         ##########################################################################
@@ -480,27 +486,27 @@ def write_Coulomb_file(
         for ksubfault in range(Nfaults):
             ### ASSUMES .FSP FILE COORDINATES ARE THE **CENTER** OF THE SUBFAULT ###
             top_mid_x[ksubfault] = x[ksubfault] + (
-                (sf_length_as / 2) * cos(deg2rad(DIP[ksubfault]))
+                (SF_LENGTH_AS[ksubfault] / 2) * cos(deg2rad(DIP[ksubfault]))
             ) * sin(deg2rad(STRIKE[ksubfault] - 90))
             top_mid_y[ksubfault] = y[ksubfault] + (
-                (sf_length_as / 2) * cos(deg2rad(DIP[ksubfault]))
+                (SF_LENGTH_AS[ksubfault] / 2) * cos(deg2rad(DIP[ksubfault]))
             ) * cos(deg2rad(STRIKE[ksubfault] - 90))
-            xstart[ksubfault] = top_mid_x[ksubfault] + (sf_length_as / 2) * sin(
+            xstart[ksubfault] = top_mid_x[ksubfault] + (SF_LENGTH_AS[ksubfault] / 2) * sin(
                 deg2rad(STRIKE[ksubfault] - 180)
             )
-            ystart[ksubfault] = top_mid_y[ksubfault] + (sf_length_as / 2) * cos(
+            ystart[ksubfault] = top_mid_y[ksubfault] + (SF_LENGTH_AS[ksubfault] / 2) * cos(
                 deg2rad(STRIKE[ksubfault] - 180)
             )
-            xfin[ksubfault] = top_mid_x[ksubfault] + (sf_length_as / 2) * sin(
+            xfin[ksubfault] = top_mid_x[ksubfault] + (SF_LENGTH_AS[ksubfault] / 2) * sin(
                 deg2rad(STRIKE[ksubfault])
             )
-            yfin[ksubfault] = top_mid_y[ksubfault] + (sf_length_as / 2) * cos(
+            yfin[ksubfault] = top_mid_y[ksubfault] + (SF_LENGTH_AS[ksubfault] / 2) * cos(
                 deg2rad(STRIKE[ksubfault])
             )
-            ztop[ksubfault] = DEP[ksubfault] - (sf_length_ad / 2) * sin(
+            ztop[ksubfault] = DEP[ksubfault] - (SF_LENGTH_AD[ksubfault] / 2) * sin(
                 deg2rad(DIP[ksubfault])
             )
-            zbot[ksubfault] = DEP[ksubfault] + (sf_length_ad / 2) * sin(
+            zbot[ksubfault] = DEP[ksubfault] + (SF_LENGTH_AD[ksubfault] / 2) * sin(
                 deg2rad(DIP[ksubfault])
             )
             out = (
