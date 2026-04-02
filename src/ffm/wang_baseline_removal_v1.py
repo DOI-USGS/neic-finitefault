@@ -9,7 +9,6 @@ Wang et al. [2011]_
      doi:10.1785/0120110039.
 """
 
-
 import argparse
 import glob
 import os
@@ -17,13 +16,13 @@ import pathlib
 import time
 from typing import List, Optional, Tuple, Union
 
-import matplotlib.pyplot as plt  # type:ignore
+import matplotlib.pyplot as plt  # type: ignore
 import numpy as np
-import scipy.integrate as integrate  # type:ignore
+import scipy.integrate as integrate  # type: ignore
 from matplotlib.axes import Axes
-from obspy import read  # type:ignore
-from obspy.core.trace import Trace  # type:ignore
-from scipy.optimize import shgo  # type:ignore
+from obspy import read  # type: ignore
+from obspy.core.trace import Trace  # type: ignore
+from scipy.optimize import shgo  # type: ignore
 
 
 def wang_process(
@@ -89,7 +88,7 @@ def wang_process(
 
 
 def _wang_baselines(
-    file: Union[pathlib.Path, str]
+    file: Union[pathlib.Path, str],
 ) -> Tuple[Trace, Trace, Trace, Optional[list]]:
     """Perform baseline removal
 
@@ -212,8 +211,8 @@ def _function(
     after = comparison[1:]
     before = comparison[:-1]
     crossings = np.nonzero(comparison == 0)[0]
-    crossings = list(crossings) + list(np.nonzero(before * after < 0)[0])  # type:ignore
-    crossings = [index for index in crossings if index > time_p]  # type:ignore
+    crossings = list(crossings) + list(np.nonzero(before * after < 0)[0])  # type: ignore
+    crossings = [index for index in crossings if index > time_p]  # type: ignore
     if not crossings:
         return np.sum(disp_data2**2)
     results = [_heaviside_fit(int(index), disp_data2, gnss) for index in crossings]
@@ -263,8 +262,8 @@ def _gnss_jump(
     after = comparison[1:]
     before = comparison[:-1]
     crossings = np.nonzero(comparison == 0)[0]
-    crossings = list(crossings) + list(np.nonzero(before * after < 0)[0])  # type:ignore
-    crossings = [index for index in crossings if index > time_p]  # type:ignore
+    crossings = list(crossings) + list(np.nonzero(before * after < 0)[0])  # type: ignore
+    crossings = [index for index in crossings if index > time_p]  # type: ignore
     if not crossings:
         return np.sum(disp_data**2), gnss, 0
     results = [_heaviside_fit(int(index), disp_data2, gnss) for index in crossings]

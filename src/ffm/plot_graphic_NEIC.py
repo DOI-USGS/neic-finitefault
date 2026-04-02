@@ -81,7 +81,7 @@ def plot_ffm_sol(
     mr_time: int = False,
     files_str: Optional[dict] = None,
     stations_gnss: Optional[zip] = None,
-    stations_cgnss: Optional[str] = None,
+    stations_cgnss: Optional[List[dict]] = None,
     legend_len: Optional[float] = None,
     scale: Optional[float] = None,
     limits: List[Optional[float]] = [None, None, None, None],
@@ -114,7 +114,7 @@ def plot_ffm_sol(
     :param stations_gnss: The gnss stations description, defaults to None
     :type stations_gnss:  Optional[zip], optional
     :param stations_cgnss: The cgnss stations description, defaults to None
-    :type stations_cgnss: Optional[str], optional
+    :type stations_cgnss: Optional[List[dict]], optional
     :param legend_len: The length of the legend, defaults to None
     :type legend_len: Optional[float], optional
     :param scale: The scale, defaults to None
@@ -389,7 +389,7 @@ def _PlotRiseTime(
         #
         # Plot the slip distribution
         #
-        indexes = np.where(slip_seg < 0.1 * max_slip)  # type:ignore
+        indexes = np.where(slip_seg < 0.1 * max_slip)  # type: ignore
         trise_seg[indexes] = 0
         tfall_seg[indexes] = 0
         fig, axes = plt.subplots(1, 2, figsize=(20, 10), sharex=True, sharey=True)
@@ -450,10 +450,10 @@ def _PlotMultiSlipDist(
     rupt_time = solution["rupture_time"]
     max_slip: Union[float, list] = [np.max(slip_seg.flatten()) for slip_seg in slip]
     max_slip = np.max(max_slip)
-    print("Max Slip of Solution: {:.2f} cm".format(max_slip))  # type:ignore
+    print("Max Slip of Solution: {:.2f} cm".format(max_slip))  # type: ignore
     if max_val != None:
-        max_slip = max_val  # type:ignore
-    print("Max Slip for Plotting: {:.2f} cm".format(max_slip))  # type:ignore
+        max_slip = max_val  # type: ignore
+    print("Max Slip for Plotting: {:.2f} cm".format(max_slip))  # type: ignore
     x_label = "Distance Along Strike (km)"
     y_label = "Distance Along Dip (km)"
     for i_segment, (segment, slip_seg, rake_seg, rupttime_seg, ps_seg) in enumerate(
@@ -521,10 +521,10 @@ def _PlotMultiSlipDist(
         cbar_ax = fig.add_axes((0.125, 0.15, 0.5, 0.07))
         sm = plt.cm.ScalarMappable(
             cmap=slipcpt,
-            norm=plt.Normalize(vmin=0.0, vmax=max_slip / 100.0),  # type:ignore
+            norm=plt.Normalize(vmin=0.0, vmax=max_slip / 100.0),  # type: ignore
         )
         cb = fig.colorbar(sm, cax=cbar_ax, orientation="horizontal")
-        cb.outline.set_linewidth(3)  # type:ignore
+        cb.outline.set_linewidth(3)  # type: ignore
         cb.set_label("Slip (m)", fontsize=18)
         strk = segment["strike"]
         dip = segment["dip"]
@@ -594,10 +594,10 @@ def PlotSlipDistribution(
     rupt_time = solution["rupture_time"]
     max_slip = [np.max(slip_seg.flatten()) for slip_seg in slip]
     max_slip = np.max(max_slip)
-    print("Max Slip of Solution: {:.2f} cm".format(max_slip))  # type:ignore
+    print("Max Slip of Solution: {:.2f} cm".format(max_slip))  # type: ignore
     if max_val != None:
-        max_slip = max_val  # type:ignore
-    print("Max Slip for Plotting: {:.2f} cm".format(max_slip))  # type:ignore
+        max_slip = max_val  # type: ignore
+    print("Max Slip for Plotting: {:.2f} cm".format(max_slip))  # type: ignore
     x_label = "Distance Along Strike (km)"
     y_label = "Distance Along Dip (km)"
     for i_segment, (segment, slip_seg, rake_seg, rupttime_seg, ps_seg) in enumerate(
@@ -676,10 +676,10 @@ def PlotSlipDistribution(
         cbar_ax = fig.add_axes((0.125, 0.15, 0.5, 0.07))
         sm = plt.cm.ScalarMappable(
             cmap=slipcpt,
-            norm=plt.Normalize(vmin=0.0, vmax=max_slip / 100.0),  # type:ignore
+            norm=plt.Normalize(vmin=0.0, vmax=max_slip / 100.0),  # type: ignore
         )
         cb = fig.colorbar(sm, cax=cbar_ax, orientation="horizontal")
-        cb.outline.set_linewidth(3)  # type:ignore
+        cb.outline.set_linewidth(3)  # type: ignore
         cb.set_label("Slip (m)", fontsize=18)
         strk = segment["strike"]
         dip = segment["dip"]
@@ -823,7 +823,7 @@ def PlotSlipTimes(
             cmap="plasma", norm=plt.Normalize(vmin=0.0, vmax=max(grid_rupttime))
         )
         cb = fig.colorbar(sm, cax=cbar_ax1, orientation="vertical")
-        cb.outline.set_linewidth(3)  # type:ignore
+        cb.outline.set_linewidth(3)  # type: ignore
         cb.set_label("Rupture Time (s)", fontsize=16)
         strk = segment["strike"]
         dip = segment["dip"]
@@ -875,7 +875,7 @@ def PlotSlipTimes(
         diag_dist = np.sqrt(xcols**2 + yrows**2)
         rupt_vel = diag_dist / rupt_vel
         rupt_vel[idx0] = vrup_ref
-        idx10 = np.where(slip_seg > 0.05 * max_slip)  # type:ignore
+        idx10 = np.where(slip_seg > 0.05 * max_slip)  # type: ignore
         mean_vrup = np.mean(rupt_vel[idx10].flatten())
         contplot = ax2.contour(
             XCOLS,
@@ -905,7 +905,7 @@ def PlotSlipTimes(
         )
         cbar_ax2 = fig.add_axes((0.85, 0.396, 0.03, 0.2))
         cb = fig.colorbar(sm, cax=cbar_ax2, orientation="vertical")
-        cb.outline.set_linewidth(3)  # type:ignore
+        cb.outline.set_linewidth(3)  # type: ignore
         cb.set_label("Rupture Velocity (km/s)", fontsize=16)
         ax2.text(
             0,
@@ -952,7 +952,7 @@ def PlotSlipTimes(
             norm=plt.Normalize(vmin=0.0, vmax=max(slip_duration.flatten())),
         )
         cb = fig.colorbar(sm, cax=cbar_ax3, orientation="vertical")
-        cb.outline.set_linewidth(3)  # type:ignore
+        cb.outline.set_linewidth(3)  # type: ignore
         cb.set_label("Slip Duration (s)", fontsize=16)
         mean_rise = np.mean(slip_duration[idx10])
         ax3.text(
@@ -1057,12 +1057,12 @@ def _PlotCumulativeSlip(
         )
 
         ### Slip_threshold to ignore low-slip region ###
-        slip_threshold = 0.1 * (max_slip / 100.0)  # type:ignore
+        slip_threshold = 0.1 * (max_slip / 100.0)  # type: ignore
         if slip_threshold < 1.0:
             slip_threshold = 1.0
-        if max_slip / 100.0 < 3.0:  # type:ignore
+        if max_slip / 100.0 < 3.0:  # type: ignore
             slip_threshold = 0.5
-        if max_slip / 100.0 < 1.0:  # type:ignore
+        if max_slip / 100.0 < 1.0:  # type: ignore
             slip_threshold = 0.2
         slip_seg0 = slip_seg
         cumslip_seg = slip_seg
@@ -1073,11 +1073,11 @@ def _PlotCumulativeSlip(
         ### Calculate equivalent slip length in along-strike and along-dip directions ###
         eq_len_AS = shakemap.equivalent_slip_length(along_strike / 100, delta_strike)
         left_edge_AS = shakemap.locate_equivalent_slip(
-            along_strike / 100, delta_strike, eq_len_AS  # type:ignore
+            along_strike / 100, delta_strike, eq_len_AS  # type: ignore
         )
         left_edge_AS = left_edge_AS + x[0]
         eq_len_AD = shakemap.equivalent_slip_length(
-            along_dip / 100, delta_dip  # type:ignore
+            along_dip / 100, delta_dip  # type: ignore
         )
         left_edge_AD = shakemap.locate_equivalent_slip(
             along_dip / 100, delta_dip, eq_len_AD
@@ -1183,12 +1183,12 @@ def _PlotCumulativeSlip(
         cbar_ax = fig.add_axes((0.124, 0.712, 0.169, 0.025))
         sm = plt.cm.ScalarMappable(
             cmap=slipcpt,
-            norm=plt.Normalize(vmin=0.0, vmax=max_slip / 100.0),  # type:ignore
+            norm=plt.Normalize(vmin=0.0, vmax=max_slip / 100.0),  # type: ignore
         )
         cb = fig.colorbar(sm, cax=cbar_ax, orientation="horizontal")
         cbar_ax.xaxis.set_ticks_position("top")
         cbar_ax.xaxis.set_label_position("top")
-        cb.outline.set_linewidth(3)  # type:ignore
+        cb.outline.set_linewidth(3)  # type: ignore
         cb.set_label("Slip (m)", fontsize=10, fontweight="bold")
         strk = segment["strike"]
         dip = segment["dip"]
@@ -1214,7 +1214,7 @@ def _PlotCumulativeSlip(
             ax1.text(
                 -0.2,
                 1.1,
-                evID,  # type:ignore
+                evID,  # type: ignore
                 fontsize=14,
                 fontweight="bold",
                 transform=ax1.transAxes,
@@ -1276,9 +1276,9 @@ def PlotSlipDist_Compare(
     max_slip = np.max(max_slip)
     max_slip2 = [np.max(slip_seg2.flatten()) for slip_seg2 in slip2]
     max_slip2 = np.max(max_slip2)
-    max_slip = np.maximum(max_slip, max_slip2)  # type:ignore
+    max_slip = np.maximum(max_slip, max_slip2)  # type: ignore
     if max_val == None:
-        max_val = max_slip  # type:ignore
+        max_val = max_slip  # type: ignore
     x_label = "Distance along strike $(km)$"
     y_label = "Distance along dip $(km)$"
     zipped = zip(segments, slip, rake, slip2, rake2, point_sources)
@@ -1350,7 +1350,7 @@ def PlotMap(
     default_dirs: dict,
     files_str: Optional[dict] = None,
     stations_gnss: Optional[zip] = None,
-    stations_cgnss: Optional[str] = None,
+    stations_cgnss: Optional[List[dict]] = None,
     max_slip: Optional[float] = None,
     legend_len: Optional[float] = None,
     scale: Optional[float] = None,
@@ -1375,7 +1375,7 @@ def PlotMap(
     :param stations_gnss: The gnss stations description, defaults to None
     :type stations_gnss:  Optional[zip], optional
     :param stations_cgnss: The cgnss stations description, defaults to None
-    :type stations_cgnss: Optional[str], optional
+    :type stations_cgnss: Optional[List[dict]], optional
     :param max_slip: Specify maximum slip, defaults to None
     :type max_slip: Optional[float], optional
     :param legend_len: The length of the legend, defaults to None
@@ -1438,7 +1438,7 @@ def PlotMap(
                 [name, sta_lat, sta_lon, obs, syn, error]
             ]
             max_obs = np.maximum([abs(float(v)) for v in obs], max_obs)
-        max_obs = np.max(max_obs)  # type:ignore
+        max_obs = np.max(max_obs)  # type: ignore
         if legend_len == None:
             if max_obs < 5:
                 legend_len = 1
@@ -1454,7 +1454,7 @@ def PlotMap(
                 legend_len = 100
         if scale == None:
             scale = 2
-        max_obs = max_obs / scale  # type:ignore
+        max_obs = max_obs / scale  # type: ignore
 
     if limits == [None, None, None, None]:
         region = [min_lon - 0.5, max_lon + 0.5, min_lat - 0.5, max_lat + 0.5]
@@ -1890,10 +1890,10 @@ def PlotMap(
             data={
                 "x": [region[1]],
                 "y": [region[2]],
-                "east_velocity": [legend_len / max_obs],  # type:ignore
+                "east_velocity": [legend_len / max_obs],  # type: ignore
                 "north_velocity": [0],
-                "east_sigma": [legend_len / max_obs / 10],  # type:ignore
-                "north_sigma": [legend_len / max_obs / 10],  # type:ignore
+                "east_sigma": [legend_len / max_obs / 10],  # type: ignore
+                "north_sigma": [legend_len / max_obs / 10],  # type: ignore
                 "correlation_EN": [0],
             }
         )
@@ -1941,14 +1941,14 @@ def PlotMap(
         )
         fig.shift_origin(xshift="0c", yshift="1.8c")
         fig.shift_origin(xshift="-0.2c", yshift="-1.1c")
-        if legend_len <= 10:  # type:ignore
+        if legend_len <= 10:  # type: ignore
             fig.text(
                 x=region[1],
                 y=region[2],
-                text=str(legend_len * 10)  # type:ignore
+                text=str(legend_len * 10)  # type: ignore
                 + "+/-"
                 + str(legend_len)
-                + " mm",  # type:ignore
+                + " mm",  # type: ignore
                 no_clip=True,
                 justify="ML",
             )
@@ -1958,8 +1958,8 @@ def PlotMap(
                 y=region[2],
                 text=str(legend_len)
                 + "+/-"
-                + str(legend_len / 10)  # type:ignore
-                + " cm",  # type:ignore
+                + str(legend_len / 10)  # type: ignore
+                + " cm",  # type: ignore
                 no_clip=True,
                 justify="ML",
             )
@@ -2327,18 +2327,18 @@ def PlotComparisonMap(
         max_val = max_slip
     ax1, cs1 = plot_map(
         ax1,
-        segments_lats,  # type:ignore
-        segments_lons,  # type:ignore
-        slip,  # type:ignore
+        segments_lats,  # type: ignore
+        segments_lons,  # type: ignore
+        slip,  # type: ignore
         max_val=max_val,
         transform=dictn["projection"],
         cmap=slipcpt,
     )
     ax2, cs2 = plot_map(
         ax2,
-        segments_lats,  # type:ignore
-        segments_lons,  # type:ignore
-        input_slip,  # type:ignore
+        segments_lats,  # type: ignore
+        segments_lons,  # type: ignore
+        input_slip,  # type: ignore
         max_val=max_val,
         transform=dictn["projection"],
         cmap=slipcpt,
@@ -2531,32 +2531,32 @@ def plot_moment_rate_function(
                 for t, val in zip(t_seg, mr_seg):
                     outsegf.write("{:8.2f}\t\t{:8.4e}\n".format(t, val))
             seg_num += 1
-        time = np.arange(nmax) * dt  # type:ignore
+        time = np.arange(nmax) * dt  # type: ignore
         with open(directory / "STF.txt", "w") as outf:
             outf.write("dt: {}\n".format(dt))
             outf.write("Time[s]     Moment_Rate [Nm/s]\n")
-            for t, val in zip(time, mr):  # type:ignore
+            for t, val in zip(time, mr):  # type: ignore
                 outf.write("{:8.2f}\t\t{:8.4e}\n".format(t, val))
 
         seismic_moment = np.trapz(mr, dx=0.01)
         magnitude = 2.0 * (np.log10(seismic_moment * 10**7) - 16.1) / 3.0
         rel_mr = mr / (max(mr))
         plt.text(
-            0.99 * max(time),  # type:ignore
+            0.99 * max(time),  # type: ignore
             0.95 * max(rel_mr),
-            "Max Mr: {:.2E} Nm/sec".format(max(mr)),  # type:ignore
+            "Max Mr: {:.2E} Nm/sec".format(max(mr)),  # type: ignore
             ha="right",
             fontweight="bold",
         )
         plt.text(
-            0.99 * max(time),  # type:ignore
+            0.99 * max(time),  # type: ignore
             0.90 * max(rel_mr),
             "M$_0$: {:.2E} Nm".format(seismic_moment),
             ha="right",
             fontweight="bold",
         )
         plt.text(
-            0.99 * max(time),  # type:ignore
+            0.99 * max(time),  # type: ignore
             0.85 * max(rel_mr),
             "M$_w$: {:.2f}".format(magnitude),
             ha="right",
@@ -2571,29 +2571,29 @@ def plot_moment_rate_function(
                 ax.plot(time, mr_seg_all[:, seg] / max(mr), label="Segment " + str(seg))
             plt.legend(loc="lower right")
         if mr_time == None:
-            tenth = np.ones(len(time)) * 0.1  # type:ignore
+            tenth = np.ones(len(time)) * 0.1  # type: ignore
             idx = np.argwhere(np.diff(np.sign(rel_mr - tenth))).flatten()
             ax.vlines(
-                time[idx][-1],  # type:ignore
+                time[idx][-1],  # type: ignore
                 0,
                 1,
                 "r",
                 linestyle="dashed",
                 lw=2,
-                dashes=(9, (5, 3)),  # type:ignore
+                dashes=(9, (5, 3)),  # type: ignore
             )
         else:
             ax.vlines(
-                mr_time,  # type:ignore
+                mr_time,  # type: ignore
                 0,
                 1,
                 "r",
                 linestyle="dashed",
                 lw=2,
-                dashes=(9, (5, 3)),  # type:ignore
+                dashes=(9, (5, 3)),  # type: ignore
             )
         ax.set_ylim((0, 1))
-        ax.set_xlim((0, max(time)))  # type:ignore
+        ax.set_xlim((0, max(time)))  # type: ignore
         plt.grid(which="minor", linestyle="dotted", color="0.5")
         plt.grid(which="major", linestyle="dotted", color="0.5")
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))
@@ -2655,9 +2655,9 @@ def _PlotSnapshotSlip(
     i = 1
 
     for ax in axes.flat:  # type: ignore
-        time = i * step * dt  # type:ignore
+        time = i * step * dt  # type: ignore
         srate, cslip, broken = __rupture_process(
-            time, slip, srmax, trup, tl, tr, tmid, tstop  # type:ignore
+            time, slip, srmax, trup, tl, tr, tmid, tstop  # type: ignore
         )
         ax.set_yticklabels([])
         ax.set_xticklabels([])
@@ -3105,8 +3105,8 @@ def __several_axes(
     :rtype: Tuple[plt.Axes, AxesImage]
     """
     (
-        stk_subfaults,  # type:ignore
-        dip_subfaults,  # type:ignore
+        stk_subfaults,  # type: ignore
+        dip_subfaults,  # type: ignore
         delta_strike,
         delta_dip,
         hyp_stk,
@@ -3130,14 +3130,14 @@ def __several_axes(
         data,
         cmap=cmap,
         origin="lower",
-        vmin=min_val,  # type:ignore
-        vmax=max_val,  # type:ignore
+        vmin=min_val,  # type: ignore
+        vmax=max_val,  # type: ignore
         aspect="auto",
         extent=(min_strike, max_strike, min_dist, max_dist),
     )
     ax.set(adjustable="datalim")
     if autosize:
-        ax.figure.set_size_inches(  # type:ignore
+        ax.figure.set_size_inches(  # type: ignore
             4 * stk_subfaults * delta_strike / dip_subfaults / delta_dip, 4
         )
     if depth_ax:
@@ -3148,7 +3148,7 @@ def __several_axes(
         ax2.set_ylabel("Depth (km)", fontsize=16)
         ax2.invert_yaxis()
         if autosize:
-            ax2.figure.set_size_inches(  # type:ignore
+            ax2.figure.set_size_inches(  # type: ignore
                 4 * stk_subfaults * delta_strike / dip_subfaults / delta_dip, 4
             )
     ax.invert_yaxis()

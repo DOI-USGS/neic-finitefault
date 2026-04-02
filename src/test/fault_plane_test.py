@@ -4,7 +4,7 @@ import shutil
 import tempfile
 
 import numpy as np
-from obspy import UTCDateTime  # type:ignore
+from obspy import UTCDateTime  # type: ignore
 
 import ffm.seismic_tensor as tensor
 from ffm.fault_plane import (

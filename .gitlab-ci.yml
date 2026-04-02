@@ -1,14 +1,42 @@
 ---
-
 default:
+  before_script:
+    # download and cache data dependencies
+    - bash install.d/data_dependencies.sh "$(pwd)"
+    # install and cache python
+    - |
+      if [ -d "miniforge" ]; then
+          . ./miniforge/etc/profile.d/conda.sh;
+      else
+          curl -L "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" -o ./miniforge.sh;
+          bash ./miniforge.sh -fbp "$(pwd)/miniforge";
+          rm -r miniforge.sh;
+      fi
+    # make conda accessible
+    - . "$(pwd)/miniforge/etc/profile.d/conda.sh"
+    - export PATH="$(pwd)/miniforge/bin:$PATH"
+    - |
+      if [ -d "$(pwd)/miniforge/envs/ff-env" ]; then
+          conda activate ff-env;
+      else
+          source install.d/ff-env.sh "$(pwd)";
+          conda activate ff-env;
+      fi
+  cache:
+    key:
+      files:
+        - install.d/*
+    paths:
+      - miniforge
+      - fortran_code/gfs_nm/long/fd_bank
+      - fortran_code/info/LITHO1.0.nc
+  image: code.usgs.gov:5001/devops/images/usgs/python:3.10-build
   tags:
     - dev
     - developers
 
 variables:
-  DOCKER_IMAGE: "code.usgs.gov:5001/devops/images/usgs/docker:20"
-   
-
+  UPSTREAM_PATH: ghsc/neic/algorithms/neic-finitefault
 
 # Do not run for merge requests
 workflow:
@@ -17,34 +45,67 @@ workflow:
     - if: $CI_COMMIT_BRANCH
 
 stages:
-  - end-to-end
+  - audit
+  - init
+  - test
 
+## -------------------------------------
+#  Audit Stage
+## -------------------------------------
 
+Python Audit:
+  script:
+    - pip install pip-audit
+    - pip-audit --ignore-vuln CVE-2026-4539
+  stage: audit
 
-.docker_login:
-  before_script:
-    - |
-      test -n "${CI_REGISTRY_USER}" -a -n "${CI_REGISTRY_PASSWORD}" \
-          && echo "${CI_REGISTRY_PASSWORD}" | \
-          docker login \
-          --username "${CI_REGISTRY_USER}" \
-          --password-stdin \
-          "${CI_REGISTRY}";
-  cache:
+## -------------------------------------
+#  Init Stage
+## -------------------------------------
+
+Fortran Install:
+  before_script: ""
+  cache: []
+  artifacts:
+    expire_in: 1 week
     paths:
-      - .trivy/
+      - fortran_code
+  needs: []
+  script:
+    - apt install gfortran make gcc -y
+    - bash install.d/ffm.sh "$(pwd)"
+  stage: init
+
+## -------------------------------------
+#  Test Stage
+## -------------------------------------
+
+Python Lint:
+  needs:
+    - Python Audit
+  script:
+    - poe lint
+  stage: test
+
+Python Test:
+  script:
+    - apt install gfortran -y
+    - pip install .
+    - poe test
+  stage: test
+
+Dockerfile Test:
+  before_script: ""
+  cache: []
+  image: code.usgs.gov:5001/devops/images/usgs/docker:27-node
+  needs:
+    - Python Audit
+  script:
+    - docker build . -t test --build-arg CI_REGISTRY="${CI_REGISTRY}"
+    - docker run test
   services:
     - alias: docker
-      name: "${DOCKER_IMAGE}-dind"
-
-End To End Test:
-  extends:
-    - .docker_login
-  image: "${DOCKER_IMAGE}" 
-  script:
-    - LOCAL_IMAGE="wasp"
-    - docker build --build-arg CI_REGISTRY="True" -t "${LOCAL_IMAGE}" .
-    - docker run wasp
-  stage: end-to-end
+      name: code.usgs.gov:5001/devops/images/usgs/docker:27-dind
   variables:
     DOCKER_DRIVER: overlay2
+  stage: test

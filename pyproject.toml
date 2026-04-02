@@ -20,7 +20,6 @@ maintainers = [
 ]
 description = "Wavelet based inversion for slip on a fault, used to generate Finite Fault products"
 keywords = ["usgs", "neic", "earthquake", "slip", "finitefault"]
-license = {file = "LICENSE.md"}
 name = "neic-finitefault"
 requires-python = ">=3.10"
 version = "1.1.0"
@@ -35,6 +34,10 @@ where = ["src"]
 "ffm" = "ffm.ffm_admin.ffm:app"
 
 [tool.poe.tasks]
+fix = [
+  { shell = "black src" },
+  { shell = "isort src/ffm" }
+]
 lint = [
   { shell = "black --check src" },
   { shell = "isort --check src/ffm" },
@@ -46,7 +49,6 @@ test = [
   { shell = "coverage html" }
 ]
 end_to_end_test = [
-  { shell = "safety check --ignore=51668" },
   { shell = "pytest src/test --cov=src/ffm" },
   { shell = "black --check src" },
   { shell = "isort --check src/ffm" },

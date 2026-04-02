@@ -22,7 +22,10 @@ from ffm.input_files import (
     inputs_simmulated_annealing,
 )
 from ffm.input_files import model_space as model_space_update
-from ffm.input_files import plane_for_chen, write_velmodel
+from ffm.input_files import (
+    plane_for_chen,
+    write_velmodel,
+)
 from ffm.management import default_dirs
 from ffm.many_events import (
     get_model_space_events,

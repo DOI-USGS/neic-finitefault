@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Management of fault planes files and solution model
-"""
-
+"""Management of fault planes files and solution model"""
 
 import os
 from typing import Tuple

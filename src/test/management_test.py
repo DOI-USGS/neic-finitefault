@@ -3,7 +3,7 @@ import shutil
 from tempfile import mkdtemp
 
 import numpy as np
-from obspy.taup import TauPyModel  # type:ignore
+from obspy.taup import TauPyModel  # type: ignore
 
 from ffm.management import (
     _distazbaz,
@@ -41,16 +41,11 @@ def test_correct_response_file():
             updated_response = f.read()
         assert (
             updated_response.strip().replace("\t", "").replace(" ", "")
-            == (
-                """END 2023-07-13T12:10:09Z
+            == ("""END 2023-07-13T12:10:09Z
         NETWORK aa
         NETWORK bb
         NETWORK cc
-        CONSTANT 11"""
-            )
-            .strip()
-            .replace("\t", "")
-            .replace(" ", "")
+        CONSTANT 11""").strip().replace("\t", "").replace(" ", "")
         )
     finally:
         print("Cleaning up test directory.")

@@ -236,8 +236,8 @@ def test_filt_waveform():
 
 
 @pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None,
-    reason="Build runner does not have the resources to run",
+    os.getenv("CI_REGISTRY") is not None or os.getenv("RUN_ALL", False) == False,
+    reason="Takes 25+ minutes to run",
 )
 def test_plot_spectra():
     file = deepcopy(TELE_WAVES[0])

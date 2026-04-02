@@ -76,13 +76,11 @@ def test_get_summary():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
         with open(tempdir / "modelling_summary.txt", "w") as f:
-            f.write(
-                """Modelling Report
+            f.write("""Modelling Report
 
                 averaged misfit error  0.1234
                 objective function value  0.5678   
-                """
-            )
+                """)
         assert get_summary(directory=tempdir) == {
             "misfit_error": 0.1234,
             "objective_error": 0.5678,
@@ -108,21 +106,17 @@ def test_get_summary_all_models():
         os.mkdir(folder1)
         os.mkdir(folder2)
         with open(folder1 / "modelling_summary.txt", "w") as f:
-            f.write(
-                """Modelling Report
+            f.write("""Modelling Report
 
                 averaged misfit error  0.1234
                 objective function value  0.5678   
-                """
-            )
+                """)
         with open(folder2 / "modelling_summary.txt", "w") as f:
-            f.write(
-                """Modelling Report
+            f.write("""Modelling Report
 
                 averaged misfit error  0.01911
                 objective function value  0.121314   
-                """
-            )
+                """)
         with open(folder1 / "segments_data.json", "w") as f:
             json.dump(
                 {

@@ -2,6 +2,7 @@
 """
 Map plot with PyGMT
 """
+
 import argparse
 import collections
 import json
@@ -11,8 +12,8 @@ from glob import glob
 from typing import List, Optional, Union
 
 import numpy as np
-import pandas as pd  # type:ignore
-import pygmt  # type:ignore
+import pandas as pd  # type: ignore
+import pygmt  # type: ignore
 
 #
 # local modules
@@ -33,7 +34,7 @@ def PlotMap(
     default_dirs: dict,
     files_str: Optional[dict] = None,
     stations_gnss: Optional[zip] = None,
-    stations_cgnss: Optional[str] = None,
+    stations_cgnss: Optional[List[dict]] = None,
     max_slip: Optional[float] = None,
     legend_len: Optional[float] = None,
     scale: Optional[float] = None,
@@ -57,7 +58,7 @@ def PlotMap(
     :param stations_gnss: The gnss stations description, defaults to None
     :type stations_gnss:  Optional[zip], optional
     :param stations_cgnss: The cgnss stations description, defaults to None
-    :type stations_cgnss: Optional[str], optional
+    :type stations_cgnss: Optional[List[dict]], optional
     :param max_slip: A specified maximum slip, defaults to None
     :type max_slip: Optional[float], optional
     :param legend_len: The length of the legend, defaults to None
@@ -117,7 +118,7 @@ def PlotMap(
                 [name, sta_lat, sta_lon, obs, syn, error]
             ]
             max_obs = np.maximum([abs(float(v)) for v in obs], max_obs)
-        max_obs = np.max(max_obs)  # type:ignore
+        max_obs = np.max(max_obs)  # type: ignore
         if legend_len == None:
             if max_obs < 5:
                 legend_len = 1
@@ -129,7 +130,7 @@ def PlotMap(
                 legend_len = 20
         if scale == None:
             scale = 2
-        max_obs = max_obs / scale  # type:ignore
+        max_obs = max_obs / scale  # type: ignore
 
     if limits == [None, None, None, None]:
         region = [min_lon - 0.5, max_lon + 0.5, min_lat - 0.5, max_lat + 0.5]
@@ -205,7 +206,7 @@ def PlotMap(
     segments = segments_data["segments"]
     rise_time = segments_data["rise_time"]
     solution = get_outputs.read_solution_static_format(
-        segments, data_dir=directory  # type:ignore
+        segments, data_dir=directory  # type: ignore
     )
     plane_info = segments[0]
     (
@@ -227,9 +228,9 @@ def PlotMap(
         maxslip = 0
         for segment in range(len(segments_lats)):
             slips = slip[segment].flatten()
-            maxslip = np.max([maxslip, np.array(slips).max() / 100])  # type:ignore
+            maxslip = np.max([maxslip, np.array(slips).max() / 100])  # type: ignore
     else:
-        maxslip = max_slip  # type:ignore
+        maxslip = max_slip  # type: ignore
     pygmt.makecpt(
         cmap=str(default_dirs["root_dir"]) + "/src/ffm/fault2.cpt",
         series=[0, maxslip],
@@ -439,9 +440,9 @@ def PlotMap(
     if stations_gnss is not None:
         print("...Plotting Static GNSS Stations")
         for name, sta_lat, sta_lon, obs, syn, error in stations_gnss2:
-            gnss_z_obs, gnss_n_obs, gnss_e_obs = obs
-            gnss_z_syn, gnss_n_syn, gnss_e_syn = syn
-            err_z, err_n, err_e = error
+            gnss_z_obs, gnss_n_obs, gnss_e_obs = obs  # type: ignore [misc]
+            gnss_z_syn, gnss_n_syn, gnss_e_syn = syn  # type: ignore [misc]
+            err_z, err_n, err_e = error  # type: ignore [misc]
 
             staticv_obs = pd.DataFrame(
                 data={
@@ -524,12 +525,12 @@ def PlotMap(
         )
         static_legend = pd.DataFrame(
             data={
-                "x": [region[1]],  # type:ignore
+                "x": [region[1]],  # type: ignore
                 "y": [region[2]],
-                "east_velocity": [legend_len / max_obs],  # type:ignore
-                "north_velocity": [0],  # type:ignore
-                "east_sigma": [legend_len / max_obs / 10],  # type:ignore
-                "north_sigma": [legend_len / max_obs / 10],  # type:ignore
+                "east_velocity": [legend_len / max_obs],  # type: ignore
+                "north_velocity": [0],  # type: ignore
+                "east_sigma": [legend_len / max_obs / 10],  # type: ignore
+                "north_sigma": [legend_len / max_obs / 10],  # type: ignore
                 "correlation_EN": [0],
             }
         )
@@ -584,7 +585,7 @@ def PlotMap(
         fig.text(
             x=region[1],
             y=region[2],
-            text=str(legend_len * 10) + "+/-" + str(legend_len) + " mm",  # type:ignore
+            text=str(legend_len * 10) + "+/-" + str(legend_len) + " mm",  # type: ignore
             xshift="a-60p",
             yshift="a-20p",
             no_clip=True,

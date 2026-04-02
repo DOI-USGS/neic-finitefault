@@ -8,7 +8,6 @@ the files with the waveforms-
     Currently, only waveform files in sac format are supported.
 """
 
-
 import argparse
 import errno
 import json
