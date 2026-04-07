@@ -721,32 +721,48 @@ def select_tele_stations(
         + (z - z0) / (20 - z0)
     )
 
+    # keeping the initial phase variable for a later print statement
+    # ([:] because immutable)
+    phase_name = phase[:]
     # Limiting the number of data. Choose one station for every degree in
     # azimuth
-
     phase = "LONG" if phase in ["Rayleigh", "Love"] else phase
     new_files: List[Union[pathlib.Path, str]] = []
-    for az0 in range(0, 360, jump):
-        az1 = az0 + jump
-        best = ""
-        best_sta: Union[pathlib.Path, str] = ""
-        best_score = -1.0
-        add_channel = False
-        for sacheader, snr, sac in zip(sacheaders, signal2noise, files):
-            dis, az, baz = mng._distazbaz(
-                sacheader.stla, sacheader.stlo, event_lat, event_lon
-            )
-            if az0 > az or az >= az1 or snr <= min_snr:
-                continue
-            value: Union[int, float] = 1 if kilometers2degrees(dis) >= 45 else 0
-            value = value if phase in ["P", "SH"] else 1.0
-            value = score(value, az, snr, az0, az1, min_snr)
-            if value > best_score:
-                add_channel = True
-                best_score = value
-                best_sta = sac
-        new_files = new_files + [best_sta] if add_channel else new_files
 
+    # Prepare bins
+    bins = list(range(0, 360, jump))
+    best_sta = {az0: None for az0 in bins}
+    best_score = {az0: -1.0 for az0 in bins}
+    add_channel = {az0: False for az0 in bins}
+
+    for sacheader, snr, sac in zip(sacheaders, signal2noise, files):
+        dis, az, baz = mng._distazbaz(
+            sacheader.stla, sacheader.stlo, event_lat, event_lon
+        )
+        # Determine which azimuth bin the station falls into
+        # Example: if jump=20, az=37° → bin=20
+        az0 = int(az / jump) * jump
+        az1 = az0 + jump
+
+        if snr <= min_snr:
+            continue
+
+        value = 1 if kilometers2degrees(dis) >= 45 else 0
+        value = value if phase in ["P", "SH"] else 1.0
+        value = score(value, az, snr, az0, az1, min_snr)
+
+        if value > best_score[az0]:
+            best_score[az0] = value
+            best_sta[az0] = sac
+            add_channel[az0] = True
+
+    for az0 in bins:
+        if add_channel[az0] and best_sta[az0] is not None:
+            new_files.append(best_sta[az0])
+
+    n_ini_files = len(files)
+    n_selected = len(new_files)
+    print(f"{n_selected}/{n_ini_files} stations selected for phase {phase_name}")
     return new_files
 
 
