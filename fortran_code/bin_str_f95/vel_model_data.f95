@@ -19,7 +19,7 @@ contains
 !  vel_model: file with velocity model
 !
    implicit none
-   character(len=100), intent(in) :: vel_model
+   character(len=300), intent(in) :: vel_model
    integer :: j
    open(1, file=vel_model, status='old')
    read(1, *) n_layers
