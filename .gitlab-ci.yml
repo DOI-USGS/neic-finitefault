@@ -71,7 +71,7 @@ Python Audit:
   allow_failure: true
   script:
     - pip install pip-audit
-    - pip-audit --ignore-vuln CVE-2026-4539 --ignore-vuln CVE-2026-40192 --ignore-vuln CVE-2026-41066 --ignore-vuln CVE-2026-39377 --ignore-vuln CVE-2026-39378  --ignore-vuln CVE-2026-3219
+    - pip-audit --ignore-vuln CVE-2026-40192
   stage: audit
 
 ## -------------------------------------
