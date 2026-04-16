@@ -5,8 +5,8 @@ import pathlib
 import time
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional
-from pydantic import BaseModel, Field
 
+from pydantic import BaseModel, Field
 
 from ffm.acquisition.event import get_event_detail, get_product
 
@@ -93,3 +93,8 @@ class TeleseismicQuery(BaseModel):
             latitude=float(props["latitude"]),
             longitude=float(props["longitude"]),
         )  # type: ignore [call-arg]
+
+    @property
+    def starttime(self):
+        """Calculate query starttime"""
+        return self.event_time - timedelta(seconds=self.seconds_before)

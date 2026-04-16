@@ -113,11 +113,6 @@ class IrisQuery(TeleseismicQuery):
         trace.stats.response = response
         return trace
 
-    @property
-    def starttime(self):
-        """Calculate query starttime"""
-        return self.event_time - timedelta(seconds=self.seconds_before)
-
     def write_data(self, directory: pathlib.Path, stream: Stream):
         """Write all the data in the stream to the provided directory"""
         with multiprocessing.Pool() as pool:

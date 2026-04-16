@@ -6,6 +6,7 @@ from typing import List, Optional
 import typer
 
 from ffm.acquisition.cmt import Cmt
+from ffm.acquisition.cwbquery import CwbQuery
 from ffm.acquisition.irisquery import IrisQuery
 from ffm.ffm_admin.common_args import (
     DATA_DIRECTORY,
@@ -90,13 +91,33 @@ def teleseismic(
     debug: bool = typer.Option(
         False, "--debug", help="Run obspy clients with debug when running commands"
     ),
+    edge_cwb_jar_path: Optional[pathlib.Path] = typer.Option(
+        None,
+        "-cwb",
+        "--edge-cwb",
+        help=(
+            "Path to USGS Edge CWB Java client jar file. If not specified, "
+            "teleseismic query is pointed to IRIS (Requires java)"
+        ),
+    ),
+    java: pathlib.Path = typer.Option(
+        pathlib.Path("/usr/bin/java"),
+        "-j",
+        "--java",
+        help=("Path to Java"),
+    ),
 ):
     """This first queries for all stations within the minimum/maximum distance
     in the list of networks, then queries for specific stations if they are
     provided in a station file"""
-    data_directory = validate_data_directory(data_directory)
+    data_directory = validate_data_directory(data_directory, make_directory=True)
 
-    waveform_query = IrisQuery.from_id(eventid=eventid, source=source)
+    if edge_cwb_jar_path is not None:
+        edge_cwb_jar_path = edge_cwb_jar_path.resolve()
+        java = java.resolve()
+        waveform_query = CwbQuery.from_id(eventid=eventid, source=source)
+    else:
+        waveform_query = IrisQuery.from_id(eventid=eventid, source=source)
     waveform_query.depth = depth or waveform_query.depth
     waveform_query.event_time = event_time or waveform_query.event_time
     waveform_query.latitude = latitude or waveform_query.latitude
@@ -110,8 +131,18 @@ def teleseismic(
             stations_data = json.load(s)
     else:
         stations_data = None
-    stream1 = waveform_query.get_data(
-        networks=networks, stations=stations_data, debug=debug
-    )
-    stream2 = waveform_query.get_responses(stream=stream1, debug=debug)
-    waveform_query.write_data(directory=data_directory, stream=stream2)
+
+    if edge_cwb_jar_path is not None:
+        waveform_query.get_data(
+            directory=data_directory,
+            edge_cwb_jar_path=edge_cwb_jar_path,
+            java=java,
+            networks=networks,
+            stations=stations_data,
+        )
+    else:
+        stream1 = waveform_query.get_data(
+            networks=networks, stations=stations_data, debug=debug
+        )
+        stream2 = waveform_query.get_responses(stream=stream1, debug=debug)
+        waveform_query.write_data(directory=data_directory, stream=stream2)
