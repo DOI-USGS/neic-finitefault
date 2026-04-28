@@ -59,7 +59,8 @@ POINT_SOURCES, SOLUTION = __get_solution()
 
 
 @pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None or os.getenv("RUN_ALL", False) == False,
+    os.getenv("RUNNER", False) in [True, "true"]
+    or os.getenv("RUN_ALL", False) in [False, "false"],
     reason="Takes 25+ minutes to run",
 )
 def test_plot():
@@ -238,7 +239,8 @@ def test_PlotComparisonMap():
 
 
 @pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None or os.getenv("RUN_ALL", False) == False,
+    os.getenv("RUNNER", False) in [True, "true"]
+    or os.getenv("RUN_ALL", False) in [False, "false"],
     reason="Takes 25+ minutes to run",
 )
 def test_PlotImagery():

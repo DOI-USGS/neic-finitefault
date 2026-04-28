@@ -91,7 +91,7 @@ def test_run(p1):
 
 
 @pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None,
+    os.getenv("RUNNER", False) in [True, "true"],
     reason="Build runner does not have the resources to run",
 )
 def test_run_multiple():

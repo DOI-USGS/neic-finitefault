@@ -125,12 +125,12 @@ class ShakeRupture:
                     continue
 
             commline = line.strip("%").strip()
-            if commline.startswith("Invs : Dx"): # single segment
+            if commline.startswith("Invs : Dx"):  # single segment
                 parts = commline.split(":")[1].split()
                 dx = float(parts[2])
                 dz = float(parts[6])
                 continue
-            if commline.startswith("Dx"): # multi-segment
+            if commline.startswith("Dx"):  # multi-segment
                 parts = commline.split()
                 dx = float(parts[2])
                 dz = float(parts[6])

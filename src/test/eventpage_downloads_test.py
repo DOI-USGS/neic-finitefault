@@ -158,7 +158,7 @@ def test_write_Coulomb_file():
 
 # @pytest.mark.skip(reason="This test is temporarily disabled.")
 @pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None,
+    os.getenv("RUNNER", False) in [True, "true"],
     reason="Pipeline does not have the required memory",
 )
 def test_write_Okada_displacements():

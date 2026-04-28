@@ -236,7 +236,8 @@ def test_filt_waveform():
 
 
 @pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None or os.getenv("RUN_ALL", False) == False,
+    os.getenv("RUNNER", False) in [True, "true"]
+    or os.getenv("RUN_ALL", False) in [False, "false"],
     reason="Takes 25+ minutes to run",
 )
 def test_plot_spectra():
