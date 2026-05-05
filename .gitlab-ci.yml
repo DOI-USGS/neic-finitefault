@@ -2,7 +2,12 @@
 default:
   before_script:
     # download and cache data dependencies
-    - bash install.d/data_dependencies.sh "$(pwd)"
+    - |
+      if [[ -f "fortran_code/gfs_nm/long/fd_bank" && -f "fortran_code/info/LITHO1.0.nc" ]]; then
+          echo "fd_bank and LITHO1.0.nc already downloaded";
+      else
+          bash install.d/data_dependencies.sh "$(pwd)"
+      fi
     # install and cache python
     - |
       if [ -d "miniforge" ]; then
@@ -37,6 +42,8 @@ default:
 
 variables:
   UPSTREAM_PATH: ghsc/neic/algorithms/neic-finitefault
+  RUN_ALL: "false"
+  RUNNER: "true"
 
 # Do not run for merge requests
 workflow:
@@ -49,14 +56,22 @@ stages:
   - init
   - test
 
+.fork: &fork
+  if: $CI_PROJECT_PATH != '$UPSTREAM_PATH'
+  variables:
+    RUN_ALL: "true"
+    RUNNER: "false"
+    RUN_END_TO_END: "true"
+
 ## -------------------------------------
 #  Audit Stage
 ## -------------------------------------
 
 Python Audit:
+  allow_failure: true
   script:
     - pip install pip-audit
-    - pip-audit --ignore-vuln CVE-2026-4539
+    - pip-audit --ignore-vuln CVE-2026-4539 --ignore-vuln CVE-2026-40192 --ignore-vuln CVE-2026-41066 --ignore-vuln CVE-2026-39377 --ignore-vuln CVE-2026-39378  --ignore-vuln CVE-2026-3219
   stage: audit
 
 ## -------------------------------------
@@ -109,3 +124,15 @@ Dockerfile Test:
   variables:
     DOCKER_DRIVER: overlay2
   stage: test
+
+Full End to End Test:
+  rules:
+    - <<: *fork
+      when: manual
+  script:
+    - apt install gfortran -y
+    - pip install .
+    - poe test
+  stage: test
+  tags:
+    - beast

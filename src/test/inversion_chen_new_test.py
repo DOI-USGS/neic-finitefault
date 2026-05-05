@@ -215,7 +215,8 @@ def _end_to_end(
 
 
 @pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None or os.getenv("RUN_END_TO_END", False) == False,
+    os.getenv("RUNNER", False) in [True, "true"]
+    or os.getenv("RUN_END_TO_END", False) in [False, "false"],
     reason="Takes 2+ hours to run",
 )
 def test_automatic_usgs():
@@ -351,7 +352,8 @@ def test_automatic_usgs():
 
 
 @pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None or os.getenv("RUN_ALL", False) == False,
+    os.getenv("RUNNER", False) in [True, "true"]
+    or os.getenv("RUN_ALL", False) in [False, "false"],
     reason="Takes 25+ minutes to run",
 )
 def test_automatic_cgnss():
@@ -415,7 +417,7 @@ def test_automatic_cgnss():
 
 
 @pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None,
+    os.getenv("RUNNER", False) in [True, "true"],
     reason="Pipeline does not have the required memory",
 )
 def test_automatic_gnss():
@@ -468,7 +470,8 @@ def test_automatic_gnss():
 
 
 @pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None or os.getenv("RUN_ALL", False) == False,
+    os.getenv("RUNNER", False) in [True, "true"]
+    or os.getenv("RUN_ALL", False) in [False, "false"],
     reason="Takes 18+ minutes to run",
 )
 def test_automatic_imagery():
@@ -519,7 +522,8 @@ def test_automatic_imagery():
 
 
 @pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None or os.getenv("RUN_ALL", False) == False,
+    os.getenv("RUNNER", False) in [True, "true"]
+    or os.getenv("RUN_ALL", False) in [False, "false"],
     reason="Takes 26+ minutes to run",
 )
 def test_automatic_strong_motion():
@@ -585,7 +589,7 @@ def test_automatic_strong_motion():
 
 
 @pytest.mark.skipif(
-    os.getenv("CI_REGISTRY") is not None,
+    os.getenv("RUNNER", False) in [True, "true"],
     reason="Pipeline does not have the required memory",
 )
 def test_automatic_tele():

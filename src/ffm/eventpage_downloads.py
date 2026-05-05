@@ -491,18 +491,18 @@ def write_Coulomb_file(
             top_mid_y[ksubfault] = y[ksubfault] + (
                 (SF_LENGTH_AS[ksubfault] / 2) * cos(deg2rad(DIP[ksubfault]))
             ) * cos(deg2rad(STRIKE[ksubfault] - 90))
-            xstart[ksubfault] = top_mid_x[ksubfault] + (SF_LENGTH_AS[ksubfault] / 2) * sin(
-                deg2rad(STRIKE[ksubfault] - 180)
-            )
-            ystart[ksubfault] = top_mid_y[ksubfault] + (SF_LENGTH_AS[ksubfault] / 2) * cos(
-                deg2rad(STRIKE[ksubfault] - 180)
-            )
-            xfin[ksubfault] = top_mid_x[ksubfault] + (SF_LENGTH_AS[ksubfault] / 2) * sin(
-                deg2rad(STRIKE[ksubfault])
-            )
-            yfin[ksubfault] = top_mid_y[ksubfault] + (SF_LENGTH_AS[ksubfault] / 2) * cos(
-                deg2rad(STRIKE[ksubfault])
-            )
+            xstart[ksubfault] = top_mid_x[ksubfault] + (
+                SF_LENGTH_AS[ksubfault] / 2
+            ) * sin(deg2rad(STRIKE[ksubfault] - 180))
+            ystart[ksubfault] = top_mid_y[ksubfault] + (
+                SF_LENGTH_AS[ksubfault] / 2
+            ) * cos(deg2rad(STRIKE[ksubfault] - 180))
+            xfin[ksubfault] = top_mid_x[ksubfault] + (
+                SF_LENGTH_AS[ksubfault] / 2
+            ) * sin(deg2rad(STRIKE[ksubfault]))
+            yfin[ksubfault] = top_mid_y[ksubfault] + (
+                SF_LENGTH_AS[ksubfault] / 2
+            ) * cos(deg2rad(STRIKE[ksubfault]))
             ztop[ksubfault] = DEP[ksubfault] - (SF_LENGTH_AD[ksubfault] / 2) * sin(
                 deg2rad(DIP[ksubfault])
             )

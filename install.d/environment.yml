@@ -184,7 +184,7 @@ dependencies:
   - notebook-shim=0.2.4=pyhd8ed1ab_1
   - obspy=1.4.2=py310hf462985_2
   - openjpeg=2.5.4=h55fea9a_0
-  - openssl=3.6.1=h35e630c_1
+  - openssl=3.6.2=h35e630c_0
   - overrides=7.7.0=pyhd8ed1ab_1
   - packageurl-python=0.17.6=pyhcf101f3_0
   - packaging=26.0=pyhcf101f3_0
@@ -214,13 +214,13 @@ dependencies:
   - pycparser=2.22=pyh29332c3_1
   - pydantic=2.12.5=pyhcf101f3_1
   - pydantic-core=2.41.5=py310hd8f68c5_1
-  - pygments=2.19.2=pyhd8ed1ab_0
+  - pygments=2.20.0=pyhd8ed1ab_0
   - pygmt=0.13.0=pyhd8ed1ab_1
   - pyparsing=3.3.2=pyhcf101f3_0
   - pyproj=3.7.1=py310h71d0299_1
   - pyshp=3.0.3=pyhd8ed1ab_0
   - pysocks=1.7.1=pyha55dd90_7
-  - pytest=9.0.2=pyhcf101f3_0
+  - pytest=9.0.3=pyhc364b38_1
   - pytest-cov=7.0.0=pyhcf101f3_1
   - python=3.10.19=h3c07f61_3_cpython
   - python-dateutil=2.9.0.post0=pyhe01879c_2

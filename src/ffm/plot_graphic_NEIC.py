@@ -1560,7 +1560,7 @@ def PlotMap(
             slips = slip[segment].flatten()
             maxslip = np.max([maxslip, np.array(slips).max() / 100])
     else:
-        maxslip = max_slip / 100  # type:ignore
+        maxslip = max_slip / 100  # type: ignore
     pygmt.makecpt(
         cmap=str(default_dirs["root_dir"]) + "/src/ffm/fault2.cpt", series=[0, maxslip]
     )
