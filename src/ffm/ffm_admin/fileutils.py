@@ -12,10 +12,14 @@ def validate_files(files: List[pathlib.Path]):
             )
 
 
-def validate_data_directory(directory: Optional[pathlib.Path]) -> pathlib.Path:
+def validate_data_directory(
+    directory: Optional[pathlib.Path], make_directory: bool = False
+) -> pathlib.Path:
     """Validate directory or create data directory"""
     if directory is None:
         directory = pathlib.Path() / "data"
+        directory.mkdir(exist_ok=True)
+    elif make_directory:
         directory.mkdir(exist_ok=True)
 
     if not directory.exists():

@@ -60,6 +60,7 @@ In order to compile and/or install the source code there are a number of prerequ
 1. gfortran: To compile the code in [fortran_code](./fortran_code/)
 2. cmake: To compile the code in [fortran_code](./fortran_code/)
 3. gcc: To provide support to miniforge/conda for compiling c code
+4. (Optional) java: For retrieving data from [EdgeCwb](https://code.usgs.gov/ghsc/neic/edgecwb/edgecwbgroup/edgecwbfiles/-/wikis/About-EdgeCWB)
 
 ## WISP Installation Scripts
 
@@ -69,6 +70,7 @@ Automated installation of the dependencies and fortran code has been provided in
    1. > NOTE: The scripts in [./install.d](./install.d/) may be run individually to suit the individuals needs. For example, to only rerun compilation of the fortran you can singularly run [ffm.sh](./install.d/ffm.sh).
 2. `pip install <path to the local neic-finitefault repository>`
 3. `conda activate ff-env`
+4. (Optional for [EdgeCwb](https://code.usgs.gov/ghsc/neic/edgecwb/edgecwbgroup/edgecwbfiles/-/wikis/About-EdgeCWB) data retrieval) `bash install.d/edgecwb.sh <path to the local neic-finitefault repository>`  
 
 The following documents provide more information about the installation process:
 
