@@ -622,6 +622,9 @@ def __remove_response_surf(
         endtime1 = stream[0].stats.endtime
         diff1 = endtime1 - starttime1
         if diff1 < 45 * 60:
+            if logger:
+                logger.warning(f"skipping {sac} for station {name}, channel {channel}: "
+                    "less than 45 min of data")
             continue
         pz_files0 = [resp for resp in response_files if name in resp]
         pz_files0 = [resp for resp in pz_files0 if channel in resp]
@@ -630,18 +633,21 @@ def __remove_response_surf(
         if loc_code in [None, ""]:
             pz_files = [resp for resp in pz_files0 if "--" in resp or "__" in resp]
         if not pz_files:
+            if logger:
+                logger.warning(f"skipping {sac} for station {name}, channel {channel}: "
+                    "missing pz_file")
             continue
         pzfile_val = next(iter(pz_files))  #
         if not os.path.isfile(pzfile_val):
+            if logger:
+                logger.warning(f"skipping {sac} for station {name}, channel {channel}: "
+                    "missing pz_file")
             continue
         paz_dict, is_paz = __read_paz(pzfile_val)
         if not is_paz:
             if logger:
-                logger.warning(
-                    "PZ response unavailable at station {}, channel {}".format(
-                        name, channel
-                    )
-                )
+                logger.warning(f"skipping {sac} for station {name}, channel {channel}: "
+                    "missing PZ response unavailable")
             continue
         netwk = stream[0].stats.network
         if stream[0].stats.sac.kcmpnm == "BHZ":
@@ -1515,10 +1521,18 @@ def __worker(
     directory = pathlib.Path(directory)
     for sac in select_str_data:
         stream = read(sac)
+        tr = stream[0]
+        name = tr.stats.station
+        channel = tr.stats.channel
+
         if _delete_criteria(stream[0].data):
+            print(f"skipping {sac} for station {name}, channel {channel}: "
+                "delete criteria for baseline removal")
             continue
         st_vel = wang1.wang_process(sac)
         if not st_vel:
+            print(f"skipping {sac} for station {name}, channel {channel}: "
+                "baseline removal did not work out")
             continue
         st_vel.write(
             str(directory / "vel_{}".format(os.path.basename(sac)[4:])), format="SAC"
