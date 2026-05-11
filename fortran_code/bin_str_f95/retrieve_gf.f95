@@ -22,8 +22,8 @@ contains
 !  vel_model: file with velocity model
 !
    implicit none
-   character(len=100), intent(in) :: gf_file
-   character(len=100), intent(out) :: vel_model, gf_bank
+   character(len=300), intent(in) :: gf_file
+   character(len=300), intent(out) :: vel_model, gf_bank
    open(1, file=gf_file, status='old')
    read(1, *)vel_model
    read(1, *)dep_max, dep_min, dep_step
@@ -44,7 +44,7 @@ contains
 !  z_max: maximum depth of point sources
 !
    implicit none
-   character(len=100) :: gf_bank
+   character(len=300) :: gf_bank
    real :: z_min, z_max
    integer :: npt, nx_b, nx_e, nz_b, nz_e, ixx, izz
    integer :: index_rec

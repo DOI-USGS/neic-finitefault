@@ -573,7 +573,7 @@ contains
    complex sour_sub(npth), green_s(inptd, 10), www, wss, z0
 
    character(len=250) modes
-   character(len=100) surf_gf_bank
+   character(len=300) surf_gf_bank
    character(len=6) sta_name(nnsta)
 
    z0 = cmplx(0.0, 0.0)

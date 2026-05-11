@@ -19,7 +19,7 @@ contains
 !  vel_model: file with velocity model
 !
    implicit none
-   character(len=100) :: vel_model
+   character(len=300) :: vel_model
    integer :: j
    vel_model = trim(vel_model)
    open(1, file=vel_model, status='old')

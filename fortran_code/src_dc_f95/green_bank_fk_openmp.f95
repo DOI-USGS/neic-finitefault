@@ -20,7 +20,7 @@ program green_bank_fk_openmp
    integer iz, k, ll, n_com, nd_max, npt, ntc, nx, nz
    logical :: disp
 
-   character(len=100) gf_file, vel_model, gf_bank, input, directory
+   character(len=300) gf_file, vel_model, gf_bank, input, directory
 !
    call getarg(1, input)
    call getarg(2, directory)

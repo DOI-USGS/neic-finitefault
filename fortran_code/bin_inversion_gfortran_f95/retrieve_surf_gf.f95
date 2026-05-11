@@ -20,8 +20,8 @@ contains
 !  gf_bank: location of GF bank
 !
    implicit none
-   character(len=100), intent(in) :: gf_file
-   character(len=100), intent(out) :: gf_bank
+   character(len=300), intent(in) :: gf_file
+   character(len=300), intent(out) :: gf_bank
    integer :: int2, int3, int4
    open(1, file=gf_file, status='old')
    read(1, *) npt_bank, dt_bank, int2, int3, int4, nfmax, nblock2
@@ -71,7 +71,7 @@ contains
 !  z_max: maximum depth to get GF from Gf bank
 !
    implicit none
-   character(len=100) :: gf_bank
+   character(len=300) :: gf_bank
    real :: d_min, d_max, z_min, z_max
    integer :: nx_b, nx_e, nz_b, nz_e, ixx, izz
    integer :: index_rec

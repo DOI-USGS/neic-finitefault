@@ -14,10 +14,10 @@ program get_strong_motion
    use bpfilter, only : bandpassfilter
    use rad_pattern, only : rad_coef
    implicit none
-   character(len=100) :: vel_model, gf_file, vel_file, gf_bank, filter_file, wave_file, stat_file
+   character(len=300) :: vel_model, gf_file, vel_file, gf_bank, filter_file, wave_file, stat_file
    character(len=70) :: string1, input
-   character(len=200) :: directory,filterfile,risetimefile,pointsourcefile
-   character(len=200) :: channelsfile,waveformsfile,responsefile
+   character(len=300) :: directory,filterfile,risetimefile,pointsourcefile
+   character(len=300) :: channelsfile,waveformsfile,responsefile
    character(len=10) :: sta_name(200)
    character(len=12) :: filename
    character(len=3) :: comp
