@@ -203,6 +203,10 @@ def _distazbaz(
             - np.cos(sigma) * np.sin(event_lat * degrees2rad),
         )
         azimuth = 360 - azimuth / degrees2rad
+
+    azimuth = azimuth % 360
+    back_azimuth = back_azimuth % 360
+
     return distance, azimuth, back_azimuth
 
 
