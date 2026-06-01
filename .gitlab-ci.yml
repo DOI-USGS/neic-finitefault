@@ -62,6 +62,17 @@ stages:
     RUN_END_TO_END: "true"
 
 ## -------------------------------------
+#  Audit Stage
+## -------------------------------------
+
+Python Audit:
+  allow_failure: true
+  script:
+    - pip install pip-audit
+    - pip-audit --ignore-vuln CVE-2026-8087 --ignore-vuln CVE-2026-8088 --ignore-vuln CVE-2026-41066 --ignore-vuln CVE-2026-39378 --ignore-vuln CVE-2026-39377 --ignore-vuln CVE-2026-40192 --ignore-vuln CVE-2026-42308 --ignore-vuln CVE-2026-42309 --ignore-vuln CVE-2026-42310 --ignore-vuln CVE-2026-42311
+  stage: audit
+
+## -------------------------------------
 #  Init Stage
 ## -------------------------------------
 
