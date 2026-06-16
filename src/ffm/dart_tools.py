@@ -125,6 +125,12 @@ def make_DART_GFs_DS_SS(
     ##########################
     ### Initialize geoclaw ###
     ##########################
+    geoclaw_clean = "make clean"
+    with open(directory / "output.log", "a") as outfile:
+        subprocess.call(
+            split(geoclaw_clean), stdout=outfile
+        )  ### Pipe all the unneccesary output to a file
+    outfile.close()
     geoclaw_init = "make .exe"
     with open(directory / "output.log", "a") as outfile:
         subprocess.call(
