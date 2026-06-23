@@ -1,6 +1,7 @@
 import json
 import os
 import pathlib
+import pygmt
 import subprocess
 from io import StringIO
 from os import chdir
@@ -840,6 +841,118 @@ def make_ffm_kinematic_dtopo(
 
 
 def plot_dtopo_snapshots(
+    dtopo_file,
+    hyp_lon,
+    hyp_lat,
+    output_dir="dtopo_pngs",
+    gif_name="dtopo_animation.gif",
+):
+    """
+    Reads a dtopo file and saves a PNG for each time step, showing deformation as a function of lon/lat.
+    Also creates a GIF of all frames. 
+    Assumes columns: time, lon, lat, deformation.
+
+    :param dtopo_file: filename of dtopo (seafloor deformation)
+    :type dtopo_file: str
+    :param hyp_lon: hypocenter longitude
+    :type hyp_lon: float
+    :param hyp_lat: hypocenter latitude
+    :type hyp_lat: float
+    :param output_dir: directory to save snapshots. Default is 'dtopo_pngs'.
+    :type output_dir: str
+    :param gif_name: filename of GIF of kinematic seafloor displacement. Default is 'dtopo_animation.gif'.
+    :type gif_name: str
+    """
+
+    pygmt.makecpt(cmap="balance", series=[-4, 4], continuous=False, background="True", output="deformation.cpt")
+    pygmt.makecpt(cmap="gray", series=[-8000, 0], continuous=False, background="True", output="dtopo.cpt")
+
+
+    # Load data
+    data = np.loadtxt(dtopo_file)
+    times = np.unique(data[:, 0])
+
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+
+    frame_files = []
+
+#    for t in times:
+    for t in range(1):
+        t=280
+        mask = data[:, 0] == t
+        lons = data[mask, 1]
+        lats = data[mask, 2]
+        deformation = data[mask, 3]
+        region_2d = [min(lons), max(lons), min(lats), max(lats)]
+
+        print(min(deformation), max(deformation))
+        disp_grid = pygmt.xyz2grd(
+            x=lons,
+            y=lats,
+            z=deformation,
+            region=region_2d,
+            spacing="30s",
+            registration="p",  # 'p' for pixel, 'g' for
+            nodata=0,
+        )
+
+        # Download elevation and crustal age grids for the study region with a resolution of 10
+        # arc-minutes and load them into xarray.DataArrays
+        grd_relief = pygmt.datasets.load_earth_relief(resolution="30s", region=region_2d)
+        dgrid = pygmt.grdgradient(grid=grd_relief, radiance=[270, 30])
+        fig = pygmt.Figure()
+        pygmt.config(MAP_FRAME_TYPE="plain", MAP_FRAME_PEN="1p", FONT_ANNOT_PRIMARY="14p", FONT_LABEL="14p",MAP_GRID_PEN_PRIMARY=0.25)
+        fig.basemap(region=region_2d, projection="M12c", frame=True)
+
+        fig.grdview(
+            projection="M12c",  # Mercator projection with a width of 12 centimeters
+            region=region_2d,
+            grid=grd_relief,  # Use elevation grid for z values
+            cmap="dtopo.cpt",  # Use colormap created for the crustal age
+            surftype="i",  # Create an image plot
+            shading="+a45/135+nt1",
+            frame=True,
+        )
+
+        fig.grdview(
+            projection="M12c",  # Mercator projection with a width of 12 centimeters
+            region=region_2d,
+            grid=grd_relief,  # Use elevation grid for z values
+            drapegrid=disp_grid,  # Use crustal age grid for color-coding
+            cmap="deformation.cpt",  # Use colormap created for the crustal age
+            surftype="i",  # Create an image plot
+            shading="+a45/135+nt0.2",
+            frame=True,
+            transparency=0,
+        )
+
+        fig.plot(
+            x=hyp_lon,
+            y=hyp_lat,
+            style="a0.4c",
+            fill="white",
+            pen="0.6p,black",
+        )
+
+        fig.coast(shorelines=True, land="lightgray")
+        fig.colorbar(
+            frame='af+lSeafloor Deformation (m)',
+            position="JMR+o0.5c/0.0c+w10c/0.5c",
+            cmap=True,
+        )
+        frame_path = os.path.join(output_dir, f"dtopo_t{t:.2f}.png")
+        print(f"Saving to {frame_path}")
+        fig.savefig(frame_path)
+        frame_files.append(frame_path)
+
+    # Create GIF
+    images = [imageio.imread(f) for f in frame_files]
+    gif_path = os.path.join(output_dir, gif_name)
+    imageio.mimsave(gif_path, images, duration=0.5)
+
+
+def old_plot_dtopo_snapshots(
     dtopo_file,
     hyp_lon,
     hyp_lat,
