@@ -1,7 +1,13 @@
 ##  If you want to change the size of GF bank, please just modify the size.h
 FFLAGS=-O
 MY_BIN=.
-F77=gfortran -ffixed-line-length-132 -mcmodel=medium -O2 -Wall -g#-fbacktrace -ffpe-trap=underflow,denormal
+# -mcmodel is x86-64-specific; not supported (and not needed) on macOS arm64
+ifeq ($(shell uname -s),Darwin)
+MCMODEL_MEDIUM =
+else
+MCMODEL_MEDIUM = -mcmodel=medium
+endif
+F77=gfortran -ffixed-line-length-132 $(MCMODEL_MEDIUM) -O2 -Wall -g#-fbacktrace -ffpe-trap=underflow,denormal
 # linux or Mac
 
 modules = constants.o retrieve_gf.o bessel2.o vel_model_data.o wave_travel.o fk_source.o haskell.o prop.o fk_kernel.o fk.o bessel.o $(SUBS)

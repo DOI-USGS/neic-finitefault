@@ -4,7 +4,13 @@ OBJS5= fft.o green_cgps.o interporation.o cmodel.o ddis.o  Read_green.o bpfilter
 OBJS4= fft.o get_green_fun.o interporation.o cmodel.o ddis.o  Read_green.o bpfilter.o
 modules = constants.o vel_model_data.o model_parameters.o
 modules2 = $(modules) geodesics.o retrieve_gf.o wave_travel.o bpfilter.o fast_fourier_trans.o rad_pattern.o store_gf.o
-F95= gfortran -Wall -O2 -ffixed-line-length-132 -fno-range-check -mcmodel=large -fbacktrace -g -fno-rerun-loop-opt
+# -mcmodel is x86-64-specific; not supported (and not needed) on macOS arm64
+ifeq ($(shell uname -s),Darwin)
+MCMODEL_LARGE =
+else
+MCMODEL_LARGE = -mcmodel=large
+endif
+F95= gfortran -Wall -O2 -ffixed-line-length-132 -fno-range-check $(MCMODEL_LARGE) -fbacktrace -g -fno-rerun-loop-opt
 
  
 all: get_strong_motion clean

@@ -115,7 +115,9 @@ def test_duration_strong_motion():
 
 
 def test_filling_data_dicts():
-    tempdir = pathlib.Path(tempfile.mkdtemp())
+    # resolve() so the expected paths match the canonicalized paths the code
+    # writes (on macOS mkdtemp returns /var/..., a symlink to /private/var/...)
+    tempdir = pathlib.Path(tempfile.mkdtemp()).resolve()
     try:
         new_surf_waves = update_manager_file_locations(
             SURF_WAVES, tempdir / "data", replace_dir=str(RESULTS_DIR / "data")
@@ -309,7 +311,9 @@ def test_failsafe():
 
 
 def test_imagery_data():
-    tempdir = pathlib.Path(tempfile.mkdtemp())
+    # resolve() so the expected paths match the canonicalized paths the code
+    # writes (on macOS mkdtemp returns /var/..., a symlink to /private/var/...)
+    tempdir = pathlib.Path(tempfile.mkdtemp()).resolve()
     try:
         new_imagery = update_manager_file_locations(
             IMAGERY_DATA, tempdir, replace_dir=str(RESULTS_DIR / "NP1"), file_key="name"

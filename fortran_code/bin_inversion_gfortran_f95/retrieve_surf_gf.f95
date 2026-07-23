@@ -7,7 +7,9 @@ module retrieve_surf_gf
    integer :: npt_bank, dt_bank
    real, private :: dep_max, dep_min, dep_step, dist_max, dist_min, d_step
    real, private :: grid_depth(50), grid_dist(1601)
-   complex, private :: green_bank(wave_pts2, 10, 1601, 50)
+! allocatable rather than static: 13 GB exceeds the +/-4GB static addressing
+! range on macOS arm64 (no -mcmodel=medium equivalent exists there)
+   complex, private, allocatable :: green_bank(:, :, :, :)
 
 
 contains
@@ -78,7 +80,8 @@ contains
    real :: fault_bounds(2, 2)
    real :: dt_c, t0, dep, dis0
    integer :: iz, iz0, k, k0, npt_c, ntc, n_com, nptf
-  
+
+   if (.not. allocated(green_bank)) allocate(green_bank(wave_pts2, 10, 1601, 50))
    call grid_properties()
    
    fault_bounds(1, 1) = d_min
@@ -144,6 +147,7 @@ contains
    integer :: k, k_down, k_left, k_up, k_right, n, ncom
    integer :: nx_b, nx_e, nz_b, nz_e
 
+   if (.not. allocated(green_bank)) allocate(green_bank(wave_pts2, 10, 1601, 50))
    fault_bounds(1, 1) = d_min
    fault_bounds(2, 1) = d_max
    fault_bounds(1, 2) = zu_min

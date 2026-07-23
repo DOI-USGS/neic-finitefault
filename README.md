@@ -64,7 +64,9 @@ In order to compile and/or install the source code there are a number of prerequ
 
 ## WISP Installation Scripts
 
-Automated installation of the dependencies and fortran code has been provided in the form of the install script [install.sh](./install.sh). Currently this install script only supports installation on linux systems as the fortran code cannot be compiled on MacOS. To instal the code please ensure that all of the [prerequisites](#prerequisites) are available and miniforge/miniconda/anaconda environment has been initialized
+Automated installation of the dependencies and fortran code has been provided in the form of the install script [install.sh](./install.sh). Currently this install script only supports installation on linux systems. To instal the code please ensure that all of the [prerequisites](#prerequisites) are available and miniforge/miniconda/anaconda environment has been initialized
+
+On macOS (including Apple Silicon/arm64), the fortran code compiles with Homebrew gfortran: run `make` in each of the three directories under [fortran_code](./fortran_code/) (or run [install.d/ffm.sh](./install.d/ffm.sh)). The pinned [environment.yml](./install.d/environment.yml) contains linux builds only, so on macOS create the conda environment from the package list instead (conda-forge channel; see [Code Dependencies](./docs/code-dependencies.md)), and install `pyrocko` with pip. GMT must be >= 6.3 for pygmt.
 
 1. `source install.sh <path to the local neic-finitefault repository>` (with other optional configurations available, run `sudo bash user_install.sh -h` for the help information)
    1. > NOTE: The scripts in [./install.d](./install.d/) may be run individually to suit the individuals needs. For example, to only rerun compilation of the fortran you can singularly run [ffm.sh](./install.d/ffm.sh).

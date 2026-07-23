@@ -6,8 +6,16 @@ modules2 = $(modules) static_data.o imagery_data.o misfit_eval.o regularization.
 #Linux
 #F95= ifort -shared-intel -mcmodel=large -O2 -assume byterecl -p#-p -132 -shared-intel
 #F77= ifort -O3 -132  -assume byterecl
-F95= gfortran -O3 -fno-range-check -mcmodel=medium -g #-mavx2 -Wall -ftree-loop-vectorize -ftree-loop-distribution#-fno-omit-frame-pointer -ffpe-trap=overflow,invalid#-ffpe-trap=overflow -funroll-loops -fcheck=all
-F77= gfortran -O1 -fno-range-check -mcmodel=large -g -fbacktrace
+# -mcmodel is x86-64-specific; not supported (and not needed) on macOS arm64
+ifeq ($(shell uname -s),Darwin)
+MCMODEL_MEDIUM =
+MCMODEL_LARGE =
+else
+MCMODEL_MEDIUM = -mcmodel=medium
+MCMODEL_LARGE = -mcmodel=large
+endif
+F95= gfortran -O3 -fno-range-check $(MCMODEL_MEDIUM) -g #-mavx2 -Wall -ftree-loop-vectorize -ftree-loop-distribution#-fno-omit-frame-pointer -ffpe-trap=overflow,invalid#-ffpe-trap=overflow -funroll-loops -fcheck=all
+F77= gfortran -O1 -fno-range-check $(MCMODEL_LARGE) -g -fbacktrace
 
 
 all: run_forward run_modelling green_tele clean
