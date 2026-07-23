@@ -673,7 +673,8 @@ def test_automatic_tele():
                 # location-00 response (new/golden amplitude ratio equals
                 # |H_10|/|H_00|), so current processing can never match them.
                 if any(
-                    sta in basename for sta in ["II_SUR", "US_GOGA", "IU_RCBR", "IU_TSUM"]
+                    sta in basename
+                    for sta in ["II_SUR", "US_GOGA", "IU_RCBR", "IU_TSUM"]
                 ):
                     continue
                 # relative tolerance: an absolute decimal criterion is below
