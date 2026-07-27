@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -ex
+
 # ==============================================================================
 # Define usage
 #     Install miniforge (if needed)

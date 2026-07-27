@@ -37,7 +37,7 @@ clawpack_install () {
     git submodule init;
     git submodule update;
 
-    cd ${OLDPWD};
+    cd "${OLDPWD}";
     clawpack_profile;
 
     # topo/bathy data
@@ -64,9 +64,7 @@ clawpack_profile () {
         echo "CLAW already specified in profile"
     else
         echo "Adding CLAW info to profile"
-        echo "" >> $profile
-        echo "# CLAWPACK" >> $profile
-        echo "export CLAW=${CLAW_DIR}/clawpack" >> $profile;
+        echo "{ ; # CLAWPACK; export CLAW=${CLAW_DIR}/clawpack; export OMP_NUM_THREADS=nproc/4 }" >> $profile;
     fi
 
     if [[ "$PYTHONPATH" == *"${CLAW_DIR}/clawpack"* ]]; then

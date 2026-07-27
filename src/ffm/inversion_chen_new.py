@@ -343,10 +343,6 @@ def _automatic2(
     ####################################################
     if "dart" in data_type:
         data_type = _remove_dart_from_auto(data_type)
-    #        with open(directory / "dart_waves.json") as t:
-    #            dart_data = json.load(t)
-    #        dt_dart = dart_data[0]["dt"]
-    #        make_DART_GFs_DS_SS(directory, tensor_info, segments_data, dart_data, dt=dt_dart)
     if data_type == []:
         print("No data types left")
         return
@@ -445,7 +441,6 @@ def modelling_new_data(
     :param directory: Where the file(s) should be read/written, defaults to pathlib.Path()
     :type directory: Union[pathlib.Path, str], optional
     """
-    print(f"REMOVE REPSONSE??: {st_response}")
     directory = pathlib.Path(directory)
     if os.path.isfile(os.path.join(data_folder, "gnss_data")):
         copy2(os.path.join(data_folder, "gnss_data"), directory)
@@ -837,8 +832,6 @@ def set_directory_structure(
         os.path.join("data", "SH"),
         os.path.join("data", "RAYLEIGH"),
         os.path.join("data", "LOVE"),
-        #        os.path.join("data", "final"),
-        #        os.path.join("data", "final_r"),
         "NP1",
         os.path.join("NP1", "logs"),
         os.path.join("NP1", "plots"),

@@ -172,11 +172,11 @@ def acquire_dart(
         "--frequency_bandpass",
         help="Corner frequencies for bandpass filter, in seconds, default is 5 to 120 s",
     ),
-    make_json: bool = typer.Option(
+    skip_json: bool = typer.Option(
         False,
         "-j",
         "--make_dart_json",
-        help="Whether to make dart_waves.json with all acquired waveforms, default is False",
+        help="Whether to skip making the dart_waves.json with all acquired waveforms, default is False",
     ),
 ):
     if (gcmt_tensor_file is None and qcmt_tensor_file is None) or (
@@ -193,7 +193,7 @@ def acquire_dart(
         max_distance=max_distance,
         plot=plot,
         fcorner=fcorner,
-        make_json=make_json,
+        make_json=(not skip_json),
     )
 
 

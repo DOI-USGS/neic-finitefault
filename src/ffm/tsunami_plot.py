@@ -11,7 +11,7 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
-from clawpack.geoclaw import fgmax_tools  # type: ignore [attr-defined]
+from clawpack.geoclaw import fgmax_tools  # type: ignore
 from clawpack.geoclaw import topotools  # type: ignore
 from clawpack.visclaw import (  # type: ignore [import-untyped, import-not-found, attr-defined]
     gaugetools,
@@ -194,22 +194,6 @@ def setplot(plotdata=None, parameter_file="geoclaw_parameter_file.json"):
         fg.read_fgmax_grids_data(fgno=1, data_file=data_file)
         fg.read_output()
 
-        # clines_zeta = [0.01] + list(np.linspace(0.05,0.3,6)) + [0.5,1.0,5.0]
-        # clines_zeta = [
-        #     0.0,
-        #     0.01,
-        #     0.03,
-        #     0.05,
-        #     0.07,
-        #     0.10,
-        #     0.30,
-        #     0.50,
-        #     1.0,
-        #     1.5,
-        #     3.0,
-        #     10,
-        #     30,
-        # ]
         clines_zeta = [1, 3, 5, 7, 10, 15, 20, 25, 30, 50]
         colors = geoplot.discrete_cmap_1(clines_zeta)
         plt.figure(1)
@@ -239,8 +223,6 @@ def setplot(plotdata=None, parameter_file="geoclaw_parameter_file.json"):
         fname = os.path.join(plotdata.plotdir, "amplitude_times.pdf")
         plt.savefig(fname)
         print("Created ", fname)
-
-        # plot_fgmax.plot_fgmax_grid(plotdata.outdir, plotdata.plotdir)
 
     otherfigure.makefig = makefig
 

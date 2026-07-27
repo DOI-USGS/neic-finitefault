@@ -1,13 +1,12 @@
 import json
 import os
 import pathlib
-import pygmt
 import subprocess
 from io import StringIO
 from os import chdir
 from shlex import split
 from shutil import copy
-from typing import Union
+from typing import List, Union
 from urllib.request import Request, urlopen
 
 import cartopy.crs as ccrs  # type: ignore
@@ -16,11 +15,13 @@ import imageio
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd  # type: ignore
+import pygmt  # type: ignore
 import requests
 from alive_progress import alive_bar
 from clawpack.geoclaw import dtopotools  # type: ignore
 from clawpack.geoclaw import topotools  # type: ignore
 from obspy import UTCDateTime  # type: ignore
+from obspy.core import utcdatetime  # type: ignore
 from obspy.core.stream import Stream  # type: ignore
 from obspy.core.trace import Trace  # type: ignore
 from obspy.signal import filter  # type: ignore
@@ -56,6 +57,8 @@ def make_DART_GFs_DS_SS(
     dart_data: dict,
     dt: float = 60,
     tfinal: int = 10800,
+    fcorner: List = [5, 120],
+    buffer_dist = 0.5,
     subfault_start: int = 0,
     time_domain: bool = False,
     plots: bool = False,
@@ -75,6 +78,10 @@ def make_DART_GFs_DS_SS(
     :type dt: float
     :param tfinal: Length of Green's functions, in seconds
     :type tfinal: int
+    :param fcorner: bandpass filter corner frequencies in minutes
+    :type fcorner: List[float]. The default is [5, 120]
+    :param buffer_dist: Extra distance (in degrees) around the min/max subfault to DART station region. The default is 0.5 deg.
+    :type buffer_dist: float
     :param subfault_start: Subfault to start calculation (use only if previous run failed midway)
     :type subfault_start: int
     :param time_domain: Whether to save Green's functions in time domain, default is False
@@ -109,10 +116,10 @@ def make_DART_GFs_DS_SS(
     )
 
     ### Find model region, with 0.5 degrees of space beyond your fault and stations ###
-    min_lon = min(min(lon_sub), min(lon_dart)) - 0.5
-    max_lon = max(max(lon_sub), max(lon_dart)) + 0.5
-    min_lat = min(min(lat_sub), min(lat_dart)) - 0.5
-    max_lat = max(max(lat_sub), max(lat_dart)) + 0.5
+    min_lon = min(min(lon_sub), min(lon_dart)) - buffer_dist
+    max_lon = max(max(lon_sub), max(lon_dart)) + buffer_dist
+    min_lat = min(min(lat_sub), min(lat_dart)) - buffer_dist
+    max_lat = max(max(lat_sub), max(lat_dart)) + buffer_dist
     model_region = {
         "west": min_lon,
         "east": max_lon,
@@ -141,9 +148,9 @@ def make_DART_GFs_DS_SS(
 
     source_dx = 2 / 60.0  # dtopo spatial sampling (2 arcmin)
     fcorner2 = [
-        1.0 / (120 * 60),
-        1.0 / (5 * 60),
-    ]  # we will bandpass filter the GFs from 5 to 120 mins for consistency with data
+        1.0 / (fcorner[1] * 60),
+        1.0 / (fcorner[0] * 60),
+    ]  # bandpass filter the GFs from for consistency with data (default 5 to 120 mins)
 
     #######################################
     ###       Loop over subfaults       ###
@@ -314,11 +321,16 @@ def make_DART_GFs_DS_SS(
                 bar()  # update progress bar, one subfault complete
 
 
-def get_subfault_locations(segments_data, tensor_info):
+def get_subfault_locations(
+    segments_data: dict,
+    tensor_info: dict,
+):
     """
     Get subfault location and orientation information from segments_data.json
     :param segments_data: Dictionary of fault segment parameters
     :type segments_data: dict
+    :param tensor_info: Moment tensor/event origin information
+    :type tensor_info: dict
     """
     subfault_lons = []
     subfault_lats = []
@@ -436,7 +448,7 @@ def make_dart_json_no_observations(
                 channel="dart",
                 distance=dist_degrees,
                 dt=60.0,
-                duration=10800,  # TO DO: CHECK THIS
+                duration=10800,
                 n_start_obs=0,
                 trace_weight=1.0,
                 wavelet_weight="0 0 2 2 2 2 2 2\n",
@@ -456,18 +468,23 @@ def make_dart_json_no_observations(
         )
 
 
-def query_dart_api(origin_time, station, dt=60, fcorner=[5, 120]):
+def query_dart_api(
+    origin_time: utcdatetime.UTCDateTime,
+    station: str,
+    dt: float = 60,
+    fcorner: List = [5, 120],
+):
     """
     Makes query to NOAA or New Zealand API for DART observations
 
     :param origin_time: Earthquake origin time
-    :type origin_time:
+    :type origin_time: obspy.core.utcdatetime.UTCDateTime
     :param station: DART station from which to query data
     :type station: str
     :param dt: Data sampling rate, in seconds, for interpolation. The default is 60.
     :type dt: float, optional
     :param fcorner: bandpass filter corner frequencies in minutes
-    :type fcorner: List[float]. The default is [5,120]
+    :type fcorner: List[float]. The default is [5, 120]
     :raises EmptyDataError: No data available for query.
     :raises RequestError: Issue with query request.
     """
@@ -558,13 +575,10 @@ def query_dart_api(origin_time, station, dt=60, fcorner=[5, 120]):
         startdate = f"/{startyear}-{startmonth}-{startday}/"
         enddate = f"{endyear}-{endmonth}-{endday}"
         url = source + domain + key + startdate + enddate
-        # print(url)
         r = requests.get(url, headers={"Accept": "text/csv"})
         try:
             if r.status_code == 200:
-                df = pd.read_csv(
-                    StringIO(r.text), parse_dates=["timestamp"]
-                )  # , index_col='timestamp')
+                df = pd.read_csv(StringIO(r.text), parse_dates=["timestamp"])
                 df["Datetime"] = df["timestamp"]
                 dates = pd.to_datetime(df["Datetime"], utc=True)
                 # calculate unix datetime
@@ -583,7 +597,6 @@ def query_dart_api(origin_time, station, dt=60, fcorner=[5, 120]):
                     model_in = f4(t_in)
 
                     model_in = model_in - np.mean(model_in[2:])
-                    # data_fil = bandpass(model_in, fcorner2, 1 / dt)
                     data_fil = filter.bandpass(
                         model_in,
                         fcorner2[0],
@@ -605,13 +618,13 @@ def query_dart_api(origin_time, station, dt=60, fcorner=[5, 120]):
 
 
 def get_dart_observations(
-    tensor_info,
-    data_directory,
-    dt=60.0,
-    max_distance=20,
-    plot=False,
-    fcorner=[5, 120],
-    make_json=False,
+    tensor_info: dict,
+    data_directory: Union[pathlib.Path, str],
+    dt: float = 60.0,
+    max_distance: float = 20,
+    plot: bool = False,
+    fcorner: List = [5, 120],
+    make_json: bool = True,
 ):
     """
     Gets DART observations from station file with DART Station ID, Longitude, and Latitude.
@@ -625,11 +638,11 @@ def get_dart_observations(
     :param max_distance: Maximum hypocenteral distance in degrees. Default is 20.
     :type max_distance: float, optional
     :param plot: Whether to plot observed data. Default is False.
-    :type plot: Bool, optional
+    :type plot: bool, optional
     :param fcorner: Bandpass corner frequencies, in seconds. Default is 5 to 120 minutes.
-    :type fcorner: array, optional
-    :param make_json: Whether to make dart_waves.json from all available stations. Default is False.
-    :type make_json: Bool, optional
+    :type fcorner: List, optional
+    :param make_json: Whether to make dart_waves.json from all available stations. Default is True.
+    :type make_json: bool, optional
     """
 
     hypo_lat = tensor_info["lat"]
@@ -664,7 +677,6 @@ def get_dart_observations(
             if len(t_in) > 1:
                 ### WRITE TO SAC FILE ###
                 new_name = "processed_{}_dart.sac".format(station)
-                # print(f"...Data retrieved, writing to {data_directory}/{new_name}")
                 tr = Trace(data=data_fil)  # leave as m
                 tr.stats.delta = dt
                 tr.stats.station = str(station)
@@ -741,19 +753,21 @@ def get_dart_observations(
 
 
 def make_ffm_kinematic_dtopo(
-    ffm_solution, directory: Union[pathlib.Path, str] = pathlib.Path(), makeplots=True
+    ffm_solution: Union[pathlib.Path, str],
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+    makeplots: bool = True,
 ):
     """
     Creates kinematic dtopo file from Solution.txt output
 
     :param ffm_solution: Solution.txt, finite fault solution file
-    :type ffm_solution: str
+    :type ffm_solution: Union[pathlib.Path, str]
     :param directory: Working directory
     :type directory: Union[pathlib.Path, str]
     :param makeplots: Whether to create dtopo animation, default is True.
-    :type makeplots: Bool, optional
+    :type makeplots: bool, optional
     :return: the filename for the kinamtic dtopo
-    :rtype: str
+    :rtype: Union[pathlib.Path, str]
     """
     directory = pathlib.Path(directory)
     fault = dtopotools.Fault()
@@ -841,19 +855,19 @@ def make_ffm_kinematic_dtopo(
 
 
 def plot_dtopo_snapshots(
-    dtopo_file,
-    hyp_lon,
-    hyp_lat,
-    output_dir="dtopo_pngs",
-    gif_name="dtopo_animation.gif",
+    dtopo_file: Union[pathlib.Path, str],
+    hyp_lon: float,
+    hyp_lat: float,
+    output_dir: Union[pathlib.Path, str] = "dtopo_pngs",
+    gif_name: str = "dtopo_animation.gif",
 ):
     """
     Reads a dtopo file and saves a PNG for each time step, showing deformation as a function of lon/lat.
-    Also creates a GIF of all frames. 
+    Also creates a GIF of all frames.
     Assumes columns: time, lon, lat, deformation.
 
     :param dtopo_file: filename of dtopo (seafloor deformation)
-    :type dtopo_file: str
+    :type dtopo_file: Union[pathlib.Path, str]
     :param hyp_lon: hypocenter longitude
     :type hyp_lon: float
     :param hyp_lat: hypocenter latitude
@@ -864,67 +878,92 @@ def plot_dtopo_snapshots(
     :type gif_name: str
     """
 
-    pygmt.makecpt(cmap="balance", series=[-4, 4], continuous=False, background="True", output="deformation.cpt")
-    pygmt.makecpt(cmap="gray", series=[-8000, 0], continuous=False, background="True", output="dtopo.cpt")
-
+    pygmt.makecpt(
+        cmap="gray",
+        series=[-8000, 0],
+        continuous=False,
+        background="True",
+        output="dtopo.cpt",
+    )
 
     # Load data
     data = np.loadtxt(dtopo_file)
     times = np.unique(data[:, 0])
+
+    min_deformation = min(data[:,3])
+    max_deformation = max(data[:,3])
+    range_deformation = max(np.abs([min_deformation, max_deformation]))
+
+    pygmt.makecpt(
+        cmap="balance",
+        series=[-range_deformation, range_deformation],
+        continuous=False,
+        background="True",
+        output="deformation.cpt",
+    )
 
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
 
     frame_files = []
 
-#    for t in times:
-    for t in range(1):
-        t=280
+    for t in times:
         mask = data[:, 0] == t
         lons = data[mask, 1]
         lats = data[mask, 2]
         deformation = data[mask, 3]
         region_2d = [min(lons), max(lons), min(lats), max(lats)]
 
-        print(min(deformation), max(deformation))
+        print(region_2d)
         disp_grid = pygmt.xyz2grd(
             x=lons,
             y=lats,
             z=deformation,
             region=region_2d,
-            spacing="30s",
-            registration="p",  # 'p' for pixel, 'g' for
+            spacing="5m",
+            registration=False,  # 'p' for pixel, 'g' for
             nodata=0,
         )
 
         # Download elevation and crustal age grids for the study region with a resolution of 10
         # arc-minutes and load them into xarray.DataArrays
-        grd_relief = pygmt.datasets.load_earth_relief(resolution="30s", region=region_2d)
+        grd_relief = pygmt.datasets.load_earth_relief(
+            resolution="30s", region=region_2d
+        )
         dgrid = pygmt.grdgradient(grid=grd_relief, radiance=[270, 30])
         fig = pygmt.Figure()
-        pygmt.config(MAP_FRAME_TYPE="plain", MAP_FRAME_PEN="1p", FONT_ANNOT_PRIMARY="14p", FONT_LABEL="14p",MAP_GRID_PEN_PRIMARY=0.25)
+        pygmt.config(
+            MAP_FRAME_TYPE="plain",
+            MAP_FRAME_PEN="1p",
+            FONT_ANNOT_PRIMARY="14p",
+            FONT_LABEL="14p",
+            MAP_GRID_PEN_PRIMARY=0.25,
+        )
         fig.basemap(region=region_2d, projection="M12c", frame=True)
 
         fig.grdview(
             projection="M12c",  # Mercator projection with a width of 12 centimeters
             region=region_2d,
             grid=grd_relief,  # Use elevation grid for z values
-            cmap="dtopo.cpt",  # Use colormap created for the crustal age
+            cmap="dtopo.cpt",  # Use colormap created for the topography
             surftype="i",  # Create an image plot
             shading="+a45/135+nt1",
             frame=True,
         )
 
+
+        info = pygmt.grdinfo(grid=disp_grid)
+        print(info)
         fig.grdview(
             projection="M12c",  # Mercator projection with a width of 12 centimeters
             region=region_2d,
             grid=grd_relief,  # Use elevation grid for z values
-            drapegrid=disp_grid,  # Use crustal age grid for color-coding
-            cmap="deformation.cpt",  # Use colormap created for the crustal age
+            drapegrid=disp_grid,  # Use disp grid for color-coding
+            cmap="deformation.cpt",  # Use colormap created for the seafloor deformation
             surftype="i",  # Create an image plot
             shading="+a45/135+nt0.2",
             frame=True,
-            transparency=0,
+            transparency=35,
         )
 
         fig.plot(
@@ -937,79 +976,13 @@ def plot_dtopo_snapshots(
 
         fig.coast(shorelines=True, land="lightgray")
         fig.colorbar(
-            frame='af+lSeafloor Deformation (m)',
+            frame="af+lSeafloor Deformation (m)",
             position="JMR+o0.5c/0.0c+w10c/0.5c",
             cmap=True,
         )
         frame_path = os.path.join(output_dir, f"dtopo_t{t:.2f}.png")
         print(f"Saving to {frame_path}")
         fig.savefig(frame_path)
-        frame_files.append(frame_path)
-
-    # Create GIF
-    images = [imageio.imread(f) for f in frame_files]
-    gif_path = os.path.join(output_dir, gif_name)
-    imageio.mimsave(gif_path, images, duration=0.5)
-
-
-def old_plot_dtopo_snapshots(
-    dtopo_file,
-    hyp_lon,
-    hyp_lat,
-    output_dir="dtopo_pngs",
-    gif_name="dtopo_animation.gif",
-):
-    """
-    Reads a dtopo file and saves a PNG for each time step, showing deformation as a function of lon/lat.
-    Also creates a GIF of all frames.
-    Assumes columns: time, lon, lat, deformation.
-
-    :param dtopo_file: filename of dtopo (seafloor deformation)
-    :type dtopo_file: str
-    :param hyp_lon: hypocenter longitude
-    :type hyp_lon: float
-    :param hyp_lat: hypocenter latitude
-    :type hyp_lat: float
-    :param output_dir: directory to save snapshots. Default is 'dtopo_pngs'.
-    :type output_dir: str
-    :param gif_name: filename of GIF of kinematic seafloor displacement. Default is 'dtopo_animation.gif'.
-    :type gif_name: str
-    """
-
-    # Load data
-    data = np.loadtxt(dtopo_file)
-    times = np.unique(data[:, 0])
-
-    # Create output directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
-
-    frame_files = []
-
-    for t in times:
-        mask = data[:, 0] == t
-        lons = data[mask, 1]
-        lats = data[mask, 2]
-        deformation = data[mask, 3]
-
-        plt.figure(figsize=(8, 6))
-        ax = plt.axes(projection=ccrs.PlateCarree())
-        ax.coastlines()
-        sc = plt.scatter(
-            lons, lats, c=deformation, cmap="seismic", vmin=-4, vmax=4, s=5
-        )
-        epi = plt.plot(hyp_lon, hyp_lat, "*", c="k")
-        plt.colorbar(sc, label="Deformation")
-        gl = ax.gridlines(draw_labels=True, linestyle="--", color="gray")
-
-        # Optional: Customize label appearance and visibility
-        gl.top_labels = False  # Disable labels at the top
-        gl.right_labels = False  # Disable labels on the right
-        plt.title(f"Deformation at t={t:.2f} s")
-        plt.grid()
-        plt.tight_layout()
-        frame_path = os.path.join(output_dir, f"dtopo_t{t:.2f}.png")
-        plt.savefig(frame_path)
-        plt.close()
         frame_files.append(frame_path)
 
     # Create GIF
@@ -1026,7 +999,7 @@ def run_ffm_tsunami(
     run_geoclaw: bool = True,
 ):
     """
-    Runs tsunami forward model calculation from FFM solution assuming static slip
+    Runs tsunami forward model calculation from FFM solution assuming kinematic seafloor deformation
 
     :param directory: Directory that holds the FFM solution param file. The default is pathlib.Path().
     :type directory: Union[pathlib.Path, str]
@@ -1162,13 +1135,19 @@ def run_ffm_tsunami(
         plt.savefig(f"{directory}/dart_fwdmodel.png")
 
 
-def make_ffm_static_dtopo(ffm_solution, directory, makeplots=True):
+def make_ffm_static_dtopo(
+    ffm_solution: Union[pathlib.Path, str],
+    directory: Union[pathlib.Path, str],
+    makeplots: bool = True,
+):
     """
     Create dtopo data file for deformation of seafloor due to earthquake.
     Uses the Okada model with fault parameters and mesh specified below.
 
     :param ffm_solution: FFM solution file in PARAM format.
-    :type ffm_solution: str
+    :type ffm_solution: Union[pathlib.Path, str]
+    :param directory: Working directory
+    :type directory: Union[pathlib.Path, str],
     :param makeplots: Whether to make plots of seafloor deformation. The default is True.
     :type makeplots: bool, optional
     :return: Filename where dtopo is saved.
@@ -1182,7 +1161,7 @@ def make_ffm_static_dtopo(ffm_solution, directory, makeplots=True):
     fault.subfaults = []
     fault.rupture_type = "static"
     source_dx = 2 / 60.0  # dtopo spatial sampling (2 arcmin)
-    event_m0 = 0
+    event_m0: float = 0
     num_subfaults = 0
     with open(ffm_solution, "r") as sol:
         for line in sol:
@@ -1257,7 +1236,11 @@ def make_ffm_static_dtopo(ffm_solution, directory, makeplots=True):
     return dtopo_fname
 
 
-def dart_high_res_locations(dart_data, segments_data, tensor_info):
+def dart_high_res_locations(
+    dart_data: dict,
+    segments_data: dict,
+    tensor_info: dict,
+):
     """
     Determine regions around each DART station for higher resolution in GeoClaw
 
@@ -1358,7 +1341,6 @@ def make_topo(
     east = np.ceil(east * 10) / 10.0
     south = np.floor(south * 10) / 10.0
     north = np.ceil(north * 10) / 10.0
-    # print(west, east, south, north)
     ### Use gmt grdcut to crop topo30.grd to region of interest
     grdcut_command = (
         f"gmt grdcut {topogrd} -G{crop_grd} -R{west}/{east}/{south}/{north}"
@@ -1375,12 +1357,12 @@ def make_topo(
 
 
 def dart_gf_time_freq_domain(
-    station,
-    dt,
-    subfault,
-    time_out,
-    eta,
-    gf_file_freq,
+    station: str,
+    dt: float,
+    subfault: int,
+    time_out: np.ndarray,
+    eta: np.ndarray,
+    gf_file_freq: str,
     GF_directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """

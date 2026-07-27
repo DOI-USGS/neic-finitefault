@@ -1455,14 +1455,6 @@ def PlotMap(
             max_lat = max(max_lat, latp)
             min_lon = min(min_lon, lonp)
             max_lon = max(max_lon, lonp)
-    # if stations_dart is not None:
-    #     for file in stations_dart:
-    #         name = file["name"]
-    #         latp, lonp = file["location"]
-    #         min_lat = min(min_lat, latp-0.5)
-    #         max_lat = max(max_lat, latp+0.5)
-    #         min_lon = min(min_lon, lonp-0.5)
-    #         max_lon = max(max_lon, lonp+0.5)
     if stations_gnss is not None:
         max_obs = np.zeros(3)
         stations_gnss2: list = []
@@ -1833,17 +1825,6 @@ def PlotMap(
         )
         fig.shift_origin(xshift="-0.4c", yshift="2.3c")
 
-    ### DART ###
-    # if stations_dart is not None:
-    #     print("...Plotting DART Stations")
-    #     for file in stations_dart:
-    #         name = file["name"]
-    #         latp, lonp = file["location"]
-    #         fig.plot(
-    #             x=lonp, y=latp, style="t7p", fill="red", pen="black"
-    #         )
-    #         if label_stations == True:
-    #             fig.text(x=lonp, y=latp, text=name, justify="TR", font="7p")
     if stations_dart is not None:
         ### ADD TO LEGEND ###
         fig.shift_origin(xshift="0.8c", yshift="-2.3c")

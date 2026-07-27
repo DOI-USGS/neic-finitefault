@@ -104,7 +104,7 @@ def gf_retrieve(
 
     if "dart" in used_data_type:
         print(
-            "Using previously computed DART GFs \n ... To recompute DART GFs run `wasp process tsunami-greens <directory>`"
+            "Using previously computed DART GFs \n ... To recompute DART GFs run `ffm process tsunami-greens <directory>`"
         )
         logger6 = ml.create_log("DART_GF", directory / "logs" / "green_dart_log")
         logger6.addHandler(ch)

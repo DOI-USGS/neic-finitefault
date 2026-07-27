@@ -142,6 +142,18 @@ def tsunami_greens(
         "--t_final",
         help="Runtime of tsunami model, in seconds",
     ),
+    fcorner: List[float] = typer.Option(
+        [5, 120],
+        "-f",
+        "--frequency_bandpass",
+        help="Corner frequencies for bandpass filter, in seconds, default is 5 to 120 s",
+    ),
+    buffer_dist: float = typer.Option(
+        0.5,
+        "-b",
+        "--buffer",
+        help="Extra distance around the min/max subfault-to-DART-station region. The default is 0.5 degrees. Large subfaults (~20km+)  may need a larger buffer to avoid edge effects."
+    ),
     subfault_start: int = typer.Option(
         0,
         "-ss",
@@ -178,6 +190,8 @@ def tsunami_greens(
         dart_data,
         dt=dt,
         tfinal=tfinal,
+        fcorner=fcorner,
+        buffer_dist=buffer_dist,
         subfault_start=subfault_start,
         time_domain=time_domain,
         plots=plots,
