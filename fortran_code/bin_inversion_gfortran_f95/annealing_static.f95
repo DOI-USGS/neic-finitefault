@@ -47,8 +47,8 @@ contains
 
    subroutine annealingstatic_set_procedure_param()
    implicit none
-   real :: real0
-   call get_weights_moment_end(moment_input, smooth_moment, smooth_slip, smooth_time, real0, emin0)
+   real :: real0, real1
+   call get_weights_moment_end(moment_input, smooth_moment, smooth_slip, smooth_time, real1, real0, emin0)
    end subroutine annealingstatic_set_procedure_param
 
 

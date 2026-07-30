@@ -33,8 +33,8 @@ contains
    
    subroutine modelparameters_set_procedure_param()
    implicit none
-   real :: real0, real1, real2, real3, real4
-   call get_weights_moment_end(real0, real1, real2, real3, t_latest, real4)
+   real :: real0, real1, real2, real3, real4, real5
+   call get_weights_moment_end(real0, real1, real2, real3, real5, t_latest, real4)
    end subroutine modelparameters_set_procedure_param
 
    

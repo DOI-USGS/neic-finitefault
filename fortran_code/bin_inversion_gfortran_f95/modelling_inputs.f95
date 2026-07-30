@@ -4,6 +4,7 @@ module modelling_inputs
    implicit none
    integer :: seed0, io_data, n_iter
    real :: t0, cooling_rate, t_stop, emin0, smooth_moment, smooth_slip, smooth_time
+   real :: smooth_rise
    real :: t_mid, t_latest, moment_input
    integer :: start_annealing, io_func, io, events
    real :: moment_event(10)
@@ -14,10 +15,18 @@ contains
 
    subroutine read_annealing_param()
    implicit none
+   integer :: ios
+   real :: dummy(7), smooth_rise0
+   character(len=200) :: weights_line
    write(*,*)'Store annealing and modelling parameters...'
    open(10, file='annealing.txt', status='old')
    read(10,*) n_iter, seed0, io_data, moment_input
-   read(10,*) t0, cooling_rate, t_stop, emin0, smooth_moment, smooth_slip, smooth_time
+   read(10,'(a)') weights_line
+   read(weights_line,*) t0, cooling_rate, t_stop, emin0, smooth_moment, smooth_slip, smooth_time
+!  optional trailing token: weight of rise time smoothness regularization
+   smooth_rise = 0.0
+   read(weights_line,*,iostat=ios) dummy, smooth_rise0
+   if (ios .eq. 0) smooth_rise = smooth_rise0
    read(10,*) start_annealing, t_mid, io_func, t_latest
    read(10,*) io
    close(10)
@@ -67,22 +76,24 @@ contains
    
 
    subroutine get_weights_moment_end(moment_input0, smooth_moment0, smooth_slip0, smooth_time0, &
-                                &    t_latest0, emin00)
+                                &    smooth_rise0, t_latest0, emin00)
 !
 !  Args:
 !  moment_input0: input seismic moment
 !  smooth_moment0: weight of moment constrain
 !  smooth_slip0: weight of slip constrain
 !  smooth_time0: weight of time constrain
+!  smooth_rise0: weight of rise time constrain
 !  t_latest0: latest time of rupture time allowed
 !  emin00: related to moment constrain
-!  
+!
    implicit none
-   real :: moment_input0, smooth_moment0, smooth_slip0, smooth_time0, t_latest0, emin00
+   real :: moment_input0, smooth_moment0, smooth_slip0, smooth_time0, smooth_rise0, t_latest0, emin00
    moment_input0 = moment_input
    smooth_moment0 = smooth_moment
    smooth_slip0 = smooth_slip
    smooth_time0 = smooth_time
+   smooth_rise0 = smooth_rise
    t_latest0 = t_latest
    emin00 = emin0
    end subroutine get_weights_moment_end
