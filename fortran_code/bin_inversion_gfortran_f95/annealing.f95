@@ -25,6 +25,7 @@ module annealing
    implicit none
    real :: coef_moment, coef_slip, coef_gnss, coef_imagery, coef_time
    real :: w_body, w_surf, w_strong, w_cgnss, w_static, w_imagery, w_dart
+   real :: coef_rise = 0.0
    real :: current_value, min_value, min_dt, area
    real :: imagery_misfit0
    integer :: subfaults_segment(max_seg)
@@ -38,7 +39,7 @@ module annealing
    real :: shear(max_subfaults), rise_param1, rise_param2, dxs, dys
    integer :: max_freq, lnpt, channels, events
    real :: dt_channel(max_stations)
-   real :: moment_input, smooth_moment, smooth_slip, smooth_time, t_latest, emin0
+   real :: moment_input, smooth_moment, smooth_slip, smooth_time, smooth_rise, t_latest, emin0
    real :: moment_event(10)
    logical :: segment_in_event(max_seg, 10), subfault_in_event(max_subfaults, 10)
    real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
@@ -94,7 +95,7 @@ contains
    real :: real0, real1, real2, real3, real4
    call get_annealing_param(int0, int1, real0, real1, real2, start_annealing, real3)
    call get_weights_moment_end(moment_input, smooth_moment, smooth_slip, smooth_time, &
-                                &    real4, emin0)
+                                &    smooth_rise, real4, emin0)
    call get_dataset_weights(w_body, w_surf, w_strong, w_cgnss, w_static, w_imagery, w_dart)
    end subroutine annealing_set_procedure_param
 
@@ -174,6 +175,22 @@ contains
    end subroutine initial_model
 
 
+   elemental real function total_rise_of(trise, tfall)
+!
+!  Args:
+!  trise: rise time value of one subfault
+!  tfall: fall time value of one subfault
+!
+!  Total rise time of one subfault, the quantity acted on by the rise time
+!  smoothness regularization. Single seam: a source time function whose
+!  parameters combine differently must redefine only this function.
+!
+   implicit none
+   real, intent(in) :: trise, tfall
+   total_rise_of = trise+tfall
+   end function total_rise_of
+
+
    subroutine print_summary(slip, rake, rupt_time, t_rise, t_fall, static, imagery, &
       &   get_coeff, ramp)
 !
@@ -192,6 +209,7 @@ contains
    real*8, optional :: ramp(:)
    real :: slip(:), rake(:), rupt_time(:)
    real :: t_rise(:), t_fall(:)
+   real :: total_rise(max_subfaults), rise_reg
    real amp, moment, moment_reg, dt, value1, slip_reg, gnss_misfit, imagery_misfit, &
       & time_reg, forward_real3(wave_pts2, max_stations), slip_dip, slip_stk, &
       & forward_imag3(wave_pts2, max_stations), real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2)
@@ -314,7 +332,11 @@ contains
    call slip_laplace(slip_reg)
    call time_laplace(rupt_time, time_reg)
    if (time_reg .lt. 1.0e-9) time_reg = 1.0
- 
+   total_rise(:) = 0.0
+   total_rise(1:subfaults) = total_rise_of(t_rise(1:subfaults), t_fall(1:subfaults))
+   call time_laplace(total_rise, rise_reg)
+   if (rise_reg .lt. 1.0e-9) rise_reg = 1.0
+
    !coef_gnss = 0.0
    !coef_imagery = 0.0
    imagery_misfit0 = 0.0
@@ -340,6 +362,7 @@ contains
       coef_slip = smooth_slip*misfit2/(slip_reg*amp)
       coef_slip = min(0.003, coef_slip)
       coef_time = smooth_time*misfit2/(time_reg*amp)
+      coef_rise = smooth_rise*misfit2/(rise_reg*amp)
       if (static) then
          coef_gnss = w_static*misfit2/(gnss_misfit*amp)
       endif
@@ -349,7 +372,7 @@ contains
    endif
 
    value1 = misfit2+coef_moment*moment_reg+coef_slip*slip_reg*amp
-   value1 = value1+coef_time*time_reg
+   value1 = value1+coef_time*time_reg+coef_rise*rise_reg
    value1 = value1+coef_gnss*gnss_misfit+coef_imagery*imagery_misfit
    do segment = 1, segments
       subfaults_segment(segment) = nys_sub(segment)*nxs_sub(segment)
@@ -364,12 +387,14 @@ contains
    write(*,*)'moment error', moment_reg
    write(*,*)'slip smoothness penalization', slip_reg
    write(*,*)'time smoothness penalization', time_reg
+   if (smooth_rise .gt. 0.0) write(*,*)'rise time smoothness penalization', rise_reg
    if (static) write(*,*)'static data penalization', gnss_misfit
    if (imagery) write(*,*)'imagery data penalization', imagery_misfit
    write(*,*)'total moment of the inversion', moment
    write(*,'(/A, F10.7)')'moment error coefficient', coef_moment
    write(*,*)'slip smoothness penalization coefficient', coef_slip
    write(*,*)'time smoothness penalization coefficient', coef_time
+   if (smooth_rise .gt. 0.0) write(*,*)'rise time smoothness penalization coefficient', coef_rise
    if (static) write(*,*)'static data penalization coefficient', coef_gnss
    if (imagery) write(*,*)'imagery data penalization coefficient', coef_imagery
    write(*,'(/A, I4)')'Amount of variables: ', 5 * subfaults
@@ -387,6 +412,7 @@ contains
    write(12,*)'moment error', moment_reg
    write(12,*)'slip smoothness penalization', slip_reg
    write(12,*)'time smoothness penalization', time_reg
+   if (smooth_rise .gt. 0.0) write(12,*)'rise time smoothness penalization', rise_reg
    if (static) write(12,*)'static data penalization', gnss_misfit
    if (imagery) write(12,*)'imagery data penalization', imagery_misfit
    write(12,*)'objective function value', value1
@@ -394,6 +420,7 @@ contains
    write(12,'(/A, F10.7)')'moment error coefficient', coef_moment
    write(12,*)'slip smoothness penalization coefficient', coef_slip
    write(12,*)'time smoothness penalization coefficient', coef_time
+   if (smooth_rise .gt. 0.0) write(12,*)'rise time smoothness penalization coefficient', coef_rise
    if (static) write(12,*)'static data penalization coefficient', coef_gnss
    if (imagery) write(12,*)'imagery data penalization coefficient', coef_imagery
    write(12,'(/A, I4)')'Amount of variables: ', 5 * subfaults
@@ -420,6 +447,7 @@ contains
    real*8, optional :: ramp(:)
    real :: slip(:), rake(:), rupt_time(:)
    real :: t_rise(:), t_fall(:)
+   real :: total_rise(max_subfaults), rise_reg
    real amp, moment, moment_reg(10), moment_reg2, dt, value1, slip_reg, gnss_misfit, imagery_misfit, &
       & time_reg, forward_real3(wave_pts2, max_stations), slip_dip, slip_stk, &
       & forward_imag3(wave_pts2, max_stations), real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2)
@@ -541,7 +569,11 @@ contains
    call slip_laplace(slip_reg)
    call time_laplace(rupt_time, time_reg)
    if (time_reg .lt. 1.0e-9) time_reg = 1.0
- 
+   total_rise(:) = 0.0
+   total_rise(1:subfaults) = total_rise_of(t_rise(1:subfaults), t_fall(1:subfaults))
+   call time_laplace(total_rise, rise_reg)
+   if (rise_reg .lt. 1.0e-9) rise_reg = 1.0
+
    coef_gnss = 0.0
    coef_imagery = 0.0
    imagery_misfit0 = 0.0
@@ -561,6 +593,7 @@ contains
       coef_slip = smooth_slip*misfit2/(slip_reg*amp)
       coef_slip = min(0.003, coef_slip)
       coef_time = smooth_time*misfit2/(time_reg*amp)
+      coef_rise = smooth_rise*misfit2/(rise_reg*amp)
       if (static) then
          coef_gnss = w_static*misfit2/(gnss_misfit*amp)
       endif
@@ -570,7 +603,7 @@ contains
    endif
 
    value1 = misfit2+coef_moment*moment_reg2+coef_slip*slip_reg*amp
-   value1 = value1+coef_time*time_reg
+   value1 = value1+coef_time*time_reg+coef_rise*rise_reg
    value1 = value1+coef_gnss*gnss_misfit+coef_imagery*imagery_misfit
    do segment = 1, segments
       subfaults_segment(segment) = nys_sub(segment)*nxs_sub(segment)
@@ -587,12 +620,14 @@ contains
    enddo
    write(*,*)'slip smoothness penalization', slip_reg
    write(*,*)'time smoothness penalization', time_reg
+   if (smooth_rise .gt. 0.0) write(*,*)'rise time smoothness penalization', rise_reg
    if (static) write(*,*)'static data penalization', gnss_misfit
    if (imagery) write(*,*)'imagery data penalization', imagery_misfit
    write(*,*)'total moment of the inversion', moment
    write(*,'(/A, F10.7)')'moment error coefficient', coef_moment
    write(*,*)'slip smoothness penalization coefficient', coef_slip
    write(*,*)'time smoothness penalization coefficient', coef_time
+   if (smooth_rise .gt. 0.0) write(*,*)'rise time smoothness penalization coefficient', coef_rise
    if (static) write(*,*)'static data penalization coefficient', coef_gnss
    if (imagery) write(*,*)'imagery data penalization coefficient', coef_imagery
    write(*,'(/A, I4)')'Amount of variables: ', 5 * subfaults
@@ -612,6 +647,7 @@ contains
    enddo
    write(12,*)'slip smoothness penalization', slip_reg
    write(12,*)'time smoothness penalization', time_reg
+   if (smooth_rise .gt. 0.0) write(12,*)'rise time smoothness penalization', rise_reg
    if (static) write(12,*)'static data penalization', gnss_misfit
    if (imagery) write(12,*)'imagery data penalization', imagery_misfit
    write(12,*)'objective function value', value1
@@ -619,6 +655,7 @@ contains
    write(12,'(/A, F10.7)')'moment error coefficient', coef_moment
    write(12,*)'slip smoothness penalization coefficient', coef_slip
    write(12,*)'time smoothness penalization coefficient', coef_time
+   if (smooth_rise .gt. 0.0) write(12,*)'rise time smoothness penalization coefficient', coef_rise
    if (static) write(12,*)'static data penalization coefficient', coef_gnss
    if (imagery) write(12,*)'imagery data penalization coefficient', coef_imagery
    write(12,'(/A, I4)')'Amount of variables: ', 5 * subfaults
@@ -648,7 +685,8 @@ contains
    & diff, random0, aux, delta0, amp, moment_reg, value1, gnss_misfit, &
    & moment, slip_reg, slip_dip, slip_stk, moment0, &
    & time_reg, rupt_time0, rake0, slip0, kahan_y, kahan_t, kahan_c, &
-   & trise0, tfall0, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
+   & trise0, tfall0, trise1, tfall1, rise_reg, total_rise(max_subfaults), &
+   & real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
    & slip_beg, slip_max, slip_end, angle_beg, angle_end, angle_max, &
    & rupt_beg, rupt_end, rupt_max, rise_time_beg, rise_time_end, rise_time_max
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
@@ -713,6 +751,8 @@ contains
 
    call define_slip_field(slip, rake)
    call time_laplace(rupt_time, time_reg)
+   total_rise(:) = 0.0
+   total_rise(1:subfaults) = total_rise_of(t_rise(1:subfaults), t_fall(1:subfaults))
 !
 !  An iteration of the simulated annealing algorithm, over each subfault.
 !
@@ -919,9 +959,14 @@ contains
          call slip_laplace(slip_reg)
          rupt_time(subfault) = rupt_time1
          call time_laplace(rupt_time, time_reg)
+!  candidate total rise time, from the same values the accept path stores
+         trise1 = (irise-1)*rise_param2+rise_param1
+         tfall1 = (ifall-1)*rise_param2+rise_param1
+         total_rise(subfault) = total_rise_of(trise1, tfall1)
+         call time_laplace(total_rise, rise_reg)
 
          value1 = misfit2+moment_reg*coef_moment+amp*slip_reg*coef_slip
-         value1 = value1+coef_time*time_reg+coef_gnss*gnss_misfit
+         value1 = value1+coef_time*time_reg+coef_rise*rise_reg+coef_gnss*gnss_misfit
          moment0 = moment0-slip1*shear(subfault)
          diff = value1-current_value
 !  
@@ -935,13 +980,14 @@ contains
             slip(subfault) = slip1
             rake(subfault) = rake1
             rupt_time(subfault) = rupt_time1
-            t_rise(subfault) = (irise-1)*rise_param2+rise_param1
-            t_fall(subfault) = (ifall-1)*rise_param2+rise_param1
+            t_rise(subfault) = trise1
+            t_fall(subfault) = tfall1
             n_accept = n_accept+1
          else
             rupt_time(subfault) = rupt_time0
             t_rise(subfault) = trise0
             t_fall(subfault) = tfall0
+            total_rise(subfault) = total_rise_of(trise0, tfall0)
             slip(subfault) = slip0
             rake(subfault) = rake0
          end if
@@ -1017,7 +1063,8 @@ contains
    & diff, random0, aux, delta0, amp, moment_reg, value1, gnss_misfit, imagery_misfit, &
    & moment, slip_reg, slip_dip, slip_stk, kahan_y, kahan_c, kahan_t, &
    & time_reg, rupt_time0, rake0, slip0, moment0, &
-   & trise0, tfall0, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
+   & trise0, tfall0, trise1, tfall1, rise_reg, total_rise(max_subfaults), &
+   & real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
    & slip_beg, slip_max, slip_end, angle_beg, angle_end, angle_max, &
    & rupt_beg, rupt_end, rupt_max, rise_time_beg, rise_time_end, rise_time_max
    real ramp_beg, ramp_end, ramp_max, ramp_use
@@ -1088,6 +1135,8 @@ contains
 
    call define_slip_field(slip, rake)
    call time_laplace(rupt_time, time_reg)
+   total_rise(:) = 0.0
+   total_rise(1:subfaults) = total_rise_of(t_rise(1:subfaults), t_fall(1:subfaults))
 !
 !  An iteration of the simulated annealing algorithm, over each subfault.
 !
@@ -1292,9 +1341,14 @@ contains
          call slip_laplace(slip_reg)
          rupt_time(subfault) = rupt_time1
          call time_laplace(rupt_time, time_reg)
+!  candidate total rise time, from the same values the accept path stores
+         trise1 = (irise-1)*rise_param2+rise_param1
+         tfall1 = (ifall-1)*rise_param2+rise_param1
+         total_rise(subfault) = total_rise_of(trise1, tfall1)
+         call time_laplace(total_rise, rise_reg)
 
          value1 = misfit2+moment_reg*coef_moment+amp*slip_reg*coef_slip
-         value1 = value1+coef_time*time_reg
+         value1 = value1+coef_time*time_reg+coef_rise*rise_reg
          value1 = value1+coef_gnss*gnss_misfit+coef_imagery*imagery_misfit
          moment0 = moment0-slip1*shear(subfault)
          diff = value1-current_value
@@ -1310,13 +1364,14 @@ contains
             slip(subfault) = slip1
             rake(subfault) = rake1
             rupt_time(subfault) = rupt_time1
-            t_rise(subfault) = (irise-1)*rise_param2+rise_param1
-            t_fall(subfault) = (ifall-1)*rise_param2+rise_param1
+            t_rise(subfault) = trise1
+            t_fall(subfault) = tfall1
             n_accept = n_accept+1
          else
             rupt_time(subfault) = rupt_time0
             t_rise(subfault) = trise0
             t_fall(subfault) = tfall0
+            total_rise(subfault) = total_rise_of(trise0, tfall0)
             slip(subfault) = slip0
             rake(subfault) = rake0
          end if
@@ -1446,7 +1501,8 @@ contains
    & diff, random0, aux, delta0, amp, moment_reg(10), moment_reg2, value1, gnss_misfit, &
    & moment, slip_reg, slip_dip, slip_stk, moment0(10), &
    & time_reg, rupt_time0, rake0, slip0, kahan_y, kahan_t, kahan_c, &
-   & trise0, tfall0, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
+   & trise0, tfall0, trise1, tfall1, rise_reg, total_rise(max_subfaults), &
+   & real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
    & slip_beg, slip_max, slip_end, angle_beg, angle_end, angle_max, &
    & rupt_beg, rupt_end, rupt_max, rise_time_beg, rise_time_end, rise_time_max
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
@@ -1524,6 +1580,8 @@ contains
 
    call define_slip_field(slip, rake)
    call time_laplace(rupt_time, time_reg)
+   total_rise(:) = 0.0
+   total_rise(1:subfaults) = total_rise_of(t_rise(1:subfaults), t_fall(1:subfaults))
 !
 !  An iteration of the simulated annealing algorithm, over each subfault.
 !
@@ -1735,9 +1793,14 @@ contains
          call slip_laplace(slip_reg)
          rupt_time(subfault) = rupt_time1
          call time_laplace(rupt_time, time_reg)
+!  candidate total rise time, from the same values the accept path stores
+         trise1 = (irise-1)*rise_param2+rise_param1
+         tfall1 = (ifall-1)*rise_param2+rise_param1
+         total_rise(subfault) = total_rise_of(trise1, tfall1)
+         call time_laplace(total_rise, rise_reg)
 
          value1 = misfit2+moment_reg2*coef_moment+amp*slip_reg*coef_slip
-         value1 = value1+coef_time*time_reg+coef_gnss*gnss_misfit
+         value1 = value1+coef_time*time_reg+coef_rise*rise_reg+coef_gnss*gnss_misfit
          moment0(event) = moment0(event)-slip1*shear(subfault)
          moment_reg2 = moment_reg2 - moment_reg(event)
          diff = value1-current_value
@@ -1752,13 +1815,14 @@ contains
             slip(subfault) = slip1
             rake(subfault) = rake1
             rupt_time(subfault) = rupt_time1
-            t_rise(subfault) = (irise-1)*rise_param2+rise_param1
-            t_fall(subfault) = (ifall-1)*rise_param2+rise_param1
+            t_rise(subfault) = trise1
+            t_fall(subfault) = tfall1
             n_accept = n_accept+1
          else
             rupt_time(subfault) = rupt_time0
             t_rise(subfault) = trise0
             t_fall(subfault) = tfall0
+            total_rise(subfault) = total_rise_of(trise0, tfall0)
             slip(subfault) = slip0
             rake(subfault) = rake0
          end if
@@ -1842,7 +1906,8 @@ contains
    & diff, random0, aux, delta0, amp, moment_reg(10), moment_reg2, value1, gnss_misfit, imagery_misfit, &
    & moment, slip_reg, slip_dip, slip_stk, kahan_y, kahan_c, kahan_t, &
    & time_reg, rupt_time0, rake0, slip0, moment0(10), &
-   & trise0, tfall0, real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
+   & trise0, tfall0, trise1, tfall1, rise_reg, total_rise(max_subfaults), &
+   & real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2), &
    & slip_beg, slip_max, slip_end, angle_beg, angle_end, angle_max, &
    & rupt_beg, rupt_end, rupt_max, rise_time_beg, rise_time_end, rise_time_max
    real ramp_beg, ramp_end, ramp_max, ramp_use
@@ -1927,6 +1992,8 @@ contains
 
    call define_slip_field(slip, rake)
    call time_laplace(rupt_time, time_reg)
+   total_rise(:) = 0.0
+   total_rise(1:subfaults) = total_rise_of(t_rise(1:subfaults), t_fall(1:subfaults))
 !
 !  An iteration of the simulated annealing algorithm, over each subfault.
 !
@@ -2136,9 +2203,14 @@ contains
          call slip_laplace(slip_reg)
          rupt_time(subfault) = rupt_time1
          call time_laplace(rupt_time, time_reg)
+!  candidate total rise time, from the same values the accept path stores
+         trise1 = (irise-1)*rise_param2+rise_param1
+         tfall1 = (ifall-1)*rise_param2+rise_param1
+         total_rise(subfault) = total_rise_of(trise1, tfall1)
+         call time_laplace(total_rise, rise_reg)
 
          value1 = misfit2+moment_reg2*coef_moment+amp*slip_reg*coef_slip
-         value1 = value1+coef_time*time_reg
+         value1 = value1+coef_time*time_reg+coef_rise*rise_reg
          value1 = value1+coef_gnss*gnss_misfit+coef_imagery*imagery_misfit
          moment0(event) = moment0(event)-slip1*shear(subfault)
          moment_reg2 = moment_reg2 - moment_reg(event)
@@ -2155,13 +2227,14 @@ contains
             slip(subfault) = slip1
             rake(subfault) = rake1
             rupt_time(subfault) = rupt_time1
-            t_rise(subfault) = (irise-1)*rise_param2+rise_param1
-            t_fall(subfault) = (ifall-1)*rise_param2+rise_param1
+            t_rise(subfault) = trise1
+            t_fall(subfault) = tfall1
             n_accept = n_accept+1
          else
             rupt_time(subfault) = rupt_time0
             t_rise(subfault) = trise0
             t_fall(subfault) = tfall0
+            total_rise(subfault) = total_rise_of(trise0, tfall0)
             slip(subfault) = slip0
             rake(subfault) = rake0
          end if

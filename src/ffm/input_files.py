@@ -1246,13 +1246,15 @@ def inputs_simmulated_annealing(
     initial_temp = dictionary["initial_temperature"]
 
     type_of_inversion = 1
+    weights_line = "{} {} {} 0.1 {} {} {}".format(
+        initial_temp, cooling_rate, 4 * 10**-6, weight0, weight1, weight2
+    )
+    # optional trailing token, ignored by binaries which predate it
+    if "rise_time_weight" in dictionary:
+        weights_line = "{} {}".format(weights_line, dictionary["rise_time_weight"])
     with open(directory / "annealing.txt", "w") as filewrite:
         filewrite.write("{} -7 {} {} 90\n".format(iters, type_of_inversion, moment_mag))
-        filewrite.write(
-            "{} {} {} 0.1 {} {} {}\n".format(
-                initial_temp, cooling_rate, 4 * 10**-6, weight0, weight1, weight2
-            )
-        )
+        filewrite.write("{}\n".format(weights_line))
         filewrite.write("0 {} 0 {}\n".format(10**-4, source_dur))
         filewrite.write("1\n")
 
