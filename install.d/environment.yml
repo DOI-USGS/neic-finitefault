@@ -2,10 +2,12 @@ name: ff-env
 channels:
   - conda-forge
 dependencies:
+  - alive-progress
   - black
   - cutde
   - cartopy
   - filelock
+  - imageio
   - isort
   - matplotlib
   - mypy

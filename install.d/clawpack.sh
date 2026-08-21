@@ -1,6 +1,6 @@
 #! /bin/bash
 
-set -ex
+set -e
 
 # Install Clawpack/GeoClaw if requested to facilitate DART observations
 # ==============================================================================
