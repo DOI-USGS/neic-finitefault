@@ -58,7 +58,7 @@ def make_DART_GFs_DS_SS(
     dt: float = 60,
     tfinal: int = 10800,
     fcorner: List = [5, 120],
-    buffer_dist = 0.5,
+    buffer_dist=0.5,
     subfault_start: int = 0,
     time_domain: bool = False,
     plots: bool = False,
@@ -890,8 +890,8 @@ def plot_dtopo_snapshots(
     data = np.loadtxt(dtopo_file)
     times = np.unique(data[:, 0])
 
-    min_deformation = min(data[:,3])
-    max_deformation = max(data[:,3])
+    min_deformation = min(data[:, 3])
+    max_deformation = max(data[:, 3])
     range_deformation = max(np.abs([min_deformation, max_deformation]))
 
     pygmt.makecpt(
@@ -950,7 +950,6 @@ def plot_dtopo_snapshots(
             shading="+a45/135+nt1",
             frame=True,
         )
-
 
         info = pygmt.grdinfo(grid=disp_grid)
         print(info)
