@@ -52,7 +52,6 @@ def plot_waveforms(
         min_time = np.minimum(np.min(time), min_time)
         max_time = np.maximum(np.max(time), max_time)
         if custom == "fill":
-            # min_val, max_val = ax.get_ylim()
             min_val = 0.0
             max_val = 0.0
             min_val = np.minimum(np.min(waveform), min_val)
@@ -64,9 +63,6 @@ def plot_waveforms(
                 )
             )
             min_val, max_val = ax.get_ylim()
-            # min_val = -max_amp
-            # max_val = max_amp
-            # ax.set_ylim((min_val, max_val))
             ax.vlines(0, min_val, max_val, "k", lw=1)
             if type_str == "body":
                 if weight == 0.0:
@@ -526,37 +522,21 @@ def plot_waveform_fits(
             plot_name = "P_body_waves"
         if "BHT" in components:
             plot_name = "SH_body_waves"
-    #        units = "nm"
 
     if type_str == "surf":
         if "BHZ" in components:
             plot_name = "Rayleigh_surf_waves"
         if "BHT" in components:
             plot_name = "Love_surf_waves"
-    #        units = "mm"
 
     if type_str == "cgnss":
         plot_name = "cGNSS_waves"
-    #        units = "cm"
 
     if type_str == "strong":
         plot_name = "strong_motion_waves"
-    #        units = "cm/s"
 
     if type_str == "dart":
         plot_name = "dart_waves"
-    #        units = "m"
-
-    #    dict = {
-    #        "weights": weights,
-    #        "azimuths": azimuths,
-    #        "names": names,
-    #        "distances": distances,
-    #        "type_str": type_str,
-    #        "comps": comp,
-    #        "units": units,
-    #    }
-    #    axes2 = add_metadata(axes2, **dict)
 
     if type_str == "dart":
         plot_name = "dart_waves"

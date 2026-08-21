@@ -89,10 +89,8 @@ def setplot(plotdata=None, parameter_file="geoclaw_parameter_file.json"):
     plotitem = plotaxes.new_plotitem(plot_type="2d_pcolor")
     plotitem.plot_var = geoplot.surface_or_depth
     plotitem.pcolor_cmap = geoplot.tsunami_colormap
-    plotitem.pcolor_cmin = -0.02
-    plotitem.pcolor_cmax = 0.02
-    # plotitem.pcolor_cmin = -0.2
-    # plotitem.pcolor_cmax = 0.2
+    plotitem.pcolor_cmin = -0.2
+    plotitem.pcolor_cmax = 0.2
     plotitem.add_colorbar = True
     plotitem.amr_celledges_show = [0, 0, 0]
     plotitem.patchedges_show = 1
