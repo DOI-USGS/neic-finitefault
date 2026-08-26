@@ -51,12 +51,6 @@ def setrun(claw_pkg="geoclaw", parameter_file="geoclaw_parameter_file.json"):
     parameter = json.load(f)
 
     # ------------------------------------------------------------------
-    # Problem-specific parameters to be written to setprob.data:
-    # ------------------------------------------------------------------
-
-    # probdata = rundata.new_UserData(name='probdata',fname='setprob.data')
-
-    # ------------------------------------------------------------------
     # GeoClaw specific parameters:
     # ------------------------------------------------------------------
     rundata = setgeo(rundata, parameter_file)

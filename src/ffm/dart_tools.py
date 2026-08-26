@@ -135,13 +135,13 @@ def make_DART_GFs_DS_SS(
     ##########################
     geoclaw_clean = "make clean"
     with open(directory / "output.log", "a") as outfile:
-        subprocess.call(
+        subprocess.check_call(
             split(geoclaw_clean), stdout=outfile
         )  ### Pipe all the unneccesary output to a file
     outfile.close()
     geoclaw_init = "make .exe"
     with open(directory / "output.log", "a") as outfile:
-        subprocess.call(
+        subprocess.check_call(
             split(geoclaw_init), stdout=outfile
         )  ### Pipe all the unneccesary output to a file
     outfile.close()
@@ -235,7 +235,7 @@ def make_DART_GFs_DS_SS(
 
                 geoclaw_run = "make .output"
                 with open(directory / "output.log", "a") as outfile:
-                    subprocess.call(
+                    subprocess.check_call(
                         split(geoclaw_run), stdout=outfile
                     )  ### Pipe all the unneccesary output to a file
                 outfile.close()
@@ -1105,16 +1105,16 @@ def run_ffm_tsunami(
 
         geoclaw_init = "make .exe"
         with open(directory / "output.log", "a") as outfile:
-            subprocess.call(
+            subprocess.check_call(
                 split(geoclaw_init), stdout=outfile
             )  ### Pipe all the unneccesary output to a file
         outfile.close()
 
-        subprocess.call(split(geoclaw_init))
+        subprocess.check_call(split(geoclaw_init))
         print("RUN GEOCLAW")
         geoclaw_plot = "make .plots"
         with open(directory / "output.log", "a") as outfile:
-            subprocess.call(split(geoclaw_plot), stdout=outfile)
+            subprocess.check_call(split(geoclaw_plot), stdout=outfile)
         outfile.close()
         chdir(working_dir)
         ### Make output plots comparing synthetic waveforms to data ###
