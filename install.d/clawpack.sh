@@ -49,10 +49,12 @@ clawpack_profile () {
     system="$(uname)";
     if [ "$system" == 'Linux' ]; then 
         profile=~/.bashrc
+        total_cpus=$(nproc)
         # shellcheck disable=SC1090
         source $profile;
     elif [ "$system" == 'FreeBSD' ] || [ "$system" == 'Darwin' ]; then 
         profile=~/.bash_profile
+        total_cpus=$(sysctl -n hw.ncpu)
         # shellcheck disable=SC1090
         source $profile;
     else    
@@ -64,7 +66,10 @@ clawpack_profile () {
         echo "CLAW already specified in profile"
     else
         echo "Adding CLAW info to profile"
-        echo "{ ; # CLAWPACK; export CLAW=${CLAW_DIR}/clawpack; export OMP_NUM_THREADS=nproc/4 }" >> $profile;
+        echo "" >> $profile
+        echo "# CLAWPACK" >> $profile
+        echo "export CLAW=${CLAW_DIR}/clawpack" >> $profile
+        echo "export OMP_NUM_THREADS=$(( total_cpus / 4 ))" >> $profile
     fi
 
     if [[ "$PYTHONPATH" == *"${CLAW_DIR}/clawpack"* ]]; then
