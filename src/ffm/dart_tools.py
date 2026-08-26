@@ -905,6 +905,8 @@ def plot_dtopo_snapshots(
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
 
+    region_2d = [min(data[:,1]), max(data[:,1]), min(data[:,2]), max(data[:,2])]
+
     frame_files = []
 
     for t in times:
@@ -912,23 +914,21 @@ def plot_dtopo_snapshots(
         lons = data[mask, 1]
         lats = data[mask, 2]
         deformation = data[mask, 3]
-        region_2d = [min(lons), max(lons), min(lats), max(lats)]
 
-        print(region_2d)
         disp_grid = pygmt.xyz2grd(
             x=lons,
             y=lats,
             z=deformation,
             region=region_2d,
-            spacing="5m",
-            registration=False,  # 'p' for pixel, 'g' for
+            spacing="30s",
+            registration="gridline",  # 'p' for pixel, 'g' for
             nodata=0,
         )
 
         # Download elevation and crustal age grids for the study region with a resolution of 10
         # arc-minutes and load them into xarray.DataArrays
         grd_relief = pygmt.datasets.load_earth_relief(
-            resolution="30s", region=region_2d
+            resolution="30s", region=region_2d, registration="gridline"
         )
         dgrid = pygmt.grdgradient(grid=grd_relief, radiance=[270, 30])
         fig = pygmt.Figure()
@@ -952,7 +952,6 @@ def plot_dtopo_snapshots(
         )
 
         info = pygmt.grdinfo(grid=disp_grid)
-        print(info)
         fig.grdview(
             projection="M12c",  # Mercator projection with a width of 12 centimeters
             region=region_2d,
@@ -980,13 +979,13 @@ def plot_dtopo_snapshots(
             cmap=True,
         )
         frame_path = os.path.join(output_dir, f"dtopo_t{t:.2f}.png")
-        print(f"Saving to {frame_path}")
         fig.savefig(frame_path)
         frame_files.append(frame_path)
 
     # Create GIF
     images = [imageio.imread(f) for f in frame_files]
     gif_path = os.path.join(output_dir, gif_name)
+    print(f"Saving to {gif_path}")
     imageio.mimsave(gif_path, images, duration=0.5)
 
 
