@@ -136,13 +136,19 @@ def make_DART_GFs_DS_SS(
     geoclaw_clean = "make clean"
     with open(directory / "output.log", "a") as outfile:
         subprocess.check_call(
-            split(geoclaw_clean), cwd=str(PROJECT_DIRECTORY)+"/src/ffm", stdout=outfile, stderr=outfile
+            split(geoclaw_clean),
+            cwd=str(PROJECT_DIRECTORY) + "/src/ffm",
+            stdout=outfile,
+            stderr=outfile,
         )  ### Pipe all the unneccesary output to a file
     outfile.close()
     geoclaw_init = "make .exe"
     with open(directory / "output.log", "a") as outfile:
         subprocess.check_call(
-            split(geoclaw_init), cwd=str(PROJECT_DIRECTORY)+"/src/ffm", stdout=outfile, stderr=outfile
+            split(geoclaw_init),
+            cwd=str(PROJECT_DIRECTORY) + "/src/ffm",
+            stdout=outfile,
+            stderr=outfile,
         )  ### Pipe all the unneccesary output to a file
     outfile.close()
 
@@ -236,7 +242,10 @@ def make_DART_GFs_DS_SS(
                 geoclaw_run = "make .output"
                 with open(directory / "output.log", "a") as outfile:
                     subprocess.check_call(
-                        split(geoclaw_run), cwd=str(GF_directory), stdout=outfile, stderr=outfile
+                        split(geoclaw_run),
+                        cwd=str(GF_directory),
+                        stdout=outfile,
+                        stderr=outfile,
                     )  ### Pipe all the unneccesary output to a file
                 outfile.close()
                 chdir(run_directory)
@@ -905,10 +914,16 @@ def plot_dtopo_snapshots(
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
 
-    region_2d = [int(np.floor(min(data[:,1]))), int(np.ceil(max(data[:,1]))), int(np.floor(min(data[:,2]))), int(np.ceil(max(data[:,2])))]
+    region_2d = [
+        int(np.floor(min(data[:, 1]))),
+        int(np.ceil(max(data[:, 1]))),
+        int(np.floor(min(data[:, 2]))),
+        int(np.ceil(max(data[:, 2]))),
+    ]
 
     grd_relief = pygmt.datasets.load_earth_relief(
-        resolution="30s", region=region_2d,
+        resolution="30s",
+        region=region_2d,
     )
     dgrid = pygmt.grdgradient(grid=grd_relief, radiance=[270, 30])
 
@@ -1104,14 +1119,22 @@ def run_ffm_tsunami(
         geoclaw_init = "make .exe"
         with open(directory / "output.log", "a") as outfile:
             subprocess.check_call(
-                split(geoclaw_init), cwd=str(tsunami_output_directory), stdout=outfile, stderr=outfile
+                split(geoclaw_init),
+                cwd=str(tsunami_output_directory),
+                stdout=outfile,
+                stderr=outfile,
             )  ### Pipe all the unneccesary output to a file
         outfile.close()
 
         print("RUN GEOCLAW")
         geoclaw_plot = "make .plots"
         with open(directory / "output.log", "a") as outfile:
-            subprocess.check_call(split(geoclaw_plot), cwd=str(tsunami_output_directory), stdout=outfile, stderr=outfile)
+            subprocess.check_call(
+                split(geoclaw_plot),
+                cwd=str(tsunami_output_directory),
+                stdout=outfile,
+                stderr=outfile,
+            )
         outfile.close()
         chdir(working_dir)
         ### Make output plots comparing synthetic waveforms to data ###
