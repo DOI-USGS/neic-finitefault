@@ -878,7 +878,8 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1, misfit1_no_weight, chan_scale, ds_name)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, &
+!$omp& real1, imag1, coeffs_syn, misfit1, misfit1_no_weight, chan_scale, ds_name)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
@@ -1250,7 +1251,8 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1, misfit1_no_weight, chan_scale, ds_name)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, &
+!$omp& real1, imag1, coeffs_syn, misfit1, misfit1_no_weight, chan_scale, ds_name)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
@@ -1691,7 +1693,8 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1, misfit1_no_weight, chan_scale, ds_name)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, &
+!$omp& real1, imag1, coeffs_syn, misfit1, misfit1_no_weight, chan_scale, ds_name)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
@@ -2091,7 +2094,8 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1, misfit1_no_weight, chan_scale, ds_name)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, &
+!$omp& real1, imag1, coeffs_syn, misfit1, misfit1_no_weight, chan_scale, ds_name)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
