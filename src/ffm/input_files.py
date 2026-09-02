@@ -1255,7 +1255,37 @@ def inputs_simmulated_annealing(
         )
         filewrite.write("0 {} 0 {}\n".format(10**-4, source_dur))
         filewrite.write("1\n")
+
+    weights_path = directory / "dataset_weights.json"
+    w_body = 1.0
+    w_surf = 1.0
+    w_strong = 1.0
+    w_cgnss = 1.0
+    w_static = 1.0
+    w_imagery = 1.0
+    w_dart = 1.0
+    if weights_path.is_file():
+        try:
+            with open(weights_path, "r") as f:
+                dweights = json.load(f)
+            if "weights" in dweights and isinstance(dweights["weights"], dict):
+                dweights = dweights["weights"]
+            w_body = float(dweights.get("body", 1.0))
+            w_surf = float(dweights.get("surf", 1.0))
+            w_strong = float(dweights.get("strong", 1.0))
+            w_cgnss = float(dweights.get("cgnss", 1.0))
+            w_static = float(dweights.get("static", dweights.get("gnss", 1.0)))
+            w_imagery = float(dweights.get("imagery", dweights.get("insar", 1.0)))
+            w_dart = float(dweights.get("dart", 1.0))
+        except Exception:
+            pass
+
+    with open(directory / "dataset_weights.txt", "w") as fw:
+        fw.write(
+            f"{w_body} {w_surf} {w_strong} {w_cgnss} {w_static} {w_imagery} {w_dart}\n"
+        )
     return
+
 
 
 def model_space(

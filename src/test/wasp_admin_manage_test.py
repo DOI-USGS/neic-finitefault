@@ -1151,3 +1151,53 @@ def test_velmodel_to_json():
     finally:
         print("Cleaning up test directory.")
         shutil.rmtree(tempdir)
+
+
+def test_update_dataset_weights():
+    from ffm.ffm_admin.manage import app
+
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        # 1. Show with no weights file yet (should auto-create default)
+        result = runner.invoke(
+            app,
+            ["update-dataset-weights", str(tempdir), "--show"],
+        )
+        assert result.exit_code == 0
+        assert "Current Dataset Weights:" in result.output
+        assert (tempdir / "dataset_weights.json").is_file()
+        with open(tempdir / "dataset_weights.json") as f:
+            data = json.load(f)
+        assert data["weights"]["body"] == 1.0
+
+        # 2. Update static and surf weights
+        result = runner.invoke(
+            app,
+            [
+                "update-dataset-weights",
+                str(tempdir),
+                "--static",
+                "0.1",
+                "--surf",
+                "0.5",
+            ],
+        )
+        assert result.exit_code == 0
+        assert "Updated" in result.output
+        with open(tempdir / "dataset_weights.json") as f:
+            data = json.load(f)
+        assert data["weights"]["static"] == 0.1
+        assert data["weights"]["surf"] == 0.5
+        assert data["weights"]["body"] == 1.0
+
+        # 3. If dataset_weights.txt exists or is created, verify it matches
+        if (tempdir / "dataset_weights.txt").is_file():
+            with open(tempdir / "dataset_weights.txt") as f:
+                txt_content = f.read().split()
+            # body=1.0, surf=0.5, strong=1.0, cgnss=1.0, static=0.1, imagery=1.0, dart=1.0
+            assert float(txt_content[0]) == 1.0
+            assert float(txt_content[1]) == 0.5
+            assert float(txt_content[4]) == 0.1
+    finally:
+        shutil.rmtree(tempdir)
+

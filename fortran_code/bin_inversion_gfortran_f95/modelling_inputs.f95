@@ -7,6 +7,7 @@ module modelling_inputs
    real :: t_mid, t_latest, moment_input
    integer :: start_annealing, io_func, io, events
    real :: moment_event(10)
+   real :: weight_body, weight_surf, weight_strong, weight_cgnss, weight_static, weight_imagery, weight_dart
 
 
 contains
@@ -14,6 +15,7 @@ contains
 
    subroutine read_annealing_param()
    implicit none
+   logical :: is_weights_file
    write(*,*)'Store annealing and modelling parameters...'
    open(10, file='annealing.txt', status='old')
    read(10,*) n_iter, seed0, io_data, moment_input
@@ -21,7 +23,36 @@ contains
    read(10,*) start_annealing, t_mid, io_func, t_latest
    read(10,*) io
    close(10)
+
+   weight_body = 1.0
+   weight_surf = 1.0
+   weight_strong = 1.0
+   weight_cgnss = 1.0
+   weight_static = 1.0
+   weight_imagery = 1.0
+   weight_dart = 1.0
+   inquire(file='dataset_weights.txt', exist=is_weights_file)
+   if (is_weights_file) then
+      open(15, file='dataset_weights.txt', status='old')
+      read(15, *, iostat=io) weight_body, weight_surf, weight_strong, weight_cgnss, &
+         & weight_static, weight_imagery, weight_dart
+      close(15)
+   endif
    end subroutine read_annealing_param
+
+
+   subroutine get_dataset_weights(w_body, w_surf, w_strong, w_cgnss, w_static, w_imagery, w_dart)
+   implicit none
+   real :: w_body, w_surf, w_strong, w_cgnss, w_static, w_imagery, w_dart
+   w_body = weight_body
+   w_surf = weight_surf
+   w_strong = weight_strong
+   w_cgnss = weight_cgnss
+   w_static = weight_static
+   w_imagery = weight_imagery
+   w_dart = weight_dart
+   end subroutine get_dataset_weights
+
    
    
    subroutine moment_events()

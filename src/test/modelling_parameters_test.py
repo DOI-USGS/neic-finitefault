@@ -3,7 +3,7 @@ import pathlib
 import shutil
 import tempfile
 
-from ffm.modelling_parameters import modelling_prop
+from ffm.modelling_parameters import create_dataset_weights, modelling_prop
 
 from .testutils import (
     RESULTS_DIR,
@@ -38,5 +38,33 @@ def test_modelling_prop():
             target_model = json.load(md)
         assert_values_close(model_space, model_data)
         assert_values_close(model_data, target_model)
+        # check dataset_weights.json creation
+        assert (tempdir / "dataset_weights.json").is_file()
+        with open(tempdir / "dataset_weights.json") as dw:
+            dw_data = json.load(dw)
+        assert "weights" in dw_data
+        assert dw_data["weights"]["body"] == 1.0
+        assert dw_data["weights"]["cgnss"] == 1.0
+        assert dw_data["weights"]["imagery"] == 1.0
+        assert dw_data["weights"]["strong"] == 1.0
+        assert dw_data["weights"]["surf"] == 1.0
     finally:
         shutil.rmtree(tempdir)
+
+
+def test_create_dataset_weights():
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        weights_data = create_dataset_weights(
+            data_type=["tele_waves", "gnss_data"],
+            directory=tempdir,
+        )
+        assert weights_data["weights"]["body"] == 1.0
+        assert weights_data["weights"]["static"] == 1.0
+        assert "strong" not in weights_data["weights"]
+        with open(tempdir / "dataset_weights.json") as f:
+            saved = json.load(f)
+        assert saved == weights_data
+    finally:
+        shutil.rmtree(tempdir)
+

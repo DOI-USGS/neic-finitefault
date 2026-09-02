@@ -33,7 +33,7 @@ from ffm.many_events import (
     get_segments_events,
     get_waveforms_events,
 )
-from ffm.modelling_parameters import modelling_prop
+from ffm.modelling_parameters import create_dataset_weights, modelling_prop
 from ffm.modify_jsons import modify_channels
 from ffm.modify_sacs import correct_waveforms, plot_channels
 from ffm.read_config import CONFIG_PATH, PROJECT_DIRECTORY
@@ -457,6 +457,136 @@ def modify_dicts(
                 input=False,
                 station_dict=modify_dict,
             )
+
+
+@app.command(help="View or update relative dataset weights in dataset_weights.json")
+def update_dataset_weights(
+    directory: pathlib.Path = typer.Argument(
+        ..., help="Path to the directory containing dataset_weights.json"
+    ),
+    show: bool = typer.Option(
+        False,
+        "--show",
+        "-s",
+        help="Display the current dataset weights",
+    ),
+    body: Optional[float] = typer.Option(
+        None,
+        "--body",
+        help="Relative weight for teleseismic body waves",
+    ),
+    surf: Optional[float] = typer.Option(
+        None,
+        "--surf",
+        help="Relative weight for teleseismic surface waves",
+    ),
+    strong: Optional[float] = typer.Option(
+        None,
+        "--strong",
+        help="Relative weight for strong motion waveforms",
+    ),
+    cgnss: Optional[float] = typer.Option(
+        None,
+        "--cgnss",
+        help="Relative weight for high-rate continuous GNSS",
+    ),
+    static: Optional[float] = typer.Option(
+        None,
+        "--static",
+        help="Relative weight for static GNSS offsets",
+    ),
+    imagery: Optional[float] = typer.Option(
+        None,
+        "--imagery",
+        help="Relative weight for InSAR / optical imagery",
+    ),
+    dart: Optional[float] = typer.Option(
+        None,
+        "--dart",
+        help="Relative weight for DART tsunami data",
+    ),
+):
+    """View or update relative weights for each dataset type"""
+    weights_file = directory / "dataset_weights.json"
+    weights_dict: dict = {}
+    if weights_file.is_file():
+        with open(weights_file, "r") as f:
+            data = json.load(f)
+        if "weights" in data and isinstance(data["weights"], dict):
+            weights_dict = data["weights"]
+        else:
+            weights_dict = data
+    else:
+        detected_types = []
+        if (directory / "channels_body.txt").is_file() or (
+            directory / "tele_waves.json"
+        ).is_file():
+            detected_types.append("body")
+        if (directory / "channels_surf.txt").is_file() or (
+            directory / "surf_waves.json"
+        ).is_file():
+            detected_types.append("surf")
+        if (directory / "channels_strong.txt").is_file() or (
+            directory / "strong_motion_waves.json"
+        ).is_file():
+            detected_types.append("strong")
+        if (directory / "channels_cgnss.txt").is_file() or (
+            directory / "cgnss_waves.json"
+        ).is_file():
+            detected_types.append("cgnss")
+        if (directory / "static_data.txt").is_file() or (
+            directory / "static_data.json"
+        ).is_file():
+            detected_types.append("static")
+        if (directory / "imagery_data.txt").is_file() or (
+            directory / "imagery_data.json"
+        ).is_file():
+            detected_types.append("imagery")
+        if not detected_types:
+            detected_types = ["body", "surf", "strong", "cgnss", "static", "imagery"]
+        weights_dict = {dt: 1.0 for dt in detected_types}
+        create_dataset_weights(detected_types, directory=directory)
+
+    updates = {
+        "body": body,
+        "surf": surf,
+        "strong": strong,
+        "cgnss": cgnss,
+        "static": static,
+        "imagery": imagery,
+        "dart": dart,
+    }
+    has_updates = any(v is not None for v in updates.values())
+    if has_updates:
+        for k, v in updates.items():
+            if v is not None:
+                weights_dict[k] = float(v)
+        output_dict = {
+            "weights": weights_dict,
+            "description": "Relative weight multipliers for each dataset type in the inversion objective function",
+        }
+        with open(weights_file, "w") as f:
+            json.dump(
+                output_dict,
+                f,
+                sort_keys=True,
+                indent=4,
+                separators=(",", ": "),
+                ensure_ascii=False,
+            )
+        typer.echo(f"Updated {weights_file}")
+
+        annealing_prop_file = directory / "annealing_prop.json"
+        if annealing_prop_file.is_file():
+            with open(annealing_prop_file, "r") as f:
+                prop = json.load(f)
+            inputs_simmulated_annealing(prop, directory=directory)
+            typer.echo(f"Updated {directory / 'dataset_weights.txt'}")
+
+    typer.echo("\nCurrent Dataset Weights:")
+    for dt, w in sorted(weights_dict.items()):
+        typer.echo(f"  {dt:10s}: {w}")
+
 
 
 @app.command(help="Modify data in sac files")

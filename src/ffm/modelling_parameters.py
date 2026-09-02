@@ -17,6 +17,71 @@ import ffm.management as mng
 import ffm.seismic_tensor as tensor
 
 
+
+def create_dataset_weights(
+    data_type: list,
+    weights: Optional[dict] = None,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+) -> dict:
+    """Write or update dataset_weights.json with relative weights for each dataset type
+
+    :param data_type: The types of data available
+    :type data_type: list
+    :param weights: Specific weights dictionary to override defaults, defaults to None
+    :type weights: Optional[dict], optional
+    :param directory: The directory to write to, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
+    :return: The dataset weights dictionary
+    :rtype: dict
+    """
+    type_mapping = {
+        "tele_waves": "body",
+        "body_waves": "body",
+        "body": "body",
+        "surf_waves": "surf",
+        "surf": "surf",
+        "strong_waves": "strong",
+        "strong": "strong",
+        "cgnss_waves": "cgnss",
+        "cgnss": "cgnss",
+        "gnss": "static",
+        "gnss_data": "static",
+        "static": "static",
+        "static_data": "static",
+        "imagery": "imagery",
+        "insar": "imagery",
+        "dart": "dart",
+    }
+    std_data_types: list = []
+    for dt in data_type:
+        dt_clean = type_mapping.get(dt, dt)
+        if dt_clean not in std_data_types:
+            std_data_types.append(dt_clean)
+
+    dataset_weights: dict = {}
+    for dt in std_data_types:
+        if weights and dt in weights:
+            dataset_weights[dt] = float(weights[dt])
+        else:
+            dataset_weights[dt] = 1.0
+
+    output_dict = {
+        "weights": dataset_weights,
+        "description": "Relative weight multipliers for each dataset type in the inversion objective function",
+    }
+
+    with open(directory / "dataset_weights.json", "w") as f:
+        json.dump(
+            output_dict,
+            f,
+            sort_keys=True,
+            indent=4,
+            separators=(",", ": "),
+            ensure_ascii=False,
+        )
+    return output_dict
+
+
 def modelling_prop(
     tensor_info: dict,
     segments_data: dict,
@@ -69,6 +134,9 @@ def modelling_prop(
             separators=(",", ": "),
             ensure_ascii=False,
         )
+
+    # Generate dataset_weights.json
+    create_dataset_weights(data_type=data_type, directory=directory)
 
     moment_mag = tensor_info["moment_mag"]
     segments = segments_data["segments"]

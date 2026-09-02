@@ -939,6 +939,11 @@ def filling_data_dicts(
             ramp_types=ramp_types,
             directory=working_directory,
         )
+    if not os.path.isfile(working_directory / "dataset_weights.json"):
+        from ffm.modelling_parameters import create_dataset_weights
+
+        create_dataset_weights(data_types, directory=working_directory)
+
 
 
 def get_traces_files(

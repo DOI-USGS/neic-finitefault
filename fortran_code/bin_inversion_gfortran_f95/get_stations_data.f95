@@ -18,6 +18,7 @@ module get_stations_data
    logical :: cgnss_channels(max_stations)
    integer :: lnpt, nlen, jmin, jmax, max_freq, start(max_stations)
    integer :: event_sta(max_stations)
+   integer :: f_strong, l_strong, f_cgnss, l_cgnss, f_body, l_body, f_surf, l_surf, f_dart, l_dart
 
 
 contains
@@ -95,6 +96,52 @@ contains
    end subroutine get_event_sta
 
 
+   subroutine get_channel_dataset_info(channel, w_body, w_surf, w_strong, w_cgnss, w_dart, &
+      & chan_w, ds_name)
+   implicit none
+   integer, intent(in) :: channel
+   real, intent(in) :: w_body, w_surf, w_strong, w_cgnss, w_dart
+   real, intent(out) :: chan_w
+   character(len=10), intent(out) :: ds_name
+
+   chan_w = 1.0
+   ds_name = 'unknown'
+
+   if (f_strong > 0 .and. channel >= f_strong .and. channel <= l_strong) then
+      chan_w = w_strong
+      ds_name = 'strong'
+   else if (f_cgnss > 0 .and. channel >= f_cgnss .and. channel <= l_cgnss) then
+      chan_w = w_cgnss
+      ds_name = 'cgnss'
+   else if (f_body > 0 .and. channel >= f_body .and. channel <= l_body) then
+      chan_w = w_body
+      ds_name = 'body'
+   else if (f_surf > 0 .and. channel >= f_surf .and. channel <= l_surf) then
+      chan_w = w_surf
+      ds_name = 'surf'
+   else if (f_dart > 0 .and. channel >= f_dart .and. channel <= l_dart) then
+      chan_w = w_dart
+      ds_name = 'dart'
+   end if
+   end subroutine get_channel_dataset_info
+
+
+   subroutine get_dataset_ranges(fs, ls, fc, lc, fb, lb, fsu, lsu, fd, ld)
+   implicit none
+   integer :: fs, ls, fc, lc, fb, lb, fsu, lsu, fd, ld
+   fs = f_strong
+   ls = l_strong
+   fc = f_cgnss
+   lc = l_cgnss
+   fb = f_body
+   lb = l_body
+   fsu = f_surf
+   lsu = l_surf
+   fd = f_dart
+   ld = l_dart
+   end subroutine get_dataset_ranges
+
+
    subroutine get_data(strong, cgnss, body, surf, dart)
 !
 !  Args:
@@ -115,29 +162,50 @@ contains
    write(*,*)'Get stations metadata and waveforms and store them in memory...'
    first = 0
    last = 0
+   f_strong = 0
+   l_strong = 0
+   f_cgnss = 0
+   l_cgnss = 0
+   f_body = 0
+   l_body = 0
+   f_surf = 0
+   l_surf = 0
+   f_dart = 0
+   l_dart = 0
    dt_channel(:) = 0.0
    if (strong) then
+      f_strong = first + 1
       call get_near_field_stations(first, last, strong, .False.)
+      l_strong = last
       first = last
    end if
    if (cgnss) then
+      f_cgnss = first + 1
       call get_near_field_stations(first, last, .False., cgnss)
+      l_cgnss = last
       first = last
    end if
    if (body) then
+      f_body = first + 1
       call get_body_waves_stations(first, last)
+      l_body = last
       first = last
    end if
    if (surf) then
+      f_surf = first + 1
       call get_surface_waves_stations(first, last)
+      l_surf = last
       first = last
    end if
    if (dart) then
+      f_dart = first + 1
       call get_dart_stations(first, last)
+      l_dart = last
       first = last
    end if
    channels = last
    end subroutine get_data
+
 
 
    subroutine get_near_field_stations(first, last, strong, cgnss)
