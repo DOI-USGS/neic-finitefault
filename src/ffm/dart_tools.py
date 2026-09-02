@@ -136,13 +136,13 @@ def make_DART_GFs_DS_SS(
     geoclaw_clean = "make clean"
     with open(directory / "output.log", "a") as outfile:
         subprocess.check_call(
-            split(geoclaw_clean), stdout=outfile
+            split(geoclaw_clean), cwd=str(PROJECT_DIRECTORY)+"/src/ffm", stdout=outfile, stderr=outfile
         )  ### Pipe all the unneccesary output to a file
     outfile.close()
     geoclaw_init = "make .exe"
     with open(directory / "output.log", "a") as outfile:
         subprocess.check_call(
-            split(geoclaw_init), stdout=outfile
+            split(geoclaw_init), cwd=str(PROJECT_DIRECTORY)+"/src/ffm", stdout=outfile, stderr=outfile
         )  ### Pipe all the unneccesary output to a file
     outfile.close()
 
@@ -236,7 +236,7 @@ def make_DART_GFs_DS_SS(
                 geoclaw_run = "make .output"
                 with open(directory / "output.log", "a") as outfile:
                     subprocess.check_call(
-                        split(geoclaw_run), stdout=outfile
+                        split(geoclaw_run), cwd=str(GF_directory), stdout=outfile, stderr=outfile
                     )  ### Pipe all the unneccesary output to a file
                 outfile.close()
                 chdir(run_directory)
@@ -905,7 +905,12 @@ def plot_dtopo_snapshots(
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
 
-    region_2d = [min(data[:,1]), max(data[:,1]), min(data[:,2]), max(data[:,2])]
+    region_2d = [int(np.floor(min(data[:,1]))), int(np.ceil(max(data[:,1]))), int(np.floor(min(data[:,2]))), int(np.ceil(max(data[:,2])))]
+
+    grd_relief = pygmt.datasets.load_earth_relief(
+        resolution="30s", region=region_2d,
+    )
+    dgrid = pygmt.grdgradient(grid=grd_relief, radiance=[270, 30])
 
     frame_files = []
 
@@ -920,17 +925,11 @@ def plot_dtopo_snapshots(
             y=lats,
             z=deformation,
             region=region_2d,
-            spacing="30s",
-            registration="gridline",  # 'p' for pixel, 'g' for
+            spacing="3m",
+            registration="p",  # 'p' for pixel, 'g' for
             nodata=0,
         )
 
-        # Download elevation and crustal age grids for the study region with a resolution of 10
-        # arc-minutes and load them into xarray.DataArrays
-        grd_relief = pygmt.datasets.load_earth_relief(
-            resolution="30s", region=region_2d, registration="gridline"
-        )
-        dgrid = pygmt.grdgradient(grid=grd_relief, radiance=[270, 30])
         fig = pygmt.Figure()
         pygmt.config(
             MAP_FRAME_TYPE="plain",
@@ -951,7 +950,7 @@ def plot_dtopo_snapshots(
             frame=True,
         )
 
-        info = pygmt.grdinfo(grid=disp_grid)
+        # info = pygmt.grdinfo(grid=disp_grid)
         fig.grdview(
             projection="M12c",  # Mercator projection with a width of 12 centimeters
             region=region_2d,
@@ -1105,15 +1104,14 @@ def run_ffm_tsunami(
         geoclaw_init = "make .exe"
         with open(directory / "output.log", "a") as outfile:
             subprocess.check_call(
-                split(geoclaw_init), stdout=outfile
+                split(geoclaw_init), cwd=str(tsunami_output_directory), stdout=outfile, stderr=outfile
             )  ### Pipe all the unneccesary output to a file
         outfile.close()
 
-        subprocess.check_call(split(geoclaw_init))
         print("RUN GEOCLAW")
         geoclaw_plot = "make .plots"
         with open(directory / "output.log", "a") as outfile:
-            subprocess.check_call(split(geoclaw_plot), stdout=outfile)
+            subprocess.check_call(split(geoclaw_plot), cwd=str(tsunami_output_directory), stdout=outfile, stderr=outfile)
         outfile.close()
         chdir(working_dir)
         ### Make output plots comparing synthetic waveforms to data ###
