@@ -53,6 +53,26 @@ def read_config(config_path: pathlib.Path = CONFIG_PATH) -> configparser.ConfigP
     config = configparser.ConfigParser()
     config.read(config_path)
     _validate_config(config=config, config_path=config_path)
+
+    # Dynamically update the fd_bank path in low.in based on the resolved code_path
+    try:
+        code_path = pathlib.Path(config["PATHS"]["code_path"])
+        low_in_path = code_path / "fortran_code" / "gfs_nm" / "long" / "low.in"
+        if low_in_path.exists():
+            with open(low_in_path, "r") as f:
+                raw_lines = [line.strip() for line in f.readlines() if line.strip()]
+            expected_fd_bank = str(
+                (code_path / "fortran_code" / "gfs_nm" / "long" / "fd_bank").resolve()
+            )
+            if len(raw_lines) >= 4:
+                raw_lines[3] = expected_fd_bank
+            elif len(raw_lines) == 3:
+                raw_lines.append(expected_fd_bank)
+            with open(low_in_path, "w") as f:
+                f.write("\n".join(raw_lines[:4]) + "\n")
+    except Exception:
+        pass
+
     return config
 
 
