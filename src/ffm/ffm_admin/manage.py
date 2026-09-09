@@ -459,7 +459,15 @@ def modify_dicts(
             )
 
 
-@app.command(help="View or update relative dataset weights in dataset_weights.json")
+@app.command(
+    help=(
+        "View or update relative dataset weights in dataset_weights.json.\n\n"
+        "Waveform weights (body, surf, strong, cgnss, dart) scale the penalty per station channel in the objective function "
+        "(e.g., --body 1.0 --surf 0.2 penalizes body wave error 5x more heavily per station than surface waves).\n\n"
+        "Static and imagery weights scale relative to the total combined waveform misfit "
+        "(e.g., --static 1.0 balances equally with total waveforms, while --static 10.0 gives static data 10x weight)."
+    )
+)
 def update_dataset_weights(
     directory: pathlib.Path = typer.Argument(
         ..., help="Path to the directory containing dataset_weights.json"
@@ -473,37 +481,39 @@ def update_dataset_weights(
     body: Optional[float] = typer.Option(
         None,
         "--body",
-        help="Relative weight for teleseismic body waves",
+        help="Relative weight per station for teleseismic body waves (P/SH)",
     ),
     surf: Optional[float] = typer.Option(
         None,
         "--surf",
-        help="Relative weight for teleseismic surface waves",
+        help="Relative weight per station for teleseismic surface waves (Rayleigh/Love)",
     ),
     strong: Optional[float] = typer.Option(
         None,
         "--strong",
-        help="Relative weight for strong motion waveforms",
+        help="Relative weight per station for strong motion waveforms",
     ),
     cgnss: Optional[float] = typer.Option(
         None,
         "--cgnss",
-        help="Relative weight for high-rate continuous GNSS",
+        help="Relative weight per station for high-rate continuous GNSS",
     ),
     static: Optional[float] = typer.Option(
         None,
         "--static",
-        help="Relative weight for static GNSS offsets",
+        "--static-gnss",
+        help="Relative weight for static GNSS offsets (relative to total waveform misfit; 1.0 = equal weight)",
     ),
     imagery: Optional[float] = typer.Option(
         None,
         "--imagery",
-        help="Relative weight for InSAR / optical imagery",
+        "--insar",
+        help="Relative weight for InSAR / optical imagery (relative to total waveform misfit; 1.0 = equal weight)",
     ),
     dart: Optional[float] = typer.Option(
         None,
         "--dart",
-        help="Relative weight for DART tsunami data",
+        help="Relative weight per station for DART tsunami data",
     ),
 ):
     """View or update relative weights for each dataset type"""
@@ -563,7 +573,13 @@ def update_dataset_weights(
                 weights_dict[k] = float(v)
         output_dict = {
             "weights": weights_dict,
-            "description": "Relative weight multipliers for each dataset type in the inversion objective function",
+            "description": (
+                "Relative dataset weights. Waveform weights (body, surf, strong, cgnss, dart) scale the penalty "
+                "per station channel in the objective function: e.g., 'body: 1.0, surf: 0.2' means fitting error "
+                "at a body wave station is penalized 5x more heavily than the equivalent error at a surface wave station. "
+                "Static and imagery weights scale relative to the total combined waveform misfit: 'static: 1.0' balances "
+                "static data equally with all combined waveforms, 'static: 0.1' gives 10% weight, and 'static: 10.0' gives 10x weight."
+            ),
         }
         with open(weights_file, "w") as f:
             json.dump(

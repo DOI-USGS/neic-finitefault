@@ -67,7 +67,13 @@ def create_dataset_weights(
 
     output_dict = {
         "weights": dataset_weights,
-        "description": "Relative weight multipliers for each dataset type in the inversion objective function",
+        "description": (
+            "Relative dataset weights. Waveform weights (body, surf, strong, cgnss, dart) scale the penalty "
+            "per station channel in the objective function: e.g., 'body: 1.0, surf: 0.2' means fitting error "
+            "at a body wave station is penalized 5x more heavily than the equivalent error at a surface wave station. "
+            "Static and imagery weights scale relative to the total combined waveform misfit: 'static: 1.0' balances "
+            "static data equally with all combined waveforms, 'static: 0.1' gives 10% weight, and 'static: 10.0' gives 10x weight."
+        ),
     }
 
     with open(directory / "dataset_weights.json", "w") as f:

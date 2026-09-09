@@ -1190,14 +1190,55 @@ def test_update_dataset_weights():
         assert data["weights"]["surf"] == 0.5
         assert data["weights"]["body"] == 1.0
 
-        # 3. If dataset_weights.txt exists or is created, verify it matches
-        if (tempdir / "dataset_weights.txt").is_file():
-            with open(tempdir / "dataset_weights.txt") as f:
-                txt_content = f.read().split()
-            # body=1.0, surf=0.5, strong=1.0, cgnss=1.0, static=0.1, imagery=1.0, dart=1.0
-            assert float(txt_content[0]) == 1.0
-            assert float(txt_content[1]) == 0.5
-            assert float(txt_content[4]) == 0.1
+        # 4. Test aliases --static-gnss and --insar
+        result = runner.invoke(
+            app,
+            [
+                "update-dataset-weights",
+                str(tempdir),
+                "--static-gnss",
+                "0.2",
+                "--insar",
+                "0.8",
+            ],
+        )
+        assert result.exit_code == 0
+        with open(tempdir / "dataset_weights.json") as f:
+            data = json.load(f)
+        assert data["weights"]["static"] == 0.2
+        assert data["weights"]["imagery"] == 0.8
+
+        # 5. Verify validation errors in inputs_simmulated_annealing
+        from ffm.input_files import inputs_simmulated_annealing
+        fake_prop = {
+            "seismic_moment": 1e20,
+            "moment_weight": 1.0,
+            "slip_weight": 1.0,
+            "time_weight": 1.0,
+            "max_source_dur": 10.0,
+            "iterations": 100,
+            "cooling_rate": 0.9,
+            "initial_temperature": 100.0,
+        }
+
+        # Malformed JSON
+        with open(tempdir / "dataset_weights.json", "w") as f:
+            f.write("not valid json{")
+        import pytest
+        with pytest.raises(ValueError, match="Failed to parse dataset weights file"):
+            inputs_simmulated_annealing(fake_prop, directory=tempdir)
+
+        # Unrecognized key
+        with open(tempdir / "dataset_weights.json", "w") as f:
+            json.dump({"weights": {"unknown_dataset": 1.0}}, f)
+        with pytest.raises(ValueError, match="Unrecognized key"):
+            inputs_simmulated_annealing(fake_prop, directory=tempdir)
+
+        # Negative weight
+        with open(tempdir / "dataset_weights.json", "w") as f:
+            json.dump({"weights": {"body": -0.5}}, f)
+        with pytest.raises(ValueError, match="Invalid weight value"):
+            inputs_simmulated_annealing(fake_prop, directory=tempdir)
     finally:
         shutil.rmtree(tempdir)
 
