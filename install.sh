@@ -70,8 +70,16 @@ LITHO1=${LITHO1:-"download"}
 INSTALL_DIR="${FINITEFAULT_DIR}/install.d"
 # shellcheck source=./install.d/miniforge.sh
 source "${INSTALL_DIR}/miniforge.sh" "${FINITEFAULT_DIR}";
-# shellcheck disable=SC1090
-. "${HOME}/miniforge/etc/profile.d/conda.sh"
+if [ -f "${HOME}/miniforge/etc/profile.d/conda.sh" ]; then
+    . "${HOME}/miniforge/etc/profile.d/conda.sh"
+elif [ -f "${HOME}/miniforge3/etc/profile.d/conda.sh" ]; then
+    . "${HOME}/miniforge3/etc/profile.d/conda.sh"
+elif command -v conda > /dev/null 2>&1; then
+    CONDA_BASE=$(conda info --base 2>/dev/null)
+    if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
+        . "${CONDA_BASE}/etc/profile.d/conda.sh"
+    fi
+fi
 # shellcheck source=./install.d/ff-env.sh
 source "${INSTALL_DIR}/ff-env.sh" "${FINITEFAULT_DIR}";
 conda activate ff-env;

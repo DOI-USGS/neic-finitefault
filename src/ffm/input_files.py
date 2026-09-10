@@ -1255,7 +1255,80 @@ def inputs_simmulated_annealing(
         )
         filewrite.write("0 {} 0 {}\n".format(10**-4, source_dur))
         filewrite.write("1\n")
+
+    weights_path = directory / "dataset_weights.json"
+    w_body = 1.0
+    w_surf = 1.0
+    w_strong = 1.0
+    w_cgnss = 1.0
+    w_static = 1.0
+    w_imagery = 1.0
+    w_dart = 1.0
+    if weights_path.is_file():
+        try:
+            with open(weights_path, "r") as f:
+                dweights = json.load(f)
+        except Exception as err:
+            raise ValueError(
+                f"Failed to parse dataset weights file {weights_path}: {err}"
+            ) from err
+
+        if not isinstance(dweights, dict):
+            raise ValueError(
+                f"Expected JSON object in {weights_path}, got {type(dweights).__name__}"
+            )
+        if "weights" in dweights and isinstance(dweights["weights"], dict):
+            raw_weights = dweights["weights"]
+        else:
+            raw_weights = {k: v for k, v in dweights.items() if k != "description"}
+
+        valid_keys = {
+            "body": "body",
+            "surf": "surf",
+            "strong": "strong",
+            "cgnss": "cgnss",
+            "static": "static",
+            "gnss": "static",
+            "static_gnss": "static",
+            "imagery": "imagery",
+            "insar": "imagery",
+            "dart": "dart",
+        }
+        unknown_keys = set(raw_weights.keys()) - set(valid_keys.keys())
+        if unknown_keys:
+            valid_str = ", ".join(sorted(set(valid_keys.keys())))
+            raise ValueError(
+                f"Unrecognized key(s) in {weights_path}: {', '.join(sorted(unknown_keys))}. "
+                f"Allowed keys are: {valid_str}"
+            )
+
+        parsed_weights: dict = {}
+        for k, v in raw_weights.items():
+            try:
+                val = float(v)
+                if val < 0 or not np.isfinite(val):
+                    raise ValueError
+            except (ValueError, TypeError) as err:
+                raise ValueError(
+                    f"Invalid weight value for '{k}' in {weights_path}: {v}. Must be a non-negative finite number."
+                ) from err
+            canonical = valid_keys[k]
+            parsed_weights[canonical] = val
+
+        w_body = parsed_weights.get("body", 1.0)
+        w_surf = parsed_weights.get("surf", 1.0)
+        w_strong = parsed_weights.get("strong", 1.0)
+        w_cgnss = parsed_weights.get("cgnss", 1.0)
+        w_static = parsed_weights.get("static", 1.0)
+        w_imagery = parsed_weights.get("imagery", 1.0)
+        w_dart = parsed_weights.get("dart", 1.0)
+
+    with open(directory / "dataset_weights.txt", "w") as fw:
+        fw.write(
+            f"{w_body} {w_surf} {w_strong} {w_cgnss} {w_static} {w_imagery} {w_dart}\n"
+        )
     return
+
 
 
 def model_space(

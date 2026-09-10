@@ -86,8 +86,8 @@ FD_FILE="${FORTRAN_DIR}/gfs_nm/long/fd_bank"
 echo "Updating the location of the fd_bank file in ${LOWIN_FILE}"
 if grep -Fq "fd_bank" "${LOWIN_FILE}"
 then
-    echo "There appears to be a path to fd_bank in ${LOWIN_FILE} already."
-    echo "Please check that it is correct. Skipping adding the file line."
+    echo "Updating existing path to fd_bank in ${LOWIN_FILE}."
+    sed -i.bak "s|.*fd_bank.*|${FD_FILE}|" "${LOWIN_FILE}" && rm -f "${LOWIN_FILE}.bak"
 else
     echo -e "\n$FD_FILE" >> "$LOWIN_FILE"
 fi
