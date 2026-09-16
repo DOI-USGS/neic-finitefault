@@ -11,6 +11,7 @@ import json
 import logging
 import os
 import pathlib
+import shutil
 import time
 from functools import partial
 from multiprocessing import Pool
@@ -758,6 +759,24 @@ def select_process_cgnss(
     select_strong_stations(tensor_info, strong_files3)
     ml.close_log(logger1)
     return
+
+
+def select_process_dart(
+    dart_files: List[str],
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+):
+    """
+    Module for selecting and moving dart waveform files
+    :param dart_files: List of dart file parameters
+    :type dart_files: List[str]
+    :param directory: The path to the directory with files to read/write, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
+    """
+    directory = pathlib.Path(directory)
+    if not os.path.isdir(directory / "DART"):
+        os.mkdir(directory / "DART")
+    for file in dart_files:
+        shutil.copy(file, directory / "DART")
 
 
 def __select_distance(

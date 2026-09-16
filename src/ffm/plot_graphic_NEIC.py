@@ -81,7 +81,8 @@ def plot_ffm_sol(
     mr_time: int = False,
     files_str: Optional[dict] = None,
     stations_gnss: Optional[zip] = None,
-    stations_cgnss: Optional[List[dict]] = None,
+    stations_cgnss: Optional[dict] = None,
+    stations_dart: Optional[dict] = None,
     legend_len: Optional[float] = None,
     scale: Optional[float] = None,
     limits: List[Optional[float]] = [None, None, None, None],
@@ -110,11 +111,13 @@ def plot_ffm_sol(
     :param mr_time: Add moment rate time, defaults to False
     :type mr_time: int, optional
     :param files_str: The stations file properties, defaults to None
-    :type files_str:Optional[dict], optional
+    :type files_str: Optional[dict], optional
     :param stations_gnss: The gnss stations description, defaults to None
     :type stations_gnss:  Optional[zip], optional
     :param stations_cgnss: The cgnss stations description, defaults to None
-    :type stations_cgnss: Optional[List[dict]], optional
+    :type stations_cgnss: Optional[dict], optional
+    :param stations_dart: The dart stations description, defaults to None
+    :type stations_dart: Optional[dict], optional
     :param legend_len: The length of the legend, defaults to None
     :type legend_len: Optional[float], optional
     :param scale: The scale, defaults to None
@@ -168,6 +171,7 @@ def plot_ffm_sol(
         files_str=files_str,
         stations_gnss=stations_gnss,
         stations_cgnss=stations_cgnss,
+        stations_dart=stations_dart,
         max_slip=max_val,
         legend_len=legend_len,
         scale=scale,
@@ -190,6 +194,28 @@ def plot_misfit(
     :raises FileNotFoundError: When a data type's json file is not found
     """
     directory = pathlib.Path(directory)
+    if "dart" in used_data_type:
+        if not os.path.isfile(directory / "dart_waves.json"):
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), "dart_waves.json"
+            )
+        with open(directory / "dart_waves.json") as dw:
+            traces_info = json.load(dw)
+        traces_info = get_outputs.get_data_dict(
+            traces_info,
+            obs_file="waveforms_dart.txt",
+            syn_file="synthetics_dart.txt",
+            directory=directory,
+        )
+        values = [["dart"]]
+        for components in values:
+            plot_waveform_fits(
+                traces_info,
+                components,
+                "dart",
+                start_margin=0,
+                plot_directory=directory,
+            )
     if "body" in used_data_type:
         if not os.path.isfile(directory / "tele_waves.json"):
             raise FileNotFoundError(
@@ -1350,7 +1376,8 @@ def PlotMap(
     default_dirs: dict,
     files_str: Optional[dict] = None,
     stations_gnss: Optional[zip] = None,
-    stations_cgnss: Optional[List[dict]] = None,
+    stations_cgnss: Optional[dict] = None,
+    stations_dart: Optional[dict] = None,
     max_slip: Optional[float] = None,
     legend_len: Optional[float] = None,
     scale: Optional[float] = None,
@@ -1375,7 +1402,9 @@ def PlotMap(
     :param stations_gnss: The gnss stations description, defaults to None
     :type stations_gnss:  Optional[zip], optional
     :param stations_cgnss: The cgnss stations description, defaults to None
-    :type stations_cgnss: Optional[List[dict]], optional
+    :type stations_cgnss: Optional[dict], optional
+    :param stations_dart: The dart stations description, defaults to None
+    :type stations_dart: Optional[dict], optional
     :param max_slip: Specify maximum slip, defaults to None
     :type max_slip: Optional[float], optional
     :param legend_len: The length of the legend, defaults to None
@@ -1426,6 +1455,14 @@ def PlotMap(
             max_lat = max(max_lat, latp)
             min_lon = min(min_lon, lonp)
             max_lon = max(max_lon, lonp)
+    # if stations_dart is not None:
+    #     for file in stations_dart:
+    #         name = file["name"]
+    #         latp, lonp = file["location"]
+    #         min_lat = min(min_lat, latp-0.5)
+    #         max_lat = max(max_lat, latp+0.5)
+    #         min_lon = min(min_lon, lonp-0.5)
+    #         max_lon = max(max_lon, lonp+0.5)
     if stations_gnss is not None:
         max_obs = np.zeros(3)
         stations_gnss2: list = []
@@ -1796,6 +1833,40 @@ def PlotMap(
         )
         fig.shift_origin(xshift="-0.4c", yshift="2.3c")
 
+    ### DART ###
+    # if stations_dart is not None:
+    #     print("...Plotting DART Stations")
+    #     for file in stations_dart:
+    #         name = file["name"]
+    #         latp, lonp = file["location"]
+    #         fig.plot(
+    #             x=lonp, y=latp, style="t7p", fill="red", pen="black"
+    #         )
+    #         if label_stations == True:
+    #             fig.text(x=lonp, y=latp, text=name, justify="TR", font="7p")
+    if stations_dart is not None:
+        ### ADD TO LEGEND ###
+        fig.shift_origin(xshift="0.8c", yshift="-2.3c")
+        fig.plot(
+            x=region[1],
+            y=region[2],
+            no_clip=True,
+            style="t10p",
+            fill="red",
+            pen="black",
+        )
+        fig.shift_origin(xshift="-0.8c", yshift="2.3c")
+        fig.shift_origin(xshift="1.0c", yshift="-2.3c")
+        fig.text(
+            x=region[1],
+            y=region[2],
+            text="DART",
+            no_clip=True,
+            justify="ML",
+            offset=0 / 10,
+        )
+        fig.shift_origin(xshift="-1.0c", yshift="2.3c")
+
     ### STATIC GNSS ####
     if stations_gnss is not None:
         print("...Plotting Static GNSS Stations")
@@ -1952,7 +2023,7 @@ def PlotMap(
                 no_clip=True,
                 justify="ML",
             )
-        else:
+        elif legend_len < 100:  # type: ignore
             fig.text(
                 x=region[1],
                 y=region[2],
@@ -1960,6 +2031,17 @@ def PlotMap(
                 + "+/-"
                 + str(legend_len / 10)  # type: ignore
                 + " cm",  # type: ignore
+                no_clip=True,
+                justify="ML",
+            )
+        else:
+            fig.text(
+                x=region[1],
+                y=region[2],
+                text=str(legend_len / 100)  # type: ignore
+                + "+/-"
+                + str(legend_len / 1000)  # type: ignore
+                + " m",  # type: ignore
                 no_clip=True,
                 justify="ML",
             )
@@ -1987,6 +2069,16 @@ def PlotMap(
             frame="g",
         )
         fig.plot(x=lon0, y=lat0, style="a7p", fill="gold", pen="black")
+
+        ### DART ON INSET ###
+        if stations_dart is not None:
+            print("...Plotting DART Stations")
+            for file in stations_dart:
+                name = file["name"]
+                latp, lonp = file["location"]
+                fig.plot(x=lonp, y=latp, style="t7p", fill="red", pen="black")
+                if label_stations == True:
+                    fig.text(x=lonp, y=latp, text=name, justify="TR", font="7p")
 
     fig.savefig(directory / "Map.eps")
     fig.savefig(directory / "Map.png")

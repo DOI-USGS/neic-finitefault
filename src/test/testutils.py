@@ -196,6 +196,13 @@ def get_tele_waves_json(min: int = 0, max: int = 3, all: bool = False):
     return tele_waves
 
 
+def get_dart_waves_json():
+    """Get dart_waves.json"""
+    with open(RESULTS_DIR / "NP1" / "dart_waves_no_obs.json", "r") as f:
+        dart_data = json.load(f)
+    return dart_data
+
+
 def get_tensor_info():
     """Get the tensor information"""
     return get_tensor(cmt_file=END_TO_END_DIR / "info" / "20003k7a_cmt_CMT")

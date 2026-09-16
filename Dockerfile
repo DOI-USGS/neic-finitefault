@@ -11,6 +11,7 @@ RUN apt install -y \
     cmake \
     curl \
     gcc \
+    git \
     gfortran \
     && apt clean;
 
@@ -25,6 +26,7 @@ USER usgs-user
 WORKDIR /neic-finitefault
 RUN ls
 RUN bash install.sh /neic-finitefault
+RUN bash install.d/clawpack.sh /neic-finitefault --yes
 SHELL ["/bin/bash", "-i", "-c"]
 RUN echo ". ${HOME}/miniforge/etc/profile.d/conda.sh" >> "${HOME}/.bashrc"
 RUN echo "conda activate ff-env" >> "${HOME}/.bashrc"

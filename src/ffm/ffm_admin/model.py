@@ -7,6 +7,7 @@ from typing import List
 
 import typer
 
+from ffm.dart_tools import run_ffm_tsunami
 from ffm.ffm_admin.fileutils import validate_files
 from ffm.inversion_chen_new import (
     automatic_usgs,
@@ -346,4 +347,44 @@ def run_multiple(
         rupt_vel=rupture_velocities,
         config_file=config_file,
         directory=directory,
+    )
+
+
+@app.command(help="Run a tsunami forward model")
+def tsunami_forward(
+    directory: pathlib.Path = typer.Argument(
+        ..., help="Path to the modelling directory"
+    ),
+    ffm_solution: pathlib.Path = typer.Option(
+        "Solution.txt",
+        "-sol",
+        "--ffm-solution",
+        help="Finite fault model solution file in PARAM format (e.g., Solution.txt)",
+    ),
+    tfinal: int = typer.Option(
+        10800, "-t", "--t_final", help="Runtime of tsunami model, in seconds"
+    ),
+    model_type: str = typer.Option(
+        "kinematic",
+        "-sk",
+        "--static_or_kinematic",
+        help="Whether to treat the finite fault slip as instantaneous ('static') or 'kinematic'",
+    ),
+    run_geoclaw: bool = typer.Option(
+        True,
+        "-r",
+        "--run_geoclaw",
+        help="Whether to run the geoclaw model (True) or simply make the geoclaw input files (False), default is True",
+    ),
+):
+    if model_type != "kinematic" and model_type != "static":
+        raise ValueError("model type must be 'static' or 'kinematic'")
+    if ffm_solution == "Solution.txt":
+        ffm_solution = pathlib.Path(directory) / ffm_solution
+    run_ffm_tsunami(
+        directory,
+        ffm_solution=ffm_solution,
+        tfinal=tfinal,
+        model_type=model_type,
+        run_geoclaw=run_geoclaw,
     )

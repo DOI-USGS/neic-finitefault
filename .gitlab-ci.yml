@@ -20,12 +20,17 @@ default:
           source install.d/ff-env.sh "$(pwd)";
           conda activate ff-env;
       fi
+    # make clawpack installation
+    - source install.d/clawpack.sh "$(pwd)" -y;
   cache:
     key:
       files:
         - install.d/environment.yml
     paths:
       - miniforge
+      - fortran_code/gfs_nm/long/fd_bank
+      - fortran_code/info/LITHO1.0.nc
+      - clawpack
   image: code.usgs.gov:5001/devops/images/usgs/python:3.10-build
   tags:
     - dev
@@ -125,12 +130,14 @@ Python Test:
   script:
     - apt install gfortran -y
     - pip install .
+    - export CLAW=$(pwd)/clawpack
+    - export PYTHONPATH=$CLAW:$PYTHONPATH
+    - export FC=gfortran
     - poe test
   stage: test
 
 Dockerfile Test:
   before_script: ""
-  cache: []
   image: code.usgs.gov:5001/devops/images/usgs/docker:27-node
   script:
     - docker build . -t test --build-arg CI_REGISTRY="${CI_REGISTRY}"

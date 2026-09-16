@@ -1,0 +1,40 @@
+[
+    {
+        "azimuth": 351.47935896078167,
+        "component": "dart",
+        "derivative": false,
+        "distance": 11.181947730071977,
+        "dt": 60.0,
+        "duration": 10800,
+        "file": "None",
+        "location": [
+            -20.46861,
+            -73.43278
+        ],
+        "name": "32401",
+        "observed": null,
+        "start_signal": 0,
+        "synthetic": null,
+        "trace_weight": 1.0,
+        "wavelet_weight": "0 0 2 2 2 2 2 2\n"
+    },
+    {
+        "azimuth": 336.80543360320996,
+        "component": "dart",
+        "derivative": false,
+        "distance": 5.2290214692743024,
+        "dt": 60.0,
+        "duration": 10800,
+        "file": "None",
+        "location": [
+            -26.73472,
+            -73.9775
+        ],
+        "name": "32402",
+        "observed": null,
+        "start_signal": 0,
+        "synthetic": null,
+        "trace_weight": 1.0,
+        "wavelet_weight": "0 0 2 2 2 2 2 2\n"
+    }
+]

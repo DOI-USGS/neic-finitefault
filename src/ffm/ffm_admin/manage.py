@@ -9,11 +9,13 @@ import numpy as np
 import typer
 from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 
+from ffm.dart_tools import get_dart_observations
 from ffm.data_acquisition import acquisition
 from ffm.data_management import filling_data_dicts
 from ffm.fault_plane import create_finite_fault
 from ffm.get_outputs import read_solution_static_format, synthetics_to_SAC
 from ffm.input_files import (
+    input_chen_dart,
     input_chen_imagery,
     input_chen_near_field,
     input_chen_static,
@@ -130,6 +132,69 @@ def acquire(
         waveform_directory=directory,
     )
     typer.echo(f"Time spent downloading metadata: {time.time() - time0}")
+
+
+@app.command(help="Acquire DART data from NOAA")
+def acquire_dart(
+    directory: pathlib.Path = typer.Argument(
+        ..., help="Path to the working directory where tensor_info.json is found"
+    ),
+    data_directory: pathlib.Path = typer.Argument(
+        ..., help="Path to the data directory"
+    ),
+    dt: float = typer.Option(
+        60.0,
+        "-dt",
+        "--sampling_rate",
+        help="Desired data sampling rate, in seconds, default is 60s",
+    ),
+    gcmt_tensor_file: pathlib.Path = typer.Option(
+        None, "-g", "--gcmt", help="Path to the GCMT moment tensor file"
+    ),
+    qcmt_tensor_file: pathlib.Path = typer.Option(
+        None, "-q", "--qcmt", help="Path to the QuakeML moment tensor file"
+    ),
+    max_distance: float = typer.Option(
+        20,
+        "-max",
+        "--maximum_distance",
+        help="Maximum station hypocentral distance, in kilometers, default is 20",
+    ),
+    plot: bool = typer.Option(
+        False,
+        "-p",
+        "--plot_observations",
+        help="Whether to save plots of collected observations, default is False",
+    ),
+    fcorner: Tuple[float, float] = typer.Option(
+        [5, 120],
+        "-f",
+        "--frequency_bandpass",
+        help="Corner frequencies for bandpass filter, in seconds, default is 5 to 120 s",
+    ),
+    make_json: bool = typer.Option(
+        False,
+        "-j",
+        "--make_dart_json",
+        help="Whether to make dart_waves.json with all acquired waveforms, default is False",
+    ),
+):
+    if (gcmt_tensor_file is None and qcmt_tensor_file is None) or (
+        gcmt_tensor_file is not None and qcmt_tensor_file is not None
+    ):
+        raise ValueError("Either gcmt_tensor_file or qcmt_tensor_file must be defined.")
+    tensor_file = gcmt_tensor_file or qcmt_tensor_file
+    tensor_info = get_tensor(cmt_file=gcmt_tensor_file, quake_file=qcmt_tensor_file)
+    # get the data
+    get_dart_observations(
+        tensor_info,
+        data_directory,
+        dt=dt,
+        max_distance=max_distance,
+        plot=plot,
+        fcorner=fcorner,
+        make_json=make_json,
+    )
 
 
 @app.command(help="Create the finite fault from the tensor and plane information")
@@ -876,6 +941,8 @@ def synthetic_sac(
         synthetics_to_SAC("strong", 10, directory)
     if "cgnss" in chosen_data_types:
         synthetics_to_SAC("cgnss", 10, directory)
+    if "dart" in chosen_data_types:
+        synthetics_to_SAC("dart", 10, directory)
 
 
 @app.command(help="Write the tensor file from a GCMT moment tensor")
@@ -1004,6 +1071,13 @@ def update_inputs(
             tensor_info=tensor_info,
             data_prop=data_prop,
             data_type="cgnss",
+            directory=directory,
+        )
+    if "dart" in chosen_data_types:
+        validate_files([directory / "dart_waves.json"])
+        input_chen_dart(
+            tensor_info=tensor_info,
+            data_prop=data_prop,
             directory=directory,
         )
     if "gnss" in chosen_data_types:

@@ -463,6 +463,75 @@ def cgnss_traces(
     return info_traces
 
 
+def dart_traces(
+    files: List[Union[pathlib.Path, str]],
+    tensor_info: dict,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
+) -> List[dict]:
+    """Write json dictionary with properties for DART data
+
+    :param files: List of files holding DART data
+    :type files: List[Union[pathlib.Path, str]]
+    :param tensor_info: The tensor information
+    :type tensor_info: dict
+    :param directory: Where the file should be written, defaults to pathlib.Path()
+    :type directory: Union[pathlib.Path, str], optional
+    :return: The DART properties written to dart_waves.json
+    :rtype: List[dict]
+    """
+    directory = pathlib.Path(directory)
+    if len(files) == 0:
+        return []
+    event_lat = tensor_info["lat"]
+    event_lon = tensor_info["lon"]
+    depth = tensor_info["depth"]
+    origin_time = UTCDateTime(tensor_info["datetime"])
+    info_traces = []
+    headers = [SACTrace.read(file) for file in files]
+    dt_dart = headers[0].delta
+    fun1 = lambda header: mng._distazbaz(header.stla, header.stlo, event_lat, event_lon)
+    values = map(fun1, headers)
+    distances = [value[0] for value in values]
+    zipped = zip(distances, headers)
+
+    headers = [header for header in headers]
+    streams = [read(file) for file in files]
+    streams = [st for st in streams]
+
+    for file, header, stream in zip(files, headers, streams):
+        start = origin_time - stream[0].stats.starttime
+        distance, azimuth, back_azimuth = mng._distazbaz(
+            header.stla, header.stlo, event_lat, event_lon
+        )
+        info = _dict_trace(
+            file=file,
+            name_station=header.kstnm,
+            azimuth=azimuth,
+            channel="dart",
+            distance=distance / 111.11,
+            dt=dt_dart,
+            duration=len(stream[0].data),
+            n_start_obs=int(start // dt_dart),
+            trace_weight=1.0,
+            wavelet_weight="0 0 2 2 2 2 2 2\n",
+            observed_trace=None,
+            synthetic_trace=None,
+            location=[header.stla, header.stlo],
+        )
+        info_traces.append(info)
+
+    with open(directory / "dart_waves.json", "w") as f:
+        json.dump(
+            info_traces,
+            f,
+            sort_keys=True,
+            indent=4,
+            separators=(",", ": "),
+            ensure_ascii=False,
+        )
+    return info_traces
+
+
 def static_data(
     tensor_info: dict,
     unit: Literal["cm", "m", "mm"] = "m",
@@ -939,15 +1008,20 @@ def filling_data_dicts(
             ramp_types=ramp_types,
             directory=working_directory,
         )
+    if "dart" in data_types:
+        dart_data = get_traces_files("dart", directory=data_folder)
+        if not os.path.isfile(working_directory / "dart_waves.json"):
+            print(f"Creating dart_waves.json in {working_directory}")
+            dart_traces(dart_data, tensor_info, directory=working_directory)
+
     if not os.path.isfile(working_directory / "dataset_weights.json"):
         from ffm.modelling_parameters import create_dataset_weights
 
         create_dataset_weights(data_types, directory=working_directory)
 
 
-
 def get_traces_files(
-    data_type: Literal["cgnss", "strong", "surf", "body"],
+    data_type: Literal["cgnss", "strong", "surf", "body", "dart"],
     directory: Union[pathlib.Path, str] = pathlib.Path(),
 ) -> List[Union[pathlib.Path, str]]:
     """Get list with waveform files (in sac format) for stations and
@@ -975,6 +1049,8 @@ def get_traces_files(
         traces_files = glob(os.path.join(directory / "STR", "processed*"))  # type: ignore
     if data_type == "cgnss":
         traces_files = glob(os.path.join(directory / "cGNSS", "processed*"))  # type: ignore
+    if data_type == "dart":
+        traces_files = glob(os.path.join(directory / "DART", "processed*"))  # type: ignore
     traces_files = [os.path.abspath(file) for file in traces_files]  # type: ignore
     return traces_files
 

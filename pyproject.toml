@@ -3,7 +3,12 @@ requires = ["setuptools >= 72.2.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.isort]
+known_first_party = ["ffm"]
 profile = "black"
+src_paths = ["src"]
+
+[tool.black]
+target-version = ["py310"]
 
 [project]
 authors = [

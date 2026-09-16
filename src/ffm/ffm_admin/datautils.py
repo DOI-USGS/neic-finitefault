@@ -8,12 +8,14 @@ DEFAULT_MANAGEMENT_FILES = {
     "strong": "strong_motion_waves.json",
     "surf": "surf_waves.json",
     "body": "tele_waves.json",
+    "dart": "dart_waves.json",
 }
 
 
 class AcquireDataTypes(str, Enum):
     strong = "strong"
     body = "body"
+    dart = "dart"
 
 
 class ManagedDataTypes(str, Enum):
@@ -23,6 +25,7 @@ class ManagedDataTypes(str, Enum):
     strong = "strong"
     surf = "surf"
     body = "body"
+    dart = "dart"
 
 
 class ModifiableDataTypes(str, Enum):
@@ -31,6 +34,7 @@ class ModifiableDataTypes(str, Enum):
     strong_motion = "strong"
     surf = "surf"
     body = "body"
+    dart = "dart"
 
 
 ProcessDataTypes = ManagedDataTypes
@@ -41,3 +45,4 @@ class ShiftMatchDataTypes(str, Enum):
     strong = "strong"
     surf = "surf"
     body = "body"
+    dart = "dart"

@@ -273,6 +273,11 @@ def map(
             traces_info = json.load(s)
     else:
         traces_info = None
+    if ManagedDataTypes.dart in chosen_data_types:
+        with open(directory / DEFAULT_MANAGEMENT_FILES["dart"]) as d:
+            traces_info_dart = json.load(d)
+    else:
+        traces_info_dart = None
 
     PlotMap(
         tensor_info=tensor_info,
@@ -469,6 +474,11 @@ def neic(
             traces_info = json.load(s)
     else:
         traces_info = None
+    if ManagedDataTypes.dart in chosen_data_types:
+        with open(directory / DEFAULT_MANAGEMENT_FILES["dart"]) as d:
+            traces_info_dart = json.load(d)
+    else:
+        traces_info_dart = None
 
     # generate other formats of the solution
     static_to_fsp(
@@ -541,6 +551,7 @@ def neic(
             files_str=traces_info,
             stations_gnss=stations_gnss,
             stations_cgnss=traces_info_cgnss,
+            stations_dart=traces_info_dart,
             max_val=max_slip,
             legend_len=legend_length,
             scale=scale,

@@ -102,6 +102,14 @@ def gf_retrieve(
         loggers = loggers + [logger5]
         data_types = data_types + ["imagery"]
 
+    if "dart" in used_data_type:
+        print(
+            "Using previously computed DART GFs \n ... To recompute DART GFs run `wasp process tsunami-greens <directory>`"
+        )
+        logger6 = ml.create_log("DART_GF", directory / "logs" / "green_dart_log")
+        logger6.addHandler(ch)
+        data_types = data_types + ["dart"]
+
     for p, log, data_type in zip(processes, loggers, data_types):
         out, err = p.communicate(timeout=100000)
         log.info(out.decode("utf-8"))
