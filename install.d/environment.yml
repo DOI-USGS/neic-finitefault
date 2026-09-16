@@ -5,6 +5,7 @@ dependencies:
   - black
   - cutde
   - cartopy
+  - deprecated
   - filelock
   - isort
   - matplotlib

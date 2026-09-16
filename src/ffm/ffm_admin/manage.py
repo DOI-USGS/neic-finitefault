@@ -86,7 +86,7 @@ def _parse_imagery(value: str) -> Tuple[pathlib.Path, Optional[str]]:
     help=(
         "Acquire strong motion and teleseismic bodywave data.\n"
         "NOTICE: 'acquire' deprecated as of 1.2.0, use 'ffm get-data' or modules in ffm.acquisition. "
-        "To be removed after 2.0.0."
+        "To be removed in 2.1.0."
     )
 )
 def acquire(
