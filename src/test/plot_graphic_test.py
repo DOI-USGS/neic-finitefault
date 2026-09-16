@@ -3,6 +3,7 @@ import os
 import pathlib
 import shutil
 import tempfile
+from ffm.model.result.solution import Solution
 from test.testutils import (
     RESULTS_DIR,
     get_cgnss_json,
@@ -19,7 +20,7 @@ from test.testutils import (
 import pytest
 
 from ffm.fault_plane import point_sources_param, shear_modulous
-from ffm.get_outputs import get_imagery, read_solution_static_format, retrieve_gnss
+from ffm.get_outputs import get_imagery, retrieve_gnss
 from ffm.plot_graphic import (
     PlotComparisonMap,
     PlotImagery,
@@ -46,10 +47,10 @@ def __get_solution():
             TENSOR,
             SEGMENTS["rise_time"],
         )
-        solution = read_solution_static_format(
-            SEGMENTS["segments"],
-            tempdir,
-        )
+
+        solution = Solution.from_static_solution_file(
+            segments_data=SEGMENTS, solution_filepath=tempdir / "Solution.txt"
+        )._old_format
         return point_sources, solution
     finally:
         shutil.rmtree(tempdir)

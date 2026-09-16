@@ -82,7 +82,9 @@ def plot_ffm_sol(
     Next, we load necessary data for plots.
     >>> vel_model = json.load(open('velmodel_data.json')) # Assume vel_model stored in file 'velmodel_data.json'
     >>> segments, rise_time, point_sources = pl_mng.__read_planes_info() # Loads point sources and segments information
-    >>> solution = get_outputs.read_solution_static_format(segments, point_sources)
+    >>> solution = Solution.from_static_solution_file(
+            segments_data=segments_data, solution_filepath=directory / "Solution.txt"
+        )._old_format
     >>> shear = pf.shear_modulous(point_sources, velmodel=vel_model)
     >>> tensor_info = {
             'moment_mag': 7 * 10 ** 27,

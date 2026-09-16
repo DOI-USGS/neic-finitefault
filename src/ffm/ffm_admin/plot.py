@@ -16,9 +16,10 @@ from ffm.eventpage_downloads import (
     write_Okada_displacements,
 )
 from ffm.fault_plane import point_sources_param, shear_modulous
-from ffm.get_outputs import get_imagery, read_solution_static_format, retrieve_gnss
+from ffm.get_outputs import get_imagery, retrieve_gnss
 from ffm.load_ffm_model import load_ffm_model
 from ffm.management import default_dirs
+from ffm.model.result.solution import Solution
 from ffm.plot_graphic_NEIC import (
     PlotComparisonMap,
     PlotImagery,
@@ -137,7 +138,9 @@ def kml(
             vel_model = json.load(v)
 
     # get the solution
-    solution = read_solution_static_format(segments, data_dir=directory)
+    solution = Solution.from_static_solution_file(
+        segments_data=segments_data, solution_filepath=directory / "Solution.txt"
+    )._old_format
 
     # get files with trace information
     if ManagedDataTypes.gnss in chosen_data_types:
@@ -253,7 +256,9 @@ def map(
     )
 
     # get the solution
-    solution = read_solution_static_format(segments, data_dir=directory)
+    solution = Solution.from_static_solution_file(
+        segments_data=segments_data, solution_filepath=directory / "Solution.txt"
+    )._old_format
 
     # get files with trace information
     if ManagedDataTypes.gnss in chosen_data_types:
@@ -449,7 +454,9 @@ def neic(
             vel_model = json.load(v)
 
     # get the solution
-    solution = read_solution_static_format(segments, data_dir=directory)
+    solution = Solution.from_static_solution_file(
+        segments_data=segments_data, solution_filepath=directory / "Solution.txt"
+    )._old_format
 
     # get files with trace information
     if ManagedDataTypes.gnss in chosen_data_types:

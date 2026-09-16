@@ -17,7 +17,6 @@ import ffm.management as mng
 import ffm.seismic_tensor as tensor
 
 
-
 def create_dataset_weights(
     data_type: list,
     weights: Optional[dict] = None,

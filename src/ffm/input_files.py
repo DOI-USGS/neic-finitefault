@@ -1330,7 +1330,6 @@ def inputs_simmulated_annealing(
     return
 
 
-
 def model_space(
     segments: dict,
     directory: Union[pathlib.Path, str] = pathlib.Path(),

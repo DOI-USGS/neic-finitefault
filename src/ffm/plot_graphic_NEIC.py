@@ -43,6 +43,7 @@ import ffm.seismic_tensor as tensor
 import ffm.shakemap_tools as shakemap
 import ffm.velocity_models as mv
 from ffm import get_outputs, load_ffm_model
+from ffm.model.result.solution import Solution
 from ffm.plot_maps_NEIC import plot_map, set_map_cartopy
 from ffm.static2fsp import static_to_fsp
 from ffm.static2srf import static_to_srf
@@ -1537,7 +1538,9 @@ def PlotMap(
     with open(directory / "segments_data.json") as s:
         segments_data = json.load(s)
     segments = segments_data["segments"]
-    solution = get_outputs.read_solution_static_format(segments, data_dir=directory)
+    solution = Solution.from_static_solution_file(
+        segments_data=segments_data, solution_filepath=directory / "Solution.txt"
+    )._old_format
     plane_info = segments[0]
     (
         stk_subfaults,

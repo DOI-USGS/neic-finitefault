@@ -945,7 +945,6 @@ def filling_data_dicts(
         create_dataset_weights(data_types, directory=working_directory)
 
 
-
 def get_traces_files(
     data_type: Literal["cgnss", "strong", "surf", "body"],
     directory: Union[pathlib.Path, str] = pathlib.Path(),

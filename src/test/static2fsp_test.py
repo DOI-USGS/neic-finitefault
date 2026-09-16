@@ -4,6 +4,7 @@ import tempfile
 
 from ffm import get_outputs
 from ffm.static2fsp import static_to_fsp
+from ffm.model.result.solution import Solution
 
 from .testutils import (
     RESULTS_DIR,
@@ -47,15 +48,15 @@ def test_static_to_fsp_single_segment():
             tempdir / "imagery_data.txt",
         )
         segments = get_segments_data()
-        solution = get_outputs.read_solution_static_format(
-            segments["segments"], tempdir
+        solution = Solution.from_static_solution_file(
+            segments, tempdir / "Solution.txt"
         )
         static_to_fsp(
             get_tensor_info(),
             segments,
             ["cgnss", "gnss", "imagery", "strong", "surf", "body"],
             get_velmodel_data(),
-            solution,
+            solution._old_format,
             tempdir,
         )
         with open(tempdir / "fsp_sol_file.txt") as f:
@@ -105,15 +106,17 @@ def test_static_to_fsp_multi_segment():
             tempdir / "imagery_data.txt",
         )
         segments = get_multisegments_data()
-        solution = get_outputs.read_solution_static_format(
-            segments["segments"], tempdir
+        solution = Solution.from_static_solution_file(
+            segments, tempdir / "Solution.txt"
         )
+        print(solution.segments[0].data.strike)
+        print(solution.segments[0].data.dip)
         static_to_fsp(
             get_tensor_info(),
             segments,
             ["cgnss", "gnss", "imagery", "strong", "surf", "body"],
             get_velmodel_data(),
-            solution,
+            solution._old_format,
             tempdir,
         )
         with open(tempdir / "fsp_sol_file.txt") as f:
@@ -123,6 +126,8 @@ def test_static_to_fsp_multi_segment():
             target = f.readlines()[41:]
 
         for l, t in zip(data, target):
+            print(l)
+            print(t)
             assert l == t
     finally:
         shutil.rmtree(tempdir)

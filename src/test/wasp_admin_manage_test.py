@@ -1210,6 +1210,7 @@ def test_update_dataset_weights():
 
         # 5. Verify validation errors in inputs_simmulated_annealing
         from ffm.input_files import inputs_simmulated_annealing
+
         fake_prop = {
             "seismic_moment": 1e20,
             "moment_weight": 1.0,
@@ -1225,6 +1226,7 @@ def test_update_dataset_weights():
         with open(tempdir / "dataset_weights.json", "w") as f:
             f.write("not valid json{")
         import pytest
+
         with pytest.raises(ValueError, match="Failed to parse dataset weights file"):
             inputs_simmulated_annealing(fake_prop, directory=tempdir)
 
@@ -1241,4 +1243,3 @@ def test_update_dataset_weights():
             inputs_simmulated_annealing(fake_prop, directory=tempdir)
     finally:
         shutil.rmtree(tempdir)
-

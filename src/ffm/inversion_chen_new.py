@@ -31,6 +31,7 @@ import ffm.traces_properties as tp
 import ffm.velocity_models as mv
 from ffm import get_outputs, input_files
 from ffm.load_ffm_model import load_ffm_model
+from ffm.model.result.solution import Solution
 from ffm.static2fsp import static_to_fsp
 
 
@@ -352,9 +353,16 @@ def _automatic2(
     # write solution in FSP format
     #
     logging.info
-    solution = get_outputs.read_solution_static_format(segments, data_dir=directory)
+    solution = Solution.from_static_solution_file(
+        segments_data=segments_data, solution_filepath=directory / "Solution.txt"
+    )
     static_to_fsp(
-        tensor_info, segments_data, data_type, velmodel, solution, directory=directory
+        tensor_info,
+        segments_data,
+        data_type,
+        velmodel,
+        solution._old_format,
+        directory=directory,
     )
 
 
@@ -1141,7 +1149,9 @@ def execute_plot(
     connections = None
     if "connections" in segments_data:
         connections = segments_data["connections"]
-    solution = get_outputs.read_solution_static_format(segments, data_dir=directory)
+    solution = Solution.from_static_solution_file(
+        segments_data=segments_data, solution_filepath=directory / "Solution.txt"
+    )
     if not velmodel:
         velmodel = mv.select_velmodel(tensor_info, default_dirs, directory=directory)
     point_sources = pf.point_sources_param(
@@ -1154,7 +1164,7 @@ def execute_plot(
         segments_data,
         point_sources,
         shear,
-        solution,
+        solution._old_format,
         default_dirs,
         directory=directory,
     )
@@ -1176,7 +1186,7 @@ def execute_plot(
             tensor_info,
             segments,
             point_sources,
-            solution,
+            solution._old_format,
             default_dirs,
             files_str=traces_info,
             stations_gnss=stations_gnss,
@@ -1192,7 +1202,7 @@ def execute_plot(
                     tensor_info,
                     segments,
                     point_sources,
-                    solution,
+                    solution._old_format,
                     imagery_points,
                     datafile=key,
                     directory=directory,
@@ -1205,14 +1215,18 @@ def execute_plot(
             directory=directory,
         )
         plot.PlotSlipDist_Compare(
-            segments, point_sources, input_model, solution, directory=directory
+            segments,
+            point_sources,
+            input_model,
+            solution._old_format,
+            directory=directory,
         )
         plot.PlotComparisonMap(
             tensor_info,
             segments,
             point_sources,
             input_model,
-            solution,
+            solution._old_format,
             directory=directory,
         )
     plot_files = glob.glob(os.path.join(directory, "plots", "*png"))
