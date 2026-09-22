@@ -9,7 +9,6 @@ import numpy as np
 import typer
 from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 
-from ffm.dart_tools import get_dart_observations
 from ffm.data_acquisition import acquisition
 from ffm.data_management import filling_data_dicts
 from ffm.fault_plane import create_finite_fault
@@ -132,69 +131,6 @@ def acquire(
         waveform_directory=directory,
     )
     typer.echo(f"Time spent downloading metadata: {time.time() - time0}")
-
-
-@app.command(help="Acquire DART data from NOAA")
-def acquire_dart(
-    directory: pathlib.Path = typer.Argument(
-        ..., help="Path to the working directory where tensor_info.json is found"
-    ),
-    data_directory: pathlib.Path = typer.Argument(
-        ..., help="Path to the data directory"
-    ),
-    dt: float = typer.Option(
-        60.0,
-        "-dt",
-        "--sampling_rate",
-        help="Desired data sampling rate, in seconds, default is 60s",
-    ),
-    gcmt_tensor_file: pathlib.Path = typer.Option(
-        None, "-g", "--gcmt", help="Path to the GCMT moment tensor file"
-    ),
-    qcmt_tensor_file: pathlib.Path = typer.Option(
-        None, "-q", "--qcmt", help="Path to the QuakeML moment tensor file"
-    ),
-    max_distance: float = typer.Option(
-        20,
-        "-max",
-        "--maximum_distance",
-        help="Maximum station hypocentral distance, in kilometers, default is 20",
-    ),
-    plot: bool = typer.Option(
-        False,
-        "-p",
-        "--plot_observations",
-        help="Whether to save plots of collected observations, default is False",
-    ),
-    fcorner: Tuple[float, float] = typer.Option(
-        [5, 120],
-        "-f",
-        "--frequency_bandpass",
-        help="Corner frequencies for bandpass filter, in seconds, default is 5 to 120 s",
-    ),
-    skip_json: bool = typer.Option(
-        False,
-        "-j",
-        "--make_dart_json",
-        help="Whether to skip making the dart_waves.json with all acquired waveforms, default is False",
-    ),
-):
-    if (gcmt_tensor_file is None and qcmt_tensor_file is None) or (
-        gcmt_tensor_file is not None and qcmt_tensor_file is not None
-    ):
-        raise ValueError("Either gcmt_tensor_file or qcmt_tensor_file must be defined.")
-    tensor_file = gcmt_tensor_file or qcmt_tensor_file
-    tensor_info = get_tensor(cmt_file=gcmt_tensor_file, quake_file=qcmt_tensor_file)
-    # get the data
-    get_dart_observations(
-        tensor_info,
-        data_directory,
-        dt=dt,
-        max_distance=max_distance,
-        plot=plot,
-        fcorner=fcorner,
-        make_json=(not skip_json),
-    )
 
 
 @app.command(help="Create the finite fault from the tensor and plane information")
@@ -674,7 +610,6 @@ def update_dataset_weights(
     typer.echo("\nCurrent Dataset Weights:")
     for dt, w in sorted(weights_dict.items()):
         typer.echo(f"  {dt:10s}: {w}")
-
 
 
 @app.command(help="Modify data in sac files")

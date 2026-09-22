@@ -1,16 +1,11 @@
 import json
 import pathlib
-from glob import glob
 from shutil import rmtree
 from tempfile import mkdtemp
 from test.testutils import MockResponse
 from unittest import mock
 
-import numpy as np
-from obspy.core import Stream, Trace
 from typer.testing import CliRunner
-
-from ffm.ffm_admin.acquisition import app
 
 runner = CliRunner()
 

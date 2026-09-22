@@ -7,7 +7,6 @@ fault modelling
 
 import errno
 import glob
-import json
 import logging
 import os
 import pathlib
@@ -18,19 +17,24 @@ from multiprocessing import Pool
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
-from obspy import read  # type: ignore
-from obspy.core.utcdatetime import UTCDateTime  # type: ignore
-from obspy.geodetics import gps2dist_azimuth, locations2degrees  # type: ignore
-from obspy.io.sac import SACTrace  # type: ignore
-from obspy.signal import rotate  # type: ignore
-from obspy.signal.invsim import simulate_seismometer  # type: ignore
-from obspy.taup import TauPyModel  # type: ignore
-from scipy.integrate import cumulative_trapezoid  # type: ignore
-from scipy.signal import butter, filtfilt  # type: ignore
+from obspy import read  # type: ignore [import-untyped]
+from obspy.core.utcdatetime import UTCDateTime  # type: ignore [import-untyped]
+from obspy.geodetics import (  # type: ignore [import-untyped]
+    gps2dist_azimuth,
+    locations2degrees,
+)
+from obspy.io.sac import SACTrace  # type: ignore [import-untyped]
+from obspy.signal import filter, rotate  # type: ignore [import-untyped]
+from obspy.signal.invsim import simulate_seismometer  # type: ignore [import-untyped]
+from obspy.taup import TauPyModel  # type: ignore [import-untyped]
+from scipy.integrate import cumulative_trapezoid  # type: ignore [import-untyped]
+from scipy.interpolate import interp1d  # type: ignore [import-untyped]
+from scipy.signal import butter, filtfilt, find_peaks  # type: ignore [import-untyped]
 
 import ffm.management as mng
 import ffm.modulo_logs as ml
 import ffm.wang_baseline_removal_v1 as wang1
+from ffm.data_types.dartdata import Dart, DartDataUnion, GeoNetDart, NoaaDart
 
 ###################################
 # teleseismic body waves
@@ -1626,3 +1630,50 @@ def select_strong_stations(tensor_info: dict, files: List[str]) -> List[str]:
         if not file in select_stations:
             os.remove(file)
     return select_stations
+
+
+#####################
+# dart data
+#####################
+
+
+def process_dart(
+    data: DartDataUnion,
+    frequency_corners: Tuple[float, float],
+    dt: float,
+    filter_peak_noise: bool = False,
+) -> DartDataUnion:
+    # get datetimes as timestamps
+    timestamps = np.array([t.timestamp() for t in data.time])
+    # get timestamps and time_deltas from first time
+    time = timestamps - timestamps[0]
+    # get evenly spaced array of time from first time, used for interpolation
+    interpolation_times = np.arange(0, time[len(time) - 1], dt)
+
+    # filter out noisy large amplitude data (currently only known to be an issue with NOAA dart data)
+    if filter_peak_noise:
+        peak_idx = find_peaks(data.height, prominence=1)[0]
+        for idx in range(len(peak_idx)):
+            print("HERE", idx)
+            data.height[peak_idx[idx]] = np.nan
+
+    # create interpolation function
+    interpolation_function = interp1d(time, data.height, "cubic")
+    model_in = interpolation_function(interpolation_times)
+    model_in = model_in - np.mean(model_in[2:])
+    fcorner2 = [1.0 / (frequency_corners[1] * dt), 1.0 / (frequency_corners[0] * dt)]
+
+    # bandpass filter the data
+    filtered_data = filter.bandpass(
+        model_in,
+        fcorner2[0],
+        fcorner2[1],
+        1 / dt,
+        corners=2,
+        zerophase=True,
+    )
+
+    # set time as relative to first timestamp
+    data.interpolated_time = interpolation_times
+    data.interpolated_height = filtered_data
+    return data

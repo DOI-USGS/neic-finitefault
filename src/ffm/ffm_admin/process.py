@@ -152,7 +152,7 @@ def tsunami_greens(
         0.5,
         "-b",
         "--buffer",
-        help="Extra distance around the min/max subfault-to-DART-station region. The default is 0.5 degrees. Large subfaults (~20km+)  may need a larger buffer to avoid edge effects."
+        help="Extra distance around the min/max subfault-to-DART-station region. The default is 0.5 degrees. Large subfaults (~20km+)  may need a larger buffer to avoid edge effects.",
     ),
     subfault_start: int = typer.Option(
         0,

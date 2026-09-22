@@ -19,6 +19,7 @@ dist
 htmlcov
 src/neic_finitefault.egg-info
 .coveragerc
+xgeoclaw
 
 # fortran files
 fortran_code/src_dc_f95/bessel.f
