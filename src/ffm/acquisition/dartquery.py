@@ -376,4 +376,4 @@ class DartQuery(BaseModel):
 
         if len(metadata) > 0:
             with open(directory / "dart_waves.json", "w") as f:
-                json.dump(metadata, f)
+                json.dump(metadata, f, sort_keys=True, indent=4, separators=(",", ": "), ensure_ascii=False,)

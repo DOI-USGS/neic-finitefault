@@ -1654,7 +1654,6 @@ def process_dart(
     if filter_peak_noise:
         peak_idx = find_peaks(data.height, prominence=1)[0]
         for idx in range(len(peak_idx)):
-            print("HERE", idx)
             data.height[peak_idx[idx]] = np.nan
 
     # create interpolation function

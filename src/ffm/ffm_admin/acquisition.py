@@ -46,7 +46,7 @@ def cmt(
 )
 def dart(
     eventid: str = typer.Option(
-        None,
+        None, "-e", "--eventid",
         help="An event ID used to identify an earthquake in the USGS Feeds or ComCat",
     ),
     source: str = QUERY_SOURCE,
