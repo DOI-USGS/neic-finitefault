@@ -35,7 +35,8 @@ where = ["src"]
 
 [tool.poe.tasks]
 audit = [
-  { shell = "pip-audit --ignore-vuln PYSEC-2026-3628" }
+  # TODO: remove after upgrading python version and removal of fiona
+  { shell = "pip-audit --ignore-vuln GHSA-chx6-46f5-w4vp --ignore-vuln GHSA-c2m8-h5v5-343r --ignore-vuln GHSA-3hv7-mjh2-fv65 --ignore-vuln  CVE-2026-97687 --ignore-vuln CVE-2026-97688 --ignore-vuln CVE-2026-97689" }
 ]
 fix = [
   { shell = "black src" },
