@@ -3,7 +3,7 @@ import pathlib
 from functools import cached_property
 from typing import List, Tuple
 
-import pandas as pd
+import pandas as pd  # type: ignore [import-untyped]
 from pydantic import BaseModel, Field
 
 from ffm.model.result.segment import Segment, SegmentData
@@ -86,7 +86,7 @@ class Solution(BaseModel):
     @staticmethod
     def __parse_static_header(
         lines: List[str],
-    ) -> Tuple[float, float, int, int, List[Tuple[float, float, float]]]:
+    ) -> Tuple[float, float, int, int, List[tuple]]:
         """
         Parse the header for a segment in static solution file (Solution.txt)
 

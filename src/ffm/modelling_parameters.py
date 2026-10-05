@@ -33,6 +33,7 @@ def create_dataset_weights(
     :return: The dataset weights dictionary
     :rtype: dict
     """
+    directory = pathlib.Path(directory)
     type_mapping = {
         "tele_waves": "body",
         "body_waves": "body",

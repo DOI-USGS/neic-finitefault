@@ -11,7 +11,7 @@ import pathlib
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
-from deprecated import deprecated
+from deprecated import deprecated  # type: ignore [import-untyped]
 from obspy import Stream, Trace, read  # type: ignore
 
 import ffm.plane_management as pl_mng
