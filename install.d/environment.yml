@@ -22,7 +22,7 @@ dependencies:
   - ratelimiter
   - scipy
   - shapely
-  - tornado
+  - tornado>=6.5.8
   - typer
   - pip:
       - pyrocko
