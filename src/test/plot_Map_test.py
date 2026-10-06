@@ -50,7 +50,7 @@ def testPlotMap():
             segments["rise_time"],
         )
         solution = Solution.from_static_solution_file(
-            segments_data=SEGMENTS, solution_filepath=tempdir / "Solution.txt"
+            segments_data=segments, solution_filepath=tempdir / "Solution.txt"
         )._old_format
         PlotMap(
             tensor,
