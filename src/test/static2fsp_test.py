@@ -62,7 +62,6 @@ def test_static_to_fsp_single_segment():
 
         with open(tempdir / "fsp_sol_file.txt") as f:
             data = f.readlines()[41:]
-            dstr = f.read()
         with open(RESULTS_DIR / "NP1" / "fsp_sol_file.txt") as f:
             target = f.readlines()[41:]
 
@@ -118,10 +117,9 @@ def test_static_to_fsp_multi_segment():
             solution._old_format,
             tempdir,
         )
-        
+
         with open(tempdir / "fsp_sol_file.txt") as f:
             data = f.readlines()[41:]
-            dstr = f.read()
         with open(RESULTS_DIR / "NP1" / "fsp_sol_file_multisegment.txt") as f:
             target = f.readlines()[41:]
 
