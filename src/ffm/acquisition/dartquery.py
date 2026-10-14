@@ -332,6 +332,11 @@ class DartQuery(BaseModel):
                     starttime=UTCDateTime(self.starttime),
                     endtime=UTCDateTime(self.event_time),
                 )
+                if len(trace.data) == 0 or len(trace.data[~np.isnan(trace.data)]) == 0:
+                    print(
+                        f"No data left after processing and filtering for {station.id}"
+                    )
+                    continue
                 trace.data = trace.data - np.mean(pre_event.data)
                 # create and write stream
                 dart_directory = directory / "DART"
@@ -376,4 +381,11 @@ class DartQuery(BaseModel):
 
         if len(metadata) > 0:
             with open(directory / "dart_waves.json", "w") as f:
-                json.dump(metadata, f, sort_keys=True, indent=4, separators=(",", ": "), ensure_ascii=False,)
+                json.dump(
+                    metadata,
+                    f,
+                    sort_keys=True,
+                    indent=4,
+                    separators=(",", ": "),
+                    ensure_ascii=False,
+                )

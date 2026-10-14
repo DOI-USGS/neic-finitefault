@@ -51,6 +51,10 @@ def parse_geonet_dart(
         data_station.latitude = sensor["latitude"]
         data_station.longitude = sensor["longitude"]
         data = pd.DataFrame(sensor["data"])
+        data = data.dropna()
+        if len(data) == 0:
+            print(f"No dart non-nan available for {station.id}")
+            continue
         # sort just in case the values come in unordered
         data = data.sort_values(by="ts")
         data_station.data = GeoNetDart(  # type: ignore [call-arg]
@@ -107,6 +111,9 @@ def parse_noaa_dart(
     )
     data = data.drop(data[data.height == 9999.000].index)
     data = data.reset_index(drop=True)
+    data = data.dropna()
+    if len(data) == 0:
+        raise EmptyDataError(f"No dart non-nan available in NOAA response")
 
     # Noaa provides data for multiple resolutions in the same response
     # this means that there may be duplicate timestamps with different values
