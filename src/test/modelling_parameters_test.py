@@ -67,4 +67,3 @@ def test_create_dataset_weights():
         assert saved == weights_data
     finally:
         shutil.rmtree(tempdir)
-

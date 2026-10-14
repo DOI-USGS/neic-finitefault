@@ -11,6 +11,7 @@ def get_event_detail(eventid: str, retries: int = 3) -> Optional[dict]:
         try:
             response = requests.get(url)
             response.raise_for_status()
+            break
         except:
             logging.warning(f"Failed to get detail for {eventid}")
     if response.status_code != 200:

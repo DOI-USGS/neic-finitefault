@@ -17,7 +17,6 @@ import ffm.management as mng
 import ffm.seismic_tensor as tensor
 
 
-
 def create_dataset_weights(
     data_type: list,
     weights: Optional[dict] = None,
@@ -34,6 +33,7 @@ def create_dataset_weights(
     :return: The dataset weights dictionary
     :rtype: dict
     """
+    directory = pathlib.Path(directory)
     type_mapping = {
         "tele_waves": "body",
         "body_waves": "body",
