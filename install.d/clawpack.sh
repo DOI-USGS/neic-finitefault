@@ -48,42 +48,27 @@ clawpack_install () {
 clawpack_profile () {
     system="$(uname)";
     if [ "$system" == 'Linux' ]; then 
-        profile=~/.bashrc
         total_cpus=$(nproc)
         # shellcheck disable=SC1090
-        source $profile;
     elif [ "$system" == 'FreeBSD' ] || [ "$system" == 'Darwin' ]; then 
-        profile=~/.bash_profile
         total_cpus=$(sysctl -n hw.ncpu)
         # shellcheck disable=SC1090
-        source $profile;
     else    
         echo "Currently only Linux and Unix systems are supported. Exiting."
         exit    
     fi
     # Check CLAW setup in profile and add if necessary
-    if [[ "$CLAW" == "${CLAW_DIR}/clawpack" ]]; then
-        echo "CLAW already specified in profile"
-    else
-        echo "Adding CLAW info to profile"
-        echo "" >> $profile
-        echo "# CLAWPACK" >> $profile
-        echo "export CLAW=${CLAW_DIR}/clawpack" >> $profile
-        echo "export OMP_NUM_THREADS=$(( total_cpus / 4 ))" >> $profile
+    OMP_NUM_THREADS=$(( total_cpus / 4 ))
+    if [[ "${OMP_NUM_THREADS}" -eq 0 ]]; then
+        OMP_NUM_THREADS=1
     fi
 
-    if [[ "$PYTHONPATH" == *"${CLAW_DIR}/clawpack"* ]]; then
-        echo "PythonPath already contains Clawpack"
-    else
-        echo "Adding CLAW to PythonPath"
-        echo "export PYTHONPATH=${CLAW_DIR}/clawpack:\$PYTHONPATH" >> $profile;
-    fi
-    if [[ "$FC" == "gfortran" ]]; then
-        echo "FC already set to gfortran"
-    else
-        echo "export FC=gfortran" >> $profile;
-    fi
-    source $profile;
+    cat << EOF > .env
+CLAW=${CLAW_DIR}/clawpack
+OMP_NUM_THREADS=${OMP_NUM_THREADS}
+PYTHONPATH=${CLAW_DIR}/clawpack:${PYTHONPATH}
+FC=gfortran
+EOF
 }
 
 

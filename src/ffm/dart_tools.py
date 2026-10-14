@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 import json
 import os
 import pathlib
@@ -15,12 +18,18 @@ import pygmt  # type: ignore
 from alive_progress import alive_bar
 from clawpack.geoclaw import dtopotools  # type: ignore
 from clawpack.geoclaw import topotools  # type: ignore
+from obspy import UTCDateTime  # type: ignore
+from obspy.core import utcdatetime  # type: ignore
+from obspy.core.stream import Stream  # type: ignore
+from obspy.core.trace import Trace  # type: ignore
 from obspy.signal import filter  # type: ignore
 
 import ffm.fault_plane as pf
 import ffm.management as mng
 from ffm.data_management import _dict_trace
 from ffm.read_config import PROJECT_DIRECTORY
+
+load_dotenv()
 
 
 class EmptyDataError(Exception):

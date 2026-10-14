@@ -20,6 +20,7 @@ dependencies:
   - pytest
   - pytest-cov
   - python=3.10
+  - python-dotenv
   - ratelimiter
   - scipy
   - shapely
