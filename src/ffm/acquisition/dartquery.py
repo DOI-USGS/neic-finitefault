@@ -343,6 +343,8 @@ class DartQuery(BaseModel):
                 if not dart_directory.exists():
                     dart_directory.mkdir(parents=True)
                 filepath = dart_directory / filename
+
+                print(f"Writing data for {station.id}")
                 Stream([trace]).write(str(filepath), format="SAC", byteorder=0)
                 # get metadata for waveform to add to dart_waves.json
                 metadata += [
