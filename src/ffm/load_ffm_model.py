@@ -10,6 +10,7 @@ import numpy as np
 
 import ffm.plane_management as pl_mng
 from ffm import get_outputs
+from ffm.model.result.solution import Solution
 
 
 def load_ffm_model(
@@ -49,7 +50,9 @@ def load_ffm_model(
     tfall = []
 
     if option == "Solution.txt":
-        solution = get_outputs.read_solution_static_format(segments, data_dir=directory)
+        solution = Solution.from_static_solution_file(
+            segments_data=segments_data, solution_filepath=directory / "Solution.txt"
+        )._old_format
         slip = solution["slip"]
         rake = solution["rake"]
         trup = solution["rupture_time"]

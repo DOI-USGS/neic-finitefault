@@ -23,6 +23,7 @@ import ffm.plane_management as pl_mng
 import ffm.seismic_tensor as tensor
 import ffm.velocity_models as mv
 from ffm import get_outputs
+from ffm.model.result.solution import Solution
 from ffm.plot_graphic_NEIC import __redefine_lat_lon
 
 
@@ -205,9 +206,9 @@ def PlotMap(
         segments_data = json.load(sf)
     segments = segments_data["segments"]
     rise_time = segments_data["rise_time"]
-    solution = get_outputs.read_solution_static_format(
-        segments, data_dir=directory  # type: ignore
-    )
+    solution = Solution.from_static_solution_file(
+        segments_data=segments_data, solution_filepath=directory / "Solution.txt"
+    )._old_format
     plane_info = segments[0]
     (
         stk_subfaults,

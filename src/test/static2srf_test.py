@@ -4,6 +4,7 @@ import tempfile
 
 from ffm import get_outputs
 from ffm.static2srf import static_to_srf
+from ffm.model.result.solution import Solution
 
 from .testutils import (
     RESULTS_DIR,
@@ -46,15 +47,15 @@ def test_static_to_srf():
             tempdir / "imagery_data.txt",
         )
         segments = get_segments_data()
-        solution = get_outputs.read_solution_static_format(
-            segments["segments"], tempdir
+        solution = Solution.from_static_solution_file(
+            segments, tempdir / "Solution.txt"
         )
         static_to_srf(
             get_tensor_info(),
             segments,
             ["cgnss", "gnss", "imagery", "strong", "surf", "body"],
             get_velmodel_data(),
-            solution,
+            solution._old_format,
             directory=tempdir,
         )
 

@@ -12,7 +12,7 @@ from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 from ffm.data_acquisition import acquisition
 from ffm.data_management import filling_data_dicts
 from ffm.fault_plane import create_finite_fault
-from ffm.get_outputs import read_solution_static_format, synthetics_to_SAC
+from ffm.get_outputs import synthetics_to_SAC
 from ffm.input_files import (
     input_chen_imagery,
     input_chen_near_field,
@@ -30,6 +30,7 @@ from ffm.many_events import (
     get_segments_events,
     get_waveforms_events,
 )
+from ffm.model.result.solution import Solution
 from ffm.modelling_parameters import create_dataset_weights, modelling_prop
 from ffm.modify_jsons import modify_channels
 from ffm.modify_sacs import correct_waveforms, plot_channels
@@ -85,7 +86,7 @@ def _parse_imagery(value: str) -> Tuple[pathlib.Path, Optional[str]]:
     help=(
         "Acquire strong motion and teleseismic bodywave data.\n"
         "NOTICE: 'acquire' deprecated as of 1.2.0, use 'ffm get-data' or modules in ffm.acquisition. "
-        "To be removed after 2.0.0."
+        "To be removed in 2.1.0."
     )
 )
 def acquire(
@@ -611,7 +612,6 @@ def update_dataset_weights(
         typer.echo(f"  {dt:10s}: {w}")
 
 
-
 @app.command(help="Modify data in sac files")
 def modify_sacs(
     directory: pathlib.Path = typer.Argument(..., help="Path to the data directory"),
@@ -760,9 +760,9 @@ def static_to_srf(
             segments_data = json.load(s)
 
     # get the solution
-    solution = read_solution_static_format(
-        segments=segments_data["segments"], data_dir=directory
-    )
+    solution = Solution.from_static_solution_file(
+        segments_data=segments_data, solution_filepath=directory / "Solution.txt"
+    )._old_format
 
     # convert static to srf
     convert_static_to_srf(
@@ -840,9 +840,9 @@ def static_to_fsp(
             segments_data = json.load(s)
 
     # get the solution
-    solution = read_solution_static_format(
-        segments=segments_data["segments"], data_dir=directory
-    )
+    solution = Solution.from_static_solution_file(
+        segments_data=segments_data, solution_filepath=directory / "Solution.txt"
+    )._old_format
 
     # convert static to srf
     convert_static_to_fsp(

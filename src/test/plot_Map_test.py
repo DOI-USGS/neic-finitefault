@@ -5,9 +5,8 @@ import shutil
 import tempfile
 
 from ffm.fault_plane import point_sources_param
-from ffm.get_outputs import read_solution_static_format
 from ffm.plot_Map import PlotMap
-
+from ffm.model.result.solution import Solution
 from .testutils import (
     RESULTS_DIR,
     get_cgnss_json,
@@ -50,10 +49,9 @@ def testPlotMap():
             tensor,
             segments["rise_time"],
         )
-        solution = read_solution_static_format(
-            segments["segments"],
-            tempdir,
-        )
+        solution = Solution.from_static_solution_file(
+            segments_data=segments, solution_filepath=tempdir / "Solution.txt"
+        )._old_format
         PlotMap(
             tensor,
             segments["segments"],

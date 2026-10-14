@@ -11,6 +11,7 @@ import pathlib
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
+from deprecated import deprecated  # type: ignore [import-untyped]
 from obspy import Stream, Trace, read  # type: ignore
 
 import ffm.plane_management as pl_mng
@@ -21,6 +22,10 @@ from ffm import get_outputs
 ##########################
 
 
+@deprecated(
+    "read_solution_static_format deprecated and to be removed in 2.1.0. "
+    "Parsing functionality moved to ffm.model.result.solution."
+)
 def read_solution_static_format(
     segments: List[Dict[str, str]], data_dir: Union[str, pathlib.Path] = pathlib.Path()
 ) -> dict:
