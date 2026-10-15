@@ -20,6 +20,7 @@ default:
           source install.d/ff-env.sh "$(pwd)";
           conda activate ff-env;
       fi
+    - apt install -y gfortran
     # make clawpack installation
     - source install.d/clawpack.sh "$(pwd)" -y;
   cache:
@@ -87,6 +88,8 @@ Python Install:
 ## -------------------------------------
 
 Python Audit:
+  # remove when python version update MR is merged
+  allow_failure: true
   needs:
     - Python Install
   script:

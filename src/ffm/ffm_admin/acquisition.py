@@ -10,6 +10,7 @@ from ffm.acquisition.cmt import Cmt
 from ffm.acquisition.cwbquery import CwbQuery
 from ffm.acquisition.dartquery import DartQuery
 from ffm.acquisition.irisquery import IrisQuery
+from ffm.acquisition.topographyquery import TopographyQuery
 from ffm.data_processing import process_dart
 from ffm.ffm_admin.common_args import (
     DATA_DIRECTORY,
@@ -39,6 +40,33 @@ def cmt(
     cmt = Cmt.from_id(eventid=eventid, source=source, allow_unreviewed=allow_unreviewed)
     data_directory = validate_data_directory(data_directory)
     cmt.write(data_directory / f"{eventid}_cmt_CMT")
+
+
+@app.command(
+    help="Get topography data (https://topex.ucsd.edu/WWW_html/srtm30_plus.html)"
+)
+def topo(
+    north: float = typer.Argument(..., help="The north (maximum latitude) extent"),
+    south: float = typer.Argument(..., help="The north (minimum latitude) extent"),
+    east: float = typer.Argument(..., help="The east (maximum longitude) extent"),
+    west: float = typer.Argument(..., help="The west (minimum longitude) extent"),
+    format: str = typer.Option(
+        "geoclaw_ascii",
+        "-f",
+        "--format",
+        help="The data format to write (defaults to geoclaw ascii used in dart calculations)",
+    ),
+    data_directory: Optional[pathlib.Path] = DATA_DIRECTORY,
+):
+    """Get global topography and topography data"""
+    data_directory = validate_data_directory(data_directory, make_directory=True)
+    topography_query = TopographyQuery(
+        north=north,
+        south=south,
+        east=east,
+        west=west,
+    )
+    topography_query.get_data(directory=data_directory, format=format)
 
 
 @app.command(

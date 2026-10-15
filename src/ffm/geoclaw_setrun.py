@@ -9,6 +9,7 @@ that will be read in by the Fortran code.
 from __future__ import absolute_import, print_function
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 import json

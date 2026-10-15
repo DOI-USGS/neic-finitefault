@@ -1,4 +1,13 @@
+import shutil
+from tempfile import mkdtemp
+
 from dotenv import load_dotenv
+
+from ffm.acquisition.topographyquery import TopographyQuery
+from ffm.input_data.topographyesriascii import TopographyEsriAscii
+from ffm.input_data.topographynetcdf import TopographyNetCDF
+from ffm.input_data.topographyxyz import TopographyXYZ
+
 load_dotenv()
 
 import json
@@ -7,7 +16,7 @@ import pathlib
 import subprocess
 from os import chdir
 from shlex import split
-from shutil import copy
+from shutil import copy, rmtree
 from typing import List, Union
 
 import imageio
@@ -56,6 +65,8 @@ def make_DART_GFs_DS_SS(
     subfault_start: int = 0,
     time_domain: bool = False,
     plots: bool = False,
+    global_topography: str | pathlib.Path | None = os.getenv("GLOBAL_TOPOGRAPHY"),
+    local_topography: str | pathlib.Path | None = None,
 ):
     """
     Use subfault locations and DART location to make tsunami Green's functions
@@ -81,6 +92,10 @@ def make_DART_GFs_DS_SS(
     :param time_domain: Whether to save Green's functions in time domain, default is False
     :type time_domain: bool
     :param plots: Whether to save plot of subfault slip/rake and resulting seafloor deformation, default is False
+    :param global_topography: Path to a global topography file, Default is os.getenv("GLOBAL_TOPOGRAPHY")
+    :type global_topograph: str | pathlib.Path | None
+    :param local_topography: Path to a pre-trimmed topography file, Default is None
+    :type local_topography: str | pathlib.Path
     :type plots: bool
     """
 
@@ -121,7 +136,15 @@ def make_DART_GFs_DS_SS(
         "north": max_lat,
     }
     ### get topography for this region of interest ###
-    topo_path = make_topo(min_lon, max_lon, min_lat, max_lat, directory)
+    topo_path = make_topo(
+        min_lon,
+        max_lon,
+        min_lat,
+        max_lat,
+        directory,
+        global_topography=global_topography,
+        local_topography=local_topography,
+    )
     copy(topo_path, GF_directory)
 
     ##########################
@@ -554,7 +577,7 @@ def make_ffm_kinematic_dtopo(
 
                 num_subfaults += 1
                 max_stf = np.max([max_stf, t_rup + t_ris + t_fal])
-    ind_hyp = np.where(T_RUP == np.min(T_RUP))[0][0]
+    ind_hyp = np.where(T_RUP == np.min(T_RUP))[0][0]  # type: ignore [call-overload]
     print(f"{num_subfaults} total subfaults")
     max_stf = np.ceil(max_stf / 10) * 10  # round max_stf up to the nearest 10
     print(f"Max STF: {max_stf}")
@@ -719,6 +742,8 @@ def run_ffm_tsunami(
     tfinal: int = 10800,
     model_type: str = "kinematic",
     run_geoclaw: bool = True,
+    global_topography: str | pathlib.Path | None = os.getenv("GLOBAL_TOPOGRAPHY"),
+    local_topography: str | pathlib.Path | None = None,
 ):
     """
     Runs tsunami forward model calculation from FFM solution assuming kinematic seafloor deformation
@@ -733,6 +758,10 @@ def run_ffm_tsunami(
     :type model_type: str, optional
     :param run_geoclaw: Whether to run the model (otherwise, just make the input files), default is True
     :type run_geoclaw: bool, optional
+    :param global_topography: Path to a global topography file, Default is os.getenv("GLOBAL_TOPOGRAPHY")
+    :type global_topograph: str | pathlib.Path | None
+    :param local_topography: Path to a pre-trimmed topography file, Default is None
+    :type local_topography: str | pathlib.Path
     """
     # Set up directories to stay organized
     directory = pathlib.Path(directory).resolve()
@@ -787,7 +816,15 @@ def run_ffm_tsunami(
     else:
         raise ValueError("model_type must be either static or kinematic")
     dtopo_type = 1
-    topo_path = make_topo(min_lon, max_lon, min_lat, max_lat, directory)
+    topo_path = make_topo(
+        min_lon,
+        max_lon,
+        min_lat,
+        max_lat,
+        directory,
+        global_topography=global_topography,
+        local_topography=local_topography,
+    )
     copy(dtopo_fname, tsunami_output_directory)
     copy(topo_path, tsunami_output_directory)
     ##############################
@@ -1044,6 +1081,8 @@ def make_topo(
     south: float,
     north: float,
     directory: Union[pathlib.Path, str],
+    global_topography: str | pathlib.Path | None = os.getenv("GLOBAL_TOPOGRAPHY"),
+    local_topography: str | pathlib.Path | None = None,
 ):
     """
     Makes topo file for GeoClaw
@@ -1058,31 +1097,81 @@ def make_topo(
     :type north: float
     :param directory: directory where modeling is being performed
     :type directory: Union[pathlib.Path, str]
+    :param global_topography: Path to a global topography file, Default is os.getenv("GLOBAL_TOPOGRAPHY")
+    :type global_topograph: str | pathlib.Path | None
+    :param local_topography: Path to a pre-trimmed topography file, Default is None
+    :type local_topography: str | pathlib.Path
     :return: GeoClaw topo file in ESRI Arc/Info ASCII format
     :rtype: string
     """
     directory = pathlib.Path(directory)
-    topogrd = pathlib.Path(os.environ["CLAW"]) / "topo30.grd"
-    crop_grd = directory / "topo_crop.nc"
-    ei_topo_out = directory / "topo.txt"
-    ### Round boundaries to the nearest 10th of a degree
-    west = np.floor(west * 10) / 10.0
-    east = np.ceil(east * 10) / 10.0
-    south = np.floor(south * 10) / 10.0
-    north = np.ceil(north * 10) / 10.0
-    ### Use gmt grdcut to crop topo30.grd to region of interest
-    grdcut_command = (
-        f"gmt grdcut {topogrd} -G{crop_grd} -R{west}/{east}/{south}/{north}"
-    )
-    os.system(grdcut_command)
-    ### Use grdconvert to convert format from grd to ESRI Arc/Info ASCII Grid Interchange format
-    grdconvert_command = f"gmt grdconvert {crop_grd}=nf -G{ei_topo_out}=ei"
-    os.system(grdconvert_command)
-    ### Invert the columns of the header to have number before description
-    topo = topotools.Topography(ei_topo_out, topo_type=2)
-    topo_crop_out = directory / "topo.topo"
-    topo.write(topo_crop_out, no_data_value=-999999)
-    return topo_crop_out
+    topo_out = directory / "topo.topo"
+
+    # if neither local or global topography defined, then get the local topography dynamically
+    if global_topography is None and local_topography is None:
+        topography_query = TopographyQuery(
+            north=north, south=south, east=east, west=west
+        )
+        topography_query.get_data(directory=directory, format="geoclaw_ascii")
+        return topo_out
+
+    # if local topography specified, convert to geoclaw ascii if needed
+    if local_topography is not None:
+        local_topography = pathlib.Path(local_topography)
+        if not local_topography.exists():
+            raise FileNotFoundError(
+                f"Specified topography file {local_topography} does not exist."
+            )
+        topo: TopographyEsriAscii | TopographyNetCDF | TopographyXYZ
+        match local_topography.suffix:
+            case ".grd":
+                topo = TopographyNetCDF(local_topography)
+                topo.write_geoclaw_ascii(topo_out)
+            case ".nc":
+                topo = TopographyNetCDF(local_topography)
+                topo.write_geoclaw_ascii(topo_out)
+            case ".asc":
+                topo = TopographyEsriAscii(local_topography)
+                topo.write_geoclaw_ascii(topo_out)
+            case ".xyz":
+                topo = TopographyXYZ(local_topography)
+                topo.write_geoclaw_ascii(topo_out)
+            case ".topo":
+                shutil.copy(local_topography, topo_out)
+            case _:
+                raise ValueError(
+                    "Unsupported local topography type. Supported types are netCDF (.grd, .nc), Esri ASCII (.asc), or xyz (.xyz)"
+                )
+        return topo_out
+    else:
+        global_topography = pathlib.Path(global_topography)  # type: ignore [arg-type]
+        if not global_topography.exists():
+            raise FileNotFoundError(
+                f"Specified topography file {global_topography} does not exist."
+            )
+        if global_topography.suffix not in [".grd", ".nc"]:
+            raise ValueError(
+                "Global topography files are only accepted in grid/netcdf format"
+            )
+        try:
+            tempdir = pathlib.Path(mkdtemp())
+            temp_crop = tempdir / "temp_crop.nc"
+            ### Round boundaries to the nearest 10th of a degree
+            west = np.floor(west * 10) / 10.0
+            east = np.ceil(east * 10) / 10.0
+            south = np.floor(south * 10) / 10.0
+            north = np.ceil(north * 10) / 10.0
+
+            pygmt.grdcut(
+                global_topography,
+                outgrid=str(temp_crop),
+                region=[west, east, south, north],
+            )
+            topo = TopographyNetCDF(temp_crop)
+            topo.write_geoclaw_ascii(topo_out)
+        finally:
+            rmtree(tempdir)
+        return topo_out
 
 
 def dart_gf_time_freq_domain(

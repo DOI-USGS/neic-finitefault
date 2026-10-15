@@ -371,7 +371,7 @@ class DartQuery(BaseModel):
                         trace.times(reftime=UTCDateTime(self.event_time)) / (3600),
                         trace.data * 100.0,
                     )
-                    plt.xlim([-1, 7])
+                    plt.xlim((-1, 7))
                     plt.xlabel("Time After Origin (hrs)")
                     plt.ylabel("Tsunami Amplitude (cm)")
                     plt.savefig(directory / f"{station.id}_dart.png")

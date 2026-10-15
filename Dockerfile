@@ -43,4 +43,6 @@ ARG RUN_END_TO_END=False
 ENV CI_REGISTRY=$CI_REGISTRY
 ENV RUN_END_TO_END=$RUN_END_TO_END
 
+RUN conda activate ff-env && ffm get-data topo -20 -33.5 -70 -74.5 -d /neic-finitefault/clawpack/ -f netcdf
+ENV GLOBAL_TOPOGRAPHY=/neic-finitefault/clawpack/topo.nc
 CMD ["/bin/bash", "-i", "-c", "poe test"]

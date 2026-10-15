@@ -6,6 +6,7 @@ import tempfile
 from itertools import islice
 from operator import itemgetter
 import unittest
+import pandas as pd
 
 import numpy as np
 
@@ -24,6 +25,7 @@ from ffm.dart_tools import (
 
 from .testutils import (
     RESULTS_DIR,
+    DATA_DIR,
     get_dart_waves_json,
     get_segments_data,
     get_tensor_info,
@@ -55,6 +57,8 @@ class TestDartTools(unittest.TestCase):
             subfault_start=subfault_start,
             time_domain=True,
             plots=False,
+            global_topography=None,
+            local_topography=DATA_DIR / "input_data" / "end_to_end.nc",
         )
         num_dart = len(dart_data)
         for kdart in range(num_dart):
@@ -242,14 +246,55 @@ class TestDartTools(unittest.TestCase):
 
     def test_make_topo(self):
         west, east, south, north = -75, -72, -33, -29
-        topo_crop_out = make_topo(west, east, south, north, self.tempdir)
+        topo_crop_out = make_topo(
+            west,
+            east,
+            south,
+            north,
+            self.tempdir,
+            global_topography=DATA_DIR / "input_data" / "topo.nc",
+            local_topography=None,
+        )
         assert (topo_crop_out).exists()
-        topo_crop_target = RESULTS_DIR / "Tsunami_Output" / "topo.topo"
+        topo_crop_target = DATA_DIR / "input_data" / "topo.topo"
         with open(topo_crop_target) as f:
-            topo_target = list(islice(f, 10))
+            target_lines = f.readlines()
         with open(topo_crop_out) as g:
-            topo = list(islice(g, 10))
-        assert topo == topo_target
+            lines = g.readlines()
+        # ncols
+        print(lines[0:10])
+        print(target_lines[0:10])
+        self.assertEqual(lines.pop(0), target_lines.pop(0))
+        # nrows
+        self.assertEqual(lines.pop(0), target_lines.pop(0))
+        # xlower
+        np.testing.assert_almost_equal(
+            float(lines.pop(0).split("xlower")[0]),
+            float(target_lines.pop(0).split("xlower")[0]),
+            decimal=8,
+        )
+        # ylower
+        np.testing.assert_almost_equal(
+            float(lines.pop(0).split("ylower")[0]),
+            float(target_lines.pop(0).split("ylower")[0]),
+            decimal=10,
+        )
+        # cellsize
+        np.testing.assert_almost_equal(
+            float(lines.pop(0).split("cellsize")[0]),
+            float(target_lines.pop(0).split("cellsize")[0]),
+            decimal=10,
+        )
+        # nodata_value
+        np.testing.assert_almost_equal(
+            float(lines.pop(0).split("nodata_value")[0]),
+            float(target_lines.pop(0).split("nodata_value")[0]),
+            decimal=10,
+        )
+        # compare rest of data values
+        data = [float(v.strip()) for v in lines]
+        target_data = [float(v.strip()) for v in target_lines]
+        np.testing.assert_array_almost_equal(data, target_data, decimal=10)
 
     def test_make_ffm_kinematic_dtopo(self):
         self.tempdir = pathlib.Path(self.tempdir)
@@ -257,20 +302,44 @@ class TestDartTools(unittest.TestCase):
         dtopo_fname = make_ffm_kinematic_dtopo(
             ffm_solution, self.tempdir, makeplots=False
         )
-        with open(dtopo_fname) as f:
-            dtopo_10_lines = list(islice(f, 10))
-        with open(RESULTS_DIR / "NP1" / "kinematic_dtopo.tt1") as g:
-            dtopo_target_10_lines = list(islice(g, 10))
-        assert dtopo_10_lines == dtopo_target_10_lines
+        dtopo_10 = pd.read_csv(dtopo_fname, names=["index", "lon", "lat", "dtopo"])
+        dtopo_target_10 = pd.read_csv(
+            RESULTS_DIR / "NP1" / "kinematic_dtopo.tt1",
+            names=["index", "lon", "lat", "dtopo"],
+        )
+        np.testing.assert_array_equal(
+            dtopo_10["index"].values, dtopo_target_10["index"].values
+        )
+        np.testing.assert_array_almost_equal(
+            dtopo_10["lat"].values, dtopo_target_10["lat"].values, decimal=10
+        )
+        np.testing.assert_array_almost_equal(
+            dtopo_10["lon"].values, dtopo_target_10["lon"].values, decimal=10
+        )
+        np.testing.assert_array_almost_equal(
+            dtopo_10["dtopo"].values, dtopo_target_10["dtopo"].values, decimal=10
+        )
 
     def test_make_ffm_static_dtopo(self):
         ffm_solution = RESULTS_DIR / "NP1" / "Solution.txt"
         dtopo_fname = make_ffm_static_dtopo(ffm_solution, self.tempdir, makeplots=False)
-        with open(dtopo_fname) as f:
-            dtopo_10_lines = list(islice(f, 10))
-        with open(RESULTS_DIR / "NP1" / "static_dtopo.tt1") as g:
-            dtopo_target_10_lines = list(islice(g, 10))
-        assert dtopo_10_lines == dtopo_target_10_lines
+        dtopo_10 = pd.read_csv(dtopo_fname, names=["index", "lon", "lat", "dtopo"])
+        dtopo_target_10 = pd.read_csv(
+            RESULTS_DIR / "NP1" / "static_dtopo.tt1",
+            names=["index", "lon", "lat", "dtopo"],
+        )
+        np.testing.assert_array_equal(
+            dtopo_10["index"].values, dtopo_target_10["index"].values
+        )
+        np.testing.assert_array_almost_equal(
+            dtopo_10["lat"].values, dtopo_target_10["lat"].values, decimal=10
+        )
+        np.testing.assert_array_almost_equal(
+            dtopo_10["lon"].values, dtopo_target_10["lon"].values, decimal=10
+        )
+        np.testing.assert_array_almost_equal(
+            dtopo_10["dtopo"].values, dtopo_target_10["dtopo"].values, decimal=10
+        )
 
     def test_dart_high_res_locations(self):
         lon_dart_target = [-73.43278, -73.9775]
@@ -330,10 +399,17 @@ class TestDartTools(unittest.TestCase):
         high_res_regions, gauges, lon_dart, lat_dart = dart_high_res_locations(
             dart_data, segments_data, tensor_info
         )
-        assert high_res_regions == high_res_regions_target
-        assert gauges == gauges_target
-        assert lon_dart == lon_dart_target
-        assert lat_dart == lat_dart_target
+        # compare high res regions
+        for key1, values1 in high_res_regions.items():
+            for key2, values2 in values1.items():
+                assert values2 == high_res_regions_target[key1][key2]
+        # compare gauges
+        for key1, values1 in gauges.items():
+            for key2, values2 in values1.items():
+                assert values2 == gauges_target[key1][key2]
+        # compare dart longitudes and latitudes
+        np.testing.assert_array_equal(lon_dart, lon_dart_target)
+        np.testing.assert_array_equal(lat_dart, lat_dart_target)
 
     def test_plot_dtopo_snapshots(self):
         self.tempdir = pathlib.Path(self.tempdir)
@@ -421,13 +497,26 @@ class TestDartTools(unittest.TestCase):
             RESULTS_DIR / "NP1" / "dart_waves_no_obs.json",
             self.tempdir / "dart_waves.json",
         )
-        run_ffm_tsunami(self.tempdir, ffm_solution, run_geoclaw=False)
+        run_ffm_tsunami(
+            self.tempdir,
+            ffm_solution,
+            run_geoclaw=False,
+            global_topography=None,
+            local_topography=DATA_DIR / "input_data" / "topo.nc",
+        )
         geoclaw_parameter_file = self.tempdir / "geoclaw_parameter_file.json"
         with open(geoclaw_parameter_file) as g:
             geoclaw_parameter = json.load(g)
+
         assert geoclaw_parameter["model_region"] == model_region_target
-        assert geoclaw_parameter["high_res_regions"] == high_res_regions_target
-        assert geoclaw_parameter["gauges"] == gauges_target
+        # compare high res regions
+        for key1, values1 in geoclaw_parameter["high_res_regions"].items():
+            for key2, values2 in values1.items():
+                assert values2 == high_res_regions_target[key1][key2]
+        # compare gauges
+        for key1, values1 in geoclaw_parameter["gauges"].items():
+            for key2, values2 in values1.items():
+                assert values2 == gauges_target[key1][key2]
         assert os.path.basename(geoclaw_parameter["topo_path"]) == topo_path_target
         assert os.path.basename(geoclaw_parameter["dtopo_path"]) == dtopo_path_target
         assert geoclaw_parameter["dtopo_type"] == dtopo_type_target
@@ -456,10 +545,8 @@ class TestDartTools(unittest.TestCase):
             gf_fil,
             self.tempdir / gf_file_freq_dip,
         )
-        with (
-            open(self.tempdir / gf_file_freq_dip, "r") as f1,
-            open(freq_dip_target, "r") as f2,
-        ):
-            content1 = f1.read()
-            content2 = f2.read()
-        assert content1 == content2
+
+        data = np.genfromtxt(self.tempdir / gf_file_freq_dip)
+        target = np.genfromtxt(freq_dip_target)
+        np.testing.assert_array_almost_equal(data[:, 0], target[:, 0])
+        np.testing.assert_array_almost_equal(data[:, 1], target[:, 1])

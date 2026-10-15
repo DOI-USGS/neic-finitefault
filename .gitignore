@@ -31,6 +31,15 @@ gf_static_f95
 green_bank_openmp_f95
 config.ini
 
+# installation files
+CWBQuery
+clawpack
+.env
+*.log
+
+
+
+
 # tutorial
 examples/*
 examples/.ipynb_checkpoints
