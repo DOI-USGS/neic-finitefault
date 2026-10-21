@@ -43,13 +43,14 @@ def cmt(
 
 
 @app.command(
-    help="Get topography data (https://topex.ucsd.edu/WWW_html/srtm30_plus.html)"
+    context_settings={"ignore_unknown_options": True},
+    help="Get topography data (https://topex.ucsd.edu/WWW_html/srtm30_plus.html)",
 )
 def topo(
-    north: float = typer.Argument(..., help="The north (maximum latitude) extent"),
-    south: float = typer.Argument(..., help="The north (minimum latitude) extent"),
-    east: float = typer.Argument(..., help="The east (maximum longitude) extent"),
     west: float = typer.Argument(..., help="The west (minimum longitude) extent"),
+    east: float = typer.Argument(..., help="The east (maximum longitude) extent"),
+    south: float = typer.Argument(..., help="The south (minimum latitude) extent"),
+    north: float = typer.Argument(..., help="The north (maximum latitude) extent"),
     format: str = typer.Option(
         "geoclaw_ascii",
         "-f",

@@ -15,10 +15,10 @@ class TopographyQuery(BaseModel):
     Class to query for bathymetry data
     """
 
-    north: float = Field(..., description="The north (maximum latitude) extent")
-    south: float = Field(..., description="The north (minimum latitude) extent")
-    east: float = Field(..., description="The east (maximum longitude) extent")
     west: float = Field(..., description="The west (minimum longitude) extent")
+    east: float = Field(..., description="The east (maximum longitude) extent")
+    south: float = Field(..., description="The south (minimum latitude) extent")
+    north: float = Field(..., description="The north (maximum latitude) extent")
 
     def get_data(
         self,
@@ -33,6 +33,19 @@ class TopographyQuery(BaseModel):
             "west": self.west,
             "east": self.east,
         }
+        print(params)
+
+        # check that lon/lat extent is reasonable
+        if not (-90 <= params["north"] <= 90 and -90 <= params["south"] <= 90):
+            raise ValueError("Latitude values must be between -90 and 90")
+        if not (-180 <= params["west"] <= 360 and -180 <= params["east"] <= 360):
+            raise ValueError(
+                "Longitude values must be between 0 and 360 or -180 to 180"
+            )
+        if params["south"] > params["north"]:
+            raise ValueError("South latitude must be lower than North latitude")
+        if params["west"] > params["east"]:
+            raise ValueError("West longitude must be lower than East longitude")
 
         response = requests.post(url, data=params)
         response.raise_for_status()
