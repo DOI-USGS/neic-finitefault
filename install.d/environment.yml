@@ -26,6 +26,7 @@ dependencies:
   - shapely
   - tornado>=6.5.8
   - typer
+  - xarray
   - pip:
       - pyrocko
       - poethepoet

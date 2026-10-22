@@ -16,6 +16,8 @@ function usage {
     echo "  CLAW_DIR string  the directory where clawpack will be installed"
     echo "                   (example: /home/user)"
     echo "  --yes install without prompt"
+    echo "  --t, --topo           downlaod the full global topography file"
+    echo "                          (local topography can be queried for dynamically using 'ffm get-data topo')"
    }
 
 
@@ -27,21 +29,34 @@ bathymetry_download () {
         echo -e "\nCopying TOPO30 (Becker et al., 2009)"; 
         curl -o "${TOPO_FILE}" -L "https://topex.ucsd.edu/pub/srtm30_plus/topo30/topo30.grd";
     fi
+
+    echo GLOBAL_TOPOGRAPHY=${TOPO_FILE} >> ${CLAW_DIR}/.env
 }
 
 clawpack_install () {
-    echo -e "\nInstalling Clawpack";
-    git clone https://github.com/clawpack/clawpack.git "${CLAW_DIR}/clawpack";
-    cd "${CLAW_DIR}/clawpack";
-    git checkout v5.14.0;
-    git submodule init;
-    git submodule update;
+    # activate ff-env
+    
+    system="$(uname)"
+    if [ "$system" == 'Linux' ]; then
+        source ~/.bashrc
+    elif [ "$system" == 'FreeBSD' ] || [ "$system" == 'Darwin' ]; then
+        source ~/.bash_profile
+    fi
 
-    cd "${OLDPWD}";
+    status=0
+    conda activate ff-env || status=$?
+    if [ "$status" -eq "1" ]; then
+        echo "Activating the ff-env conda environment failed."
+        echo "Ensure that it has been created and conda init has run."
+        exit 1;
+    fi
+    
+    conda install -y meson-python;
+    echo "Installing Clawpack";
+    pip install --src="${CLAW_DIR}" --user --no-build-isolation -e \
+        git+https://github.com/clawpack/clawpack.git@v5.14.0#egg=clawpack
+
     clawpack_profile;
-
-    # topo/bathy data
-    bathymetry_download;
 }
 
 
@@ -63,27 +78,30 @@ clawpack_profile () {
         OMP_NUM_THREADS=1
     fi
 
-    cat << EOF > .env
+    cat << EOF > ${CLAW_DIR}/.env
 CLAW=${CLAW_DIR}/clawpack
 OMP_NUM_THREADS=${OMP_NUM_THREADS}
-PYTHONPATH=${CLAW_DIR}/clawpack:${PYTHONPATH}
+PYTHONPATH=${CLAW_DIR}/clawpack:\${PYTHONPATH}
 FC=gfortran
 EOF
 }
 
 
 clawpack_feedback () {
-  while IFS= read -n1 -r -p "Do you want to install Clawpack? Required for DART observations. [y/n] " && [[ $REPLY != d ]]; do
+  while IFS= read -n1 -r -p "Do you want to install Clawpack and/or install global topography? Required for DART observations. [c: clawpack, t: global topography, b: both clawpack and global topography, n: no install] " && [[ $REPLY != d ]]; do
   case $REPLY in
-    y) clawpack_install && break;;
+    c) clawpack_install && break;;
+    t) bathymetry_download && break;;
+    b) clawpack_install && bathymetry_download && break;;
     n) echo -e "\nSkipping Clawpack installation.\n" && break;;
-    *) echo -e "\nInvalid input (valid choices: y, n)\n";;
+    *) echo -e "\nInvalid input (valid choices: c, t, b, n)\n";;
   esac
   done
 }
 
 
 ## parse arguments
+TOPO=1
 SILENT=1
 REQUIRED_ARGS=()
 while [[ $# -gt 0 ]]; do
@@ -91,6 +109,10 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         -y|--yes)
             SILENT=0
+            shift
+            ;;
+        -t|--topo)
+            TOPO=0
             shift
             ;;
         -h|--help)
@@ -119,12 +141,11 @@ then
 fi
 
 echo -e "\nChecking for existing Clawpack installation";
-if [ -d "${CLAW_DIR}/clawpack" ]; then
-  echo "Clawpack found";
-  bathymetry_download;
-  clawpack_profile;
-elif (( SILENT == 0 )); then
+if (( SILENT == 0 )); then
   clawpack_install;
+  if (( TOPO == 0 )); then
+    bathymetry_download
+  fi
 else
   echo "Clawpack installation not found";
   clawpack_feedback;

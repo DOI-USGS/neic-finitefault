@@ -2611,7 +2611,7 @@ def plot_moment_rate_function(
             for t, val in zip(time, mr):  # type: ignore
                 outf.write("{:8.2f}\t\t{:8.4e}\n".format(t, val))
 
-        seismic_moment = np.trapz(mr, dx=0.01)
+        seismic_moment = np.trapz(mr, dx=0.01)  # type: ignore [assignment]
         magnitude = 2.0 * (np.log10(seismic_moment * 10**7) - 16.1) / 3.0
         rel_mr = mr / (max(mr))
         plt.text(
