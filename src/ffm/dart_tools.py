@@ -113,7 +113,6 @@ def make_DART_GFs_DS_SS(
     ### NUMBER OF OUTPUT TIMES ###
     ##############################
     num_output_times = 0  ### Just making GFs at DART stations, so don't need any general tsunami output
-    clines_zeta = [1, 3, 5, 7, 10, 15, 20, 25, 30, 50]  # max amplitude for plot, in m
 
     ### Find DART locations and create "gauge" and "high_res_region" dicts
     high_res_regions, gauges, lon_dart, lat_dart = dart_high_res_locations(
@@ -216,7 +215,7 @@ def make_DART_GFs_DS_SS(
                 x, y = fault.create_dtopo_xy(dx=source_dx, buffer_size=1.5)
                 gf_dtopo = fault.create_dtopography(x, y, times=[1.0])
                 dtopo_fname = f"{GF_directory}/{str(subf).rjust(4, '0')}_{gf_type[rake_direction]}.tt1"
-                gf_dtopo.write(dtopo_fname, dtopo_type=1)
+                gf_dtopo.write(dtopo_fname, dtopo_type=1, dZ_format="%.6f")
 
                 if plots == True:
                     # Quick GeoClaw plot of seafloor deformation
@@ -240,7 +239,6 @@ def make_DART_GFs_DS_SS(
                     "tfinal": tfinal,
                     "num_output_times": num_output_times,
                     "wave_tolerance": 1.0e-5,
-                    "clines_zeta": clines_zeta,
                 }
                 with open(geoclaw_parameter_file, "w") as fout:
                     json_dumps_str = json.dumps(setrun_parameter, indent=4)
@@ -805,7 +803,6 @@ def run_ffm_tsunami(
         "south": min_lat,
         "north": max_lat,
     }
-    clines_zeta = [1, 3, 5, 7, 10, 15, 20, 25, 30, 50]  # max amplitude for plot, in m
     ##################
     ### TOPO/DTOPO ###
     ##################
@@ -847,7 +844,6 @@ def run_ffm_tsunami(
         "tfinal": tfinal,
         "num_output_times": num_output_times,
         "wave_tolerance": 1.0e-4,
-        "clines_zeta": clines_zeta,
     }
     with open(geoclaw_parameter_file, "w") as fout:
         json_dumps_str = json.dumps(setrun_parameter, indent=4)
@@ -980,7 +976,7 @@ def make_ffm_static_dtopo(
     x, y = fault.create_dtopo_xy(dx=source_dx, buffer_size=3)
     fault.create_dtopography(x, y, times=[1.0])
     dtopo = fault.dtopo
-    dtopo.write(dtopo_fname, dtopo_type=1)
+    dtopo.write(dtopo_fname, dtopo_type=1, dZ_format="%.6f")
 
     event_Mw = (2.0 / 3) * (np.log10(event_m0 * 1e-7) - 9.1)
     print(f"Event Mw: {event_Mw}")
