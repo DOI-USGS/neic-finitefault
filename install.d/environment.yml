@@ -6,6 +6,7 @@ dependencies:
   - black
   - cutde
   - cartopy
+  - deprecated
   - filelock
   - imageio
   - isort

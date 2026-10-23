@@ -1,26 +1,28 @@
 # Change Log
 
 - [Change Log](#change-log)
-- [1.X.X](#1xx)
-  - [Changed](#changed)
-  - [Removed](#removed)
+- [1.3.0](#130)
+- [1.2.0](#120)
 - [1.1.0](#110)
   - [Added](#added)
-  - [Changed](#changed-1)
-  - [Fixed](#fixed)
-  - [Removed](#removed-1)
 - [1.0.0 ](#100-)
-  - [Added](#added-1)
-  - [Changed](#changed-2)
-  - [Fixed](#fixed-1)
-  - [Removed](#removed-2)
 - [0.1.0 (Provisional Release)](#010-provisional-release)
-  - [Added](#added-2)
-  - [Changed](#changed-3)
 
-# 1.X.X
+# 1.3.0
 
 ## Added
+
+- Add Solution class to handle managing model solutions and file formats.
+- Added deprecated as dependency to manage deprecated functions.
+
+## Changed
+
+- Deprecated ffm.read_solution_static_format to be removed in 2.1.0.
+
+# 1.2.0
+
+## Added
+
 - Native macOS (arm64) build support for the fortran code: the 13 GB static
   `green_bank` array in `retrieve_surf_gf.f95` is now allocatable (required
   because ARM64 static addressing is limited to +/-4 GB and gcc has no large
@@ -32,6 +34,7 @@
   is also initialized for zsh (the macOS default shell), and `ffm.sh` checks
   that `make`/`cpp`/`gfortran` are available before compiling, with Xcode
   Command Line Tools and Homebrew hints on macOS.
+- Strong motion data acquisition added to the command line interface.
 
 ## Changed
 
@@ -43,8 +46,10 @@
   `testutils.py`, temporary directories are resolved (macOS `/var` symlink),
   and annealing `Solution.txt` outputs are compared by structure, geometry,
   and total moment magnitude rather than byte equality.
+- Deprecated ffm.acquisition to be removed in 2.1.0
 
 ## Fixed
+
 - `fortran_code/src_dc_f95` no longer tracks both `bessel.f` and `bessel.F`,
   which are the same path on case-insensitive filesystems (macOS, Windows) and
   made every checkout permanently dirty there. `bessel.f` is a build artifact
