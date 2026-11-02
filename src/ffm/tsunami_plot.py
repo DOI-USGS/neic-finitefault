@@ -5,11 +5,6 @@ This module is imported by the plotting routines and then the
 function setplot is called to set the plot parameters.
 
 """
-
-from dotenv import load_dotenv
-
-load_dotenv()
-
 import json
 import os
 

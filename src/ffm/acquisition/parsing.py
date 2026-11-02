@@ -9,8 +9,6 @@ from typing import List, Union
 import numpy as np
 import pandas as pd  # type: ignore [import-untyped]
 import pygmt
-from geoclaw.src.python.geoclaw import topotools
-from pyclaw.src.pyclaw.fileio import netcdf
 
 from ffm.data_types.dartdata import GeoNetDart, NoaaDart
 from ffm.data_types.dartstation import DartStation, GeoNetDartStation, NoaaDartStation

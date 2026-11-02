@@ -1,14 +1,10 @@
 import shutil
 from tempfile import mkdtemp
 
-from dotenv import load_dotenv
-
 from ffm.acquisition.topographyquery import TopographyQuery
 from ffm.input_data.topographyesriascii import TopographyEsriAscii
 from ffm.input_data.topographynetcdf import TopographyNetCDF
 from ffm.input_data.topographyxyz import TopographyXYZ
-
-load_dotenv()
 
 import json
 import os
@@ -25,8 +21,6 @@ import numpy as np
 import pandas as pd  # type: ignore
 import pygmt  # type: ignore
 from alive_progress import alive_bar
-from clawpack.geoclaw import dtopotools  # type: ignore
-from clawpack.geoclaw import topotools  # type: ignore
 from obspy import UTCDateTime  # type: ignore
 from obspy.core import utcdatetime  # type: ignore
 from obspy.core.stream import Stream  # type: ignore
@@ -37,8 +31,6 @@ import ffm.fault_plane as pf
 import ffm.management as mng
 from ffm.data_management import _dict_trace
 from ffm.read_config import PROJECT_DIRECTORY
-
-load_dotenv()
 
 
 class EmptyDataError(Exception):
@@ -98,6 +90,7 @@ def make_DART_GFs_DS_SS(
     :type local_topography: str | pathlib.Path
     :type plots: bool
     """
+    from clawpack.geoclaw import dtopotools  # type: ignore
 
     print("Computing DART GFs. This will take a while.")
     #####################
@@ -509,6 +502,8 @@ def make_ffm_kinematic_dtopo(
     :return: the filename for the kinamtic dtopo
     :rtype: Union[pathlib.Path, str]
     """
+    from clawpack.geoclaw import dtopotools  # type: ignore
+
     directory = pathlib.Path(directory)
     fault = dtopotools.Fault()
     fault.rupture_type = "kinematic"
@@ -915,6 +910,7 @@ def make_ffm_static_dtopo(
     :return: Filename where dtopo is saved.
     :rtype: str
     """
+    from clawpack.geoclaw import dtopotools  # type: ignore
 
     directory = pathlib.Path(directory)
     dtopo_fname = directory / "static_dtopo.tt1"

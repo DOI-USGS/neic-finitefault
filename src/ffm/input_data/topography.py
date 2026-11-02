@@ -5,7 +5,6 @@ from tempfile import mkdtemp
 import numpy as np
 import pandas as pd
 import pygmt
-from geoclaw.src.python.geoclaw import topotools
 
 
 class Topography:
@@ -113,6 +112,7 @@ class Topography:
         :param outfile: Path where the file format will be written
         :type outfile: pathlib.Path | str
         """
+        from geoclaw.src.python.geoclaw import topotools
         outfile = pathlib.Path(outfile)
         try:
             tempdir = pathlib.Path(mkdtemp())
