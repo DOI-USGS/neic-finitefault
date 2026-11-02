@@ -17,6 +17,7 @@ from multiprocessing import Pool
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
+import pandas as pd
 from obspy import read  # type: ignore [import-untyped]
 from obspy.core.utcdatetime import UTCDateTime  # type: ignore [import-untyped]
 from obspy.geodetics import (  # type: ignore [import-untyped]
@@ -1655,13 +1656,15 @@ def process_dart(
         peak_idx = find_peaks(data.height, prominence=1)[0]
         for idx in range(len(peak_idx)):
             data.height[peak_idx[idx]] = np.nan
-
     # create interpolation function
-    interpolation_function = interp1d(time, data.height, "cubic")
-    model_in = interpolation_function(interpolation_times)
+    model_df = pd.DataFrame({"height": data.height}, index=time)
+    combined_index = model_df.index.union(interpolation_times)
+    model_df_reindexed = model_df.reindex(combined_index)
+    interpolated_df = model_df_reindexed["height"].interpolate(method="cubic")
+    model_in = interpolated_df.loc[interpolation_times]
+
     model_in = model_in - np.mean(model_in[2:])
     fcorner2 = [1.0 / (frequency_corners[1] * dt), 1.0 / (frequency_corners[0] * dt)]
-
     # bandpass filter the data
     filtered_data = filter.bandpass(
         model_in,
@@ -1671,7 +1674,6 @@ def process_dart(
         corners=2,
         zerophase=True,
     )
-
     # set time as relative to first timestamp
     data.interpolated_time = interpolation_times
     data.interpolated_height = filtered_data
