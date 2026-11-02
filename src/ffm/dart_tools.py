@@ -1,18 +1,12 @@
-import shutil
-from tempfile import mkdtemp
-
-from ffm.acquisition.topographyquery import TopographyQuery
-from ffm.input_data.topographyesriascii import TopographyEsriAscii
-from ffm.input_data.topographynetcdf import TopographyNetCDF
-from ffm.input_data.topographyxyz import TopographyXYZ
-
 import json
 import os
 import pathlib
+import shutil
 import subprocess
 from os import chdir
 from shlex import split
 from shutil import copy, rmtree
+from tempfile import mkdtemp
 from typing import List, Union
 
 import imageio
@@ -21,6 +15,7 @@ import numpy as np
 import pandas as pd  # type: ignore
 import pygmt  # type: ignore
 from alive_progress import alive_bar
+from dotenv import load_dotenv
 from obspy import UTCDateTime  # type: ignore
 from obspy.core import utcdatetime  # type: ignore
 from obspy.core.stream import Stream  # type: ignore
@@ -29,8 +24,14 @@ from obspy.signal import filter  # type: ignore
 
 import ffm.fault_plane as pf
 import ffm.management as mng
+from ffm.acquisition.topographyquery import TopographyQuery
 from ffm.data_management import _dict_trace
+from ffm.input_data.topographyesriascii import TopographyEsriAscii
+from ffm.input_data.topographynetcdf import TopographyNetCDF
+from ffm.input_data.topographyxyz import TopographyXYZ
 from ffm.read_config import PROJECT_DIRECTORY
+
+load_dotenv()
 
 
 class EmptyDataError(Exception):
