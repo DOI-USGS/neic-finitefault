@@ -24,15 +24,14 @@ RUN chown usgs-user /neic-finitefault
 
 USER usgs-user
 WORKDIR /neic-finitefault
-RUN ls
-RUN bash install.sh /neic-finitefault
-RUN bash install.d/clawpack.sh /neic-finitefault --yes
 SHELL ["/bin/bash", "-i", "-c"]
+RUN bash install.sh /neic-finitefault
 RUN echo ". ${HOME}/miniforge/etc/profile.d/conda.sh" >> "${HOME}/.bashrc"
 RUN echo "conda activate ff-env" >> "${HOME}/.bashrc"
 RUN echo "source ${HOME}/.bashrc" >> "${HOME}/.bash_profile"
 ENV PATH="${HOME}/miniforge/bin:$PATH"
 ENV PATH="${HOME}/miniforge/envs/ff-env/bin:$PATH"
+RUN bash install.d/clawpack.sh /neic-finitefault --yes
 RUN conda activate ff-env && pip install -e .
 
 
