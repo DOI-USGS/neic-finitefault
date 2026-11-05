@@ -4,6 +4,14 @@ ARG FROM_IMAGE=code.usgs.gov:5001/devops/images/usgs/ubuntu
 FROM ${FROM_IMAGE} AS packages
 USER root
 
+## Add deprecation warning
+RUN echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+RUN echo "The Dockerfile was a temporary stop gap until Mac compatible Fortran compiling was achieved."
+RUN echo "As of !214, the Fortran code is now Mac compatible."
+RUN echo "The Dockerfile is deprecated and no longer supported as of version 2.0.0 and will be removed after version 2.1.0."
+RUN echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+RUN sleep 5;
+
 RUN mkdir /neic-finitefault
 WORKDIR /neic-finitefault
 COPY install.d /neic-finitefault/install.d
