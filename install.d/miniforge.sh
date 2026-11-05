@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 # ==============================================================================
 # Define usage
 #     Install miniforge (if needed)

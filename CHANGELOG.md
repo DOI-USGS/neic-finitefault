@@ -17,6 +17,9 @@
 - Integration with GeoClaw module of Clawpack for DART data integration.
   Optional clawpack installation added to install.sh.
 
+## Deprecated
+- The Dockerfile was a temporary stop gap until Mac compatible Fortran compiling was achieved. As of !214, the Fortran code is now Mac compatible. The Dockerfile is deprecated and no longer supported as of version 2.0.0 and will be removed after version 2.1.0.
+
 # 1.3.0
 
 ## Added

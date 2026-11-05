@@ -95,6 +95,10 @@ Tests and linting can both be run locally:
 
 
 # Using the Docker Image
+> [!IMPORTANT]  
+> The Dockerfile was a temporary stop gap until Mac compatible 
+> Fortran compiling was achieved. As of !214, the Fortran code is now Mac compatible. The Dockerfile is deprecated and no longer supported as of version 2.0.0 and will be removed after version 2.1.0. 
+
 This repository provides a Dockerfile to locally build a docker image for the dependencies and source code. Below are some creating and using the image. See the [Dockerfile](./Dockerfile) for the build steps/configuration.
 
 > While these commands listed are docker commands. The commands should be 1 to 1 with Podman commands. Replace the word "docker" in the command with "podman".

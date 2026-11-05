@@ -42,19 +42,10 @@ clawpack_install () {
     elif [ "$system" == 'FreeBSD' ] || [ "$system" == 'Darwin' ]; then
         source ~/.bash_profile
     fi
-
-    status=0
-    conda activate ff-env || status=$?
-    if [ "$status" -eq "1" ]; then
-        echo "Activating the ff-env conda environment failed."
-        echo "Ensure that it has been created and conda init has run."
-        exit 1;
-    fi
     
     conda install -y meson-python;
     echo "Installing Clawpack";
-    pip install --src="${CLAW_DIR}" --user --no-build-isolation -e \
-        git+https://github.com/clawpack/clawpack.git@v5.14.0#egg=clawpack
+    pip install --src=$HOME/clawpack_src --user --no-build-isolation -e git+https://github.com/clawpack/clawpack.git@v5.14.0#egg=clawpack;
 
     clawpack_profile;
 }
