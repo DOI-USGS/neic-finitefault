@@ -8,12 +8,14 @@ from typing import Any, List
 
 import typer
 
+from ffm.dart_tools import make_DART_GFs_DS_SS
 from ffm.data_processing import (
     select_process_cgnss,
     select_process_strong,
     select_process_surf_tele,
     select_process_tele_body,
 )
+from ffm.fault_plane import point_sources_param
 from ffm.green_functions import fk_green_fun1, gf_retrieve
 from ffm.input_files import write_green_file
 from ffm.management import default_dirs
@@ -121,6 +123,79 @@ def greens(
             )
         p1.wait()
     gf_retrieve(chosen_data_types, default_directories, directory=directory)
+
+
+@app.command(help="Calculate DART Green's functions")
+def tsunami_greens(
+    directory: pathlib.Path = typer.Argument(
+        ..., help="Path to the modelling directory"
+    ),
+    dt: float = typer.Option(
+        60.0,
+        "-dt",
+        "--sampling_rate",
+        help="Desired sampling rate, in seconds",
+    ),
+    tfinal: int = typer.Option(
+        10800,
+        "-t",
+        "--t_final",
+        help="Runtime of tsunami model, in seconds",
+    ),
+    fcorner: List[float] = typer.Option(
+        [5, 120],
+        "-f",
+        "--frequency_bandpass",
+        help="Corner frequencies for bandpass filter, in seconds, default is 5 to 120 s",
+    ),
+    buffer_dist: float = typer.Option(
+        0.5,
+        "-b",
+        "--buffer",
+        help="Extra distance around the min/max subfault-to-DART-station region. The default is 0.5 degrees. Large subfaults (~20km+)  may need a larger buffer to avoid edge effects.",
+    ),
+    subfault_start: int = typer.Option(
+        0,
+        "-ss",
+        "--subfault_start",
+        help="Begin calculation at this subfault number (for use if previous run failed midway)",
+    ),
+    time_domain: bool = typer.Option(
+        False,
+        "-time",
+        "--save-time-domain",
+        help="Whether to save Green's functions in time domain, default is False",
+    ),
+    plots: bool = typer.Option(
+        False,
+        "-p",
+        "--plots",
+        help="Whether to save plots of subfault slip/rake and seafloor deformation, default is False",
+    ),
+):
+    tensor_file = directory / "tensor_info.json"
+    with open(tensor_file) as t:
+        tensor_info = json.load(t)
+    segments_file = directory / "segments_data.json"
+    with open(segments_file) as s:
+        segments_data = json.load(s)
+    dart_file = directory / "dart_waves.json"
+    with open(dart_file) as d:
+        dart_data = json.load(d)
+
+    make_DART_GFs_DS_SS(
+        directory,
+        tensor_info,
+        segments_data,
+        dart_data,
+        dt=dt,
+        tfinal=tfinal,
+        fcorner=fcorner,
+        buffer_dist=buffer_dist,
+        subfault_start=subfault_start,
+        time_domain=time_domain,
+        plots=plots,
+    )
 
 
 @app.command(help="Base data processing routine")

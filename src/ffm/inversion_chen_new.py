@@ -30,6 +30,7 @@ import ffm.seismic_tensor as tensor
 import ffm.traces_properties as tp
 import ffm.velocity_models as mv
 from ffm import get_outputs, input_files
+from ffm.dart_tools import make_DART_GFs_DS_SS
 from ffm.load_ffm_model import load_ffm_model
 from ffm.model.result.solution import Solution
 from ffm.static2fsp import static_to_fsp
@@ -72,7 +73,7 @@ def automatic_usgs(
         "automatic_ffm", os.path.join(directory, "logs", "automatic_ffm.log")
     )
     logger = ml.add_console_handler(logger)
-    logger.info("Starting fff program")
+    logger.info("Starting ffm program")
     time0 = time.time()
     if "gnss" in data_type:
         if os.path.isfile(os.path.join(directory, "data", "gnss_data")):
@@ -231,6 +232,8 @@ def automatic_usgs(
     logger.info("Time spent: {}".format(time.time() - time0))
     ml.close_log(logger)
     ### Make NP1 plots ###
+    if "dart" in data_type:
+        data_type = _remove_dart_from_auto(data_type)
     logger.info("Plot data in folder {}/NP1".format(directory))
     with open(directory / "NP1/segments_data.json") as s:
         segments_data = json.load(s)
@@ -336,6 +339,14 @@ def _automatic2(
     mp.modelling_prop(
         tensor_info, segments_data, data_type=data_type, directory=directory
     )
+    ####################################################
+    ### Calculate DART GFs if DART in auto inversion ###
+    ####################################################
+    if "dart" in data_type:
+        data_type = _remove_dart_from_auto(data_type)
+    if data_type == []:
+        print("No data types left")
+        return
     #
     # write text files from JSONs
     #
@@ -364,6 +375,24 @@ def _automatic2(
         solution._old_format,
         directory=directory,
     )
+
+
+def _remove_dart_from_auto(
+    used_data: List[str],
+) -> List[str]:
+    """
+    If dart data in auto_model, remove and supply instructions for including dart in later manual model
+    :param used_data: The data types included
+    :type used_data: List[str]
+    :return: The updated data types list
+    :rtype: List[str]
+    """
+    new_used_data = used_data.copy()
+    new_used_data.remove("dart")
+    print(
+        "Calculating DART GFs for both nodal planes is time intensive and unnecessary. WISP is removing the DART data from this auto_model run. When you have selected the proper nodal plane (NP1 or NP2), calculate the DART GFs using `ffm process tsunami-greens` and model with `ffm model run manual_model`."
+    )
+    return new_used_data
 
 
 def _check_surf_GF(
@@ -493,6 +522,10 @@ def modelling_new_data(
                 stdout=out_gf_strong,
             )
         p2.wait()
+    if "dart" in data_type:
+        with open(directory / "dart_waves.json") as t:
+            dart_data = json.load(t)
+        make_DART_GFs_DS_SS(directory, tensor_info, segments_data, dart_data)
     data_type2: list = []
     if os.path.isfile(directory / "tele_waves.json"):
         data_type2 = data_type2 + ["body"]
@@ -622,6 +655,8 @@ def forward_modelling(
     #
     # Get input model
     #
+    if option == None:
+        option = "Solution.txt"
     model = load_ffm_model(
         segments_data,
         point_sources,
@@ -805,8 +840,6 @@ def set_directory_structure(
         os.path.join("data", "SH"),
         os.path.join("data", "RAYLEIGH"),
         os.path.join("data", "LOVE"),
-        os.path.join("data", "final"),
-        os.path.join("data", "final_r"),
         "NP1",
         os.path.join("NP1", "logs"),
         os.path.join("NP1", "plots"),
@@ -859,14 +892,14 @@ def processing(
         + glob.glob(os.path.join(directory, "*_BH*sac"))
     )
     strong_files = (
-        glob.glob(os.path.join(directory, "*.HN*SAC*"))
-        + glob.glob(os.path.join(directory, "*.HL*SAC*"))
-        + glob.glob(os.path.join(directory, "*.HN*sac*"))
-        + glob.glob(os.path.join(directory, "*.HL*sac*"))
-        + glob.glob(os.path.join(directory, "*.AH?.*"))
-        + glob.glob(os.path.join(directory, "*_HN*sac*"))
-        + glob.glob(os.path.join(directory, "*_HL*sac*"))
-        + glob.glob(os.path.join(directory, "*HG*sac*"))
+        glob.glob(os.path.join(directory, "*.HN?.SAC"))
+        + glob.glob(os.path.join(directory, "*.HL?.SAC"))
+        + glob.glob(os.path.join(directory, "*.HN?.sac"))
+        + glob.glob(os.path.join(directory, "*.HL?.sac*"))
+        + glob.glob(os.path.join(directory, "*.AH?.sac"))
+        + glob.glob(os.path.join(directory, "*.HN?.sac"))
+        + glob.glob(os.path.join(directory, "*.HL?.sac"))
+        + glob.glob(os.path.join(directory, "*.HG?.sac"))
     )
     cgnss_files = glob.glob(os.path.join(directory, "*L[HXY][ENZ].sac")) + glob.glob(
         os.path.join(directory, "*L[HXY][ENZ].SAC")
@@ -917,6 +950,9 @@ def processing(
             data_type = __update_types(data_type, types_to_remove=["cgnss"])
         else:
             raise Exception("No cgnss data files found")
+    if "dart" in data_type:
+        dart_files = glob.glob(os.path.join(directory, "*dart.sac"))
+        proc.select_process_dart(dart_files, directory=directory)
     return data_type
 
 
@@ -1169,7 +1205,12 @@ def execute_plot(
         directory=directory,
     )
     plot.plot_misfit(data_type, directory=directory)
-    traces_info, stations_gnss, traces_info_cgnss = [None, None, None]
+    traces_info, stations_gnss, traces_info_cgnss, traces_info_dart = [
+        None,
+        None,
+        None,
+        None,
+    ]
     if "strong" in data_type:
         with open(directory / "strong_motion_waves.json") as smw:
             traces_info = json.load(smw)
@@ -1181,7 +1222,15 @@ def execute_plot(
             directory=directory
         )
         stations_gnss = zip(names, lats, lons, observed, synthetic, error)
-    if "strong" in data_type or "cgnss" in data_type or "gnss" in data_type:
+    if "dart" in data_type:
+        with open(directory / "dart_waves.json") as dartw:
+            traces_info_dart = json.load(dartw)
+    if (
+        "strong" in data_type
+        or "cgnss" in data_type
+        or "gnss" in data_type
+        or "dart" in data_type
+    ):
         plot.PlotMap(
             tensor_info,
             segments,
@@ -1191,6 +1240,7 @@ def execute_plot(
             files_str=traces_info,
             stations_gnss=stations_gnss,
             stations_cgnss=traces_info_cgnss,
+            stations_dart=traces_info_dart,
             directory=directory,
         )
     if "imagery" in data_type:

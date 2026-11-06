@@ -42,28 +42,35 @@ def plot_waveforms(
     :param color: The color of the plot line, defaults to "blue"
     :type color: str, optional
     :param custom: The custom option (fill), defaults to None
-    :type custom: Optional[Literal[&quot;fill&quot;, &quot;syn&quot;]], optional
+    :type custom: Optional[Literal[str]], optional
     :return: The updated axes
     :rtype: List[plt.Axes]
     """
     nPlot = 0
     for ax, time, waveform, weight in zip(axes, times, waveforms, weights):
-        nPlot += 1
-        if weight == 0.0:
-            ax.plot(time, waveform, color=color, linewidth=2, linestyle="dashed")
-        else:
-            ax.plot(time, waveform, color=color, linewidth=2 * weight)
         min_time, max_time = ax.get_xlim()
         min_time = np.minimum(np.min(time), min_time)
         max_time = np.maximum(np.max(time), max_time)
         if custom == "fill":
-            min_val, max_val = ax.get_ylim()
+            min_val = 0.0
+            max_val = 0.0
             min_val = np.minimum(np.min(waveform), min_val)
             max_val = np.maximum(np.max(waveform), max_val)
-            ax.set_ylim((-(max(abs(min_val), max_val)), max(abs(min_val), max_val)))
+            ax.set_ylim(
+                (
+                    -1.1 * (max(abs(min_val), max_val)),
+                    1.1 * (max(abs(min_val), max_val)),
+                )
+            )
             min_val, max_val = ax.get_ylim()
             ax.vlines(0, min_val, max_val, "k", lw=1)
             if type_str == "body":
+                if weight == 0.0:
+                    ax.plot(
+                        time, waveform, color=color, linewidth=2, linestyle="dashed"
+                    )
+                else:
+                    ax.plot(time, waveform, color=color, linewidth=2 * weight)
                 ax.text(
                     np.max(time),
                     0.6 * max_val,
@@ -74,6 +81,12 @@ def plot_waveforms(
                 ax.hlines(0, -20, np.max(time), "k", lw=1)
                 ax.set_xlim((-20, np.max(time)))
             elif type_str == "surf":
+                if weight == 0.0:
+                    ax.plot(
+                        time, waveform, color=color, linewidth=2, linestyle="dashed"
+                    )
+                else:
+                    ax.plot(time, waveform, color=color, linewidth=2 * weight)
                 ax.text(
                     np.max(time),
                     0.6 * max_val,
@@ -84,6 +97,12 @@ def plot_waveforms(
                 ax.hlines(0, -350, np.max(time), "k", lw=1)
                 ax.set_xlim((-350, np.max(time)))
             elif type_str == "cgnss" or type_str == "strong":
+                if weight == 0.0:
+                    ax.plot(
+                        time, waveform, color=color, linewidth=2, linestyle="dashed"
+                    )
+                else:
+                    ax.plot(time, waveform, color=color, linewidth=2 * weight)
                 min_wval = np.min(waveform)
                 max_wval = np.max(waveform)
                 if max_wval > abs(min_wval):
@@ -104,12 +123,34 @@ def plot_waveforms(
                     )
                 ax.hlines(0, -15, np.max(time), "k", lw=1)
                 ax.set_xlim((-15, np.max(time)))
+            elif type_str == "dart":
+                time = np.array(time)
+                waveform = np.array(waveform)
+                if weight == 0.0:
+                    ax.plot(
+                        time / 3600,
+                        waveform,
+                        color=color,
+                        linewidth=2,
+                        linestyle="dashed",
+                    )
+                else:
+                    ax.plot(time / 3600, waveform, color=color, linewidth=2 * weight)
+                ax.hlines(0, -0.5, np.max(time / 3600), "k", lw=1)
+                ax.set_xlim((-0.5, 3))
             min_time, max_time = ax.get_xlim()
+            nPlot += 1
         if custom == "syn":
             max_val = np.maximum(abs(min(waveform)), max(waveform))
             tmin, tmax = ax.get_xlim()
             ymin, ymax = ax.get_ylim()
             if type_str == "body":
+                if weight == 0.0:
+                    ax.plot(
+                        time, waveform, color=color, linewidth=2, linestyle="dashed"
+                    )
+                else:
+                    ax.plot(time, waveform, color=color, linewidth=2 * weight)
                 ax.text(
                     tmax,
                     0.6 * ymin,
@@ -119,6 +160,12 @@ def plot_waveforms(
                     color="red",
                 )
             elif type_str == "surf":
+                if weight == 0.0:
+                    ax.plot(
+                        time, waveform, color=color, linewidth=2, linestyle="dashed"
+                    )
+                else:
+                    ax.plot(time, waveform, color=color, linewidth=2 * weight)
                 ax.text(
                     tmax,
                     0.6 * ymin,
@@ -128,6 +175,12 @@ def plot_waveforms(
                     color="red",
                 )
             elif type_str == "cgnss" or type_str == "strong":
+                if weight == 0.0:
+                    ax.plot(
+                        time, waveform, color=color, linewidth=2, linestyle="dashed"
+                    )
+                else:
+                    ax.plot(time, waveform, color=color, linewidth=2 * weight)
                 ax.text(
                     tmax,
                     0.6 * ymin,
@@ -136,6 +189,19 @@ def plot_waveforms(
                     va="center",
                     color="red",
                 )
+            elif type_str == "dart":
+                time = np.array(time)
+                waveform = np.array(waveform)
+                if weight == 0.0:
+                    ax.plot(
+                        time / 3600,
+                        waveform,
+                        color=color,
+                        linewidth=2,
+                        linestyle="dashed",
+                    )
+                else:
+                    ax.plot(time / 3600, waveform, color=color, linewidth=2 * weight)
         if type_str == "body":
             ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=5, min_n_ticks=5))
             ax.yaxis.set_major_locator(ticker.NullLocator())
@@ -146,8 +212,14 @@ def plot_waveforms(
         elif type_str == "cgnss" or type_str == "strong":
             ax.xaxis.set_major_locator(ticker.MultipleLocator(40))
             ax.yaxis.get_major_locator().set_params(integer=True)  # type: ignore
-        if nPlot > len(weights) - 3:
-            ax.set_xlabel("Time After OT (s)")
+        elif type_str == "dart":
+            ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+        if type_str == "dart":
+            if nPlot == len(weights):
+                ax.set_xlabel("Time After OT (hrs)")
+        else:
+            if nPlot > len(weights) - 3:
+                ax.set_xlabel("Time After OT (s)")
         ax.grid(axis="x", which="both", linestyle="dotted", color="0.5")
     return axes
 
@@ -159,6 +231,7 @@ def add_metadata(
     distances: Optional[List[float]] = None,
     names: Optional[List[str]] = None,
     type_str: Optional[List[float]] = None,
+    units: Optional[List[str]] = None,
     weights: Optional[List[float]] = None,
 ) -> List[plt.Axes]:
     """Add metadata to axes
@@ -168,13 +241,15 @@ def add_metadata(
     :param azimuths: A list of azimuth values, defaults to None
     :type azimuths: Optional[List[float]], optional
     :param comps: A list of components, defaults to None
-    :type comps: Optional[List[float]], optional
+    :type comps: Optional[List[str]], optional
     :param distances: A list of distance values, defaults to None
     :type distances: Optional[List[float]], optional
     :param names: A list of names, defaults to None
     :type names: Optional[List[str]], optional
     :param type_str: A list of data types, defaults to None
     :type type_str: Optional[List[float]], optional
+    :param units: A list of unit values, defaults to None
+    :type units: Optional[List[str]], optional
     :param weights: A list of weight values, defaults to None
     :type weights: Optional[List[float]], optional
     :return: The updated axes
@@ -190,9 +265,11 @@ def add_metadata(
             unit = "nm"
         elif type_str == "surf":
             unit = "mm"
+        elif type_str == "dart":
+            unit = "m"
         else:
             raise ValueError(
-                "Data type must be waveform (body, surf, strong, or cgnss)"
+                "Data type must be waveform (body, surf, strong, cgnss, or dart)"
             )
         if type_str == "cgnss" or type_str == "strong":
             if distances is not None:
@@ -223,11 +300,34 @@ def add_metadata(
                     ax.text(
                         -0.10,
                         0.5,
-                        comp,
-                        ha="right",
+                        f"{comp}\n({unit})",
+                        ha="center",
                         va="center",
                         transform=ax.transAxes,
                         rotation=90,
+                    )
+        elif type_str == "dart":
+            if names is not None:
+                for ax, name in zip(axes, names):
+                    ax.text(
+                        -0.10,
+                        0.45,
+                        f"{name}\n({unit})",
+                        ha="center",
+                        va="center",
+                        transform=ax.transAxes,
+                        fontweight="bold",
+                        rotation=90,
+                    )
+            if distances is not None:
+                for ax, dist in zip(axes, distances):
+                    ax.text(
+                        0.01,
+                        0.46,
+                        "{:0.0f}".format(dist),
+                        ha="left",
+                        va="top",
+                        transform=ax.transAxes,
                     )
         else:
             if names is not None:
@@ -308,13 +408,19 @@ def plot_waveform_fits(
     if type_str == "cgnss" or type_str == "strong":
         files = [file for file in files]
         print("Creating Waveform Fit Plot: " + str(type_str))
+    if type_str == "dart":
+        files = [file for file in files]
+        print("Creating Waveform Fit Plot: " + str(type_str))
     if not len(files):
         print(
             f"No files found matching components ({components}). "
             "Not plotting waveform fits."
         )
         return
-    files = sorted(files, key=lambda k: (k["azimuth"], k["component"]))
+    if type_str == "dart":
+        files = sorted(files, key=lambda k: (k["distance"]))
+    else:
+        files = sorted(files, key=lambda k: (k["azimuth"], k["component"]))
     sampling = [file["dt"] for file in files]
     names = [file["name"] for file in files]
     azimuths = [file["azimuth"] for file in files]
@@ -336,15 +442,21 @@ def plot_waveform_fits(
         dt * np.arange(-start, len(observed) - start)
         for dt, start, observed in zip(sampling, start_waveform, obs_waveforms)
     ]
-    numrows_phase = len(files) // 3 + 1
-    fig, axes = plt.subplots(
-        max(3, numrows_phase), 3, figsize=(20, int(2.2 * numrows_phase))
-    )
+    if type_str == "dart":
+        numrows_phase = len(files) + 1
+        fig, axes = plt.subplots(
+            max(3, numrows_phase), 1, figsize=(8, int(4 * numrows_phase))
+        )
+    else:
+        numrows_phase = len(files) // 3 + 1
+        fig, axes = plt.subplots(
+            max(3, numrows_phase), 3, figsize=(20, int(2.2 * numrows_phase))
+        )
     axes2: List[Axes] = axes.ravel()  # type: ignore
     for ax in axes2[len(files) :]:
         ax.axis("off")
 
-    if type_str == "body" or type_str == "surf":
+    if type_str == "body" or type_str == "surf" or type_str == "dart":
         axes2 = plot_waveforms(
             list(axes2),
             obs_times,
@@ -422,6 +534,12 @@ def plot_waveform_fits(
 
     if type_str == "strong":
         plot_name = "strong_motion_waves"
+
+    if type_str == "dart":
+        plot_name = "dart_waves"
+
+    if type_str == "dart":
+        plot_name = "dart_waves"
 
     plt.savefig(plot_directory / (plot_name + ".png"), dpi=300)  # bbox_inches='tight')
     plt.savefig(plot_directory / (plot_name + ".ps"))

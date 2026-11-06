@@ -2,11 +2,13 @@ name: ff-env
 channels:
   - conda-forge
 dependencies:
+  - alive-progress
   - black
   - cutde
   - cartopy
   - deprecated
   - filelock
+  - imageio
   - isort
   - matplotlib
   - mypy
@@ -19,11 +21,13 @@ dependencies:
   - pytest
   - pytest-cov
   - python=3.10
+  - python-dotenv
   - ratelimiter
   - scipy
   - shapely
   - tornado>=6.5.8
   - typer
+  - xarray
   - pip:
       - pyrocko
       - poethepoet

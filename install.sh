@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # ==============================================================================
 # Define usage
 #     Sets up usage function, parses and validates arguments
@@ -89,6 +88,10 @@ pip install -e "${FINITEFAULT_DIR}";
 source "${INSTALL_DIR}/ffm.sh" "${FINITEFAULT_DIR}";
 # shellcheck source=./install.d/data_dependencies.sh
 source "${INSTALL_DIR}/data_dependencies.sh" "${FINITEFAULT_DIR}" --fd-bank "${FD_BANK}" --lith "${LITHO1}";
+# install clawpack in the same directory as neic-finitefault
+CLAW_DIR=$(dirname "${FINITEFAULT_DIR}");
+# shellcheck source=./install.d/clawpack.sh
+source "${INSTALL_DIR}/clawpack.sh" "${CLAW_DIR}"
 
 # get back to top level directly and message completion of installation
 cd "${FINITEFAULT_DIR}" || echo "Failed to return to finite fault top level directly";

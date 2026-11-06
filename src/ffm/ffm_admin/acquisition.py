@@ -1,14 +1,17 @@
 import json
 import pathlib
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Optional, Tuple, Union
 
+import numpy as np
 import typer
 
 from ffm.acquisition.cmt import Cmt
 from ffm.acquisition.cwbquery import CwbQuery
+from ffm.acquisition.dartquery import DartQuery
 from ffm.acquisition.irisquery import IrisQuery
-from ffm.acquisition.teleseismicquery import TeleseismicQuery
+from ffm.acquisition.topographyquery import TopographyQuery
+from ffm.data_processing import process_dart
 from ffm.ffm_admin.common_args import (
     DATA_DIRECTORY,
     QUERY_EVENTID,
@@ -37,6 +40,158 @@ def cmt(
     cmt = Cmt.from_id(eventid=eventid, source=source, allow_unreviewed=allow_unreviewed)
     data_directory = validate_data_directory(data_directory)
     cmt.write(data_directory / f"{eventid}_cmt_CMT")
+
+
+@app.command(
+    context_settings={"ignore_unknown_options": True},
+    help="Get topography data (https://topex.ucsd.edu/WWW_html/srtm30_plus.html)",
+)
+def topo(
+    west: float = typer.Argument(..., help="The west (minimum longitude) extent"),
+    east: float = typer.Argument(..., help="The east (maximum longitude) extent"),
+    south: float = typer.Argument(..., help="The south (minimum latitude) extent"),
+    north: float = typer.Argument(..., help="The north (maximum latitude) extent"),
+    format: str = typer.Option(
+        "geoclaw_ascii",
+        "-f",
+        "--format",
+        help="The data format to write (defaults to geoclaw ascii used in dart calculations)",
+    ),
+    data_directory: Optional[pathlib.Path] = DATA_DIRECTORY,
+):
+    """Get global topography and topography data"""
+    data_directory = validate_data_directory(data_directory, make_directory=True)
+    topography_query = TopographyQuery(
+        north=north,
+        south=south,
+        east=east,
+        west=west,
+    )
+    topography_query.get_data(directory=data_directory, format=format)
+
+
+@app.command(
+    help="Get DART data from NOAA. One of eventid, gcmt_tensor_file, or qcmt_tensor_file must be defined."
+)
+def dart(
+    eventid: str = typer.Option(
+        None,
+        "-e",
+        "--eventid",
+        help="An event ID used to identify an earthquake in the USGS Feeds or ComCat",
+    ),
+    source: str = QUERY_SOURCE,
+    gcmt_tensor_file: pathlib.Path = typer.Option(
+        None, "-g", "--gcmt", help="Path to the GCMT moment tensor file"
+    ),
+    qcmt_tensor_file: pathlib.Path = typer.Option(
+        None, "-q", "--qcmt", help="Path to the QuakeML moment tensor file"
+    ),
+    latitude: float = typer.Option(
+        None, "-lat", "--latitude", help="Override origin or tensor's latitude"
+    ),
+    longitude: float = typer.Option(
+        None, "-lon", "--longitude", help="Override origin or tensor's  longitude"
+    ),
+    dt: float = typer.Option(
+        60.0,
+        "-dt",
+        "--sampling_rate",
+        help="Desired data sampling rate, in seconds, default is 60s",
+    ),
+    max_distance: float = typer.Option(
+        20,
+        "-max",
+        "--maximum_distance",
+        help="Maximum station hypocentral distance, in kilometers, default is 20",
+    ),
+    hours_after: int = typer.Option(
+        8,
+        help="How many hours after the event to get data for",
+    ),
+    hours_before: int = typer.Option(
+        1,
+        help="How many hours before the event to get data for",
+    ),
+    stations_file: pathlib.Path = typer.Option(
+        pathlib.Path(__file__).parent.parent
+        / "acquisition"
+        / "DART_station_locations.txt",
+        "-sf",
+        "--stations-file",
+        help="A file of dart station locations.",
+    ),
+    plot: bool = typer.Option(
+        False,
+        "-p",
+        "--plot_observations",
+        help="Whether to save plots of collected observations, default is False",
+    ),
+    fcorner: Tuple[float, float] = typer.Option(
+        [5, 120],
+        "-f",
+        "--frequency_bandpass",
+        help="Corner frequencies for bandpass filter, in seconds, default is 5 to 120 s",
+    ),
+    # Although breaking convention with other workflows, the dart data should always
+    # be processed to interpolated data right away, due to inconsistencies with sampling
+    # In general processing should fall into a separate step from data acquisition
+    raw: bool = typer.Option(
+        False,
+        "-r",
+        "--raw",
+        help="Get raw data. Default is to process with a bandpass filter.",
+    ),
+    data_directory: Optional[pathlib.Path] = DATA_DIRECTORY,
+):
+    data_directory = validate_data_directory(data_directory, make_directory=True)
+    # initialize query
+    if (
+        len(
+            [
+                input_type
+                for input_type in [eventid, gcmt_tensor_file, qcmt_tensor_file]
+                if input_type is not None
+            ]
+        )
+        > 1
+    ):
+        raise ValueError(
+            "eventid, gcmt_tensor_file, and qcmt_tensor_file are mutually exclusive."
+        )
+    if gcmt_tensor_file is not None:
+        dart_query = DartQuery.from_gcmt_tensor_file(gcmt_tensor_file)
+    elif qcmt_tensor_file:
+        dart_query = DartQuery.from_qcmt_tensor_file(qcmt_tensor_file)
+    elif eventid is not None:
+        dart_query = DartQuery.from_id(eventid=eventid, source=source)
+    dart_query.latitude = latitude or dart_query.latitude
+    dart_query.longitude = longitude or dart_query.longitude
+    dart_query.dt = dt or dart_query.dt
+    dart_query.max_distance = max_distance or dart_query.max_distance
+    dart_query.hours_after = hours_after or dart_query.hours_after
+    dart_query.hours_before = hours_before or dart_query.hours_before
+
+    # get stations
+    stations = dart_query.get_stations(stations_file)
+    if len(stations) == 0:
+        typer.echo(
+            f"No stations within maximum distance boundary ({dart_query.max_distance} decimal degrees) for event at lat={dart_query.latitude} lon={dart_query.longitude}"
+        )
+        raise typer.Exit()
+
+    # get data
+    stations = dart_query.get_data(stations)
+
+    # write data
+    dart_query.write_data(
+        stations=stations,
+        directory=data_directory,
+        frequency_corners=fcorner,
+        dt=dt,
+        raw=raw,
+        plot=plot,
+    )
 
 
 @app.command(help="Get teleseismic data from EARTHSCOPE or USGS NEIC CWB")

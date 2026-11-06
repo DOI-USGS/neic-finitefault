@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # ==============================================================================
 # Define usage
 #     Sets up usage function and parses arguments

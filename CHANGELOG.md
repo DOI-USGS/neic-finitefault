@@ -1,12 +1,24 @@
 # Change Log
 
 - [Change Log](#change-log)
+- [2.0.0](#200-)
 - [1.3.0](#130)
 - [1.2.0](#120)
 - [1.1.0](#110)
-  - [Added](#added)
 - [1.0.0 ](#100-)
 - [0.1.0 (Provisional Release)](#010-provisional-release)
+
+
+# 2.0.0
+
+## Added
+- New `dataset_weights.txt` to control relative weighting of intrument types.
+- Local waveform data allows optional custom filtering parameters per channel.
+- Integration with GeoClaw module of Clawpack for DART data integration.
+  Optional clawpack installation added to install.sh.
+
+## Deprecated
+- The Dockerfile was a temporary stop gap until Mac compatible Fortran compiling was achieved. As of !214, the Fortran code is now Mac compatible. The Dockerfile is deprecated and no longer supported as of version 2.0.0 and will be removed after version 2.1.0.
 
 # 1.3.0
 

@@ -14,6 +14,7 @@ from ffm.data_management import filling_data_dicts
 from ffm.fault_plane import create_finite_fault
 from ffm.get_outputs import synthetics_to_SAC
 from ffm.input_files import (
+    input_chen_dart,
     input_chen_imagery,
     input_chen_near_field,
     input_chen_static,
@@ -876,6 +877,8 @@ def synthetic_sac(
         synthetics_to_SAC("strong", 10, directory)
     if "cgnss" in chosen_data_types:
         synthetics_to_SAC("cgnss", 10, directory)
+    if "dart" in chosen_data_types:
+        synthetics_to_SAC("dart", 10, directory)
 
 
 @app.command(help="Write the tensor file from a GCMT moment tensor")
@@ -1004,6 +1007,13 @@ def update_inputs(
             tensor_info=tensor_info,
             data_prop=data_prop,
             data_type="cgnss",
+            directory=directory,
+        )
+    if "dart" in chosen_data_types:
+        validate_files([directory / "dart_waves.json"])
+        input_chen_dart(
+            tensor_info=tensor_info,
+            data_prop=data_prop,
             directory=directory,
         )
     if "gnss" in chosen_data_types:

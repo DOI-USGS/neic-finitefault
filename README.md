@@ -16,11 +16,14 @@
 
 ---
 
-This code uses a nonlinear simulated annealing inversion method to model slip amplitude, rake, rupture time, and rise time on a discretized fault plane, finding the solution that best fits the observations in the wavelet domain. WISP currently accomodates observations from (1) teleseismic broadband stations, (2) regional strong-motion accelerometer stations, (3) static and high-rate Global Navigation Satellite Systems stations, and (4) Interferometric Synthetic Aperture Radar.
+This code uses a nonlinear simulated annealing inversion method to model slip amplitude, rake, rupture time, and rise time on a discretized fault plane, finding the solution that best fits the observations in the wavelet domain. WISP currently accomodates observations from (1) teleseismic broadband stations, (2) regional strong-motion accelerometer stations, (3) static and high-rate Global Navigation Satellite Systems stations, (4) downsampled imagery (e.g., Interferometric Synthetic Aperture Radar) and (5) Deep-ocean Assessment and Reporting of Tsunamis (DART).
 
 The inversion approach is based on the method of Ji et al. (2002, 2003) and Shao et al. (2011). The original inversion package was developed by Dr. Chen Ji. Koch et al. (2019) modified the heuristic rules used to automatically define the search ranges for finite-fault inversions based on the moment tensor solution, and incorporated regional strong-motion waveforms into the workflow. They also converted the codebase of the software package from Fortran 77 to Fortran 95, improving its flexibility. Goldberg et al. (2022) enabled the integration of satellite geodetic observations into the inversion framework.
 
 The Regional Green's functions are calculated using the method of Zhu & Rivera (2002).
+
+Integration of DART data relies on the GeoClaw module of Clawpack (Clawpack Development Team, 2026).
+
 
 ## Suggested Citation
 
@@ -46,6 +49,8 @@ Shao, G. F., X. Y. Li, C. Ji, and T. Maeda (2011). Focal mechanism and slip hist
 - Koch, P., F. Bravo, S. Riquelme, and J. G. F. Crempien (2019). Near-real-time finite-fault inversions for large earthquakes in Chile using strong-motion data, Seismological Research Letters, 90, no. 5, 1971–1986, https://doi.org/10.1785/0220180294.
 - Goldberg, D. E., P. Koch, D. Melgar, S. Riquelme, and W. L. Yeck (2022). Beyond the Teleseism: Introducing Regional Seismic and Geodetic Data into Routine USGS FiniteFault Modeling, Seismological Research Letters, 93, 3308–3323, https://doi.org/10.1785/0220220047.
 - Zhu, L., & Rivera, L. A. (2002). A note on the dynamic and static displacements from a point source in multilayered media: A note on the dynamic and static displacements from a point source. Geophysical Journal International, 148(3), 619–627. https://doi.org/10.1046/j.1365-246X.2002.01610.x.
+For Including DART Observations:
+- Clawpack Development Team (2026), Clawpack Software, http://www.clawpack.org, https://doi.org/10.17605/osf.io/kmw6h.
 
 ## Disclaimer and License Information
 [Disclaimer](./DISCLAIMER.md)
@@ -90,6 +95,10 @@ Tests and linting can both be run locally:
 
 
 # Using the Docker Image
+> [!IMPORTANT]  
+> The Dockerfile was a temporary stop gap until Mac compatible 
+> Fortran compiling was achieved. As of !214, the Fortran code is now Mac compatible. The Dockerfile is deprecated and no longer supported as of version 2.0.0 and will be removed after version 2.1.0. 
+
 This repository provides a Dockerfile to locally build a docker image for the dependencies and source code. Below are some creating and using the image. See the [Dockerfile](./Dockerfile) for the build steps/configuration.
 
 > While these commands listed are docker commands. The commands should be 1 to 1 with Podman commands. Replace the word "docker" in the command with "podman".

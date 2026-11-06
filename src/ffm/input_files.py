@@ -749,9 +749,9 @@ def input_chen_dart(
         open(directory / "waveforms_dart.txt", "w") as file2,
     ):
         write_files_wavelet_observed(
-            file1, file2, dt_dart, data_prop, traces_info, dart=True, zero_start=True
+            file1, file2, dt_dart, data_prop, traces_info, dart=True, zero_start=False
         )
-    return "cgnss"
+    return "dart"
 
 
 def input_chen_imagery(
@@ -1170,7 +1170,7 @@ def from_synthetic_to_obs(
                 if add_error:
                     error = max_val0 * np.random.randn(length)
                 for order, filter, corner in zip(orders, filters, corners):
-                    b, a = butter(order, corner, btype=filter)
+                    b, a = butter(order, corner, btype=filter)  # type: ignore [call-overload]
                     error = filtfilt(b, a, error)
                 waveform = waveform + error  # type: ignore
                 write_observed_file(
