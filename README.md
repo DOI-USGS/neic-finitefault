@@ -27,7 +27,7 @@ Integration of DART data relies on the GeoClaw module of Clawpack (Clawpack Deve
 
 ## Suggested Citation
 
-Koch, P., Goldberg, D.E., Hunsinger, H., Melgar, D., Riquelme, S., Yeck, W.L., and Haynie, K.L., 2025, Wavelet Inversion for SliP (WISP), version 1.1.0: U.S. Geological Survey software release, https://doi.org/10.5066/P14RVF65.
+Koch, P., Goldberg, D.E., Hunsinger, H., Melgar, D., Riquelme, S., Yeck, W.L., and Haynie, K.L., 2025, Wavelet Inversion for SliP (WISP), version 2.0.0: U.S. Geological Survey software release, https://doi.org/10.5066/P14RVF65.
 
 ## Authors
 
