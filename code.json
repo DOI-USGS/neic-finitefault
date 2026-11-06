@@ -23,7 +23,7 @@
     "vcs": "git",
     "laborHours": 350,
 
-    "tags": ["usgs", "neic", "earthquake", "slip", "finitefault"],
+    "tags": ["usgs", "neic", "earthquake", "slip", "finitefault", "usg-artificial-intelligence"],
 
     "languages": ["python", "fortran"],
 
