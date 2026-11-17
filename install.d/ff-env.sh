@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # ==============================================================================
 # Define usage
 #     Install conda (if needed) and create the conda environment

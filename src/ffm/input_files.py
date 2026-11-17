@@ -548,7 +548,9 @@ def input_chen_near_field(
     .. warning::
 
         Make sure the filters of strong motion data agree with the values in
-        sampling_filter.json!
+        sampling_filter.json! Channels whose dictionary carries "low_freq"
+        and/or "high_freq" keys use those corners instead of the global values
+        (their data must be filtered consistently by the user).
     """
     directory = pathlib.Path(directory)
     if data_type == "strong":
@@ -589,6 +591,17 @@ def input_chen_near_field(
 
     with open(filename1, "w") as outfile:
         outfile.write("Corners: {} {}".format(low_freq, high_freq))
+        # optional per-channel corners, read by get_strong_motion when present
+        for file in traces_info:
+            if "low_freq" in file or "high_freq" in file:
+                outfile.write(
+                    "\n{} {} {} {}".format(
+                        file["name"],
+                        file["component"],
+                        file.get("low_freq", low_freq),
+                        file.get("high_freq", high_freq),
+                    )
+                )
 
     disp_or_vel = 0
     string = "{0:3d} {1:>5}{2:>9.3f}{3:>10.3f} 31{4:>5} {5} 0\n"
@@ -736,9 +749,9 @@ def input_chen_dart(
         open(directory / "waveforms_dart.txt", "w") as file2,
     ):
         write_files_wavelet_observed(
-            file1, file2, dt_dart, data_prop, traces_info, dart=True, zero_start=True
+            file1, file2, dt_dart, data_prop, traces_info, dart=True, zero_start=False
         )
-    return "cgnss"
+    return "dart"
 
 
 def input_chen_imagery(
@@ -1157,7 +1170,7 @@ def from_synthetic_to_obs(
                 if add_error:
                     error = max_val0 * np.random.randn(length)
                 for order, filter, corner in zip(orders, filters, corners):
-                    b, a = butter(order, corner, btype=filter)
+                    b, a = butter(order, corner, btype=filter)  # type: ignore [call-overload]
                     error = filtfilt(b, a, error)
                 waveform = waveform + error  # type: ignore
                 write_observed_file(
@@ -1244,6 +1257,78 @@ def inputs_simmulated_annealing(
         filewrite.write("{}\n".format(weights_line))
         filewrite.write("0 {} 0 {}\n".format(10**-4, source_dur))
         filewrite.write("1\n")
+
+    weights_path = directory / "dataset_weights.json"
+    w_body = 1.0
+    w_surf = 1.0
+    w_strong = 1.0
+    w_cgnss = 1.0
+    w_static = 1.0
+    w_imagery = 1.0
+    w_dart = 1.0
+    if weights_path.is_file():
+        try:
+            with open(weights_path, "r") as f:
+                dweights = json.load(f)
+        except Exception as err:
+            raise ValueError(
+                f"Failed to parse dataset weights file {weights_path}: {err}"
+            ) from err
+
+        if not isinstance(dweights, dict):
+            raise ValueError(
+                f"Expected JSON object in {weights_path}, got {type(dweights).__name__}"
+            )
+        if "weights" in dweights and isinstance(dweights["weights"], dict):
+            raw_weights = dweights["weights"]
+        else:
+            raw_weights = {k: v for k, v in dweights.items() if k != "description"}
+
+        valid_keys = {
+            "body": "body",
+            "surf": "surf",
+            "strong": "strong",
+            "cgnss": "cgnss",
+            "static": "static",
+            "gnss": "static",
+            "static_gnss": "static",
+            "imagery": "imagery",
+            "insar": "imagery",
+            "dart": "dart",
+        }
+        unknown_keys = set(raw_weights.keys()) - set(valid_keys.keys())
+        if unknown_keys:
+            valid_str = ", ".join(sorted(set(valid_keys.keys())))
+            raise ValueError(
+                f"Unrecognized key(s) in {weights_path}: {', '.join(sorted(unknown_keys))}. "
+                f"Allowed keys are: {valid_str}"
+            )
+
+        parsed_weights: dict = {}
+        for k, v in raw_weights.items():
+            try:
+                val = float(v)
+                if val < 0 or not np.isfinite(val):
+                    raise ValueError
+            except (ValueError, TypeError) as err:
+                raise ValueError(
+                    f"Invalid weight value for '{k}' in {weights_path}: {v}. Must be a non-negative finite number."
+                ) from err
+            canonical = valid_keys[k]
+            parsed_weights[canonical] = val
+
+        w_body = parsed_weights.get("body", 1.0)
+        w_surf = parsed_weights.get("surf", 1.0)
+        w_strong = parsed_weights.get("strong", 1.0)
+        w_cgnss = parsed_weights.get("cgnss", 1.0)
+        w_static = parsed_weights.get("static", 1.0)
+        w_imagery = parsed_weights.get("imagery", 1.0)
+        w_dart = parsed_weights.get("dart", 1.0)
+
+    with open(directory / "dataset_weights.txt", "w") as fw:
+        fw.write(
+            f"{w_body} {w_surf} {w_strong} {w_cgnss} {w_static} {w_imagery} {w_dart}\n"
+        )
     return
 
 

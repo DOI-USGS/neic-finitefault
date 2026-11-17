@@ -4,8 +4,7 @@ import tempfile
 
 import numpy as np
 
-from ffm.fault_plane import point_sources_param
-from ffm.get_outputs import read_solution_static_format
+from ffm.model.result.solution import Solution
 from ffm.shakemap_tools import (
     equivalent_slip_length,
     locate_equivalent_slip,
@@ -22,10 +21,9 @@ def get_strike():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:
         shutil.copyfile(RESULTS_DIR / "NP1" / "Solution.txt", tempdir / "Solution.txt")
-        solution = read_solution_static_format(
-            SEGMENTS["segments"],
-            tempdir,
-        )
+        solution = Solution.from_static_solution_file(
+            segments_data=SEGMENTS, solution_filepath=tempdir / "Solution.txt"
+        )._old_format
     finally:
         shutil.rmtree(tempdir)
     slip = solution["slip"]

@@ -1,16 +1,11 @@
 import json
 import pathlib
-from glob import glob
 from shutil import rmtree
 from tempfile import mkdtemp
 from test.testutils import MockResponse
 from unittest import mock
 
-import numpy as np
-from obspy.core import Stream, Trace
 from typer.testing import CliRunner
-
-from ffm.ffm_admin.acquisition import app
 
 runner = CliRunner()
 
@@ -58,15 +53,13 @@ DETAIL = {
 def test_teleseismic():
     with mock.patch(target="requests.get") as mock_requests:
         mock_requests.return_value = MockResponse(json.dumps(DETAIL), 200)
-        with mock.patch(
-            target="ffm.acquisition.irisquery.IrisQuery.from_id"
-        ) as mock_IrisQuery:
-            mock_IrisQuery.return_value = mock.MagicMock()
-            tempdir = pathlib.Path(mkdtemp())
-            try:
-                result = runner.invoke(
-                    app, ["teleseismic", "eventid", "-d", str(tempdir), "-n", "US"]
-                )
-                assert result.exit_code == 0
-            finally:
-                rmtree(tempdir)
+        from ffm.ffm_admin.acquisition import app
+
+        tempdir = pathlib.Path(mkdtemp())
+        try:
+            result = runner.invoke(
+                app, ["teleseismic", "eventid", "-d", str(tempdir), "-n", "US"]
+            )
+            assert result.exit_code == 0
+        finally:
+            rmtree(tempdir)

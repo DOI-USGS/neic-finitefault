@@ -1,7 +1,7 @@
 import pathlib
 import shutil
 import tempfile
-
+from ffm.model.result.solution import Solution
 from ffm import get_outputs
 from ffm.fault_plane import point_sources_param
 from ffm.write_KML import PlotMap_KML
@@ -21,9 +21,10 @@ def test_write_KML():
             TENSOR,
             SEGMENTS["rise_time"],
         )
-        solution = get_outputs.read_solution_static_format(
-            SEGMENTS["segments"], tempdir
-        )
+
+        solution = Solution.from_static_solution_file(
+            segments_data=SEGMENTS, solution_filepath=tempdir / "Solution.txt"
+        )._old_format
         PlotMap_KML(
             TENSOR,
             SEGMENTS["segments"],

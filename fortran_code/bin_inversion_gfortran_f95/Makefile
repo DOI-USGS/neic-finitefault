@@ -14,7 +14,7 @@ else
 MCMODEL_MEDIUM = -mcmodel=medium
 MCMODEL_LARGE = -mcmodel=large
 endif
-F95= gfortran -O3 -fno-range-check $(MCMODEL_MEDIUM) -g #-mavx2 -Wall -ftree-loop-vectorize -ftree-loop-distribution#-fno-omit-frame-pointer -ffpe-trap=overflow,invalid#-ffpe-trap=overflow -funroll-loops -fcheck=all
+F95= gfortran -O3 -fno-range-check -ffree-line-length-none $(MCMODEL_MEDIUM) -g #-mavx2 -Wall -ftree-loop-vectorize -ftree-loop-distribution#-fno-omit-frame-pointer -ffpe-trap=overflow,invalid#-ffpe-trap=overflow -funroll-loops -fcheck=all
 F77= gfortran -O1 -fno-range-check $(MCMODEL_LARGE) -g -fbacktrace
 
 

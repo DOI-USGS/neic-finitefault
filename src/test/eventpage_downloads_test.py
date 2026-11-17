@@ -19,7 +19,6 @@ from .testutils import (
 
 RESULTS_DIR = pathlib.Path(__file__).parent / "data" / "end_to_end" / "results"
 
-from ffm import get_outputs
 from ffm.eventpage_downloads import (
     make_waveproperties_json,
     temporary_file_reorganization_for_publishing,
@@ -27,6 +26,7 @@ from ffm.eventpage_downloads import (
     write_Coulomb_file,
     write_Okada_displacements,
 )
+from ffm.model.result.solution import Solution
 from ffm.static2fsp import static_to_fsp
 
 
@@ -135,9 +135,9 @@ def test_write_Coulomb_file():
             tempdir / "static_data.json",
         )
         segments = get_segments_data()
-        solution = get_outputs.read_solution_static_format(
-            segments["segments"], tempdir
-        )
+        solution = Solution.from_static_solution_file(
+            segments_data=segments, solution_filepath=tempdir / "Solution.txt"
+        )._old_format
         static_to_fsp(
             get_tensor_info(),
             segments,

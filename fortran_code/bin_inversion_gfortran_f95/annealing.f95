@@ -7,10 +7,12 @@ module annealing
    use wavelets, only : wavelet_syn
    use wavelet_param, only : get_data_param 
    use rise_time, only : source
-   use get_stations_data, only : get_properties, count_wavelets
+   use get_stations_data, only : get_properties, count_wavelets, get_channel_dataset_info, &
+                               & get_dataset_ranges
    use random_gen, only : ran1, cauchy
    use misfit_eval, only : misfit_channel
-   use modelling_inputs, only : get_annealing_param, get_weights_moment_end, get_many_events 
+   use modelling_inputs, only : get_annealing_param, get_weights_moment_end, get_many_events, &
+                              & get_dataset_weights 
    use regularization, only : slip_laplace, time_laplace, define_slip_field, modify_slip_field
    use static_data, only : static_synthetic, static_remove_subfault, &
                        &   static_modify_subfault, static_add_subfault
@@ -22,6 +24,7 @@ module annealing
    use omp_lib
    implicit none
    real :: coef_moment, coef_slip, coef_gnss, coef_imagery, coef_time
+   real :: w_body, w_surf, w_strong, w_cgnss, w_static, w_imagery, w_dart
    real :: coef_rise = 0.0
    real :: current_value, min_value, min_dt, area
    real :: imagery_misfit0
@@ -93,6 +96,7 @@ contains
    call get_annealing_param(int0, int1, real0, real1, real2, start_annealing, real3)
    call get_weights_moment_end(moment_input, smooth_moment, smooth_slip, smooth_time, &
                                 &    smooth_rise, real4, emin0)
+   call get_dataset_weights(w_body, w_surf, w_strong, w_cgnss, w_static, w_imagery, w_dart)
    end subroutine annealing_set_procedure_param
 
    
@@ -211,6 +215,10 @@ contains
       & forward_imag3(wave_pts2, max_stations), real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2)
    real :: rake2, delta_freq, delta_freq0, moment0, kahan_y, kahan_t, kahan_c
    real*8 :: shift, misfit2, misfit1, misfit1_no_weight
+   real :: misfit_body, misfit_surf, misfit_strong, misfit_cgnss, misfit_dart, chan_scale
+   character(len=10) :: ds_name
+   integer :: fs, ls, fc, lc, fb, lb, fsu, lsu, fd, ld
+   logical :: has_body, has_surf, has_strong, has_cgnss, has_dart
    integer :: i, segment, channel, irise, ifall, jf, k, subfault, used_data
    complex*16 :: z0, forward(wave_pts), z, z1
    logical :: static, get_coeff, imagery
@@ -222,6 +230,17 @@ contains
 
    call get_properties(sta_name, component, dt_channel, channels)
    call get_options(weight, misfit_type, t_min, t_max, wavelet_weight)
+   call get_dataset_ranges(fs, ls, fc, lc, fb, lb, fsu, lsu, fd, ld)
+   has_strong = (fs > 0 .and. ls >= fs)
+   has_cgnss = (fc > 0 .and. lc >= fc)
+   has_body = (fb > 0 .and. lb >= fb)
+   has_surf = (fsu > 0 .and. lsu >= fsu)
+   has_dart = (fd > 0 .and. ld >= fd)
+   misfit_strong = 0.0
+   misfit_cgnss = 0.0
+   misfit_body = 0.0
+   misfit_surf = 0.0
+   misfit_dart = 0.0
 
    used_data = 0
    call count_wavelets(used_data)
@@ -241,6 +260,7 @@ contains
    misfit2 = 0.d0
    open(12,file='misfit_details.txt')
    write(12,*) "id sta_name component weight misfit"
+
    do channel = 1, channels
       delta_freq = delta_freq0/dt_channel(channel)
       dt = dt_channel(channel)
@@ -273,7 +293,14 @@ contains
       end do
       call wavelet_syn(real1, imag1, coeffs_syn)
       call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)
+      call get_channel_dataset_info(channel, w_body, w_surf, w_strong, w_cgnss, w_dart, chan_scale, ds_name)
+      misfit1 = misfit1 * chan_scale
       misfit2 = misfit2 + misfit1
+      if (trim(ds_name) == 'strong') misfit_strong = misfit_strong + misfit1
+      if (trim(ds_name) == 'cgnss') misfit_cgnss = misfit_cgnss + misfit1
+      if (trim(ds_name) == 'body') misfit_body = misfit_body + misfit1
+      if (trim(ds_name) == 'surf') misfit_surf = misfit_surf + misfit1
+      if (trim(ds_name) == 'dart') misfit_dart = misfit_dart + misfit1
       write(12,*) channel, sta_name(channel), component(channel), weight(channel), misfit1_no_weight
    end do
 
@@ -337,10 +364,10 @@ contains
       coef_time = smooth_time*misfit2/(time_reg*amp)
       coef_rise = smooth_rise*misfit2/(rise_reg*amp)
       if (static) then
-         coef_gnss = misfit2/(gnss_misfit*amp)
+         coef_gnss = w_static*misfit2/(gnss_misfit*amp)
       endif
       if (imagery) then
-         coef_imagery = misfit2/(imagery_misfit*amp)
+         coef_imagery = w_imagery*misfit2/(imagery_misfit*amp)
       endif
    endif
 
@@ -352,6 +379,11 @@ contains
    end do
    write(*,'()')
    write(*,*)'averaged misfit error', misfit2
+   if (has_body) write(*,*)'  body wave misfit error', misfit_body
+   if (has_surf) write(*,*)'  surface wave misfit error', misfit_surf
+   if (has_strong) write(*,*)'  strong motion misfit error', misfit_strong
+   if (has_cgnss) write(*,*)'  cgnss misfit error', misfit_cgnss
+   if (has_dart) write(*,*)'  dart misfit error', misfit_dart
    write(*,*)'moment error', moment_reg
    write(*,*)'slip smoothness penalization', slip_reg
    write(*,*)'time smoothness penalization', time_reg
@@ -372,6 +404,11 @@ contains
    open(12,file='modelling_summary.txt')
    write(12,'(/A/)')'Modelling Report'
    write(12,*)'averaged misfit error', misfit2
+   if (has_body) write(12,*)'  body wave misfit error', misfit_body
+   if (has_surf) write(12,*)'  surface wave misfit error', misfit_surf
+   if (has_strong) write(12,*)'  strong motion misfit error', misfit_strong
+   if (has_cgnss) write(12,*)'  cgnss misfit error', misfit_cgnss
+   if (has_dart) write(12,*)'  dart misfit error', misfit_dart
    write(12,*)'moment error', moment_reg
    write(12,*)'slip smoothness penalization', slip_reg
    write(12,*)'time smoothness penalization', time_reg
@@ -416,11 +453,27 @@ contains
       & forward_imag3(wave_pts2, max_stations), real1(wave_pts2), imag1(wave_pts2), coeffs_syn(wave_pts2)
    real :: rake2, delta_freq, delta_freq0, moment0(10), kahan_y, kahan_t, kahan_c
    real*8 :: shift, misfit2, misfit1, misfit1_no_weight
+   real :: misfit_body, misfit_surf, misfit_strong, misfit_cgnss, misfit_dart, chan_scale
+   character(len=10) :: ds_name
+   integer :: fs, ls, fc, lc, fb, lb, fsu, lsu, fd, ld
+   logical :: has_body, has_surf, has_strong, has_cgnss, has_dart
    integer :: i, segment, channel, irise, ifall, jf, k, subfault, used_data
    complex*16 :: z0, forward(wave_pts), z, z1
    logical :: static, get_coeff, imagery
    character(len=15) :: sta_name(max_stations)
    character(len=3) :: component(max_stations)
+
+   call get_dataset_ranges(fs, ls, fc, lc, fb, lb, fsu, lsu, fd, ld)
+   has_strong = (fs > 0 .and. ls >= fs)
+   has_cgnss = (fc > 0 .and. lc >= fc)
+   has_body = (fb > 0 .and. lb >= fb)
+   has_surf = (fsu > 0 .and. lsu >= fsu)
+   has_dart = (fd > 0 .and. ld >= fd)
+   misfit_strong = 0.0
+   misfit_cgnss = 0.0
+   misfit_body = 0.0
+   misfit_surf = 0.0
+   misfit_dart = 0.0
 
    used_data = 0
    call count_wavelets(used_data)
@@ -470,7 +523,14 @@ contains
       end do
       call wavelet_syn(real1, imag1, coeffs_syn)
       call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)
+      call get_channel_dataset_info(channel, w_body, w_surf, w_strong, w_cgnss, w_dart, chan_scale, ds_name)
+      misfit1 = misfit1 * chan_scale
       misfit2 = misfit2 + misfit1
+      if (trim(ds_name) == 'strong') misfit_strong = misfit_strong + misfit1
+      if (trim(ds_name) == 'cgnss') misfit_cgnss = misfit_cgnss + misfit1
+      if (trim(ds_name) == 'body') misfit_body = misfit_body + misfit1
+      if (trim(ds_name) == 'surf') misfit_surf = misfit_surf + misfit1
+      if (trim(ds_name) == 'dart') misfit_dart = misfit_dart + misfit1
    end do
 
    amp = 1.0
@@ -535,10 +595,10 @@ contains
       coef_time = smooth_time*misfit2/(time_reg*amp)
       coef_rise = smooth_rise*misfit2/(rise_reg*amp)
       if (static) then
-         coef_gnss = misfit2/(gnss_misfit*amp)
+         coef_gnss = w_static*misfit2/(gnss_misfit*amp)
       endif
       if (imagery) then
-         coef_imagery = misfit2/(imagery_misfit*amp)
+         coef_imagery = w_imagery*misfit2/(imagery_misfit*amp)
       endif
    endif
 
@@ -550,6 +610,11 @@ contains
    end do
    write(*,'()')
    write(*,*)'averaged misfit error', misfit2
+   if (has_body) write(*,*)'  body wave misfit error', misfit_body
+   if (has_surf) write(*,*)'  surface wave misfit error', misfit_surf
+   if (has_strong) write(*,*)'  strong motion misfit error', misfit_strong
+   if (has_cgnss) write(*,*)'  cgnss misfit error', misfit_cgnss
+   if (has_dart) write(*,*)'  dart misfit error', misfit_dart
    do k=1, events
       write(*,*)'moment error', moment_reg(k)
    enddo
@@ -572,6 +637,11 @@ contains
    open(12,file='modelling_summary.txt')
    write(12,'(/A/)')'Modelling Report'
    write(12,*)'averaged misfit error', misfit2
+   if (has_body) write(12,*)'  body wave misfit error', misfit_body
+   if (has_surf) write(12,*)'  surface wave misfit error', misfit_surf
+   if (has_strong) write(12,*)'  strong motion misfit error', misfit_strong
+   if (has_cgnss) write(12,*)'  cgnss misfit error', misfit_cgnss
+   if (has_dart) write(12,*)'  dart misfit error', misfit_dart
    do k=1, events
       write(12,*)'moment error', moment_reg(k)
    enddo
@@ -622,6 +692,8 @@ contains
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
    real :: delta_freq0, delta_freq, rake2!, ex!, misfit2
    real*8 :: shift, misfit2, misfit1, misfit1_no_weight
+   real :: chan_scale
+   character(len=10) :: ds_name
    complex :: green_subf
    complex*16 :: z, z1, forward(wave_pts), z0
 
@@ -846,7 +918,8 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1, misfit1_no_weight)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, &
+!$omp& real1, imag1, coeffs_syn, misfit1, misfit1_no_weight, chan_scale, ds_name)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
@@ -865,7 +938,9 @@ contains
                z = z*z1    ! we may need to increase numerical precision
             end do
             call wavelet_syn(real1, imag1, coeffs_syn)
-            call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)     
+            call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)
+            call get_channel_dataset_info(channel, w_body, w_surf, w_strong, w_cgnss, w_dart, chan_scale, ds_name)
+            misfit1 = misfit1 * chan_scale     
             misfit2 = misfit2 + misfit1    ! we may need to increase numerical precision
          end do
 !$omp end do
@@ -997,6 +1072,8 @@ contains
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
    real*8 :: shift, misfit2, misfit1, misfit1_no_weight
    real :: delta_freq, delta_freq0, rake2!, ex
+   real :: chan_scale
+   character(len=10) :: ds_name
    complex :: green_subf
    complex*16 :: z, z1, forward(wave_pts), z0
 !
@@ -1223,7 +1300,8 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1, misfit1_no_weight)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, &
+!$omp& real1, imag1, coeffs_syn, misfit1, misfit1_no_weight, chan_scale, ds_name)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
@@ -1240,7 +1318,9 @@ contains
                z = z*z1    ! we may need to increase numerical precision
             end do
             call wavelet_syn(real1, imag1, coeffs_syn)
-            call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)     
+            call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)
+            call get_channel_dataset_info(channel, w_body, w_surf, w_strong, w_cgnss, w_dart, chan_scale, ds_name)
+            misfit1 = misfit1 * chan_scale     
             misfit2 = misfit2 + misfit1    ! we may need to increase numerical precision
          end do
 !$omp end do
@@ -1428,6 +1508,8 @@ contains
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
    real :: delta_freq0, delta_freq, rake2!, ex!, misfit2
    real*8 :: shift, misfit2, misfit1, misfit1_no_weight
+   real :: chan_scale
+   character(len=10) :: ds_name
    complex :: green_subf
    complex*16 :: z, z1, forward(wave_pts), z0
 
@@ -1669,7 +1751,8 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1, misfit1_no_weight)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, &
+!$omp& real1, imag1, coeffs_syn, misfit1, misfit1_no_weight, chan_scale, ds_name)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
@@ -1688,7 +1771,9 @@ contains
                z = z*z1    ! we may need to increase numerical precision
             end do
             call wavelet_syn(real1, imag1, coeffs_syn)
-            call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)     
+            call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)
+            call get_channel_dataset_info(channel, w_body, w_surf, w_strong, w_cgnss, w_dart, chan_scale, ds_name)
+            misfit1 = misfit1 * chan_scale     
             misfit2 = misfit2 + misfit1    ! we may need to increase numerical precision
          end do
 !$omp end do
@@ -1830,6 +1915,8 @@ contains
 !   real*8, allocatable :: forward_real2(:, :), forward_imag2(:, :)
    real*8 :: shift, misfit2, misfit1, misfit1_no_weight
    real :: delta_freq, delta_freq0, rake2!, ex
+   real :: chan_scale
+   character(len=10) :: ds_name
    complex :: green_subf
    complex*16 :: z, z1, forward(wave_pts), z0
 !
@@ -2074,7 +2161,8 @@ contains
          misfit2 = 0.d0
 !$omp parallel & 
 !$omp& default(shared) &
-!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, real1, imag1, coeffs_syn, misfit1, misfit1_no_weight)
+!$omp& private(channel, delta_freq, j, shift, z, z1, green_subf, &
+!$omp& real1, imag1, coeffs_syn, misfit1, misfit1_no_weight, chan_scale, ds_name)
 !$omp do schedule(static) reduction(+:misfit2)
          do channel = 1, channels
             delta_freq = delta_freq0/dt_channel(channel)
@@ -2091,7 +2179,9 @@ contains
                z = z*z1    ! we may need to increase numerical precision
             end do
             call wavelet_syn(real1, imag1, coeffs_syn)
-            call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)     
+            call misfit_channel(channel, coeffs_syn, misfit1, misfit1_no_weight)
+            call get_channel_dataset_info(channel, w_body, w_surf, w_strong, w_cgnss, w_dart, chan_scale, ds_name)
+            misfit1 = misfit1 * chan_scale     
             misfit2 = misfit2 + misfit1    ! we may need to increase numerical precision
          end do
 !$omp end do

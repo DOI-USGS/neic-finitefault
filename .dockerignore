@@ -8,3 +8,5 @@
 !pb2002_boundaries.gmt
 !examples
 !install.sh
+!DART_station_locations.txt
+!clawpack

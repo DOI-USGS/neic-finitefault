@@ -1,8 +1,8 @@
 import datetime
 import json
+import logging
 import pathlib
 import time
-from enum import Enum
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
@@ -12,8 +12,9 @@ from obspy.core.utcdatetime import UTCDateTime  # type: ignore
 from ffm.data_acquisition import acquisition
 from ffm.data_management import filling_data_dicts
 from ffm.fault_plane import create_finite_fault
-from ffm.get_outputs import read_solution_static_format, synthetics_to_SAC
+from ffm.get_outputs import synthetics_to_SAC
 from ffm.input_files import (
+    input_chen_dart,
     input_chen_imagery,
     input_chen_near_field,
     input_chen_static,
@@ -22,10 +23,7 @@ from ffm.input_files import (
     inputs_simmulated_annealing,
 )
 from ffm.input_files import model_space as model_space_update
-from ffm.input_files import (
-    plane_for_chen,
-    write_velmodel,
-)
+from ffm.input_files import plane_for_chen, write_velmodel
 from ffm.management import default_dirs
 from ffm.many_events import (
     get_model_space_events,
@@ -33,7 +31,8 @@ from ffm.many_events import (
     get_segments_events,
     get_waveforms_events,
 )
-from ffm.modelling_parameters import modelling_prop
+from ffm.model.result.solution import Solution
+from ffm.modelling_parameters import create_dataset_weights, modelling_prop
 from ffm.modify_jsons import modify_channels
 from ffm.modify_sacs import correct_waveforms, plot_channels
 from ffm.read_config import CONFIG_PATH, PROJECT_DIRECTORY
@@ -84,7 +83,13 @@ def _parse_imagery(value: str) -> Tuple[pathlib.Path, Optional[str]]:
         return filepath, ramp
 
 
-@app.command(help="Acquire strong motion and teleseismic bodywave data")
+@app.command(
+    help=(
+        "Acquire strong motion and teleseismic bodywave data.\n"
+        "NOTICE: 'acquire' deprecated as of 1.2.0, use 'ffm get-data' or modules in ffm.acquisition. "
+        "To be removed in 2.1.0."
+    )
+)
 def acquire(
     directory: pathlib.Path = typer.Argument(..., help="Path to the data directory"),
     gcmt_tensor_file: pathlib.Path = typer.Argument(
@@ -97,6 +102,10 @@ def acquire(
         help="Type to add to the data_types list, default is [strong, body]",
     ),
 ):
+    logging.warning(
+        "'acquire' deprecated as of 1.2.0, use 'ffm get-data' or modules in ffm.acquisition. "
+        "To be removed in 2.1.0."
+    )
     # get the tensor information
     tensor_info = get_tensor(cmt_file=gcmt_tensor_file)
     event_time = tensor_info["datetime"]
@@ -459,6 +468,151 @@ def modify_dicts(
             )
 
 
+@app.command(
+    help=(
+        "View or update relative dataset weights in dataset_weights.json.\n\n"
+        "Waveform weights (body, surf, strong, cgnss, dart) scale the penalty per station channel in the objective function "
+        "(e.g., --body 1.0 --surf 0.2 penalizes body wave error 5x more heavily per station than surface waves).\n\n"
+        "Static and imagery weights scale relative to the total combined waveform misfit "
+        "(e.g., --static 1.0 balances equally with total waveforms, while --static 10.0 gives static data 10x weight)."
+    )
+)
+def update_dataset_weights(
+    directory: pathlib.Path = typer.Argument(
+        ..., help="Path to the directory containing dataset_weights.json"
+    ),
+    show: bool = typer.Option(
+        False,
+        "--show",
+        "-s",
+        help="Display the current dataset weights",
+    ),
+    body: Optional[float] = typer.Option(
+        None,
+        "--body",
+        help="Relative weight per station for teleseismic body waves (P/SH)",
+    ),
+    surf: Optional[float] = typer.Option(
+        None,
+        "--surf",
+        help="Relative weight per station for teleseismic surface waves (Rayleigh/Love)",
+    ),
+    strong: Optional[float] = typer.Option(
+        None,
+        "--strong",
+        help="Relative weight per station for strong motion waveforms",
+    ),
+    cgnss: Optional[float] = typer.Option(
+        None,
+        "--cgnss",
+        help="Relative weight per station for high-rate continuous GNSS",
+    ),
+    static: Optional[float] = typer.Option(
+        None,
+        "--static",
+        "--static-gnss",
+        help="Relative weight for static GNSS offsets (relative to total waveform misfit; 1.0 = equal weight)",
+    ),
+    imagery: Optional[float] = typer.Option(
+        None,
+        "--imagery",
+        "--insar",
+        help="Relative weight for InSAR / optical imagery (relative to total waveform misfit; 1.0 = equal weight)",
+    ),
+    dart: Optional[float] = typer.Option(
+        None,
+        "--dart",
+        help="Relative weight per station for DART tsunami data",
+    ),
+):
+    """View or update relative weights for each dataset type"""
+    weights_file = directory / "dataset_weights.json"
+    weights_dict: dict = {}
+    if weights_file.is_file():
+        with open(weights_file, "r") as f:
+            data = json.load(f)
+        if "weights" in data and isinstance(data["weights"], dict):
+            weights_dict = data["weights"]
+        else:
+            weights_dict = data
+    else:
+        detected_types = []
+        if (directory / "channels_body.txt").is_file() or (
+            directory / "tele_waves.json"
+        ).is_file():
+            detected_types.append("body")
+        if (directory / "channels_surf.txt").is_file() or (
+            directory / "surf_waves.json"
+        ).is_file():
+            detected_types.append("surf")
+        if (directory / "channels_strong.txt").is_file() or (
+            directory / "strong_motion_waves.json"
+        ).is_file():
+            detected_types.append("strong")
+        if (directory / "channels_cgnss.txt").is_file() or (
+            directory / "cgnss_waves.json"
+        ).is_file():
+            detected_types.append("cgnss")
+        if (directory / "static_data.txt").is_file() or (
+            directory / "static_data.json"
+        ).is_file():
+            detected_types.append("static")
+        if (directory / "imagery_data.txt").is_file() or (
+            directory / "imagery_data.json"
+        ).is_file():
+            detected_types.append("imagery")
+        if not detected_types:
+            detected_types = ["body", "surf", "strong", "cgnss", "static", "imagery"]
+        weights_dict = {dt: 1.0 for dt in detected_types}
+        create_dataset_weights(detected_types, directory=directory)
+
+    updates = {
+        "body": body,
+        "surf": surf,
+        "strong": strong,
+        "cgnss": cgnss,
+        "static": static,
+        "imagery": imagery,
+        "dart": dart,
+    }
+    has_updates = any(v is not None for v in updates.values())
+    if has_updates:
+        for k, v in updates.items():
+            if v is not None:
+                weights_dict[k] = float(v)
+        output_dict = {
+            "weights": weights_dict,
+            "description": (
+                "Relative dataset weights. Waveform weights (body, surf, strong, cgnss, dart) scale the penalty "
+                "per station channel in the objective function: e.g., 'body: 1.0, surf: 0.2' means fitting error "
+                "at a body wave station is penalized 5x more heavily than the equivalent error at a surface wave station. "
+                "Static and imagery weights scale relative to the total combined waveform misfit: 'static: 1.0' balances "
+                "static data equally with all combined waveforms, 'static: 0.1' gives 10% weight, and 'static: 10.0' gives 10x weight."
+            ),
+        }
+        with open(weights_file, "w") as f:
+            json.dump(
+                output_dict,
+                f,
+                sort_keys=True,
+                indent=4,
+                separators=(",", ": "),
+                ensure_ascii=False,
+            )
+        typer.echo(f"Updated {weights_file}")
+
+        annealing_prop_file = directory / "annealing_prop.json"
+        if annealing_prop_file.is_file():
+            with open(annealing_prop_file, "r") as f:
+                prop = json.load(f)
+            inputs_simmulated_annealing(prop, directory=directory)
+            typer.echo(f"Updated {directory / 'dataset_weights.txt'}")
+
+    typer.echo("\nCurrent Dataset Weights:")
+    for dt, w in sorted(weights_dict.items()):
+        typer.echo(f"  {dt:10s}: {w}")
+
+
 @app.command(help="Modify data in sac files")
 def modify_sacs(
     directory: pathlib.Path = typer.Argument(..., help="Path to the data directory"),
@@ -607,9 +761,9 @@ def static_to_srf(
             segments_data = json.load(s)
 
     # get the solution
-    solution = read_solution_static_format(
-        segments=segments_data["segments"], data_dir=directory
-    )
+    solution = Solution.from_static_solution_file(
+        segments_data=segments_data, solution_filepath=directory / "Solution.txt"
+    )._old_format
 
     # convert static to srf
     convert_static_to_srf(
@@ -687,9 +841,9 @@ def static_to_fsp(
             segments_data = json.load(s)
 
     # get the solution
-    solution = read_solution_static_format(
-        segments=segments_data["segments"], data_dir=directory
-    )
+    solution = Solution.from_static_solution_file(
+        segments_data=segments_data, solution_filepath=directory / "Solution.txt"
+    )._old_format
 
     # convert static to srf
     convert_static_to_fsp(
@@ -723,6 +877,8 @@ def synthetic_sac(
         synthetics_to_SAC("strong", 10, directory)
     if "cgnss" in chosen_data_types:
         synthetics_to_SAC("cgnss", 10, directory)
+    if "dart" in chosen_data_types:
+        synthetics_to_SAC("dart", 10, directory)
 
 
 @app.command(help="Write the tensor file from a GCMT moment tensor")
@@ -851,6 +1007,13 @@ def update_inputs(
             tensor_info=tensor_info,
             data_prop=data_prop,
             data_type="cgnss",
+            directory=directory,
+        )
+    if "dart" in chosen_data_types:
+        validate_files([directory / "dart_waves.json"])
+        input_chen_dart(
+            tensor_info=tensor_info,
+            data_prop=data_prop,
             directory=directory,
         )
     if "gnss" in chosen_data_types:

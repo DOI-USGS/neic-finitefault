@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # ==============================================================================
 # Define usage
 #     Sets up usage function and parses arguments
@@ -105,13 +107,13 @@ if [[ "$LITHO1" == *"download" ]]; then
     else
         echo "Downloading the LITHO1.0.nc file"
         curl -o "${LITHO1_FILE}" -L \
-            "https://ds.iris.edu/files/products/emc/emc-files/LITHO1.0.nc"; 
+            "https://data.earthscope.org/archive/seismology/products/emc/netcdf/LITHO1.0.r0.0-n4c.nc"; 
     fi
 else
     echo "Copying the provided LITHO1.0.nc file to the required location"
     cp "${LITHO1}" "${LITHO1_FILE}"
 fi
-lithminsize=44350184
+lithminsize=10662205
 lithsize=$(wc -c <"$LITHO1_FILE")
 if [ "$lithsize" -ge $lithminsize ]; then
     echo "LITHO1.0.nc size verified.";

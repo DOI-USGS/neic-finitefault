@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # ==============================================================================
 # Define usage
 #     Sets up usage function, parses and validates arguments
@@ -70,8 +69,16 @@ LITHO1=${LITHO1:-"download"}
 INSTALL_DIR="${FINITEFAULT_DIR}/install.d"
 # shellcheck source=./install.d/miniforge.sh
 source "${INSTALL_DIR}/miniforge.sh" "${FINITEFAULT_DIR}";
-# shellcheck disable=SC1090
-. "${HOME}/miniforge/etc/profile.d/conda.sh"
+if [ -f "${HOME}/miniforge/etc/profile.d/conda.sh" ]; then
+    . "${HOME}/miniforge/etc/profile.d/conda.sh"
+elif [ -f "${HOME}/miniforge3/etc/profile.d/conda.sh" ]; then
+    . "${HOME}/miniforge3/etc/profile.d/conda.sh"
+elif command -v conda > /dev/null 2>&1; then
+    CONDA_BASE=$(conda info --base 2>/dev/null)
+    if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
+        . "${CONDA_BASE}/etc/profile.d/conda.sh"
+    fi
+fi
 # shellcheck source=./install.d/ff-env.sh
 source "${INSTALL_DIR}/ff-env.sh" "${FINITEFAULT_DIR}";
 conda activate ff-env;
@@ -81,6 +88,10 @@ pip install -e "${FINITEFAULT_DIR}";
 source "${INSTALL_DIR}/ffm.sh" "${FINITEFAULT_DIR}";
 # shellcheck source=./install.d/data_dependencies.sh
 source "${INSTALL_DIR}/data_dependencies.sh" "${FINITEFAULT_DIR}" --fd-bank "${FD_BANK}" --lith "${LITHO1}";
+# install clawpack in the same directory as neic-finitefault
+CLAW_DIR=$(dirname "${FINITEFAULT_DIR}");
+# shellcheck source=./install.d/clawpack.sh
+source "${INSTALL_DIR}/clawpack.sh" "${CLAW_DIR}"
 
 # get back to top level directly and message completion of installation
 cd "${FINITEFAULT_DIR}" || echo "Failed to return to finite fault top level directly";

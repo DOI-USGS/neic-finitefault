@@ -11,10 +11,53 @@ from ffm.acquisition.cmt import Cmt
 
 DETAIL = {
     "properties": {
-        "mag": 6.4,
         "place": "here, there",
-        "time": 1771036057951,
         "products": {
+            "origin": [
+                {
+                    "source": "not",
+                    "properties": {
+                        "magnitude": 5,
+                        "eventtime": 1771036067951,
+                        "latitude": -15,
+                        "longitude": 150,
+                        "depth": 6,
+                    },
+                },
+                {
+                    "source": "us",
+                    "properties": {
+                        "magnitude": 6.4,
+                        "eventtime": "2026-02-14T02:27:37.951Z",
+                        "latitude": -14.8934,
+                        "longitude": 166.6013,
+                        "depth": 10,
+                        "review-status": "reviewed",
+                    },
+                },
+                {
+                    "source": "us",
+                    "properties": {
+                        "magnitude": 5,
+                        "eventtime": 1771036057951,
+                        "latitude": -14.8934,
+                        "longitude": 170.6013,
+                        "depth": 4,
+                        "review-status": "not-reviewed",
+                    },
+                },
+                {
+                    "source": "us2",
+                    "properties": {
+                        "magnitude": 2,
+                        "eventtime": 1771036057951,
+                        "latitude": -12.8934,
+                        "longitude": 171.6013,
+                        "depth": 12,
+                        "review-status": "not-reviewed",
+                    },
+                },
+            ],
             "moment-tensor": [
                 {
                     "source": "not",
@@ -38,6 +81,24 @@ DETAIL = {
                         "tensor-mtp": "3E+18",
                         "tensor-mtt": "-2E+18",
                         "sourcetime-duration": "7",
+                        "review-status": "reviewed",
+                        "derived-magnitude-type": "Mww",
+                        "derived-depth": 10.1,
+                        "derived-latitude": -14.89341,
+                        "derived-longitude": 166.60131,
+                    },
+                },
+                {
+                    "source": "us",
+                    "properties": {
+                        "derived-magnitude-type": "Mww",
+                        "sourcetime-duration": "2",
+                        "tensor-mpp": "-1E+17",
+                        "tensor-mrp": "-2E+18",
+                        "tensor-mrr": "3E+18",
+                        "tensor-mrt": "5E+18",
+                        "tensor-mtp": "3E+18",
+                        "tensor-mtt": "-1E+18",
                     },
                 },
                 {
@@ -51,12 +112,8 @@ DETAIL = {
                         "sourcetime-duration": "5",
                     },
                 },
-            ]
+            ],
         },
-    },
-    "geometry": {
-        "type": "Point",
-        "coordinates": [166.6013, -14.8934, 10],
     },
 }
 
@@ -70,7 +127,7 @@ def test_cmt_from_id():
         assert detail_cmt.latitude == -14.8934
         assert detail_cmt.longitude == 166.6013
         assert detail_cmt.magnitude == 6.4
-        assert detail_cmt.magnitude_type == "??"
+        assert detail_cmt.magnitude_type == "Mww"
         assert detail_cmt.mpp == -2e17
         assert detail_cmt.mrp == -2e18
         assert detail_cmt.mrr == 3e18
@@ -91,7 +148,7 @@ def test_cmt_from_detail():
     assert detail_cmt.latitude == -14.8934
     assert detail_cmt.longitude == 166.6013
     assert detail_cmt.magnitude == 6.4
-    assert detail_cmt.magnitude_type == "??"
+    assert detail_cmt.magnitude_type == "Mww"
     assert detail_cmt.mpp == -2e17
     assert detail_cmt.mrp == -2e18
     assert detail_cmt.mrr == 3e18
@@ -121,7 +178,7 @@ def test_cmt_from_moment_tensor():
     assert detail_cmt.latitude == -14.8934
     assert detail_cmt.longitude == 166.6013
     assert detail_cmt.magnitude == 6.4
-    assert detail_cmt.magnitude_type == "??"
+    assert detail_cmt.magnitude_type == "Mww"
     assert detail_cmt.mpp == -2e17
     assert detail_cmt.mrp == -2e18
     assert detail_cmt.mrr == 3e18
@@ -151,9 +208,9 @@ def test_cmt_write():
 event name: eventid
 time shift: 3.5
 half duration: 3.5
-latitude: -14.8934
-longitude: 166.6013
-depth: 10.0
+latitude: -14.89341
+longitude: 166.60131
+depth: 10.1
 Mrr: 3e+25
 Mtt: -2e+25
 Mpp: -2e+24

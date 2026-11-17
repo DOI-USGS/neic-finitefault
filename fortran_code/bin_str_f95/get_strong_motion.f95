@@ -38,6 +38,11 @@ program get_strong_motion
    real :: niu_fault(max_dip_psources, max_dip_subfaults, max_seg)
    real :: depth_sources(max_dip_psources, max_dip_subfaults, max_seg)
    real :: low_freq, high_freq
+   character(len=10) :: filt_name(200)
+   character(len=3) :: filt_comp(200)
+   real :: filt_low(200), filt_high(200)
+   real :: lowf, highf
+   integer :: n_filters, jf, ios
    integer :: i, j, nsta
    integer :: ir_max, n_chan, ir, nx, ky, kx, LL, no
    integer :: iys, ixs, iyp, ixp, nxp, nyp
@@ -103,6 +108,18 @@ program get_strong_motion
    filterfile=trim(directory)//filter_file
    open(1, file=filterfile, status='old')
    read(1,*)string1, low_freq, high_freq
+!
+!  optional per-channel filter corners: lines of "STA COMP low_freq high_freq"
+!  after the global corners line. Channels not listed use the global corners.
+!
+   n_filters = 0
+   do
+      if (n_filters.ge.200) exit
+      read(1, *, iostat=ios)filt_name(n_filters+1), filt_comp(n_filters+1), &
+     &   filt_low(n_filters+1), filt_high(n_filters+1)
+      if (ios.ne.0) exit
+      n_filters = n_filters + 1
+   enddo
    close(1)
    write(*,*)high_freq
    if (disp) low_freq = 0.0
@@ -187,7 +204,18 @@ program get_strong_motion
 !
    do ir = 1, ir_max
       read(12,*)no, sta_name(ir), lat_sta, lon_sta, io_mod(ir), comp
-      write(*,*)'Store response for station ', sta_name(ir), ', channel ', comp, '...'
+      lowf = low_freq
+      highf = high_freq
+      do jf = 1, n_filters
+         if ((trim(filt_name(jf)).eq.trim(sta_name(ir))).and. &
+     &       (trim(filt_comp(jf)).eq.trim(comp))) then
+            lowf = filt_low(jf)
+            highf = filt_high(jf)
+         endif
+      enddo
+      if (disp) lowf = 0.0
+      write(*,*)'Store response for station ', sta_name(ir), ', channel ', comp, &
+     &   ' (corners ', lowf, highf, ')...'
       call distaz(lat_sta,lon_sta,lat_e,lon_e,dis,az,baz)
 !      write(*,*)'az=',az,dis,baz,lat_sta,lon_sta,lat_e,lon_e
       channel2 = comp(3:3)
@@ -318,13 +346,13 @@ program get_strong_motion
                real_dip(:) = 0.0
                real_dip(:nleft) = green_dip(:nleft) / (nxp * nyp)
 
-               call bandpassfilter(real_dip, wave_pts2, dt, 4, 2, low_freq, high_freq)
+               call bandpassfilter(real_dip, wave_pts2, dt, 4, 2, lowf, highf)
                call fft(real_dip, imag_dip, lnpt, -1)
                imag_stk(:) = 0.0
                real_stk(:) = 0.0
                real_stk(:nleft) = green_stk(:nleft) / (nxp * nyp)
                
-               call bandpassfilter(real_stk, wave_pts2, dt, 4, 2, low_freq, high_freq)
+               call bandpassfilter(real_stk, wave_pts2, dt, 4, 2, lowf, highf)
                call fft(real_stk, imag_stk, lnpt, -1)
                w = t_cor*twopi*df
                z1 = cmplx(cos(w), sin(w), kind(1d0))

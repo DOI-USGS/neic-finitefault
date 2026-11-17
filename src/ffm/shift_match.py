@@ -9,6 +9,7 @@ import pathlib
 from copy import copy
 from typing import Any, List, Optional, Tuple, Union
 
+import matplotlib
 import matplotlib.pyplot as plt  # type: ignore
 import numpy as np
 from matplotlib.axes import Axes
@@ -147,13 +148,13 @@ def manual_shift(
                         if plot:
                             length = int(float(channel["duration"]))
                             plot_3comp_shift(
-                                directory,
                                 data_type,
                                 dt,
                                 channel["name"],
                                 waveform_start_signal,
                                 sample_shift,
                                 zero_start=zero_start,
+                                directory=directory,
                             )
 
     # reset synthetic and observed fields in json
@@ -165,19 +166,17 @@ def manual_shift(
 
 
 def plot_3comp_shift(
-    directory,
-    data_type,
-    dt,
-    station_name,
-    start,
-    sample_shift,
+    data_type: str,
+    dt: float,
+    station_name: str,
+    start: int,
+    sample_shift: int,
     zero_start=True,
+    directory: Union[pathlib.Path, str] = pathlib.Path(),
 ):
     """
     For regional observations, plot shift of all three components in one plot
 
-    :param directory: Where the files should be read from (default from manual_shift)
-    :type directory: Union[pathlib.Path, str]
     :param data_type: The data type
     :type data_type: str
     :param dt: The sampling rate
@@ -190,6 +189,8 @@ def plot_3comp_shift(
     :type sample_shift: int
     :param zero_start: Whether a zero start, defaults to True
     :type zero_start: bool
+    :param directory: Where the files should be read from (default from manual_shift)
+    :type directory: Union[pathlib.Path, str]
     """
     plot_folder: Union[pathlib.Path, str] = (
         "strong_shift" if data_type == "strong" else "cgnss_shift"
@@ -269,17 +270,17 @@ def plot_3comp_shift(
 
 
 def plot_shift(
-    directory,
-    data_type,
-    dt,
-    synthetic,
-    observed_file,
-    length,
-    station,
-    channel,
-    start,
-    sample_shift,
-    zero_start=True,
+    directory: Union[pathlib.Path, str],
+    data_type: str,
+    dt: float,
+    synthetic: List[np.ndarray],
+    observed_file: dict,
+    length: int,
+    station: str,
+    channel: str,
+    start: int,
+    sample_shift: int,
+    zero_start: bool = True,
 ):
     """
     Plot observed and synthetic waveforms before and after shift
@@ -317,7 +318,8 @@ def plot_shift(
 
     if not os.path.isdir(plot_folder):
         os.mkdir(plot_folder)
-    fig, axes = plt.subplots(2, 1, figsize=(10, 5))
+    fig = plt.figure()
+    axes = plt.subplots(2, 1, figsize=(10, 5))  # type: ignore
     fig.suptitle("{} {}".format(station, channel))
     obs_times: list = []
     syn_times: list = []
@@ -338,15 +340,15 @@ def plot_shift(
     syn_times = [time0, time0]
     obs_waveforms = [observed0, observed1]
     syn_waveforms = [synthetic, synthetic]
-    axes[1].axvline(0)
-    axes2 = axes.ravel()
+    axes[1].axvline(0)  # type: ignore
+    axes2 = axes.ravel()  # type: ignore
     axes2 = plot_waveforms(axes2, obs_times, obs_waveforms, color="black")
     axes2 = plot_waveforms(axes2, syn_times, syn_waveforms, color="red", custom="fill")
-    axes[1].set_xlabel("Time (s)")
-    axes[0].set_ylabel("Before Shift \n" + units)
-    axes[1].set_ylabel("After Shift \n" + units)
+    axes[1].set_xlabel("Time (s)")  # type: ignore
+    axes[0].set_ylabel("Before Shift \n" + units)  # type: ignore
+    axes[1].set_ylabel("After Shift \n" + units)  # type: ignore
     name_file = os.path.join(plot_folder, "{}_{}.png".format(station, channel))
-    plt.savefig(directory / name_file)
+    plt.savefig(f"{directory} / {name_file}")
     plt.close(fig)
 
 

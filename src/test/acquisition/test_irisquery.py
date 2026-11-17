@@ -33,47 +33,25 @@ DETAIL = {
 def test_irisquery_from_id():
     with mock.patch(target="requests.get") as mock_requests:
         mock_requests.return_value = MockResponse(json.dumps(DETAIL), 200)
-        detail_irisquery = IrisQuery.from_id("eventid", "us")
-        assert detail_irisquery.depth == 10
-        assert detail_irisquery.latitude == -14.8934
-        assert detail_irisquery.longitude == 166.6013
-        assert detail_irisquery.duration == 3000
-        assert detail_irisquery.event_time == datetime(
+        detail_irisquery = IrisQuery("teleseismic", "eventid", "us")
+        assert detail_irisquery.query.depth == 10
+        assert detail_irisquery.query.latitude == -14.8934
+        assert detail_irisquery.query.longitude == 166.6013
+        assert detail_irisquery.query.duration == 3000
+        assert detail_irisquery.query.event_time == datetime(
             2026, 2, 14, 2, 27, 37, 951000, tzinfo=timezone.utc
         )
 
 
-def test_irisquery_from_detail():
-    detail_irisquery = IrisQuery.from_detail(DETAIL, "us")
-    assert detail_irisquery.depth == 10
-    assert detail_irisquery.latitude == -14.8934
-    assert detail_irisquery.longitude == 166.6013
-    assert detail_irisquery.duration == 3000
-    assert detail_irisquery.event_time == datetime(
-        2026, 2, 14, 2, 27, 37, 951000, tzinfo=timezone.utc
-    )
-
-
-def test_irisquery_from_moment_tensor():
-    detail_irisquery = IrisQuery.from_origin(
-        origin=DETAIL["properties"]["products"]["origin"][0]
-    )
-    assert detail_irisquery.depth == 10
-    assert detail_irisquery.latitude == -14.8934
-    assert detail_irisquery.longitude == 166.6013
-    assert detail_irisquery.duration == 3000
-    assert detail_irisquery.event_time == datetime(
-        2026, 2, 14, 2, 27, 37, 951000, tzinfo=timezone.utc
-    )
-
-
 def test_irisquery_end_to_end():
-    detail_irisquery = IrisQuery.from_detail(DETAIL, "us")
-    assert detail_irisquery.depth == 10
-    assert detail_irisquery.latitude == -14.8934
-    assert detail_irisquery.longitude == 166.6013
-    assert detail_irisquery.duration == 3000
-    assert detail_irisquery.event_time == datetime(
+    with mock.patch(target="requests.get") as mock_requests:
+        mock_requests.return_value = MockResponse(json.dumps(DETAIL), 200)
+        detail_irisquery = IrisQuery("teleseismic", "eventid", "us")
+    assert detail_irisquery.query.depth == 10
+    assert detail_irisquery.query.latitude == -14.8934
+    assert detail_irisquery.query.longitude == 166.6013
+    assert detail_irisquery.query.duration == 3000
+    assert detail_irisquery.query.event_time == datetime(
         2026, 2, 14, 2, 27, 37, 951000, tzinfo=timezone.utc
     )
     with mock.patch(target="ffm.acquisition.irisquery.Client") as mock_client:
@@ -104,28 +82,11 @@ def test_irisquery_end_to_end():
             ]
         )
 
-        data = detail_irisquery.get_data(
+        data = detail_irisquery.get_teleseismic_data(
             networks=["US"], stations={"US": {"STAT1": ["BH*"]}}
         )
         assert len(data) == 2
 
-    with mock.patch(target="ffm.acquisition.irisquery.Iris") as mock_iris:
-        mocked_iris = mock.MagicMock()
-        mock_iris.return_value = mocked_iris
-
-        # test getting response
-        mocked_iris.sacpz.side_effect = [b"response 1", b"response 2"]
-        data_with_response = detail_irisquery.get_responses(data)
-        assert data_with_response[0].stats.response == b"response 1"
-        assert data_with_response[1].stats.response == b"response 2"
-
-    # test writing the data
-    tempdir = pathlib.Path(mkdtemp())
-    try:
-        detail_irisquery.write_data(tempdir, data_with_response)
-        assert (tempdir / "US_STAT1_BHZ_00.sac").exists()
-        assert (tempdir / "US_STAT1_BHZ_10.sac").exists()
-        assert (tempdir / "SAC_PZs_US_STAT1_BHZ_00.sac").exists()
-        assert (tempdir / "SAC_PZs_US_STAT1_BHZ_10.sac").exists()
-    finally:
-        rmtree(tempdir)
+        data = detail_irisquery.get_strongmotion_data(
+            networks=["US"],
+        )

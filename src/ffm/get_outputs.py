@@ -11,6 +11,7 @@ import pathlib
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
+from deprecated import deprecated  # type: ignore [import-untyped]
 from obspy import Stream, Trace, read  # type: ignore
 
 import ffm.plane_management as pl_mng
@@ -21,6 +22,10 @@ from ffm import get_outputs
 ##########################
 
 
+@deprecated(
+    "read_solution_static_format deprecated and to be removed in 2.1.0. "
+    "Parsing functionality moved to ffm.model.result.solution."
+)
 def read_solution_static_format(
     segments: List[Dict[str, str]], data_dir: Union[str, pathlib.Path] = pathlib.Path()
 ) -> dict:
@@ -307,8 +312,23 @@ def synthetics_to_SAC(
         files = get_outputs.get_data_dict(
             traces_info, syn_file="synthetics_cgnss.txt", directory=directory
         )
+    elif data_type == "dart":
+        fwd_directory = directory / "forward_model/DART"
+        if not fwd_directory.exists():
+            os.mkdir(fwd_directory)
+        if not (directory / "dart_waves.json").exists():
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), "dart_waves.json"
+            )
+        with open(directory / "dart_waves.json") as t:
+            traces_info = json.load(t)
+        files = get_outputs.get_data_dict(
+            traces_info, syn_file="synthetics_dart.txt", directory=directory
+        )
     else:
-        raise ValueError("Data type must be waveform (body, surf, strong, or cgnss)")
+        raise ValueError(
+            "Data type must be waveform (body, surf, strong, cgnss, or dart)"
+        )
 
     start_waveform: List[float] = []
     for file in files:

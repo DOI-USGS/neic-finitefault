@@ -157,7 +157,7 @@ def static_to_srf(
     dart_phimx = 0
     dart_r = 0
     if "dart" in used_data:
-        dart_data = pd.read_json(directory / "dart_data.json")
+        dart_data = pd.read_json(directory / "dart_waves.json")
         quantity_dart = len(dart_data)
         dart_r = min(dart_data["distance"])
         dart_az = np.sort(dart_data["azimuth"].values.tolist())

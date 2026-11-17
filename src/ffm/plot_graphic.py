@@ -82,7 +82,9 @@ def plot_ffm_sol(
     Next, we load necessary data for plots.
     >>> vel_model = json.load(open('velmodel_data.json')) # Assume vel_model stored in file 'velmodel_data.json'
     >>> segments, rise_time, point_sources = pl_mng.__read_planes_info() # Loads point sources and segments information
-    >>> solution = get_outputs.read_solution_static_format(segments, point_sources)
+    >>> solution = Solution.from_static_solution_file(
+            segments_data=segments_data, solution_filepath=directory / "Solution.txt"
+        )._old_format
     >>> shear = pf.shear_modulous(point_sources, velmodel=vel_model)
     >>> tensor_info = {
             'moment_mag': 7 * 10 ** 27,
@@ -1342,7 +1344,7 @@ def plot_moment_rate_function(
         for t, val in zip(time, mr):  # type: ignore
             outf.write("{:8.2f}:   {:8.4e}\n".format(t, val))
 
-    seismic_moment = np.trapz(mr, dx=0.01)
+    seismic_moment = np.trapz(mr, dx=0.01)  # type: ignore [assignment]
     magnitude = 2.0 * (np.log10(seismic_moment * 10**7) - 16.1) / 3.0
     plt.xlabel("Time $(s)$")
     plt.ylabel("Moment rate $(Nm/s)$")

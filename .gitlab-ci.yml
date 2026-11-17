@@ -1,13 +1,6 @@
 ---
 default:
   before_script:
-    # download and cache data dependencies
-    - |
-      if [[ -f "fortran_code/gfs_nm/long/fd_bank" && -f "fortran_code/info/LITHO1.0.nc" ]]; then
-          echo "fd_bank and LITHO1.0.nc already downloaded";
-      else
-          bash install.d/data_dependencies.sh "$(pwd)"
-      fi
     # install and cache python
     - |
       if [ -d "miniforge" ]; then
@@ -27,14 +20,18 @@ default:
           source install.d/ff-env.sh "$(pwd)";
           conda activate ff-env;
       fi
+    - apt install -y gfortran
+    # make clawpack installation
+    - source install.d/clawpack.sh "$(pwd)" -y;
   cache:
     key:
       files:
-        - install.d/*
+        - install.d/environment.yml
     paths:
       - miniforge
       - fortran_code/gfs_nm/long/fd_bank
       - fortran_code/info/LITHO1.0.nc
+      - clawpack
   image: code.usgs.gov:5001/devops/images/usgs/python:3.10-build
   tags:
     - dev
@@ -54,6 +51,8 @@ workflow:
 stages:
   - init
   - audit
+  - lint
+  - dependencies
   - test
 
 .fork: &fork
@@ -89,44 +88,55 @@ Python Install:
 ## -------------------------------------
 
 Python Audit:
+  # remove when python version update MR is merged
   allow_failure: true
+  needs:
+    - Python Install
   script:
-    - pip install pip-audit
-    - pip-audit --ignore-vuln CVE-2026-40192
+    - pip install pip-audit poethepoet
+    - poe audit
   stage: audit
+
+## -------------------------------------
+#  Lint Stage
+## -------------------------------------
+
+Python Lint:
+  needs:
+    - Python Install
+  script:
+    - poe lint
+  stage: lint
+
+## -------------------------------------
+#  Dependencies Stage
+## -------------------------------------
+
+Data Dependencies:
+  allow_failure: true
+  artifacts:
+    paths:
+      - fortran_code/gfs_nm/long/fd_bank
+      - fortran_code/info/LITHO1.0.nc
+    expire_in: 1 day
+  needs:
+    - Python Install
+  script:
+    - bash install.d/data_dependencies.sh "$(pwd)"
+  stage: dependencies
 
 ## -------------------------------------
 #  Test Stage
 ## -------------------------------------
 
-Python Lint:
-  needs:
-    - Python Audit
-  script:
-    - poe lint
-  stage: test
-
 Python Test:
   script:
     - apt install gfortran -y
     - pip install .
+    - export CLAW=$(pwd)/clawpack
+    - export PYTHONPATH=$CLAW:$PYTHONPATH
+    - export FC=gfortran
     - poe test
-  stage: test
-
-Dockerfile Test:
-  before_script: ""
-  cache: []
-  image: code.usgs.gov:5001/devops/images/usgs/docker:27-node
-  needs:
-    - Python Audit
-  script:
-    - docker build . -t test --build-arg CI_REGISTRY="${CI_REGISTRY}"
-    - docker run test
-  services:
-    - alias: docker
-      name: code.usgs.gov:5001/devops/images/usgs/docker:27-dind
-  variables:
-    DOCKER_DRIVER: overlay2
   stage: test
 
 Full End to End Test:

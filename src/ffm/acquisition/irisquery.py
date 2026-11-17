@@ -1,10 +1,9 @@
-import json
+import logging
 import math
 import multiprocessing
 import pathlib
 import time
-from datetime import datetime, timedelta, timezone
-from typing import Dict, List, Optional
+from typing import Dict, List, Literal, Optional
 
 from obspy import Stream, Trace, UTCDateTime  # type: ignore [import-untyped]
 from obspy.clients.fdsn import Client  # type: ignore [import-untyped]
@@ -13,9 +12,9 @@ from obspy.clients.fdsn.header import (  # type: ignore [import-untyped]
 )
 from obspy.clients.iris.client import Client as Iris  # type: ignore [import-untyped]
 from obspy.core.inventory import Inventory  # type: ignore [import-untyped]
-from pydantic import BaseModel, Field
 from ratelimiter import RateLimiter  # type: ignore [import-untyped]
 
+from ffm.acquisition.strongmotionquery import StrongMotionQuery
 from ffm.acquisition.teleseismicquery import TeleseismicQuery
 
 
@@ -24,33 +23,105 @@ def rate_limit_iris(until):
     print("Rate limited, sleeping for {:d} seconds".format(duration))
 
 
-class IrisQuery(TeleseismicQuery):
+class IrisQuery:
+    def __init__(
+        self,
+        data_type: Literal["strongmotion", "teleseismic"],
+        eventid: str,
+        source: str,
+    ):
+        if data_type == "strongmotion":
+            self.query = StrongMotionQuery.from_id(eventid, source)
+        else:
+            self.query = TeleseismicQuery.from_id(eventid, source)
 
-    def get_data(
+    def get_strongmotion_data(
+        self,
+        networks: List[str] = [],
+        debug: bool = False,
+        include_gfz: bool = False,
+    ) -> Stream:
+        """Get data for specified networks (and optionally stations) from EARTHSCOPE with Obspy"""
+        client = Client("EARTHSCOPE", debug=debug)
+        try:
+            client_gfz = Client("GFZ")  # For stations belonging to CX network
+        except:
+            pass
+        # list of network, station
+        traces = []
+        for network in networks:
+            print(f"Querying network: {network}")
+            try:
+                inventory: Inventory = client.get_stations(
+                    channel="HN*",
+                    endtime=UTCDateTime(self.query.endtime),
+                    latitude=self.query.latitude,
+                    level="response",
+                    longitude=self.query.longitude,
+                    maxradius=self.query.max_distance,
+                    minradius=self.query.min_distance,
+                    network=network,
+                    starttime=UTCDateTime(self.query.starttime),
+                )
+                for station in inventory.networks[0].stations:
+                    traces += self._get_data(network, station.code, "HN*", debug)
+            except:
+                logging.info(f"No data for {network}")
+        if include_gfz:
+            print(f"Querying network: CX for GFZ")
+            try:
+                # HL = triggered strong motion data 80-100Hz
+                gfz_inventory = client_gfz.get_stations(
+                    starttime=UTCDateTime(self.query.starttime),
+                    endtime=UTCDateTime(self.query.endtime),
+                    network="CX",
+                    channel="HL*",
+                    level="response",
+                    maxradius=self.query.max_distance,
+                    minradius=self.query.min_distance,
+                    latitude=self.query.latitude,
+                    longitude=self.query.longitude,
+                )
+                print("Retrieved GFZ inventory")
+                for station in gfz_inventory.networks[0].stations:
+                    traces += self._get_data(network, station.code, "HL*", debug)
+            except Exception as e:
+                logging.warning(e)
+                pass
+        stream = Stream(traces)
+        stream.merge(-1)
+        return stream
+
+    def get_teleseismic_data(
         self,
         networks: List[str] = [],
         stations: Optional[Dict[str, Dict[str, List[str]]]] = None,
         debug: bool = False,
     ) -> Stream:
-        """Get data for specified networks (and optionally stations) from IRIS with Obspy"""
-        client = Client("IRIS", debug=debug)
+        """Get data for specified networks (and optionally stations) from EARTHSCOPE with Obspy"""
+        client = Client("EARTHSCOPE", debug=debug)
         # list of network, station
         traces = []
         for network in networks:
             print(f"Querying network: {network}")
             inventory: Inventory = client.get_stations(
                 channel="BH*",
-                endtime=UTCDateTime(self.endtime),
-                latitude=self.latitude,
+                endtime=UTCDateTime(self.query.endtime),
+                latitude=self.query.latitude,
                 level="response",
-                longitude=self.longitude,
-                maxradius=self.max_distance,
-                minradius=self.min_distance,
+                longitude=self.query.longitude,
+                maxradius=self.query.max_distance,
+                minradius=self.query.min_distance,
                 network=network,
-                starttime=UTCDateTime(self.starttime),
+                starttime=UTCDateTime(self.query.starttime),
             )
             for station in inventory.networks[0].stations:
-                traces += self._get_data(network, station.code, "BH*", debug)
+                traces += self._get_data(
+                    network,
+                    station.code,
+                    "BH*",
+                    debug,
+                )
         if stations is not None:
             for network_key, network_stations in stations.items():
                 for station_key, channels in network_stations.items():
@@ -72,16 +143,16 @@ class IrisQuery(TeleseismicQuery):
         self, network: str, station: str, channel: str, debug: bool = False
     ) -> list:
         """Get data for a given network, station, channel configuration"""
-        client = Client("IRIS", debug=debug)
+        client = Client("EARTHSCOPE", debug=debug)
         traces = []
         try:
             stream: Stream = client.get_waveforms(
                 network=network,
                 station=station,
                 channel=channel,
-                starttime=UTCDateTime(self.starttime),
+                starttime=UTCDateTime(self.query.starttime),
                 location="*",
-                endtime=UTCDateTime(self.endtime),
+                endtime=UTCDateTime(self.query.endtime),
             )
             traces += stream.traces
         except FDSNNoDataException as e:
@@ -98,16 +169,17 @@ class IrisQuery(TeleseismicQuery):
 
     @RateLimiter(max_calls=10, period=1, callback=rate_limit_iris)
     def _get_response(self, trace: Trace, debug: bool = False) -> Trace:
-        """Get the trace station's response from IRIS and set the traces
+        """Get the trace station's response from EARTHSCOPE and set the traces
         stats with the response poles and zeros"""
-        client: Iris = Iris(debug=debug)
-        response = client.sacpz(
+        client = Client("EARTHSCOPE", debug=debug)
+        response = client.get_stations(
             network=trace.stats.network,
             station=trace.stats.station,
             location=trace.stats.location,
             channel=trace.stats.channel,
-            starttime=UTCDateTime(self.starttime),
-            endtime=UTCDateTime(self.endtime),
+            starttime=UTCDateTime(self.query.starttime),
+            endtime=UTCDateTime(self.query.endtime),
+            level="response",
         )
 
         trace.stats.response = response
@@ -127,5 +199,6 @@ class IrisQuery(TeleseismicQuery):
             filename=str(directory / filename),
             format="sac",
         )
-        with open(directory / ("SAC_PZs_" + filename), "w") as f:
-            f.write(trace.stats.response.decode())
+        trace.stats.response.write(
+            str(directory / ("SAC_PZs_" + filename)), format="SACPZ"
+        )

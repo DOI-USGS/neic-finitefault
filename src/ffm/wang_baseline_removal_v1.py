@@ -145,7 +145,7 @@ def _wang_baselines(
         return trace, trace, trace, None
     args = (disp_data, a1, a2, a3, time_p, time_end, delta)
 
-    res = shgo(_function, bounds, iters=6, constraints=constraint0, args=args)
+    res = shgo(_function, bounds, iters=6, constraints=constraint0, args=args)  # type: ignore [arg-type]
     time1, time2 = res.x
     success = res.success
     if not success:

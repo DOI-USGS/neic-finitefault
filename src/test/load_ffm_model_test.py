@@ -5,7 +5,7 @@ import tempfile
 import numpy as np
 
 from ffm.fault_plane import point_sources_param
-from ffm.get_outputs import read_solution_static_format
+from ffm.model.result.solution import Solution
 from ffm.load_ffm_model import load_ffm_model
 
 from .testutils import RESULTS_DIR, get_segments_data, get_tensor_info
@@ -34,10 +34,9 @@ def test_load_ffm_model():
         solucion_model = load_ffm_model(
             segments_data=segments, point_sources=point_sources, directory=tempdir
         )
-        target_static = read_solution_static_format(
-            segments["segments"],
-            tempdir,
-        )
+        target_static = Solution.from_static_solution_file(
+            segments_data=segments, solution_filepath=tempdir / "Solution.txt"
+        )._old_format
         for key in target_static:
             if key in solucion_model:
                 np.testing.assert_array_almost_equal(

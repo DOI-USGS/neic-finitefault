@@ -5,8 +5,6 @@ from tempfile import mkdtemp
 from test.testutils import MockResponse
 from unittest import mock
 
-import numpy as np
-from obspy.core import Stream, Trace
 from typer.testing import CliRunner
 
 from ffm.ffm_admin.acquisition import app
@@ -31,6 +29,11 @@ DETAIL = {
                         "tensor-mtp": "3E+18",
                         "tensor-mtt": "-2E+18",
                         "sourcetime-duration": "7",
+                        "review-status": "reviewed",
+                        "derived-magnitude-type": "Mww",
+                        "derived-depth": 10.1,
+                        "derived-latitude": -14.89341,
+                        "derived-longitude": 166.60131,
                     },
                 },
             ],
@@ -38,12 +41,14 @@ DETAIL = {
                 {
                     "source": "us",
                     "properties": {
-                        "depth": "10",
+                        "magnitude": 6.4,
                         "eventtime": "2026-02-14T02:27:37.951Z",
-                        "latitude": "-14.8934",
-                        "longitude": "166.6013",
+                        "latitude": -14.8934,
+                        "longitude": 166.6013,
+                        "depth": 10,
+                        "review-status": "reviewed",
                     },
-                }
+                },
             ],
         },
     },
@@ -69,9 +74,9 @@ def test_cmt():
 event name: eventid
 time shift: 3.5
 half duration: 3.5
-latitude: -14.8934
-longitude: 166.6013
-depth: 10.0
+latitude: -14.89341
+longitude: 166.60131
+depth: 10.1
 Mrr: 3e+25
 Mtt: -2e+25
 Mpp: -2e+24

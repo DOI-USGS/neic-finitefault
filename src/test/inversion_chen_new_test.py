@@ -3,9 +3,11 @@ import json
 import logging
 import os
 import pathlib
+from re import L
 import shutil
 import subprocess
 import tempfile
+from unittest import mock
 
 import numpy as np
 import pytest
@@ -20,6 +22,7 @@ from ffm.inversion_chen_new import (
     processing,
     set_directory_structure,
     writing_inputs0,
+    __update_types,
 )
 from ffm.management import default_dirs
 from ffm.seismic_tensor import get_tensor, planes_from_tensor
@@ -421,10 +424,6 @@ def test_automatic_cgnss():
         shutil.rmtree(tempdir)
 
 
-@pytest.mark.skipif(
-    os.getenv("RUNNER", False) in [True, "true"],
-    reason="Pipeline does not have the required memory",
-)
 def test_automatic_gnss():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     _handle_lowin()
@@ -603,8 +602,9 @@ def test_automatic_strong_motion():
 
 
 @pytest.mark.skipif(
-    os.getenv("RUNNER", False) in [True, "true"],
-    reason="Pipeline does not have the required memory",
+    os.getenv("RUNNER", False) in [True, "true"]
+    or os.getenv("RUN_ALL", False) in [False, "false"],
+    reason="Runner lacks memory/cpu",
 )
 def test_automatic_tele():
     tempdir = pathlib.Path(tempfile.mkdtemp())
@@ -685,3 +685,76 @@ def test_automatic_tele():
                 )
     finally:
         shutil.rmtree(tempdir)
+
+
+def test_no_data():
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    _handle_lowin()
+    try:
+        set_directory_structure(TENSOR, directory=tempdir)
+        ddirs = json.dumps(default_dirs(config_path=DATA_DIR / "config.ini"))
+        with open(DATA_DIR / "config.ini") as f:
+            config = f.read().replace("/home/user/neic-finitefault", str(HOME))
+        with open(tempdir / "config.ini", "w") as wf:
+            wf.write(config)
+        updated_default_dirs = json.loads(
+            ddirs.replace("/home/user/neic-finitefault", str(HOME))
+        )
+
+        # without graceful continue
+        with pytest.raises(Exception) as e:
+            automatic_usgs(
+                tensor_info=TENSOR,
+                data_type=[
+                    "surf",
+                    "body",
+                    "strong",
+                ],
+                dt_cgnss=None,
+                default_dirs=updated_default_dirs,
+                config_path=tempdir / "config.ini",
+                directory=tempdir / "20150916225432" / "ffm.0",
+            )
+        assert "No teleseismic data files found" in str(e.value)
+
+        # with graceful continue
+        shutil.copytree(END_TO_END_DIR / "data", tempdir / "data")
+        for file in os.listdir(tempdir / "data"):
+            if (
+                os.path.isfile(os.path.join(tempdir / "data", file))
+                and "gnss_data" in file
+            ):
+                shutil.copy2(
+                    os.path.join(tempdir / "data", file),
+                    tempdir / "20150916225432" / "ffm.0" / "data",
+                )
+        automatic_usgs(
+            tensor_info=TENSOR,
+            data_type=[
+                "surf",
+                "body",
+                "strong",
+                "gnss",
+                "imagery",
+            ],
+            dt_cgnss=None,
+            default_dirs=updated_default_dirs,
+            config_path=tempdir / "config.ini",
+            directory=tempdir / "20150916225432" / "ffm.0",
+            bypass_missing_types=True,
+        )
+
+    finally:
+        shutil.rmtree(tempdir)
+
+
+def test___update_types():
+    assert __update_types(
+        ["a", "b", "c"], types_to_add=[1], types_to_remove=["a", "c"]
+    ) == ["b", 1]
+
+    # test raises error
+    with pytest.raises(Exception) as e:
+        __update_types(["a", "b", "c"], types_to_remove=["a", "b", "c"])
+
+    assert "No valid data types" in str(e.value)
