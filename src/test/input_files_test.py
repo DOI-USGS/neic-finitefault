@@ -418,6 +418,30 @@ def test_write_files_wavelet_observed():
         shutil.rmtree(tempdir)
 
 
+def test_inputs_simmulated_annealing_rise_time_weight():
+    tempdir = pathlib.Path(tempfile.mkdtemp())
+    try:
+        inputs_simmulated_annealing(
+            {
+                "seismic_moment": "test_moment",
+                "moment_weight": "test_moment_weight",
+                "slip_weight": "test_slip_weight",
+                "time_weight": "test_time_weight",
+                "max_source_dur": "test_source",
+                "iterations": "test_iter",
+                "cooling_rate": "test_cool",
+                "initial_temperature": "test_temp",
+                "rise_time_weight": "test_rise_weight",
+            },
+            tempdir,
+        )
+        with open(tempdir / "annealing.txt") as a:
+            lines = a.read().splitlines()
+        assert lines[1].endswith("test_time_weight test_rise_weight")
+    finally:
+        shutil.rmtree(tempdir)
+
+
 def test_write_green_file():
     tempdir = pathlib.Path(tempfile.mkdtemp())
     try:

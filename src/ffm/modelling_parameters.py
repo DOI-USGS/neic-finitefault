@@ -120,12 +120,14 @@ def modelling_prop(
     moment_weight = 0.1
     slip_weight = 0.15
     time_weight = 0.15
+    rise_time_weight = 0
     dictionary = {
         "initial_temperature": 0.01,
         "seismic_moment": moment_mag,
         "moment_weight": moment_weight,
         "slip_weight": slip_weight,
         "time_weight": time_weight,
+        "rise_time_weight": rise_time_weight,
         "max_source_dur": syn_len,
         "iterations": 250,
         "cooling_rate": 0.970,
